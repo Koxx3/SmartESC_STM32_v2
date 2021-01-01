@@ -222,6 +222,48 @@ __weak bool UI_SetReg(UI_Handle_t *pHandle, MC_Protocol_REG_t bRegID, int32_t wV
     }
     break;
 
+  case MC_PROTOCOL_REG_OBSERVER_CR_C1:
+    {
+      uint32_t hUICfg = pHandle->pUICfg[pHandle->bSelectedDrive];
+      SpeednPosFdbk_Handle_t* pSPD = MC_NULL;
+      int16_t hC1,hC2;
+      if (MAIN_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorMain;
+      }
+      if (AUX_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorAux;
+      }
+      if (pSPD != MC_NULL)
+      {
+        STO_CR_GetObserverGains((STO_CR_Handle_t*)pSPD,&hC1,&hC2);
+        STO_CR_SetObserverGains((STO_CR_Handle_t*)pSPD,(int16_t)wValue,hC2);
+      }
+    }
+    break;
+
+  case MC_PROTOCOL_REG_OBSERVER_CR_C2:
+    {
+      uint32_t hUICfg = pHandle->pUICfg[pHandle->bSelectedDrive];
+      SpeednPosFdbk_Handle_t* pSPD = MC_NULL;
+      int16_t hC1,hC2;
+      if (MAIN_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorMain;
+      }
+      if (AUX_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorAux;
+      }
+      if (pSPD != MC_NULL)
+      {
+        STO_CR_GetObserverGains((STO_CR_Handle_t*)pSPD,&hC1,&hC2);
+        STO_CR_SetObserverGains((STO_CR_Handle_t*)pSPD,hC1,(int16_t)wValue);
+      }
+    }
+    break;
+
   case MC_PROTOCOL_REG_IQ_SPEEDMODE:
     {
       MCI_SetIdref(pMCI,(int16_t)wValue);
@@ -423,6 +465,200 @@ __weak int32_t UI_GetReg(UI_Handle_t *pHandle, MC_Protocol_REG_t bRegID, bool * 
     case MC_PROTOCOL_REG_FLUX_KD:
     {
       bRetVal = (int32_t)PID_GetKD(pMCT->pPIDId);
+    }
+    break;
+
+    case MC_PROTOCOL_REG_OBSERVER_CR_C1:
+    {
+      uint32_t hUICfg = pHandle->pUICfg[pHandle->bSelectedDrive];
+      SpeednPosFdbk_Handle_t* pSPD = MC_NULL;
+      int16_t hC1,hC2;
+      if (MAIN_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorMain;
+      }
+      if (AUX_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorAux;
+      }
+      if (pSPD != MC_NULL)
+      {
+        STO_CR_GetObserverGains((STO_CR_Handle_t*)pSPD,&hC1,&hC2);
+      }
+      bRetVal = (int32_t)hC1;
+    }
+    break;
+
+    case MC_PROTOCOL_REG_OBSERVER_CR_C2:
+    {
+      uint32_t hUICfg = pHandle->pUICfg[pHandle->bSelectedDrive];
+      SpeednPosFdbk_Handle_t* pSPD = MC_NULL;
+      int16_t hC1,hC2;
+      if (MAIN_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorMain;
+      }
+      if (AUX_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorAux;
+      }
+      if (pSPD != MC_NULL)
+      {
+        STO_CR_GetObserverGains((STO_CR_Handle_t*)pSPD,&hC1,&hC2);
+      }
+      bRetVal = (int32_t)hC2;
+    }
+    break;
+
+    case MC_PROTOCOL_REG_OBS_CR_EL_ANGLE:
+    {
+      uint32_t hUICfg = pHandle->pUICfg[pHandle->bSelectedDrive];
+      SpeednPosFdbk_Handle_t* pSPD = MC_NULL;
+      if (MAIN_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorMain;
+      }
+      if (AUX_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorAux;
+      }
+      if (pSPD != MC_NULL)
+      {
+        bRetVal = SPD_GetElAngle(pSPD);
+      }
+    }
+    break;
+
+    case MC_PROTOCOL_REG_OBS_CR_ROT_SPEED:
+    {
+      uint32_t hUICfg = pHandle->pUICfg[pHandle->bSelectedDrive];
+      SpeednPosFdbk_Handle_t* pSPD = MC_NULL;
+      if (MAIN_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorMain;
+      }
+      if (AUX_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorAux;
+      }
+      if (pSPD != MC_NULL)
+      {
+        bRetVal = SPD_GetS16Speed(pSPD);
+      }
+    }
+    break;
+
+    case MC_PROTOCOL_REG_OBS_CR_I_ALPHA:
+    {
+      uint32_t hUICfg = pHandle->pUICfg[pHandle->bSelectedDrive];
+      SpeednPosFdbk_Handle_t* pSPD = MC_NULL;
+      if (MAIN_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorMain;
+      }
+      if (AUX_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorAux;
+      }
+      if (pSPD != MC_NULL)
+      {
+        bRetVal = STO_CR_GetEstimatedCurrent((STO_CR_Handle_t*)pSPD).alpha;
+      }
+    }
+    break;
+
+    case MC_PROTOCOL_REG_OBS_CR_I_BETA:
+    {
+      uint32_t hUICfg = pHandle->pUICfg[pHandle->bSelectedDrive];
+      SpeednPosFdbk_Handle_t* pSPD = MC_NULL;
+      if (MAIN_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorMain;
+      }
+      if (AUX_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorAux;
+      }
+      if (pSPD != MC_NULL)
+      {
+        bRetVal = STO_CR_GetEstimatedCurrent((STO_CR_Handle_t*)pSPD).beta;
+      }
+    }
+    break;
+
+    case MC_PROTOCOL_REG_OBS_CR_BEMF_ALPHA:
+    {
+      uint32_t hUICfg = pHandle->pUICfg[pHandle->bSelectedDrive];
+      SpeednPosFdbk_Handle_t* pSPD = MC_NULL;
+      if (MAIN_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorMain;
+      }
+      if (AUX_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorAux;
+      }
+      if (pSPD != MC_NULL)
+      {
+        bRetVal = STO_CR_GetEstimatedBemf((STO_CR_Handle_t*)pSPD).alpha;
+      }
+    }
+    break;
+
+    case MC_PROTOCOL_REG_OBS_CR_BEMF_BETA:
+    {
+      uint32_t hUICfg = pHandle->pUICfg[pHandle->bSelectedDrive];
+      SpeednPosFdbk_Handle_t* pSPD = MC_NULL;
+      if (MAIN_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorMain;
+      }
+      if (AUX_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorAux;
+      }
+      if (pSPD != MC_NULL)
+      {
+        bRetVal = STO_CR_GetEstimatedBemf((STO_CR_Handle_t*)pSPD).beta;
+      }
+    }
+    break;
+
+    case MC_PROTOCOL_REG_EST_CR_BEMF_LEVEL:
+    {
+      uint32_t hUICfg = pHandle->pUICfg[pHandle->bSelectedDrive];
+      SpeednPosFdbk_Handle_t* pSPD = MC_NULL;
+      if (MAIN_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorMain;
+      }
+      if (AUX_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorAux;
+      }
+      if (pSPD != MC_NULL)
+      {
+        bRetVal = STO_CR_GetEstimatedBemfLevel((STO_CR_Handle_t*)pSPD) >> 16;
+      }
+    }
+    break;
+
+    case MC_PROTOCOL_REG_OBS_CR_BEMF_LEVEL:
+    {
+      uint32_t hUICfg = pHandle->pUICfg[pHandle->bSelectedDrive];
+      SpeednPosFdbk_Handle_t* pSPD = MC_NULL;
+      if (MAIN_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorMain;
+      }
+      if (AUX_SCFG_VALUE(hUICfg) == UI_SCODE_STO_CR)
+      {
+        pSPD = pMCT->pSpeedSensorAux;
+      }
+      if (pSPD != MC_NULL)
+      {
+        bRetVal = STO_CR_GetObservedBemfLevel((STO_CR_Handle_t*)pSPD) >> 16;
+      }
     }
     break;
 

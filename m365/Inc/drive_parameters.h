@@ -47,6 +47,37 @@
                                                            average mechanical speed in
                                                            0.1Hz resolution */
 #define HALL_MTPA  false
+/****** State Observer + CORDIC ***/
+#define CORD_VARIANCE_THRESHOLD           4  /*!<Maxiumum accepted
+                                                            variance on speed
+                                                            estimates (percentage) */
+#define CORD_F1                          16384
+#define CORD_F2                          8192
+#define CORD_F1_LOG                      LOG2(16384)
+#define CORD_F2_LOG                      LOG2(8192)
+
+/* State observer constants */
+#define CORD_GAIN1                       -24156
+#define CORD_GAIN2                       24403
+
+#define CORD_MEAS_ERRORS_BEFORE_FAULTS   3  /*!< Number of consecutive errors
+                                                           on variance test before a speed
+                                                           feedback error is reported */
+#define CORD_FIFO_DEPTH_DPP              64  /*!< Depth of the FIFO used
+                                                            to average mechanical speed
+                                                            in dpp format */
+#define CORD_FIFO_DEPTH_DPP_LOG          LOG2(64)
+
+#define CORD_FIFO_DEPTH_UNIT            64  /*!< Depth of the FIFO used
+                                                           to average mechanical speed
+                                                           in dpp format */
+#define CORD_MAX_ACCEL_DPPP              226  /*!< Maximum instantaneous
+                                                              electrical acceleration (dpp
+                                                              per control period) */
+#define CORD_BEMF_CONSISTENCY_TOL        64  /* Parameter for B-emf
+                                                           amplitude-speed consistency */
+#define CORD_BEMF_CONSISTENCY_GAIN       64  /* Parameter for B-emf
+                                                          amplitude-speed consistency */
 
 /* USER CODE BEGIN angle reconstruction M1 */
 #define REV_PARK_ANGLE_COMPENSATION_FACTOR 0
@@ -67,18 +98,18 @@
 #define REGULATION_EXECUTION_RATE     1    /*!< FOC execution rate in
                                                            number of PWM cycles */
 /* Gains values for torque and flux control loops */
-#define PID_TORQUE_KP_DEFAULT         2253
-#define PID_TORQUE_KI_DEFAULT         329
+#define PID_TORQUE_KP_DEFAULT         3649
+#define PID_TORQUE_KI_DEFAULT         1995
 #define PID_TORQUE_KD_DEFAULT         100
-#define PID_FLUX_KP_DEFAULT           2253
-#define PID_FLUX_KI_DEFAULT           329
+#define PID_FLUX_KP_DEFAULT           3649
+#define PID_FLUX_KI_DEFAULT           1995
 #define PID_FLUX_KD_DEFAULT           100
 
 /* Torque/Flux control loop gains dividers*/
-#define TF_KPDIV                      4096
+#define TF_KPDIV                      1024
 #define TF_KIDIV                      16384
 #define TF_KDDIV                      8192
-#define TF_KPDIV_LOG                  LOG2(4096)
+#define TF_KPDIV_LOG                  LOG2(1024)
 #define TF_KIDIV_LOG                  LOG2(16384)
 #define TF_KDDIV_LOG                  LOG2(8192)
 #define TFDIFFERENTIAL_TERM_ENABLING  DISABLE
@@ -103,7 +134,7 @@
 /* USER CODE END PID_SPEED_INTEGRAL_INIT_DIV */
 
 #define SPD_DIFFERENTIAL_TERM_ENABLING DISABLE
-#define IQMAX                          31770
+#define IQMAX                          4766
 
 /* Default settings */
 #define DEFAULT_CONTROL_MODE           STC_SPEED_MODE /*!< STC_TORQUE_MODE or
@@ -118,7 +149,7 @@
 #define UV_VOLTAGE_PROT_ENABLING        ENABLE
 #define OV_VOLTAGE_THRESHOLD_V          42 /*!< Over-voltage
                                                          threshold */
-#define UD_VOLTAGE_THRESHOLD_V          28 /*!< Under-voltage
+#define UD_VOLTAGE_THRESHOLD_V          10 /*!< Under-voltage
                                                           threshold */
 #if 0
 #define ON_OVER_VOLTAGE                 TURN_OFF_PWM /*!< TURN_OFF_PWM,
@@ -137,6 +168,24 @@
                                                           protection (if supported by
                                                           power stage) */
 /******************************   START-UP PARAMETERS   **********************/
+
+/* Observer start-up output conditions  */
+#define OBS_MINIMUM_SPEED_RPM          580
+
+#define NB_CONSECUTIVE_TESTS           2 /* corresponding to
+                                                         former NB_CONSECUTIVE_TESTS/
+                                                         (TF_REGULATION_RATE/
+                                                         MEDIUM_FREQUENCY_TASK_RATE) */
+#define SPEED_BAND_UPPER_LIMIT         17 /*!< It expresses how much
+                                                            estimated speed can exceed
+                                                            forced stator electrical
+                                                            without being considered wrong.
+                                                            In 1/16 of forced speed */
+#define SPEED_BAND_LOWER_LIMIT         15  /*!< It expresses how much
+                                                             estimated speed can be below
+                                                             forced stator electrical
+                                                             without being considered wrong.
+                                                             In 1/16 of forced speed */
 
 #define TRANSITION_DURATION            25  /* Switch over duration, ms */
 /******************************   BUS VOLTAGE Motor 1  **********************/

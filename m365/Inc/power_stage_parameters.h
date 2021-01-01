@@ -48,7 +48,7 @@
 
 /*  ICSs gains in case of isolated current sensors,
         amplification gain for shunts based sensing */
-#define AMPLIFICATION_GAIN            99.99
+#define AMPLIFICATION_GAIN            8.00
 
 /*** Noise parameters ***/
 #define TNOISE_NS                     2550
@@ -57,9 +57,9 @@
 
 /************ Temperature sensing section ***************/
 /* V[V]=V0+dV/dT[V/Celsius]*(T-T0)[Celsius]*/
-#define V0_V                          0.290 /*!< in Volts */
+#define V0_V                          1.650 /*!< in Volts */
 #define T0_C                          25 /*!< in Celsius degrees */
-#define dV_dT                         0.025 /*!< V/Celsius degrees */
+#define dV_dT                         0.031 /*!< V/Celsius degrees */
 #define T_MAX                         70 /*!< Sensor measured
                                                        temperature at maximum
                                                        power stage working
