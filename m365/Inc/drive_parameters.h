@@ -46,38 +46,7 @@
 #define HALL_AVERAGING_FIFO_DEPTH        6 /*!< depth of the FIFO used to
                                                            average mechanical speed in
                                                            0.1Hz resolution */
-#define HALL_MTPA  false
-/****** State Observer + CORDIC ***/
-#define CORD_VARIANCE_THRESHOLD           4  /*!<Maxiumum accepted
-                                                            variance on speed
-                                                            estimates (percentage) */
-#define CORD_F1                          16384
-#define CORD_F2                          8192
-#define CORD_F1_LOG                      LOG2(16384)
-#define CORD_F2_LOG                      LOG2(8192)
-
-/* State observer constants */
-#define CORD_GAIN1                       -24156
-#define CORD_GAIN2                       24403
-
-#define CORD_MEAS_ERRORS_BEFORE_FAULTS   3  /*!< Number of consecutive errors
-                                                           on variance test before a speed
-                                                           feedback error is reported */
-#define CORD_FIFO_DEPTH_DPP              64  /*!< Depth of the FIFO used
-                                                            to average mechanical speed
-                                                            in dpp format */
-#define CORD_FIFO_DEPTH_DPP_LOG          LOG2(64)
-
-#define CORD_FIFO_DEPTH_UNIT            64  /*!< Depth of the FIFO used
-                                                           to average mechanical speed
-                                                           in dpp format */
-#define CORD_MAX_ACCEL_DPPP              226  /*!< Maximum instantaneous
-                                                              electrical acceleration (dpp
-                                                              per control period) */
-#define CORD_BEMF_CONSISTENCY_TOL        64  /* Parameter for B-emf
-                                                           amplitude-speed consistency */
-#define CORD_BEMF_CONSISTENCY_GAIN       64  /* Parameter for B-emf
-                                                          amplitude-speed consistency */
+#define HALL_MTPA  true
 
 /* USER CODE BEGIN angle reconstruction M1 */
 #define REV_PARK_ANGLE_COMPENSATION_FACTOR 0
@@ -118,8 +87,8 @@
 #define SPEED_LOOP_FREQUENCY_HZ       1000 /*!<Execution rate of speed
                                                       regulation loop (Hz) */
 
-#define PID_SPEED_KP_DEFAULT          1000/(SPEED_UNIT/10) /* Workbench compute the gain for 01Hz unit*/
-#define PID_SPEED_KI_DEFAULT          700/(SPEED_UNIT/10) /* Workbench compute the gain for 01Hz unit*/
+#define PID_SPEED_KP_DEFAULT          400/(SPEED_UNIT/10) /* Workbench compute the gain for 01Hz unit*/
+#define PID_SPEED_KI_DEFAULT          50/(SPEED_UNIT/10) /* Workbench compute the gain for 01Hz unit*/
 #define PID_SPEED_KD_DEFAULT          0/(SPEED_UNIT/10) /* Workbench compute the gain for 01Hz unit*/
 /* Speed PID parameter dividers */
 #define SP_KPDIV                      16
@@ -137,9 +106,9 @@
 #define IQMAX                          4766
 
 /* Default settings */
-#define DEFAULT_CONTROL_MODE           STC_SPEED_MODE /*!< STC_TORQUE_MODE or
+#define DEFAULT_CONTROL_MODE           STC_TORQUE_MODE /*!< STC_TORQUE_MODE or
                                                         STC_SPEED_MODE */
-#define DEFAULT_TARGET_SPEED_RPM      1500
+#define DEFAULT_TARGET_SPEED_RPM      0
 #define DEFAULT_TARGET_SPEED_UNIT      (DEFAULT_TARGET_SPEED_RPM*SPEED_UNIT/_RPM)
 #define DEFAULT_TORQUE_COMPONENT       0
 #define DEFAULT_FLUX_COMPONENT         0
@@ -169,24 +138,6 @@
                                                           power stage) */
 /******************************   START-UP PARAMETERS   **********************/
 
-/* Observer start-up output conditions  */
-#define OBS_MINIMUM_SPEED_RPM          580
-
-#define NB_CONSECUTIVE_TESTS           2 /* corresponding to
-                                                         former NB_CONSECUTIVE_TESTS/
-                                                         (TF_REGULATION_RATE/
-                                                         MEDIUM_FREQUENCY_TASK_RATE) */
-#define SPEED_BAND_UPPER_LIMIT         17 /*!< It expresses how much
-                                                            estimated speed can exceed
-                                                            forced stator electrical
-                                                            without being considered wrong.
-                                                            In 1/16 of forced speed */
-#define SPEED_BAND_LOWER_LIMIT         15  /*!< It expresses how much
-                                                             estimated speed can be below
-                                                             forced stator electrical
-                                                             without being considered wrong.
-                                                             In 1/16 of forced speed */
-
 #define TRANSITION_DURATION            25  /* Switch over duration, ms */
 /******************************   BUS VOLTAGE Motor 1  **********************/
 #define  M1_VBUS_SAMPLING_TIME  LL_ADC_SAMPLING_CYCLE(1)
@@ -196,6 +147,12 @@
 #define ADC_SAMPLING_CYCLES (1 + SAMPLING_CYCLE_CORRECTION)
 
 /******************************   ADDITIONAL FEATURES   **********************/
+
+/*  Feed-forward parameters */
+#define FEED_FORWARD_CURRENT_REG_ENABLING ENABLE
+#define CONSTANT1_Q                    934538
+#define CONSTANT1_D                    934538
+#define CONSTANT2_QD                   75731
 
 /*** On the fly start-up ***/
 

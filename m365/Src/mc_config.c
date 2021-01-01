@@ -103,6 +103,18 @@ PID_Handle_t PIDIdHandle_M1 =
 };
 
 /**
+  * @brief  FeedForwardCtrl parameters Motor 1
+  */
+FF_Handle_t FF_M1 =
+{
+  .hVqdLowPassFilterBW    = M1_VQD_SW_FILTER_BW_FACTOR,
+  .wDefConstant_1D        = (int32_t)CONSTANT1_D,
+  .wDefConstant_1Q        = (int32_t)CONSTANT1_Q,
+  .wDefConstant_2         = (int32_t)CONSTANT2_QD,
+  .hVqdLowPassFilterBWLOG = M1_VQD_SW_FILTER_BW_FACTOR_LOG
+};
+
+/**
   * @brief  SpeednTorque Controller parameters Motor 1
   */
 SpeednTorqCtrl_Handle_t SpeednTorqCtrlM1 =
@@ -159,45 +171,6 @@ PWMC_R3_2_Handle_t PWM_Handle_M1 =
   .PhaseCOffset = 0,
 
   .pParams_str = &R3_2_ParamsM1
-};
-
-/**
-  * @brief  SpeedNPosition sensor parameters Motor 1 - State Observer + CORDIC
-  */
-STO_CR_Handle_t STO_CR_M1 =
-{
-  ._Super = {
-    .bElToMecRatio                     =	POLE_PAIR_NUM,
-    .SpeedUnit                         =  SPEED_UNIT,
-    .hMaxReliableMecSpeedUnit          =	(uint16_t)(1.15*MAX_APPLICATION_SPEED_UNIT),
-    .hMinReliableMecSpeedUnit          =	(uint16_t)(MIN_APPLICATION_SPEED_UNIT),
-    .bMaximumSpeedErrorsNumber         =	MEAS_ERRORS_BEFORE_FAULTS,
-    .hMaxReliableMecAccelUnitP         =	65535,
-    .hMeasurementFrequency             =	TF_REGULATION_RATE_SCALED,
-    .DPPConvFactor                     =  DPP_CONV_FACTOR,
-    },
-  .hC1                                 =	CORD_C1,
-  .hC2                                 =	CORD_C2,
-  .hC3                                 =	CORD_C3,
-  .hC4                                 =	CORD_C4,
-  .hC5                                 =	CORD_C5,
-  .hF1                                 =	CORD_F1,
-  .hF2                                 =	CORD_F2,
-  .SpeedBufferSizeUnit                =	CORD_FIFO_DEPTH_UNIT,
-  .SpeedBufferSizedpp                 =	CORD_FIFO_DEPTH_DPP,
-  .VariancePercentage                 =	CORD_PERCENTAGE_FACTOR,
-  .SpeedValidationBand_H              =	SPEED_BAND_UPPER_LIMIT,
-  .SpeedValidationBand_L              =	SPEED_BAND_LOWER_LIMIT,
-  .MinStartUpValidSpeed               =	OBS_MINIMUM_SPEED_UNIT,
-  .StartUpConsistThreshold            =	NB_CONSECUTIVE_TESTS,
-  .Reliability_hysteresys             =	CORD_MEAS_ERRORS_BEFORE_FAULTS,
-  .MaxInstantElAcceleration           =	CORD_MAX_ACCEL_DPPP,
-  .BemfConsistencyCheck               =	CORD_BEMF_CONSISTENCY_TOL,
-  .BemfConsistencyGain                =	CORD_BEMF_CONSISTENCY_GAIN,
-  .MaxAppPositiveMecSpeedUnit         =	(uint16_t)(MAX_APPLICATION_SPEED_UNIT*1.15),
-  .F1LOG                              =	CORD_F1_LOG,
-  .F2LOG                              =	CORD_F2_LOG,
-  .SpeedBufferSizedppLOG              =	CORD_FIFO_DEPTH_DPP_LOG
 };
 
 /**
