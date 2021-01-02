@@ -1,0 +1,13 @@
+user_interface.c:61:13:UI_Init	8	static
+user_interface.c:76:13:UI_SelectMC	0	static
+user_interface.c:95:16:UI_GetSelectedMC	0	static
+user_interface.c:107:17:UI_GetSelectedMCConfig	0	static
+user_interface.c:120:13:UI_SetReg	32	static
+user_interface.c:267:16:UI_GetReg	120	static
+user_interface.c:664:13:UI_ExecCmd	8	static
+user_interface.c:757:13:UI_ExecSpeedRamp	8	static
+user_interface.c:774:13:UI_ExecTorqueRamp	8	static
+user_interface.c:800:13:UI_GetRevupData	24	static
+user_interface.c:831:13:UI_SetRevupData	24	static
+user_interface.c:852:13:UI_SetCurrentReferences	16	static
+user_interface.c:871:13:UI_GetMPInfo	0	static

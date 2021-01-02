@@ -1,0 +1,6 @@
+state_machine.c:48:13:STM_Init	0	static
+state_machine.c:264:16:STM_FaultProcessing	8	static
+state_machine.c:72:13:STM_NextState	8	static
+state_machine.c:305:16:STM_GetState	0	static
+state_machine.c:321:13:STM_FaultAcknowledged	0	static
+state_machine.c:347:17:STM_GetFaultState	0	static

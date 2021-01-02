@@ -1,0 +1,7 @@
+mc_math.c:115:20:MCM_Clarke	16	static
+mc_math.c:338:24:MCM_Trig_Functions	8	static
+mc_math.c:184:13:MCM_Park	32	static
+mc_math.c:288:20:MCM_Rev_Park	32	static
+mc_math.c:391:16:MCM_Sqrt	0	static
+mc_math.c:440:16:MCM_PhaseComputation	8	static
+mc_math.c:619:17:MCM_floatToIntBit	0	static

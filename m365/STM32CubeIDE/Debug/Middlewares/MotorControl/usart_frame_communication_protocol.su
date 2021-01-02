@@ -1,0 +1,8 @@
+usart_frame_communication_protocol.c:64:13:UFCP_Init	0	static
+usart_frame_communication_protocol.c:151:13:UFCP_TX_IRQ_Handler	8	static
+usart_frame_communication_protocol.c:224:16:UFCP_Receive	0	static
+usart_frame_communication_protocol.c:246:16:UFCP_Send	24	static
+usart_frame_communication_protocol.c:74:15:UFCP_RX_IRQ_Handler	24	static
+usart_frame_communication_protocol.c:201:13:UFCP_OVR_IRQ_Handler	16	static
+usart_frame_communication_protocol.c:214:13:UFCP_TIMEOUT_IRQ_Handler	16	static
+usart_frame_communication_protocol.c:274:13:UFCP_AbortReceive	0	static

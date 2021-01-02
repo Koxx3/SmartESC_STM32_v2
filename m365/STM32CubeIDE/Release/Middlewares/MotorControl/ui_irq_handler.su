@@ -1,0 +1,2 @@
+ui_irq_handler.c:110:6:UIIRQ_SetIrqHandler	0	static
+ui_irq_handler.c:126:7:UIIRQ_ExecIrqHandler	4	static

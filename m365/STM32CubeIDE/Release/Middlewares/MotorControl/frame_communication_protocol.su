@@ -1,0 +1,5 @@
+frame_communication_protocol.c:54:13:FCP_Init	0	static
+frame_communication_protocol.c:71:13:FCP_SetClient	0	static
+frame_communication_protocol.c:86:13:FCP_SetTimeout	0	static
+frame_communication_protocol.c:94:16:FCP_CalcCRC	0	static
+frame_communication_protocol.c:117:16:FCP_IsFrameValid	8	static
