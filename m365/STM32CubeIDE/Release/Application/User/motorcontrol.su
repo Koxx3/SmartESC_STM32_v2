@@ -1,2 +1,0 @@
-motorcontrol.c:52:13:MX_MotorControl_Init	24	static
-motorcontrol.c:62:6:vPortSetupTimerInterrupt	8	static

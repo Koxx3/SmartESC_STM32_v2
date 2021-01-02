@@ -1,6 +1,0 @@
-main.c:99:6:StartLEDTask	8	static
-main.c:658:13:startMediumFrequencyTask	8	static
-main.c:211:6:SystemClock_Config	96	static,ignoring_inline_asm
-main.c:118:5:main	120	static,ignoring_inline_asm
-main.c:677:6:HAL_TIM_PeriodElapsedCallback	0	static
-main.c:694:6:Error_Handler	0	static,ignoring_inline_asm

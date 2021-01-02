@@ -1,7 +1,0 @@
-hall_speed_pos_fdbk.c:86:13:HALL_Init	20	static
-hall_speed_pos_fdbk.c:182:13:HALL_Clear	16	static
-hall_speed_pos_fdbk.c:238:16:HALL_CalcElAngle	8	static
-hall_speed_pos_fdbk.c:276:13:HALL_CalcAvrgMecSpeedUnit	16	static
-hall_speed_pos_fdbk.c:356:15:HALL_TIMx_CC_IRQHandler	20	static
-hall_speed_pos_fdbk.c:648:15:HALL_TIMx_UP_IRQHandler	16	static
-hall_speed_pos_fdbk.c:757:13:HALL_SetMecAngle	0	static
