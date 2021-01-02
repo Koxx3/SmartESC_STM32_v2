@@ -180,9 +180,8 @@ int main(void)
   safetyHandle = osThreadNew(StartSafetyTask, NULL, &safety_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
-
-  LEDHandle = osThreadNew(StartLEDTask, NULL, &LED_attributes);
   /* add threads, ... */
+  LEDHandle = osThreadNew(StartLEDTask, NULL, &LED_attributes);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
