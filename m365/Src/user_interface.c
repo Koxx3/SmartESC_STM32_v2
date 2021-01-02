@@ -228,33 +228,6 @@ __weak bool UI_SetReg(UI_Handle_t *pHandle, MC_Protocol_REG_t bRegID, int32_t wV
     }
     break;
 
-  case MC_PROTOCOL_REG_FF_1Q:
-    {
-      FF_TuningStruct_t sNewConstants;
-      sNewConstants = FF_GetFFConstants(pMCT->pFF);
-      sNewConstants.wConst_1Q = wValue;
-      FF_SetFFConstants(pMCT->pFF,sNewConstants);
-    }
-    break;
-
-  case MC_PROTOCOL_REG_FF_1D:
-    {
-      FF_TuningStruct_t sNewConstants;
-      sNewConstants = FF_GetFFConstants(pMCT->pFF);
-      sNewConstants.wConst_1D = wValue;
-      FF_SetFFConstants(pMCT->pFF,sNewConstants);
-    }
-    break;
-
-  case MC_PROTOCOL_REG_FF_2:
-    {
-      FF_TuningStruct_t sNewConstants;
-      sNewConstants = FF_GetFFConstants(pMCT->pFF);
-      sNewConstants.wConst_2 = wValue;
-      FF_SetFFConstants(pMCT->pFF,sNewConstants);
-    }
-    break;
-
   default:
     retVal = false;
     break;
@@ -498,48 +471,6 @@ __weak int32_t UI_GetReg(UI_Handle_t *pHandle, MC_Protocol_REG_t bRegID, bool * 
       {
         bRetVal = SPD_GetS16Speed(pSPD);
       }
-    }
-    break;
-
-    case MC_PROTOCOL_REG_FF_1Q:
-    {
-      bRetVal = FF_GetFFConstants(pMCT->pFF).wConst_1Q;
-    }
-    break;
-
-    case MC_PROTOCOL_REG_FF_1D:
-    {
-      bRetVal = FF_GetFFConstants(pMCT->pFF).wConst_1D;
-    }
-    break;
-
-   case MC_PROTOCOL_REG_FF_2:
-    {
-      bRetVal = FF_GetFFConstants(pMCT->pFF).wConst_2;
-    }
-    break;
-
-    case MC_PROTOCOL_REG_FF_VQ:
-    {
-      bRetVal = FF_GetVqdff(pMCT->pFF).q;
-    }
-    break;
-
-    case MC_PROTOCOL_REG_FF_VD:
-    {
-      bRetVal = FF_GetVqdff(pMCT->pFF).d;
-    }
-    break;
-
-    case MC_PROTOCOL_REG_FF_VQ_PIOUT:
-    {
-      bRetVal = FF_GetVqdAvPIout(pMCT->pFF).q;
-    }
-    break;
-
-    case MC_PROTOCOL_REG_FF_VD_PIOUT:
-    {
-      bRetVal = FF_GetVqdAvPIout(pMCT->pFF).d;
     }
     break;
 

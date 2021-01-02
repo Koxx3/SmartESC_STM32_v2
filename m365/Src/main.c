@@ -19,6 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "cmsis_os.h"
 #include "motorcontrol.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -50,7 +51,28 @@ TIM_HandleTypeDef htim3;
 
 UART_HandleTypeDef huart3;
 
+/* Definitions for mediumFrequency */
+osThreadId_t mediumFrequencyHandle;
+const osThreadAttr_t mediumFrequency_attributes = {
+  .name = "mediumFrequency",
+  .priority = (osPriority_t) osPriorityNormal,
+  .stack_size = 128 * 4
+};
+/* Definitions for safety */
+osThreadId_t safetyHandle;
+const osThreadAttr_t safety_attributes = {
+  .name = "safety",
+  .priority = (osPriority_t) osPriorityAboveNormal,
+  .stack_size = 128 * 4
+};
 /* USER CODE BEGIN PV */
+
+osThreadId_t LEDHandle;
+const osThreadAttr_t LED_attributes = {
+  .name = "LED",
+  .priority = (osPriority_t) osPriorityNormal,
+  .stack_size = 128 * 4
+};
 
 /* USER CODE END PV */
 
@@ -63,6 +85,9 @@ static void MX_ADC2_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_USART3_UART_Init(void);
+void startMediumFrequencyTask(void *argument);
+extern void StartSafetyTask(void *argument);
+
 static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
 
@@ -70,6 +95,19 @@ static void MX_NVIC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+void StartLEDTask(void * argument)
+{
+  /* Infinite loop */
+  for(;;)
+  {
+	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, pdFALSE);
+	osDelay(200);
+	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, pdTRUE);
+    osDelay(200);
+  }
+}
+
 
 /* USER CODE END 0 */
 
@@ -115,6 +153,46 @@ int main(void)
 
   /* USER CODE END 2 */
 
+  /* Init scheduler */
+  osKernelInitialize();
+
+  /* USER CODE BEGIN RTOS_MUTEX */
+  /* add mutexes, ... */
+  /* USER CODE END RTOS_MUTEX */
+
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* add semaphores, ... */
+  /* USER CODE END RTOS_SEMAPHORES */
+
+  /* USER CODE BEGIN RTOS_TIMERS */
+  /* start timers, add new ones, ... */
+  /* USER CODE END RTOS_TIMERS */
+
+  /* USER CODE BEGIN RTOS_QUEUES */
+  /* add queues, ... */
+  /* USER CODE END RTOS_QUEUES */
+
+  /* Create the thread(s) */
+  /* creation of mediumFrequency */
+  mediumFrequencyHandle = osThreadNew(startMediumFrequencyTask, NULL, &mediumFrequency_attributes);
+
+  /* creation of safety */
+  safetyHandle = osThreadNew(StartSafetyTask, NULL, &safety_attributes);
+
+  /* USER CODE BEGIN RTOS_THREADS */
+
+  LEDHandle = osThreadNew(StartLEDTask, NULL, &LED_attributes);
+  /* add threads, ... */
+  /* USER CODE END RTOS_THREADS */
+
+  /* USER CODE BEGIN RTOS_EVENTS */
+  /* add events, ... */
+  /* USER CODE END RTOS_EVENTS */
+
+  /* Start scheduler */
+  osKernelStart();
+
+  /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -186,7 +264,7 @@ static void MX_NVIC_Init(void)
   HAL_NVIC_SetPriority(TIM1_UP_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(TIM1_UP_IRQn);
   /* TIM1_BRK_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(TIM1_BRK_IRQn, 4, 1);
+  HAL_NVIC_SetPriority(TIM1_BRK_IRQn, 4, 0);
   HAL_NVIC_EnableIRQ(TIM1_BRK_IRQn);
   /* DMA1_Channel1_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
@@ -195,7 +273,7 @@ static void MX_NVIC_Init(void)
   HAL_NVIC_SetPriority(TIM3_IRQn, 3, 0);
   HAL_NVIC_EnableIRQ(TIM3_IRQn);
   /* USART3_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(USART3_IRQn, 3, 1);
+  HAL_NVIC_SetPriority(USART3_IRQn, 3, 0);
   HAL_NVIC_EnableIRQ(USART3_IRQn);
 }
 
@@ -544,17 +622,70 @@ static void MX_DMA_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : LED_Pin */
+  GPIO_InitStruct.Pin = LED_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure peripheral I/O remapping */
+  __HAL_AFIO_REMAP_PD01_ENABLE();
+
 }
 
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
+
+/* USER CODE BEGIN Header_startMediumFrequencyTask */
+/**
+  * @brief  Function implementing the mediumFrequency thread.
+  * @param  argument: Not used
+  * @retval None
+  */
+/* USER CODE END Header_startMediumFrequencyTask */
+__weak void startMediumFrequencyTask(void *argument)
+{
+  /* USER CODE BEGIN 5 */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END 5 */
+}
+
+ /**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM4 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM4) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.
