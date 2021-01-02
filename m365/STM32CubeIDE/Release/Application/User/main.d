@@ -26,6 +26,15 @@ Application/User/main.o: C:/VSARM/Workspace/M365_MC_WB/m365/Src/main.c \
  ../../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h \
  ../../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h \
  ../../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h \
+ ../../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h \
+ ../../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
+ ../../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
+ ../../Inc/FreeRTOSConfig.h \
+ ../../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h \
+ ../../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h \
+ ../../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h \
+ ../../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3/portmacro.h \
+ ../../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h \
  ../../Inc/motorcontrol.h ../../Inc/mc_config.h \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/pid_regulator.h \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/mc_type.h \
@@ -55,7 +64,6 @@ Application/User/main.o: C:/VSARM/Workspace/M365_MC_WB/m365/Src/main.c \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/r_divider_bus_voltage_sensor.h \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/bus_voltage_sensor.h \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/virtual_bus_voltage_sensor.h \
- ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/feed_forward_ctrl.h \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/pqd_motor_power_measurement.h \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/motor_power_measurement.h \
  ../../Inc/user_interface.h \
@@ -150,6 +158,24 @@ Application/User/main.o: C:/VSARM/Workspace/M365_MC_WB/m365/Src/main.c \
 
 ../../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h:
 
+../../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h:
+
+../../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
+
+../../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
+
+../../Inc/FreeRTOSConfig.h:
+
+../../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
+
+../../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h:
+
+../../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h:
+
+../../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3/portmacro.h:
+
+../../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h:
+
 ../../Inc/motorcontrol.h:
 
 ../../Inc/mc_config.h:
@@ -211,8 +237,6 @@ Application/User/main.o: C:/VSARM/Workspace/M365_MC_WB/m365/Src/main.c \
 ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/bus_voltage_sensor.h:
 
 ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/virtual_bus_voltage_sensor.h:
-
-../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/feed_forward_ctrl.h:
 
 ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/pqd_motor_power_measurement.h:
 

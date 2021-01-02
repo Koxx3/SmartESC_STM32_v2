@@ -57,7 +57,6 @@ Application/User/mc_tasks.o: \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/r_divider_bus_voltage_sensor.h \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/bus_voltage_sensor.h \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/virtual_bus_voltage_sensor.h \
- ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/feed_forward_ctrl.h \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/pqd_motor_power_measurement.h \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/motor_power_measurement.h \
  ../../Inc/user_interface.h ../../Inc/mc_interface.h \
@@ -92,7 +91,17 @@ Application/User/mc_tasks.o: \
  ../../Inc/parameters_conversion.h ../../Inc/mc_math.h \
  ../../Inc/parameters_conversion_f10x.h ../../Inc/pmsm_motor_parameters.h \
  ../../Inc/drive_parameters.h ../../Inc/power_stage_parameters.h \
- ../../Inc/mc_api.h ../../Inc/mc_interface.h \
+ ../../Inc/mc_api.h \
+ ../../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h \
+ ../../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
+ ../../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
+ ../../Inc/FreeRTOSConfig.h \
+ ../../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h \
+ ../../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h \
+ ../../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h \
+ ../../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3/portmacro.h \
+ ../../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h \
+ ../../Inc/mc_interface.h \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/digital_output.h \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/pwm_common.h \
  ../../Inc/mc_tasks.h ../../Inc/parameters_conversion.h
@@ -219,8 +228,6 @@ Application/User/mc_tasks.o: \
 
 ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/virtual_bus_voltage_sensor.h:
 
-../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/feed_forward_ctrl.h:
-
 ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/pqd_motor_power_measurement.h:
 
 ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/motor_power_measurement.h:
@@ -298,6 +305,24 @@ Application/User/mc_tasks.o: \
 ../../Inc/power_stage_parameters.h:
 
 ../../Inc/mc_api.h:
+
+../../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h:
+
+../../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
+
+../../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
+
+../../Inc/FreeRTOSConfig.h:
+
+../../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
+
+../../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h:
+
+../../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h:
+
+../../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3/portmacro.h:
+
+../../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h:
 
 ../../Inc/mc_interface.h:
 

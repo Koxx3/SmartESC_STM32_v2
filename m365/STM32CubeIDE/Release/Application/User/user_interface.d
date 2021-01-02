@@ -57,7 +57,6 @@ Application/User/user_interface.o: \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/r_divider_bus_voltage_sensor.h \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/bus_voltage_sensor.h \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/virtual_bus_voltage_sensor.h \
- ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/feed_forward_ctrl.h \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/pqd_motor_power_measurement.h \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/motor_power_measurement.h \
  ../../Inc/user_interface.h ../../Inc/mc_interface.h \
@@ -208,8 +207,6 @@ Application/User/user_interface.o: \
 ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/bus_voltage_sensor.h:
 
 ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/virtual_bus_voltage_sensor.h:
-
-../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/feed_forward_ctrl.h:
 
 ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/pqd_motor_power_measurement.h:
 

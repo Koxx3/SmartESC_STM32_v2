@@ -85,7 +85,6 @@ Application/User/ui_task.o: \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/pwm_curr_fdbk.h \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/r_divider_bus_voltage_sensor.h \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/virtual_bus_voltage_sensor.h \
- ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/feed_forward_ctrl.h \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/pqd_motor_power_measurement.h \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/F1xx/Inc/r3_2_f1xx_pwm_curr_fdbk.h \
  ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/hall_speed_pos_fdbk.h \
@@ -268,8 +267,6 @@ Application/User/ui_task.o: \
 ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/r_divider_bus_voltage_sensor.h:
 
 ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/virtual_bus_voltage_sensor.h:
-
-../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/feed_forward_ctrl.h:
 
 ../../MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Inc/pqd_motor_power_measurement.h:
 

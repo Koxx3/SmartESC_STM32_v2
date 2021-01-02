@@ -196,7 +196,7 @@
 		<define key="FW_KPDIV" value="32768" />
 		<define key="FW_KIDIV" value="32768" />
 		<define key="MTPA_ENABLING" value="DISABLE" />
-		<define key="FEED_FORWARD_CURRENT_REG_ENABLING" value="ENABLE" />
+		<define key="FEED_FORWARD_CURRENT_REG_ENABLING" value="DISABLE" />
 		<define key="CONSTANT1_Q" value="934538" />
 		<define key="CONSTANT1_D" value="934538" />
 		<define key="CONSTANT2_QD" value="75731" />
@@ -212,7 +212,9 @@
 		<define key="SERIAL_COM_CHANNEL2" value="MC_PROTOCOL_REG_I_A" />
 		<define key="SERIAL_COM_MOTOR" value="0" />
 		<define key="LOW_SIDE_SIGNALS_ENABLING" value="LS_PWM_TIMER" />
-		<define key="RTOS" value="NONE" />
+		<define key="RTOS" value="FREERTOS" />
+		<define key="RTOS_TIMER" value="TIM4" />
+		<define key="RTOS_USE_IRQ" value="FALSE" />
 		<define key="HFI_IDH_DELAY" value="32400" />
 		<define key="HFI_STO_RPM_TH" value="OBS_MINIMUM_SPEED_RPM" />
 		<define key="HFI_RESTART_RPM_TH" value="(((HFI_STO_RPM_TH)+(STO_HFI_RPM_TH))/2)" />
@@ -264,11 +266,11 @@
 		<define key="EMERGENCY2_STOP_GPIO_PIN" value="GPIO_Pin_12" />
 		<define key="BRKIN2_GPIO_AF" value="GPIO_AF_2" />
 		<define key="HALL_TIMER_SELECTION" value="HALL_TIM3" />
-		<define key="HALL_TIMER_REMAPPING" value="NO_REMAP_TIM3" />
-		<define key="H1_GPIO_PORT" value="GPIOA" />
-		<define key="H1_GPIO_PIN" value="GPIO_Pin_6" />
-		<define key="H2_GPIO_PORT" value="GPIOA" />
-		<define key="H2_GPIO_PIN" value="GPIO_Pin_7" />
+		<define key="HALL_TIMER_REMAPPING" value="PARTIAL_REMAP_TIM3" />
+		<define key="H1_GPIO_PORT" value="GPIOB" />
+		<define key="H1_GPIO_PIN" value="GPIO_Pin_4" />
+		<define key="H2_GPIO_PORT" value="GPIOB" />
+		<define key="H2_GPIO_PIN" value="GPIO_Pin_5" />
 		<define key="H3_GPIO_PORT" value="GPIOB" />
 		<define key="H3_GPIO_PIN" value="GPIO_Pin_0" />
 		<define key="ENC_TIMER_SELECTION" value="ENC_TIM2" />

@@ -47,7 +47,7 @@
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
-
+void TIM4_IRQHandler(void);
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */

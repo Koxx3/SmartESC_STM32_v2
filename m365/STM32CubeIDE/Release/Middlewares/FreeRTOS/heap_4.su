@@ -1,0 +1,6 @@
+heap_4.c:377:13:prvInsertBlockIntoFreeList	8	static
+heap_4.c:113:7:pvPortMalloc	24	static,ignoring_inline_asm
+heap_4.c:263:6:vPortFree	8	static,ignoring_inline_asm
+heap_4.c:311:8:xPortGetFreeHeapSize	0	static
+heap_4.c:317:8:xPortGetMinimumEverFreeHeapSize	0	static
+heap_4.c:323:6:vPortInitialiseBlocks	0	static

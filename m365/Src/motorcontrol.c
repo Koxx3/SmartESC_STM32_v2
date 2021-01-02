@@ -51,8 +51,6 @@ uint32_t wConfig[NBR_OF_MOTORS] = {UI_CONFIG_M1,UI_CONFIG_M2};
  */
 __weak void MX_MotorControl_Init(void)
 {
-  /* Reconfigure the SysTick interrupt to fire every 500 us. */
-  HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/SYS_TICK_FREQUENCY);
   /* Initialize the Motor Control Subsystem */
   MCboot(pMCI,pMCT);
   mc_lock_pins();
@@ -61,6 +59,11 @@ __weak void MX_MotorControl_Init(void)
   UI_TaskInit(wConfig,NBR_OF_MOTORS,pMCI,pMCT,s_fwVer);
 }
 
+void vPortSetupTimerInterrupt( void )
+{
+  /* Reconfigure the SysTick interrupt to fire every 500 us. */
+  HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/SYS_TICK_FREQUENCY);
+}
 /**
   * @}
   */
