@@ -320,8 +320,8 @@
 		<define key="START_STOP_BTN" value="DISABLE" />
 		<define key="START_STOP_POLARITY" value="DIN_ACTIVE_LOW" />
 		<define key="START_STOP_POLARITY_EDGE" value="GPIO_NOPULL" />
-		<define key="START_STOP_GPIO_PORT" value="GPIOE" />
-		<define key="START_STOP_GPIO_PIN" value="GPIO_Pin_6" />
+		<define key="START_STOP_GPIO_PORT" value="GPIOC" />
+		<define key="START_STOP_GPIO_PIN" value="GPIO_Pin_15" />
 		<define key="BKIN_MODE" value="NONE" />
 		<define key="BKIN2_MODE" value="NONE" />
 		<define key="ADC_1_PERIPH" value="ADC1" />

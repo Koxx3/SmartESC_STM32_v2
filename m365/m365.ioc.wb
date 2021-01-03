@@ -116,15 +116,19 @@ ProjectManager.StackSize=0x400
 #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx#
 
 
-# PINs for the External OSCILLATOR
+<!--# PINs for the External OSCILLATOR
 # Mcu.PINs = PD0-OSC_IN                                                                                                #
 #          , PD1-OSC_OUT                                                                                               #
+#
+# LED GPIO
+#
 PD0-OSC_IN.Locked=false
 PD1-OSC_OUT.Locked=true
 PD1-OSC_OUT.GPIO_Label=LED
 PD1-OSC_OUT.GPIOParameters=GPIO_Label
 PD1-OSC_OUT.Signal=GPIO_Output
-#
+#-->
+
 # Mcu.PINs = PA13                                                                                                      #
 #          , PA14                                                                                                      #
 
@@ -150,7 +154,32 @@ PCC.Checker=false
 PCC.Seq0=0
 PCC.Temperature=25
 PCC.Vdd=3.6
-# 64 MHz specific settings
+# PINs for the Xiaomi power
+# Mcu.PINs = PC14-OSC32_IN                                                                                             #
+#          , PC15-OSC32_OUT                                                                                            #
+#
+# Power and Enable buttons
+PC14-OSC32_IN.GPIOParameters=GPIO_Label
+PC14-OSC32_IN.GPIO_Label=PWR_BTN
+PC14-OSC32_IN.Locked=true
+PC14-OSC32_IN.Signal=GPIO_Input
+PC15-OSC32_OUT.GPIOParameters=PinState,GPIO_Label
+PC15-OSC32_OUT.GPIO_Label=TPS_ENA
+PC15-OSC32_OUT.Locked=true
+PC15-OSC32_OUT.PinState=GPIO_PIN_SET
+PC15-OSC32_OUT.Signal=GPIO_Output
+## PINs for the XIAOMI LED
+# Mcu.PINs = PD0-OSC_IN                                                                                                #
+#          , PD1-OSC_OUT                                                                                               #
+#
+# LED GPIO
+#
+PD0-OSC_IN.Locked=false
+PD1-OSC_OUT.Locked=true
+PD1-OSC_OUT.GPIO_Label=LED
+PD1-OSC_OUT.GPIOParameters=GPIO_Label
+PD1-OSC_OUT.Signal=GPIO_Output
+## 64 MHz specific settings
 RCC.ADCFreqValue=10666666
 RCC.ADCPresc=RCC_ADCPCLK2_DIV6
 RCC.AHBFreq_Value=64000000
@@ -176,6 +205,7 @@ RCC.SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK
 RCC.TimSysFreq_Value=64000000
 RCC.USBFreq_Value=64000000
 RCC.VCOOutput2Freq_Value=8000000
+
 
 
 
@@ -838,30 +868,32 @@ Mcu.Pin0=PD0-OSC_IN
 Mcu.Pin1=PD1-OSC_OUT
 Mcu.Pin2=PA13
 Mcu.Pin3=PA14
-Mcu.Pin4=VP_MotorControl_MC_ENABLED
-Mcu.Pin5=PA3
-Mcu.Pin6=PA4
-Mcu.Pin7=PA5
-Mcu.Pin8=VP_TIM1_VS_no_output4
-Mcu.Pin9=VP_TIM1_VS_ClockSourceITR
-Mcu.Pin10=VP_TIM1_VS_ControllerModeTrigger
-Mcu.Pin11=PA8
-Mcu.Pin12=PB13
-Mcu.Pin13=PA9
-Mcu.Pin14=PB14
-Mcu.Pin15=PA10
-Mcu.Pin16=PB15
-Mcu.Pin17=VP_TIM3_VS_ClockSourceINT
-Mcu.Pin18=PB4
-Mcu.Pin19=PB5
-Mcu.Pin20=PB0
-Mcu.Pin21=PA2
-Mcu.Pin22=PA0
-Mcu.Pin23=PB10
-Mcu.Pin24=PB11
-Mcu.Pin25=VP_FREERTOS_VS_CMSIS_V2
-Mcu.Pin26=VP_SYS_VS_tim4
-Mcu.PinsNb=27
+Mcu.Pin4=PC14-OSC32_IN
+Mcu.Pin5=PC15-OSC32_OUT
+Mcu.Pin6=VP_MotorControl_MC_ENABLED
+Mcu.Pin7=PA3
+Mcu.Pin8=PA4
+Mcu.Pin9=PA5
+Mcu.Pin10=VP_TIM1_VS_no_output4
+Mcu.Pin11=VP_TIM1_VS_ClockSourceITR
+Mcu.Pin12=VP_TIM1_VS_ControllerModeTrigger
+Mcu.Pin13=PA8
+Mcu.Pin14=PB13
+Mcu.Pin15=PA9
+Mcu.Pin16=PB14
+Mcu.Pin17=PA10
+Mcu.Pin18=PB15
+Mcu.Pin19=VP_TIM3_VS_ClockSourceINT
+Mcu.Pin20=PB4
+Mcu.Pin21=PB5
+Mcu.Pin22=PB0
+Mcu.Pin23=PA2
+Mcu.Pin24=PA0
+Mcu.Pin25=PB10
+Mcu.Pin26=PB11
+Mcu.Pin27=VP_FREERTOS_VS_CMSIS_V2
+Mcu.Pin28=VP_SYS_VS_tim4
+Mcu.PinsNb=29
 ########################################################################################################################
 
 ########################################################################################################################
@@ -1328,8 +1360,8 @@ MotorControl.SPEED_BAND_UPPER_LIMIT=17
 MotorControl.SPEED_LOOP_FREQUENCY_HZ=1000
 MotorControl.SPEED_SENSOR_SELECTION=HALL_SENSORS
 MotorControl.START_STOP_BTN=false
-MotorControl.START_STOP_GPIO_PIN=LL_GPIO_PIN_6
-MotorControl.START_STOP_GPIO_PORT=GPIOE
+MotorControl.START_STOP_GPIO_PIN=LL_GPIO_PIN_15
+MotorControl.START_STOP_GPIO_PORT=GPIOC
 MotorControl.START_STOP_POLARITY=DIN_ACTIVE_LOW
 MotorControl.START_STOP_POLARITY_EDGE=GPIO_NOPULL
 MotorControl.STARTING_ANGLE_DEG=90

@@ -60,7 +60,7 @@ void USART_IRQHandler(void);
 void HardFault_Handler(void);
 void SysTick_Handler(void);
 void PFC_TIM_IRQHandler(void);
-void EXTI9_5_IRQHandler (void);
+void EXTI15_10_IRQHandler (void);
 
 /**
   * @brief  This function handles ADC1/ADC2 interrupt request.
