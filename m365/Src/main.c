@@ -25,6 +25,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "task_init.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -67,13 +69,6 @@ const osThreadAttr_t safety_attributes = {
 };
 /* USER CODE BEGIN PV */
 
-osThreadId_t LEDHandle;
-const osThreadAttr_t LED_attributes = {
-  .name = "LED",
-  .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 128 * 4
-};
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -95,19 +90,6 @@ static void MX_NVIC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-void StartLEDTask(void * argument)
-{
-  /* Infinite loop */
-  for(;;)
-  {
-	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, pdFALSE);
-	osDelay(200);
-	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, pdTRUE);
-    osDelay(200);
-  }
-}
-
 
 /* USER CODE END 0 */
 
@@ -181,7 +163,9 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
-  LEDHandle = osThreadNew(StartLEDTask, NULL, &LED_attributes);
+
+  task_init(); //bring up user tasks
+
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
