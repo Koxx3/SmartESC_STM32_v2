@@ -1,7 +1,7 @@
 /*
  * m365
  *
- * Copyright (c) 2021 Jens Kerrinnes
+ * Copyright (c) 2021 Francois Deslandes
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -21,15 +21,15 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "task_init.h"
-#include "task_LED.h"
-#include "task_pwr.h"
+#ifndef TASK_PWR_H_
+#define TASK_PWR_H_
+
+#include "cmsis_os.h"
+
+extern osThreadId_t PwrHandle;
+
+void task_PWR_init();
 
 
-void task_init(){
+#endif /* TASK_PWR_H_ */
 
-	  task_LED_init();  //Bring up the blinky
-	  task_PWR_init();  //Manage power button
-
-
-}
