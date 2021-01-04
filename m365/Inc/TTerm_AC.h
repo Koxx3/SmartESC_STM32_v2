@@ -1,7 +1,7 @@
 /*
- * m365
+ * TTerm
  *
- * Copyright (c) 2021 Jens Kerrinnes
+ * Copyright (c) 2020 Thorben Zethoff
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -20,17 +20,43 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
+    
+#ifndef Term_ACH
+#define Term_ACH
 
-#include "task_init.h"
-#include "task_LED.h"
-#include "task_pwr.h"
-#include "task_cli.h"
+#if PIC32 == 1
+#include <xc.h>
+#endif  
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
 
-void task_init(){
+#include "TTerm.h"
 
-	  task_LED_init();  //Bring up the blinky
-	  task_PWR_init();  //Manage power button
+typedef struct __ACL__ AC_LIST_ELEMENT;
+typedef struct __ACL_HEAD__ AC_LIST_HEAD;
 
+struct __ACL__{
+    AC_LIST_ELEMENT * next;
+    char * string;
+};
 
+struct __ACL_HEAD__{
+    unsigned isConst;
+    uint32_t elementCount;
+    AC_LIST_ELEMENT * first;
+};
 
-}
+AC_LIST_HEAD * ACL_create();
+AC_LIST_HEAD * ACL_createConst(const char ** strings, uint32_t count);
+AC_LIST_ELEMENT * ACL_getNext(AC_LIST_ELEMENT * currElement);
+void ACL_add(AC_LIST_HEAD * head, char * string);
+void ACL_remove(AC_LIST_HEAD * head, char * string);
+uint8_t TERM_doListAC(AC_LIST_HEAD * head, char * currInput, uint8_t length, char ** buff);
+uint8_t ACL_defaultCompleter(TERMINAL_HANDLE * handle, void * params);
+unsigned ACL_isSorted(char * a, char * b);
+void ACL_remove(AC_LIST_HEAD * head, char * string);
+void ACL_add(AC_LIST_HEAD * head, char * string);
+
+#endif

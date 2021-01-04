@@ -1,7 +1,8 @@
 /*
- * m365
+ * TTerm
  *
- * Copyright (c) 2021 Jens Kerrinnes
+ * Copyright (c) 2020 Thorben Zethoff
+ * Copyright (c) 2020 Jens Kerrinnes
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -21,16 +22,25 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "task_init.h"
-#include "task_LED.h"
-#include "task_pwr.h"
-#include "task_cli.h"
+ #if PIC32 == 1
+#include <xc.h>
+#endif  
+#include <stdint.h>
 
-void task_init(){
+#include "TTerm.h"
+#include "TTerm_AC.h"
 
-	  task_LED_init();  //Bring up the blinky
-	  task_PWR_init();  //Manage power button
+#ifndef TTERM_CMD
+#define TTERM_CMD
 
+AC_LIST_HEAD * head;
 
+uint8_t CMD_testCommandHandler(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
+uint8_t TERM_testCommandAutoCompleter(TERMINAL_HANDLE * handle, void * params);
+uint8_t CMD_help(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
+uint8_t CMD_cls(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
+uint8_t CMD_top(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
+void CMD_top_task(void * handle);
+uint8_t CMD_top_handleInput(TERMINAL_HANDLE * handle, uint16_t c);
 
-}
+#endif

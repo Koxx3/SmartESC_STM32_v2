@@ -24,6 +24,7 @@
 #include "task_pwr.h"
 #include "task_init.h"
 #include "main.h"
+#include "task_cli.h"
 
 osThreadId_t PwrHandle;
 const osThreadAttr_t PWR_attributes = { .name = "PWR", .priority =
@@ -39,7 +40,13 @@ void poweroffPressCheck(void) {
 		while (HAL_GPIO_ReadPin(PWR_BTN_GPIO_Port, PWR_BTN_Pin)) {
 			HAL_Delay(10);
 			cnt_press++;
+			if (cnt_press >= 4 * 100) {
+				task_cli_init();
+				cnt_press = 0;
+				break;
+			}
 		}
+
 		if (cnt_press >= 2 * 100) {
 			poweroff();
 		}

@@ -21,16 +21,16 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "task_init.h"
-#include "task_LED.h"
-#include "task_pwr.h"
-#include "task_cli.h"
+#ifndef TASK_CLI_H_
+#define TASK_CLI_H_
 
-void task_init(){
+#include "cmsis_os.h"
 
-	  task_LED_init();  //Bring up the blinky
-	  task_PWR_init();  //Manage power button
+extern osThreadId_t task_cli_handle;
 
 
+void task_cli_init();
 
-}
+
+#endif /* TASK_LED_H_ */
+

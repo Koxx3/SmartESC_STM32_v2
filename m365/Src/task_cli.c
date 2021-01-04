@@ -21,16 +21,52 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "task_init.h"
-#include "task_LED.h"
-#include "task_pwr.h"
 #include "task_cli.h"
+#include "task_init.h"
+#include "main.h"
+#include "TTerm.h"
+#include "printf.h"
+#include "cli_basic.h"
+#include "mc_config.h"
 
-void task_init(){
+osThreadId_t task_cli_handle;
+const osThreadAttr_t task_cli_attributes = {
+  .name = "CLI",
+  .priority = (osPriority_t) osPriorityBelowNormal,
+  .stack_size = 256 * 4
+};
 
-	  task_LED_init();  //Bring up the blinky
-	  task_PWR_init();  //Manage power button
+TERMINAL_HANDLE * cli_handle;
 
 
-
+void _putchar(char character){
+	while(!LL_USART_IsActiveFlag_TXE(pUSART.USARTx)){
+		//vTaskDelay(1);
+	}
+	LL_USART_TransmitData8(pUSART.USARTx, character);
 }
+
+
+void task_cli(void * argument)
+{
+
+	TERMINAL_HANDLE * handle = argument;
+	uint8_t c=0;
+  /* Infinite loop */
+	for(;;)
+	{
+		 if (LL_USART_IsActiveFlag_RXNE(pUSART.USARTx))
+		 {
+			c = LL_USART_ReceiveData8(pUSART.USARTx);
+			TERM_processBuffer(&c,1,handle);
+		}
+		vTaskDelay(1);
+	}
+}
+
+void task_cli_init(){
+	HAL_NVIC_DisableIRQ(USART3_IRQn);
+	cli_handle = TERM_createNewHandle(printf,pdTRUE,&TERM_cmdListHead,NULL,"root");
+	task_cli_handle = osThreadNew(task_cli, cli_handle, &task_cli_attributes);
+}
+

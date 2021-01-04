@@ -7,8 +7,8 @@ HeaderPath=Drivers\STM32F1xx_HAL_Driver\Inc;Drivers\STM32F1xx_HAL_Driver\Inc\Leg
 CDefines=ARM_MATH_CM3;USE_HAL_DRIVER;STM32F103xB;USE_HAL_DRIVER;USE_HAL_DRIVER;
 
 [PreviousGenFiles]
-HeaderPath=C:/VSARM/Workspace/M365_MC_WB/m365/Inc
+HeaderPath=C:/Git/M365_MC_WB/m365/Inc
 HeaderFiles=FreeRTOSConfig.h;motorcontrol.h;drive_parameters.h;mc_tasks.h;motor_control_protocol.h;mc_api.h;mc_config.h;mc_stm_types.h;regular_conversion_manager.h;mc_math.h;mc_interface.h;parameters_conversion.h;parameters_conversion_f10x.h;pmsm_motor_parameters.h;power_stage_parameters.h;mc_parameters.h;ui_task.h;user_interface.h;stm32f1xx_it.h;stm32f1xx_hal_conf.h;main.h;
-SourcePath=C:/VSARM/Workspace/M365_MC_WB/m365/Src
+SourcePath=C:/Git/M365_MC_WB/m365/Src
 SourceFiles=freertos.c;motorcontrol.c;mc_api.c;motor_control_protocol.c;mc_config.c;mc_tasks.c;regular_conversion_manager.c;mc_math.c;mc_interface.c;stm32f10x_mc_it.c;mc_parameters.c;ui_task.c;user_interface.c;stm32f1xx_it.c;stm32f1xx_hal_msp.c;stm32f1xx_hal_timebase_tim.c;main.c;
 
