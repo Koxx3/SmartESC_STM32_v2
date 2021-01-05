@@ -161,7 +161,7 @@
 
 #define MAIN_SCFG UI_SCODE_STO_CR
 
-#define AUX_SCFG 0x0
+#define AUX_SCFG UI_SCODE_HALL
 
 #define PLLTUNING_ENABLE
 
@@ -183,6 +183,11 @@
 
 #define DOUT_ACTIVE_HIGH   DOutputActiveHigh
 #define DOUT_ACTIVE_LOW    DOutputActiveLow
+
+/**********  AUXILIARY HALL TIMER MOTOR 1 *************/
+#define M1_HALL_TIM_PERIOD 65535
+#define M1_HALL_IC_FILTER  10
+#define SPD_TIM_M1_IRQHandler TIM3_IRQHandler
 
 /* MMI Table Motor 1 MAX_MODULATION_95_PER_CENT */
 #define START_INDEX 57

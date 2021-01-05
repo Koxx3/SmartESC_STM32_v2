@@ -37,6 +37,16 @@
 #define MEAS_ERRORS_BEFORE_FAULTS       255 /*!< Number of speed
                                                              measurement errors before
                                                              main sensor goes in fault */
+/****** Hall sensors ************/
+#define HALL_MEAS_ERRORS_BEFORE_FAULTS  255 /*!< Number of failed
+                                                           derived class specific speed
+                                                           measurements before main sensor
+                                                           goes in fault */
+
+#define HALL_AVERAGING_FIFO_DEPTH        6 /*!< depth of the FIFO used to
+                                                           average mechanical speed in
+                                                           0.1Hz resolution */
+#define HALL_MTPA  false
 /****** State Observer + CORDIC ***/
 #define CORD_VARIANCE_THRESHOLD           4  /*!<Maxiumum accepted
                                                             variance on speed
@@ -160,31 +170,31 @@
 /******************************   START-UP PARAMETERS   **********************/
 
 /* Phase 1 */
-#define PHASE1_DURATION                0 /*milliseconds */
+#define PHASE1_DURATION                1000 /*milliseconds */
 #define PHASE1_FINAL_SPEED_UNIT         (0*SPEED_UNIT/_RPM)
 #define PHASE1_FINAL_CURRENT           0
 /* Phase 2 */
-#define PHASE2_DURATION                0 /*milliseconds */
+#define PHASE2_DURATION                1000 /*milliseconds */
 #define PHASE2_FINAL_SPEED_UNIT         (0*SPEED_UNIT/_RPM)
-#define PHASE2_FINAL_CURRENT           317
+#define PHASE2_FINAL_CURRENT           0
 /* Phase 3 */
-#define PHASE3_DURATION                1000 /*milliseconds */
-#define PHASE3_FINAL_SPEED_UNIT         (2000*SPEED_UNIT/_RPM)
-#define PHASE3_FINAL_CURRENT           635
+#define PHASE3_DURATION                100 /*milliseconds */
+#define PHASE3_FINAL_SPEED_UNIT         (0*SPEED_UNIT/_RPM)
+#define PHASE3_FINAL_CURRENT           317
 /* Phase 4 */
-#define PHASE4_DURATION                0 /*milliseconds */
-#define PHASE4_FINAL_SPEED_UNIT         (2000*SPEED_UNIT/_RPM)
-#define PHASE4_FINAL_CURRENT           635
+#define PHASE4_DURATION                1000 /*milliseconds */
+#define PHASE4_FINAL_SPEED_UNIT         (500*SPEED_UNIT/_RPM)
+#define PHASE4_FINAL_CURRENT           317
 /* Phase 5 */
 #define PHASE5_DURATION                0 /* milliseconds */
-#define PHASE5_FINAL_SPEED_UNIT         (2000*SPEED_UNIT/_RPM)
-#define PHASE5_FINAL_CURRENT           635
+#define PHASE5_FINAL_SPEED_UNIT         (500*SPEED_UNIT/_RPM)
+#define PHASE5_FINAL_CURRENT           317
 
-#define ENABLE_SL_ALGO_FROM_PHASE      3
+#define ENABLE_SL_ALGO_FROM_PHASE      1
 /* Sensor-less rev-up sequence */
-#define STARTING_ANGLE_DEG             0  /*!< degrees [0...359] */
+#define STARTING_ANGLE_DEG             120  /*!< degrees [0...359] */
 /* Observer start-up output conditions  */
-#define OBS_MINIMUM_SPEED_RPM          580
+#define OBS_MINIMUM_SPEED_RPM          100
 
 #define NB_CONSECUTIVE_TESTS           1 /* corresponding to
                                                          former NB_CONSECUTIVE_TESTS/

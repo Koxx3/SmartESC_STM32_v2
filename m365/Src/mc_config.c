@@ -126,7 +126,7 @@ RevUpCtrl_Handle_t RevUpControlM1 =
   .bFirstAccelerationStage = (ENABLE_SL_ALGO_FROM_PHASE-1u),
   .hMinStartUpValidSpeed   = OBS_MINIMUM_SPEED_UNIT,
   .hMinStartUpFlySpeed     = (int16_t)(OBS_MINIMUM_SPEED_UNIT/2),
-  .OTFStartupEnabled       = false,
+  .OTFStartupEnabled       = true,
   .OTFPhaseParams         = {(uint16_t)500,
                                          0,
                              (int16_t)PHASE5_FINAL_CURRENT,
@@ -247,6 +247,41 @@ STO_Handle_t STO_M1 =
   .pFctStoOtfResetPLL            = MC_NULL,
   .pFctSTO_SpeedReliabilityCheck = &STO_CR_IsSpeedReliable
 
+};
+
+/**
+  * @brief  SpeedNPosition sensor parameters Motor 1 - HALL
+  */
+
+HALL_Handle_t HALL_M1 =
+{
+  ._Super = {
+    .bElToMecRatio                     =	POLE_PAIR_NUM,
+    .hMaxReliableMecSpeedUnit          =	(uint16_t)(1.15*MAX_APPLICATION_SPEED_UNIT),
+    .hMinReliableMecSpeedUnit          =	(uint16_t)(MIN_APPLICATION_SPEED_UNIT),
+    .bMaximumSpeedErrorsNumber         =	MEAS_ERRORS_BEFORE_FAULTS,
+    .hMaxReliableMecAccelUnitP         =	65535,
+    .hMeasurementFrequency             =	TF_REGULATION_RATE_SCALED,
+    .DPPConvFactor                     =  DPP_CONV_FACTOR,
+  },
+  .SensorPlacement     = HALL_SENSORS_PLACEMENT,
+  .PhaseShift          = (int16_t)(HALL_PHASE_SHIFT * 65536/360),
+  .SpeedSamplingFreqHz = MEDIUM_FREQUENCY_TASK_RATE,
+  .SpeedBufferSize     = HALL_AVERAGING_FIFO_DEPTH,
+ .TIMClockFreq       = HALL_TIM_CLK,
+ .TIMx                = TIM3,
+
+ .ICx_Filter          = M1_HALL_IC_FILTER,
+
+ .PWMFreqScaling      = PWM_FREQ_SCALING,
+ .HallMtpa            = HALL_MTPA,
+
+ .H1Port             =  M1_HALL_H1_GPIO_Port,
+ .H1Pin              =  M1_HALL_H1_Pin<<8,
+ .H2Port             =  M1_HALL_H2_GPIO_Port,
+ .H2Pin              =  M1_HALL_H2_Pin<<8,
+ .H3Port             =  M1_HALL_H3_GPIO_Port,
+ .H3Pin              =  M1_HALL_H3_Pin<<8,
 };
 
 /**
