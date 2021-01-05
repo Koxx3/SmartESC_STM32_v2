@@ -76,12 +76,6 @@ void Error_Handler(void);
 #define M1_CURR_AMPL_V_GPIO_Port GPIOA
 #define M1_CURR_AMPL_W_Pin GPIO_PIN_5
 #define M1_CURR_AMPL_W_GPIO_Port GPIOA
-#define M1_HALL_H1_Pin GPIO_PIN_6
-#define M1_HALL_H1_GPIO_Port GPIOA
-#define M1_HALL_H2_Pin GPIO_PIN_7
-#define M1_HALL_H2_GPIO_Port GPIOA
-#define M1_HALL_H3_Pin GPIO_PIN_0
-#define M1_HALL_H3_GPIO_Port GPIOB
 #define UART_TX_Pin GPIO_PIN_10
 #define UART_TX_GPIO_Port GPIOB
 #define UART_RX_Pin GPIO_PIN_11

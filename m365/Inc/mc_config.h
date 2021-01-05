@@ -38,7 +38,6 @@
 #include "r3_2_f1xx_pwm_curr_fdbk.h"
 
 extern RevUpCtrl_Handle_t RevUpControlM1;
-#include "hall_speed_pos_fdbk.h"
 #include "ramp_ext_mngr.h"
 #include "circle_limitation.h"
 
@@ -58,7 +57,6 @@ extern PQD_MotorPowMeas_Handle_t *pPQD_MotorPowMeasM1;
 extern VirtualSpeedSensor_Handle_t VirtualSpeedSensorM1;
 extern STO_Handle_t STO_M1;
 extern STO_CR_Handle_t STO_CR_M1;
-extern HALL_Handle_t HALL_M1;
 extern RDivider_Handle_t RealBusVoltageSensorParamsM1;
 extern CircleLimitation_Handle_t CircleLimitationM1;
 extern RampExtMngr_Handle_t RampExtMngrHFParamsM1;

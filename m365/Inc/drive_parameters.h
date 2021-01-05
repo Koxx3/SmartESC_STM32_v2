@@ -37,24 +37,14 @@
 #define MEAS_ERRORS_BEFORE_FAULTS       255 /*!< Number of speed
                                                              measurement errors before
                                                              main sensor goes in fault */
-/****** Hall sensors ************/
-#define HALL_MEAS_ERRORS_BEFORE_FAULTS  255 /*!< Number of failed
-                                                           derived class specific speed
-                                                           measurements before main sensor
-                                                           goes in fault */
-
-#define HALL_AVERAGING_FIFO_DEPTH        6 /*!< depth of the FIFO used to
-                                                           average mechanical speed in
-                                                           0.1Hz resolution */
-#define HALL_MTPA  false
 /****** State Observer + CORDIC ***/
 #define CORD_VARIANCE_THRESHOLD           4  /*!<Maxiumum accepted
                                                             variance on speed
                                                             estimates (percentage) */
 #define CORD_F1                          16384
-#define CORD_F2                          2048
+#define CORD_F2                          1024
 #define CORD_F1_LOG                      LOG2(16384)
-#define CORD_F2_LOG                      LOG2(2048)
+#define CORD_F2_LOG                      LOG2(1024)
 
 /* State observer constants */
 #define CORD_GAIN1                       -23923
