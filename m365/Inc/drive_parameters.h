@@ -34,11 +34,11 @@
 #define MAX_APPLICATION_SPEED_RPM       2500 /*!< rpm, mechanical */
 #define MIN_APPLICATION_SPEED_RPM       0 /*!< rpm, mechanical,
                                                            absolute value */
-#define MEAS_ERRORS_BEFORE_FAULTS       3 /*!< Number of speed
+#define MEAS_ERRORS_BEFORE_FAULTS       255 /*!< Number of speed
                                                              measurement errors before
                                                              main sensor goes in fault */
 /****** Hall sensors ************/
-#define HALL_MEAS_ERRORS_BEFORE_FAULTS  3 /*!< Number of failed
+#define HALL_MEAS_ERRORS_BEFORE_FAULTS  255 /*!< Number of failed
                                                            derived class specific speed
                                                            measurements before main sensor
                                                            goes in fault */
@@ -67,8 +67,8 @@
 #define REGULATION_EXECUTION_RATE     1    /*!< FOC execution rate in
                                                            number of PWM cycles */
 /* Gains values for torque and flux control loops */
-#define PID_TORQUE_KP_DEFAULT         20
-#define PID_TORQUE_KI_DEFAULT         5
+#define PID_TORQUE_KP_DEFAULT         200
+#define PID_TORQUE_KI_DEFAULT         50
 #define PID_TORQUE_KD_DEFAULT         100
 #define PID_FLUX_KP_DEFAULT           3649
 #define PID_FLUX_KI_DEFAULT           1995

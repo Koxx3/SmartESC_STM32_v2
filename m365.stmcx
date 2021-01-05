@@ -274,9 +274,9 @@
 						</var>
 						<var version="1.0" type="MC_Int" name="Main - Max allowed speed" enable="false" visible="false" readonly="false" value="2500" />
 						<var version="1.0" type="MC_Int" name="Main - Min allowed speed" enable="false" visible="false" readonly="false" value="0" />
-						<var version="1.0" type="MC_Int" name="Main - Max measurement errors number before fault" enable="true" visible="true" readonly="false" value="3" />
+						<var version="1.0" type="MC_Int" name="Main - Max measurement errors number before fault" enable="true" visible="true" readonly="false" value="255" />
 						<var version="1.0" type="MC_Int" name="Main - Hall Sensors - Average speed FIFO depth" enable="true" visible="true" readonly="false" value="6" />
-						<var version="1.0" type="MC_Double" name="Main - Hall Sensors - Input Capture filter duration" enable="true" visible="true" readonly="false" value="1.25" />
+						<var version="1.0" type="MC_Double" name="Main - Hall Sensors - Input Capture filter duration" enable="true" visible="true" readonly="false" value="4" />
 						<var version="1.0" type="MC_Bool" name="Main_ObsPLL_Use_MTPA" enable="true" visible="true" readonly="false" value="false" />
 						<var version="1.0" type="MC_Int" name="Main - Encoder - Average speed FIFO depth" enable="false" visible="true" readonly="false" value="16" />
 						<var version="1.0" type="MC_Double" name="Main - Encoder - Input Capture filter duration" enable="false" visible="true" readonly="false" value="0.70000000000000007" />
@@ -348,7 +348,7 @@
 						</var>
 						<var version="1.0" type="MC_Int" name="Aux - Max allowed speed" enable="false" visible="false" readonly="false" value="2500" />
 						<var version="1.0" type="MC_Int" name="Aux - Min allowed speed" enable="false" visible="false" readonly="false" value="0" />
-						<var version="1.0" type="MC_Int" name="Aux - Max measurement errors number before fault" enable="false" visible="true" readonly="false" value="3" />
+						<var version="1.0" type="MC_Int" name="Aux - Max measurement errors number before fault" enable="false" visible="true" readonly="false" value="255" />
 						<var version="1.0" type="MC_Int" name="Aux - Hall Sensors - Average speed FIFO depth" enable="false" visible="true" readonly="false" value="6" />
 						<var version="1.0" type="MC_Double" name="Aux - Hall Sensors - Input Capture filter duration" enable="false" visible="true" readonly="false" value="1.3" />
 						<var version="1.0" type="MC_Bool" name="Aux_ObsPLL_Use_MTPA" enable="false" visible="true" readonly="false" value="false" />
@@ -422,9 +422,9 @@
 						</var>
 						<var version="1.0" type="MC_Int" name="Torque&amp;Flux - Cut-off frequency" enable="true" visible="true" readonly="false" value="2000" />
 						<var version="1.0" type="MC_Bool" name="Torque&amp;Flux - Manual editing enabled" enable="true" visible="true" readonly="false" value="true" />
-						<var version="1.0" type="MC_Int" name="Torque - P dividend" enable="true" visible="true" readonly="false" value="20" />
+						<var version="1.0" type="MC_Int" name="Torque - P dividend" enable="true" visible="true" readonly="false" value="200" />
 						<var version="1.0" type="MC_Int" name="Torque - P divisor" enable="true" visible="true" readonly="false" value="1024" />
-						<var version="1.0" type="MC_Int" name="Torque - I dividend" enable="true" visible="true" readonly="false" value="5" />
+						<var version="1.0" type="MC_Int" name="Torque - I dividend" enable="true" visible="true" readonly="false" value="50" />
 						<var version="1.0" type="MC_Int" name="Torque - I divisor" enable="true" visible="true" readonly="false" value="16384" />
 						<var version="1.0" type="MC_Bool" name="Torque - Enable differential term" enable="false" visible="true" readonly="false" value="false" />
 						<var version="1.0" type="MC_Int" name="Torque - D dividend" enable="false" visible="true" readonly="false" value="100" />
@@ -1989,8 +1989,8 @@
 			<reg version="1.0" id="6" name="Speed Ki" description="$$DESCR_AS_NAME$$" unit="" type="16" access_mode="2" value="50" value_previous="50" minimum="0" maximum="65535" period="0" modified="false" visible="true" enable="false" />
 			<reg version="1.0" id="7" name="Speed Kd" description="$$DESCR_AS_NAME$$" unit="" type="16" access_mode="2" value="0" value_previous="0" minimum="0" maximum="65535" period="0" modified="false" visible="true" enable="true" />
 			<reg version="1.0" id="8" name="Torque reference (Iq)" description="$$DESCR_AS_NAME$$" unit="" type="144" access_mode="2" value="0" value_previous="0" minimum="-32768" maximum="32767" period="0" modified="false" visible="true" enable="true" />
-			<reg version="1.0" id="9" name="Torque Kp" description="$$DESCR_AS_NAME$$" unit="" type="16" access_mode="2" value="200" value_previous="20" minimum="0" maximum="65535" period="0" modified="false" visible="true" enable="true" />
-			<reg version="1.0" id="10" name="Torque Ki" description="$$DESCR_AS_NAME$$" unit="" type="16" access_mode="2" value="50" value_previous="5" minimum="0" maximum="65535" period="0" modified="false" visible="true" enable="true" />
+			<reg version="1.0" id="9" name="Torque Kp" description="$$DESCR_AS_NAME$$" unit="" type="16" access_mode="2" value="200" value_previous="200" minimum="0" maximum="65535" period="0" modified="false" visible="true" enable="true" />
+			<reg version="1.0" id="10" name="Torque Ki" description="$$DESCR_AS_NAME$$" unit="" type="16" access_mode="2" value="50" value_previous="50" minimum="0" maximum="65535" period="0" modified="false" visible="true" enable="true" />
 			<reg version="1.0" id="11" name="Torque Kd" description="$$DESCR_AS_NAME$$" unit="" type="16" access_mode="2" value="0" value_previous="0" minimum="0" maximum="65535" period="0" modified="false" visible="true" enable="true" />
 			<reg version="1.0" id="12" name="Flux reference (Id)" description="$$DESCR_AS_NAME$$" unit="" type="144" access_mode="2" value="0" value_previous="0" minimum="-32768" maximum="32767" period="0" modified="false" visible="true" enable="true" />
 			<reg version="1.0" id="13" name="Flux Kp" description="$$DESCR_AS_NAME$$" unit="" type="16" access_mode="2" value="3649" value_previous="3649" minimum="0" maximum="65535" period="0" modified="false" visible="true" enable="true" />
@@ -2006,7 +2006,7 @@
 			<reg version="1.0" id="23" name="Flux weakening Ki" description="$$DESCR_AS_NAME$$" unit="" type="16" access_mode="2" value="0" value_previous="0" minimum="0" maximum="65535" period="0" modified="false" visible="true" enable="false" />
 			<reg version="1.0" id="24" name="Flux weakening BUS Voltage allowed percentage reference" description="$$DESCR_AS_NAME$$" unit="" type="16" access_mode="2" value="0" value_previous="0" minimum="0" maximum="65535" period="0" modified="false" visible="true" enable="false" />
 			<reg version="1.0" id="25" name="Bus Voltage" description="$$DESCR_AS_NAME$$" unit="Volt" type="16" access_mode="0" value="36" value_previous="36" minimum="0" maximum="42" period="500" modified="false" visible="true" enable="true" />
-			<reg version="1.0" id="26" name="Heatsink Temperature" description="$$DESCR_AS_NAME$$" unit="°C" type="16" access_mode="0" value="21" value_previous="21" minimum="0" maximum="100" period="500" modified="false" visible="true" enable="true" />
+			<reg version="1.0" id="26" name="Heatsink Temperature" description="$$DESCR_AS_NAME$$" unit="°C" type="16" access_mode="0" value="20" value_previous="20" minimum="0" maximum="100" period="500" modified="false" visible="true" enable="true" />
 			<reg version="1.0" id="27" name="Motor Power" description="$$DESCR_AS_NAME$$" unit="W" type="16" access_mode="0" value="0" value_previous="0" minimum="0" maximum="200" period="500" modified="false" visible="true" enable="true" />
 			<reg version="1.0" id="28" name="DAC Out 1" description="$$DESCR_AS_NAME$$" unit="" type="8" access_mode="2" value="0" value_previous="0" minimum="0" maximum="255" period="0" modified="false" visible="true" enable="true" />
 			<reg version="1.0" id="29" name="DAC Out 2" description="$$DESCR_AS_NAME$$" unit="" type="8" access_mode="2" value="0" value_previous="0" minimum="0" maximum="255" period="0" modified="false" visible="true" enable="true" />
