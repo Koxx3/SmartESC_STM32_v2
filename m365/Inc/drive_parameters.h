@@ -37,42 +37,37 @@
 #define MEAS_ERRORS_BEFORE_FAULTS       255 /*!< Number of speed
                                                              measurement errors before
                                                              main sensor goes in fault */
-/****** State Observer + PLL ****/
-#define VARIANCE_THRESHOLD              0.1 /*!<Maximum accepted
+/****** State Observer + CORDIC ***/
+#define CORD_VARIANCE_THRESHOLD           4  /*!<Maxiumum accepted
                                                             variance on speed
                                                             estimates (percentage) */
-/* State observer scaling factors F1 */
-#define F1                               16384
-#define F2                               4096
-#define F1_LOG                           LOG2(16384)
-#define F2_LOG                           LOG2(4096)
+#define CORD_F1                          16384
+#define CORD_F2                          2048
+#define CORD_F1_LOG                      LOG2(16384)
+#define CORD_F2_LOG                      LOG2(2048)
 
 /* State observer constants */
-#define GAIN1                            -23270
-#define GAIN2                            16401
-/*Only in case PLL is used, PLL gains */
-#define PLL_KP_GAIN                      1247
-#define PLL_KI_GAIN                      55
-#define PLL_KPDIV     16384
-#define PLL_KPDIV_LOG LOG2(PLL_KPDIV)
-#define PLL_KIDIV     65535
-#define PLL_KIDIV_LOG LOG2(PLL_KIDIV)
+#define CORD_GAIN1                       -23923
+#define CORD_GAIN2                       16120
 
-#define OBS_MEAS_ERRORS_BEFORE_FAULTS    255  /*!< Number of consecutive errors
+#define CORD_MEAS_ERRORS_BEFORE_FAULTS   255  /*!< Number of consecutive errors
                                                            on variance test before a speed
                                                            feedback error is reported */
-#define STO_FIFO_DEPTH_DPP               64  /*!< Depth of the FIFO used
+#define CORD_FIFO_DEPTH_DPP              64  /*!< Depth of the FIFO used
                                                             to average mechanical speed
                                                             in dpp format */
-#define STO_FIFO_DEPTH_DPP_LOG           LOG2(64)
+#define CORD_FIFO_DEPTH_DPP_LOG          LOG2(64)
 
-#define STO_FIFO_DEPTH_UNIT              64  /*!< Depth of the FIFO used
-                                                            to average mechanical speed
-                                                            in the unit defined by #SPEED_UNIT */
-#define BEMF_CONSISTENCY_TOL             64   /* Parameter for B-emf
-                                                            amplitude-speed consistency */
-#define BEMF_CONSISTENCY_GAIN            64   /* Parameter for B-emf
+#define CORD_FIFO_DEPTH_UNIT            64  /*!< Depth of the FIFO used
+                                                           to average mechanical speed
+                                                           in dpp format */
+#define CORD_MAX_ACCEL_DPPP              19  /*!< Maximum instantaneous
+                                                              electrical acceleration (dpp
+                                                              per control period) */
+#define CORD_BEMF_CONSISTENCY_TOL        64  /* Parameter for B-emf
                                                            amplitude-speed consistency */
+#define CORD_BEMF_CONSISTENCY_GAIN       64  /* Parameter for B-emf
+                                                          amplitude-speed consistency */
 
 /* USER CODE BEGIN angle reconstruction M1 */
 #define REV_PARK_ANGLE_COMPENSATION_FACTOR 0
@@ -165,33 +160,33 @@
 /******************************   START-UP PARAMETERS   **********************/
 
 /* Phase 1 */
-#define PHASE1_DURATION                1000 /*milliseconds */
+#define PHASE1_DURATION                0 /*milliseconds */
 #define PHASE1_FINAL_SPEED_UNIT         (0*SPEED_UNIT/_RPM)
 #define PHASE1_FINAL_CURRENT           0
 /* Phase 2 */
-#define PHASE2_DURATION                1000 /*milliseconds */
+#define PHASE2_DURATION                100 /*milliseconds */
 #define PHASE2_FINAL_SPEED_UNIT         (0*SPEED_UNIT/_RPM)
-#define PHASE2_FINAL_CURRENT           0
+#define PHASE2_FINAL_CURRENT           317
 /* Phase 3 */
-#define PHASE3_DURATION                700 /*milliseconds */
-#define PHASE3_FINAL_SPEED_UNIT         (0*SPEED_UNIT/_RPM)
-#define PHASE3_FINAL_CURRENT           190
+#define PHASE3_DURATION                1000 /*milliseconds */
+#define PHASE3_FINAL_SPEED_UNIT         (2000*SPEED_UNIT/_RPM)
+#define PHASE3_FINAL_CURRENT           635
 /* Phase 4 */
-#define PHASE4_DURATION                350 /*milliseconds */
-#define PHASE4_FINAL_SPEED_UNIT         (116*SPEED_UNIT/_RPM)
-#define PHASE4_FINAL_CURRENT           222
+#define PHASE4_DURATION                0 /*milliseconds */
+#define PHASE4_FINAL_SPEED_UNIT         (2000*SPEED_UNIT/_RPM)
+#define PHASE4_FINAL_CURRENT           635
 /* Phase 5 */
-#define PHASE5_DURATION                1150 /* milliseconds */
-#define PHASE5_FINAL_SPEED_UNIT         (500*SPEED_UNIT/_RPM)
-#define PHASE5_FINAL_CURRENT           222
+#define PHASE5_DURATION                0 /* milliseconds */
+#define PHASE5_FINAL_SPEED_UNIT         (2000*SPEED_UNIT/_RPM)
+#define PHASE5_FINAL_CURRENT           635
 
-#define ENABLE_SL_ALGO_FROM_PHASE      1
+#define ENABLE_SL_ALGO_FROM_PHASE      3
 /* Sensor-less rev-up sequence */
-#define STARTING_ANGLE_DEG             90  /*!< degrees [0...359] */
+#define STARTING_ANGLE_DEG             120  /*!< degrees [0...359] */
 /* Observer start-up output conditions  */
 #define OBS_MINIMUM_SPEED_RPM          580
 
-#define NB_CONSECUTIVE_TESTS           2 /* corresponding to
+#define NB_CONSECUTIVE_TESTS           1 /* corresponding to
                                                          former NB_CONSECUTIVE_TESTS/
                                                          (TF_REGULATION_RATE/
                                                          MEDIUM_FREQUENCY_TASK_RATE) */

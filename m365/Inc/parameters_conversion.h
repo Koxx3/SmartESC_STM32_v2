@@ -70,15 +70,15 @@
 #define MAX_APPLICATION_SPEED_UNIT ((MAX_APPLICATION_SPEED_RPM*SPEED_UNIT)/_RPM)
 #define MIN_APPLICATION_SPEED_UNIT ((MIN_APPLICATION_SPEED_RPM*SPEED_UNIT)/_RPM)
 
-/************************* PLL PARAMETERS **************************/
-#define C1 (int32_t)((((int16_t)F1)*RS)/(LS*TF_REGULATION_RATE))
-#define C2 (int32_t) GAIN1
-#define C3 (int32_t)((((int16_t)F1)*MAX_BEMF_VOLTAGE)/(LS*MAX_CURRENT*TF_REGULATION_RATE))
-#define C4 (int32_t) GAIN2
-#define C5 (int32_t)((((int16_t)F1)*MAX_VOLTAGE)/(LS*MAX_CURRENT*TF_REGULATION_RATE))
-
-#define PERCENTAGE_FACTOR    (uint16_t)(VARIANCE_THRESHOLD*128u)
-#define HFI_MINIMUM_SPEED    (uint16_t) (HFI_MINIMUM_SPEED_RPM/6u)
+/*********************** OBSERVER + CORDIC PARAMETERS *************************/
+#define CORD_C1 (int32_t)((((int16_t)CORD_F1)*RS)/(LS*TF_REGULATION_RATE))
+#define CORD_C2 (int32_t) CORD_GAIN1
+#define CORD_C3 (int32_t)((((int16_t)CORD_F1)*MAX_BEMF_VOLTAGE)/(LS*MAX_CURRENT\
+                                                           *TF_REGULATION_RATE))
+#define CORD_C4 (int32_t) CORD_GAIN2
+#define CORD_C5 (int32_t)((((int16_t)CORD_F1)*MAX_VOLTAGE)/(LS*MAX_CURRENT*\
+                                                          TF_REGULATION_RATE))
+#define CORD_PERCENTAGE_FACTOR    (uint16_t)(CORD_VARIANCE_THRESHOLD*128u)
 
 #define MAX_APPLICATION_SPEED_UNIT2 ((MAX_APPLICATION_SPEED_RPM2*SPEED_UNIT)/_RPM)
 #define MIN_APPLICATION_SPEED_UNIT2 ((MIN_APPLICATION_SPEED_RPM2*SPEED_UNIT)/_RPM)
@@ -158,7 +158,8 @@
 #define DIFFTERM_ENABLE
 
 /* Sensors setting */
-#define MAIN_SCFG UI_SCODE_STO_PLL
+
+#define MAIN_SCFG UI_SCODE_STO_CR
 
 #define AUX_SCFG 0x0
 
