@@ -3,7 +3,7 @@
 	<defines>
 		<define key="POLE_PAIR_NUM" value="15" />
 		<define key="RS" value="0.17" />
-		<define key="LS" value="0.000200" />
+		<define key="LS" value="0.000100" />
 		<define key="NOMINAL_CURRENT" value="4766" />
 		<define key="MOTOR_MAX_SPEED_RPM" value="2500" />
 		<define key="MOTOR_VOLTAGE_CONSTANT" value="5.0" />
@@ -66,9 +66,9 @@
 		<define key="HALL_MTPA" value="FALSE" />
 		<define key="VARIANCE_THRESHOLD" value="0.1" />
 		<define key="F1" value="16384" />
-		<define key="F2" value="1024" />
-		<define key="GAIN1" value="-23923" />
-		<define key="GAIN2" value="16120" />
+		<define key="F2" value="2048" />
+		<define key="GAIN1" value="-23270" />
+		<define key="GAIN2" value="16401" />
 		<define key="PLL_KP_GAIN" value="1247" />
 		<define key="PLL_KI_GAIN" value="55" />
 		<define key="OBS_MEAS_ERRORS_BEFORE_FAULTS" value="255" />
@@ -80,9 +80,9 @@
 		<define key="CORD_BEMF_CONSISTENCY_TOL" value="64" />
 		<define key="CORD_BEMF_CONSISTENCY_GAIN" value="64" />
 		<define key="CORD_F1" value="16384" />
-		<define key="CORD_F2" value="1024" />
-		<define key="CORD_GAIN1" value="-23923" />
-		<define key="CORD_GAIN2" value="16120" />
+		<define key="CORD_F2" value="2048" />
+		<define key="CORD_GAIN1" value="-23270" />
+		<define key="CORD_GAIN2" value="16401" />
 		<define key="CORD_MEAS_ERRORS_BEFORE_FAULTS" value="255" />
 		<define key="CORD_FIFO_DEPTH_DPP" value="64" />
 		<define key="CORD_FIFO_DEPTH_01HZ" value="64" />
@@ -197,8 +197,8 @@
 		<define key="FW_KIDIV" value="32768" />
 		<define key="MTPA_ENABLING" value="DISABLE" />
 		<define key="FEED_FORWARD_CURRENT_REG_ENABLING" value="DISABLE" />
-		<define key="CONSTANT1_Q" value="600989" />
-		<define key="CONSTANT1_D" value="600989" />
+		<define key="CONSTANT1_Q" value="300494" />
+		<define key="CONSTANT1_D" value="300494" />
 		<define key="CONSTANT2_QD" value="9466" />
 		<define key="IQMAX" value="4766" />
 		<define key="SEGDIV" value="0" />

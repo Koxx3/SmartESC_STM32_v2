@@ -42,13 +42,13 @@
                                                             variance on speed
                                                             estimates (percentage) */
 #define CORD_F1                          16384
-#define CORD_F2                          1024
+#define CORD_F2                          2048
 #define CORD_F1_LOG                      LOG2(16384)
-#define CORD_F2_LOG                      LOG2(1024)
+#define CORD_F2_LOG                      LOG2(2048)
 
 /* State observer constants */
-#define CORD_GAIN1                       -23923
-#define CORD_GAIN2                       16120
+#define CORD_GAIN1                       -23270
+#define CORD_GAIN2                       16401
 
 #define CORD_MEAS_ERRORS_BEFORE_FAULTS   255  /*!< Number of consecutive errors
                                                            on variance test before a speed
