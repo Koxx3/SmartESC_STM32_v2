@@ -51,6 +51,8 @@
 		<define key="PWBDID" value="0" />
 		<define key="STATE_OBSERVER_CORDIC" value="TRUE" />
 		<define key="SPEED_SENSOR_SELECTION" value="STATE_OBSERVER_CORDIC" />
+		<define key="AUX_HALL_SENSORS" value="TRUE" />
+		<define key="AUXILIARY_SPEED_MEASUREMENT_SELECTION" value="AUX_HALL_SENSORS" />
 		<define key="SINGLEDRIVE" value="TRUE" />
 		<define key="DRIVES_NUMBER_SELECTION" value="SINGLEDRIVE" />
 		<define key="MAX_APPLICATION_SPEED" value="2500" />
@@ -61,7 +63,7 @@
 		<define key="ENC_INVERT_SPEED" value="DISABLE" />
 		<define key="ENC_AVERAGING_FIFO_DEPTH" value="16" />
 		<define key="HALL_MEAS_ERRORS_BEFORE_FAULTS" value="255" />
-		<define key="HALL_ICx_FILTER" value="256" />
+		<define key="HALL_ICx_FILTER" value="80" />
 		<define key="HALL_AVERAGING_FIFO_DEPTH" value="6" />
 		<define key="HALL_MTPA" value="FALSE" />
 		<define key="VARIANCE_THRESHOLD" value="0.1" />
@@ -166,11 +168,11 @@
 		<define key="ALIGNMENT_DURATION" value="700" />
 		<define key="ALIGNMENT_ANGLE_DEG" value="90" />
 		<define key="FINAL_I_ALIGNMENT" value="619" />
-		<define key="STARTING_ANGLE_DEG" value="120" />
+		<define key="STARTING_ANGLE_DEG" value="0" />
 		<define key="PHASE1_DURATION" value="0" />
 		<define key="PHASE1_FINAL_SPEED_RPM" value="0" />
 		<define key="PHASE1_FINAL_CURRENT" value="0" />
-		<define key="PHASE2_DURATION" value="100" />
+		<define key="PHASE2_DURATION" value="0" />
 		<define key="PHASE2_FINAL_SPEED_RPM" value="0" />
 		<define key="PHASE2_FINAL_CURRENT" value="317" />
 		<define key="PHASE3_DURATION" value="1000" />
@@ -277,8 +279,8 @@
 		<define key="ENC_TIMER_REMAPPING" value="NO_REMAP_TIM2" />
 		<define key="ENC_A_GPIO_PORT" value="GPIOA" />
 		<define key="ENC_A_GPIO_PIN" value="GPIO_Pin_0" />
-		<define key="ENC_B_GPIO_PORT" value="GPIOB" />
-		<define key="ENC_B_GPIO_PIN" value="GPIO_Pin_3" />
+		<define key="ENC_B_GPIO_PORT" value="GPIOA" />
+		<define key="ENC_B_GPIO_PIN" value="GPIO_Pin_1" />
 		<define key="ENC_USE_CH3" value="FALSE" />
 		<define key="R_BRAKE_GPIO_PORT" value="GPIOE" />
 		<define key="R_BRAKE_GPIO_PIN" value="GPIO_Pin_5" />

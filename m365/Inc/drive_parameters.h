@@ -164,7 +164,7 @@
 #define PHASE1_FINAL_SPEED_UNIT         (0*SPEED_UNIT/_RPM)
 #define PHASE1_FINAL_CURRENT           0
 /* Phase 2 */
-#define PHASE2_DURATION                100 /*milliseconds */
+#define PHASE2_DURATION                0 /*milliseconds */
 #define PHASE2_FINAL_SPEED_UNIT         (0*SPEED_UNIT/_RPM)
 #define PHASE2_FINAL_CURRENT           317
 /* Phase 3 */
@@ -182,7 +182,7 @@
 
 #define ENABLE_SL_ALGO_FROM_PHASE      3
 /* Sensor-less rev-up sequence */
-#define STARTING_ANGLE_DEG             120  /*!< degrees [0...359] */
+#define STARTING_ANGLE_DEG             0  /*!< degrees [0...359] */
 /* Observer start-up output conditions  */
 #define OBS_MINIMUM_SPEED_RPM          580
 
