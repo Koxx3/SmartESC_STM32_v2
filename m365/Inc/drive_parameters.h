@@ -37,16 +37,42 @@
 #define MEAS_ERRORS_BEFORE_FAULTS       255 /*!< Number of speed
                                                              measurement errors before
                                                              main sensor goes in fault */
-/****** Hall sensors ************/
-#define HALL_MEAS_ERRORS_BEFORE_FAULTS  255 /*!< Number of failed
-                                                           derived class specific speed
-                                                           measurements before main sensor
-                                                           goes in fault */
+/****** State Observer + PLL ****/
+#define VARIANCE_THRESHOLD              0.1 /*!<Maximum accepted
+                                                            variance on speed
+                                                            estimates (percentage) */
+/* State observer scaling factors F1 */
+#define F1                               16384
+#define F2                               4096
+#define F1_LOG                           LOG2(16384)
+#define F2_LOG                           LOG2(4096)
 
-#define HALL_AVERAGING_FIFO_DEPTH        6 /*!< depth of the FIFO used to
-                                                           average mechanical speed in
-                                                           0.1Hz resolution */
-#define HALL_MTPA  false
+/* State observer constants */
+#define GAIN1                            -23270
+#define GAIN2                            16401
+/*Only in case PLL is used, PLL gains */
+#define PLL_KP_GAIN                      1247
+#define PLL_KI_GAIN                      55
+#define PLL_KPDIV     16384
+#define PLL_KPDIV_LOG LOG2(PLL_KPDIV)
+#define PLL_KIDIV     65535
+#define PLL_KIDIV_LOG LOG2(PLL_KIDIV)
+
+#define OBS_MEAS_ERRORS_BEFORE_FAULTS    255  /*!< Number of consecutive errors
+                                                           on variance test before a speed
+                                                           feedback error is reported */
+#define STO_FIFO_DEPTH_DPP               64  /*!< Depth of the FIFO used
+                                                            to average mechanical speed
+                                                            in dpp format */
+#define STO_FIFO_DEPTH_DPP_LOG           LOG2(64)
+
+#define STO_FIFO_DEPTH_UNIT              64  /*!< Depth of the FIFO used
+                                                            to average mechanical speed
+                                                            in the unit defined by #SPEED_UNIT */
+#define BEMF_CONSISTENCY_TOL             64   /* Parameter for B-emf
+                                                            amplitude-speed consistency */
+#define BEMF_CONSISTENCY_GAIN            64   /* Parameter for B-emf
+                                                           amplitude-speed consistency */
 
 /* USER CODE BEGIN angle reconstruction M1 */
 #define REV_PARK_ANGLE_COMPENSATION_FACTOR 0
@@ -138,7 +164,49 @@
                                                           power stage) */
 /******************************   START-UP PARAMETERS   **********************/
 
-#define TRANSITION_DURATION            25  /* Switch over duration, ms */
+/* Phase 1 */
+#define PHASE1_DURATION                1000 /*milliseconds */
+#define PHASE1_FINAL_SPEED_UNIT         (0*SPEED_UNIT/_RPM)
+#define PHASE1_FINAL_CURRENT           0
+/* Phase 2 */
+#define PHASE2_DURATION                1000 /*milliseconds */
+#define PHASE2_FINAL_SPEED_UNIT         (0*SPEED_UNIT/_RPM)
+#define PHASE2_FINAL_CURRENT           0
+/* Phase 3 */
+#define PHASE3_DURATION                700 /*milliseconds */
+#define PHASE3_FINAL_SPEED_UNIT         (0*SPEED_UNIT/_RPM)
+#define PHASE3_FINAL_CURRENT           190
+/* Phase 4 */
+#define PHASE4_DURATION                350 /*milliseconds */
+#define PHASE4_FINAL_SPEED_UNIT         (116*SPEED_UNIT/_RPM)
+#define PHASE4_FINAL_CURRENT           222
+/* Phase 5 */
+#define PHASE5_DURATION                1150 /* milliseconds */
+#define PHASE5_FINAL_SPEED_UNIT         (500*SPEED_UNIT/_RPM)
+#define PHASE5_FINAL_CURRENT           222
+
+#define ENABLE_SL_ALGO_FROM_PHASE      1
+/* Sensor-less rev-up sequence */
+#define STARTING_ANGLE_DEG             90  /*!< degrees [0...359] */
+/* Observer start-up output conditions  */
+#define OBS_MINIMUM_SPEED_RPM          580
+
+#define NB_CONSECUTIVE_TESTS           2 /* corresponding to
+                                                         former NB_CONSECUTIVE_TESTS/
+                                                         (TF_REGULATION_RATE/
+                                                         MEDIUM_FREQUENCY_TASK_RATE) */
+#define SPEED_BAND_UPPER_LIMIT         17 /*!< It expresses how much
+                                                            estimated speed can exceed
+                                                            forced stator electrical
+                                                            without being considered wrong.
+                                                            In 1/16 of forced speed */
+#define SPEED_BAND_LOWER_LIMIT         15  /*!< It expresses how much
+                                                             estimated speed can be below
+                                                             forced stator electrical
+                                                             without being considered wrong.
+                                                             In 1/16 of forced speed */
+
+#define TRANSITION_DURATION            0  /* Switch over duration, ms */
 /******************************   BUS VOLTAGE Motor 1  **********************/
 #define  M1_VBUS_SAMPLING_TIME  LL_ADC_SAMPLING_CYCLE(1)
 /******************************   Temperature sensing Motor 1  **********************/

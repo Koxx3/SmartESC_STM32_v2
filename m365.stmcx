@@ -263,7 +263,7 @@
 					<board_name></board_name>
 					<original_board_name></original_board_name>
 					<vars>
-						<var version="1.0" type="MC_List" name="Main - Sensor selection" enable="true" visible="true" readonly="false" value="4">
+						<var version="1.0" type="MC_List" name="Main - Sensor selection" enable="true" visible="true" readonly="false" value="0">
 							<items>
 								<item tag="0" text="Sensor-less (Observer+PLL)" />
 								<item tag="1" text="Sensor-less (Observer+Cordic)" />
@@ -275,25 +275,25 @@
 						<var version="1.0" type="MC_Int" name="Main - Max allowed speed" enable="false" visible="false" readonly="false" value="2500" />
 						<var version="1.0" type="MC_Int" name="Main - Min allowed speed" enable="false" visible="false" readonly="false" value="0" />
 						<var version="1.0" type="MC_Int" name="Main - Max measurement errors number before fault" enable="true" visible="true" readonly="false" value="255" />
-						<var version="1.0" type="MC_Int" name="Main - Hall Sensors - Average speed FIFO depth" enable="true" visible="true" readonly="false" value="6" />
-						<var version="1.0" type="MC_Double" name="Main - Hall Sensors - Input Capture filter duration" enable="true" visible="true" readonly="false" value="0.03" />
-						<var version="1.0" type="MC_Bool" name="Main_ObsPLL_Use_MTPA" enable="true" visible="true" readonly="false" value="false" />
+						<var version="1.0" type="MC_Int" name="Main - Hall Sensors - Average speed FIFO depth" enable="false" visible="true" readonly="false" value="6" />
+						<var version="1.0" type="MC_Double" name="Main - Hall Sensors - Input Capture filter duration" enable="false" visible="true" readonly="false" value="4" />
+						<var version="1.0" type="MC_Bool" name="Main_ObsPLL_Use_MTPA" enable="false" visible="true" readonly="false" value="false" />
 						<var version="1.0" type="MC_Int" name="Main - Encoder - Average speed FIFO depth" enable="false" visible="true" readonly="false" value="16" />
 						<var version="1.0" type="MC_Double" name="Main - Encoder - Input Capture filter duration" enable="false" visible="true" readonly="false" value="0.70000000000000007" />
 						<var version="1.0" type="MC_Bool" name="Main - Encoder - Reverse counting direction" enable="false" visible="true" readonly="false" value="false" />
-						<var version="1.0" type="MC_Double" name="Main - ObsPLL - Variance threshold" enable="false" visible="true" readonly="false" value="10" />
-						<var version="1.0" type="MC_Double" name="Main - ObsPLL - B-emf consistency tolerance" enable="false" visible="true" readonly="false" value="100" />
-						<var version="1.0" type="MC_Double" name="Main - ObsPLL - B-emf consistency gain" enable="false" visible="true" readonly="false" value="100" />
-						<var version="1.0" type="MC_Bool" name="Main - ObsPLL - Manual editing enabled" enable="false" visible="true" readonly="false" value="false" />
-						<var version="1.0" type="MC_Bool" name="Main - ObsPLL - Back compatibility" enable="false" visible="true" readonly="false" value="false" />
+						<var version="1.0" type="MC_Double" name="Main - ObsPLL - Variance threshold" enable="true" visible="true" readonly="false" value="10" />
+						<var version="1.0" type="MC_Double" name="Main - ObsPLL - B-emf consistency tolerance" enable="true" visible="true" readonly="false" value="100" />
+						<var version="1.0" type="MC_Double" name="Main - ObsPLL - B-emf consistency gain" enable="true" visible="true" readonly="false" value="100" />
+						<var version="1.0" type="MC_Bool" name="Main - ObsPLL - Manual editing enabled" enable="true" visible="true" readonly="false" value="false" />
+						<var version="1.0" type="MC_Bool" name="Main - ObsPLL - Back compatibility" enable="true" visible="true" readonly="false" value="false" />
 						<var version="1.0" type="MC_Int" name="Main - ObsPLL - F1" enable="false" visible="true" readonly="false" value="16384" />
 						<var version="1.0" type="MC_Int" name="Main - ObsPLL - F2" enable="false" visible="true" readonly="false" value="16384" />
 						<var version="1.0" type="MC_Int" name="Main - ObsPLL - G1" enable="false" visible="true" readonly="false" value="-23270" />
 						<var version="1.0" type="MC_Int" name="Main - ObsPLL - G2" enable="false" visible="true" readonly="false" value="16066" />
 						<var version="1.0" type="MC_Int" name="Main - ObsPLL - K1" enable="false" visible="true" readonly="false" value="-22725" />
 						<var version="1.0" type="MC_Int" name="Main - ObsPLL - K2" enable="false" visible="true" readonly="false" value="14910" />
-						<var version="1.0" type="MC_Int" name="Main - ObsPLL - Average speed FIFO depth for speed loop" enable="false" visible="true" readonly="false" value="64" />
-						<var version="1.0" type="MC_Int" name="Main - ObsPLL - Average speed FIFO depth for observer equations" enable="false" visible="true" readonly="false" value="64" />
+						<var version="1.0" type="MC_Int" name="Main - ObsPLL - Average speed FIFO depth for speed loop" enable="true" visible="true" readonly="false" value="64" />
+						<var version="1.0" type="MC_Int" name="Main - ObsPLL - Average speed FIFO depth for observer equations" enable="true" visible="true" readonly="false" value="64" />
 						<var version="1.0" type="MC_Int" name="Main - ObsPLL - P dividend" enable="false" visible="true" readonly="false" value="1247" />
 						<var version="1.0" type="MC_Int" name="Main - ObsPLL - I dividend" enable="false" visible="true" readonly="false" value="55" />
 						<var version="1.0" type="MC_Int" name="Main - ObsPLL - P divisor" enable="false" visible="true" readonly="false" value="16384" />
@@ -471,16 +471,16 @@
 						<var version="1.0" type="MC_Int" name="Enc - Duration" enable="false" visible="true" readonly="false" value="700" />
 						<var version="1.0" type="MC_Int" name="Enc - Alignment electrical angle" enable="false" visible="true" readonly="false" value="90" />
 						<var version="1.0" type="MC_Double" name="Enc - Final current ramp value" enable="false" visible="true" readonly="false" value="1.95" />
-						<var version="1.0" type="MC_Bool" name="SL - Basic profile" enable="false" visible="true" readonly="false" value="true" />
-						<var version="1.0" type="MC_Int" name="SL - BP - Speed ramp duration" enable="false" visible="true" readonly="false" value="1500" />
-						<var version="1.0" type="MC_Int" name="SL - BP - Speed ramp final value" enable="false" visible="true" readonly="false" value="2700" />
+						<var version="1.0" type="MC_Bool" name="SL - Basic profile" enable="true" visible="true" readonly="false" value="true" />
+						<var version="1.0" type="MC_Int" name="SL - BP - Speed ramp duration" enable="true" visible="true" readonly="false" value="1500" />
+						<var version="1.0" type="MC_Int" name="SL - BP - Speed ramp final value" enable="true" visible="true" readonly="false" value="500" />
 						<var version="1.0" type="MC_Double" name="SL - BP - Current ramp initial value" enable="false" visible="true" readonly="false" value="0.6" />
-						<var version="1.0" type="MC_Double" name="SL - BP - Current ramp final value" enable="false" visible="true" readonly="false" value="0.70000000000000007" />
-						<var version="1.0" type="MC_Int" name="SL - BP - Current ramp duration" enable="false" visible="true" readonly="false" value="350" />
-						<var version="1.0" type="MC_Bool" name="SL - BP - Include alignment before ramp-up" enable="false" visible="true" readonly="false" value="true" />
-						<var version="1.0" type="MC_Int" name="SL - BP - Duration" enable="false" visible="true" readonly="false" value="700" />
-						<var version="1.0" type="MC_Int" name="SL - BP - Alignment electrical angle" enable="false" visible="true" readonly="false" value="90" />
-						<var version="1.0" type="MC_Double" name="SL - BP - Final current ramp value" enable="false" visible="true" readonly="false" value="0.6" />
+						<var version="1.0" type="MC_Double" name="SL - BP - Current ramp final value" enable="true" visible="true" readonly="false" value="0.70000000000000007" />
+						<var version="1.0" type="MC_Int" name="SL - BP - Current ramp duration" enable="true" visible="true" readonly="false" value="350" />
+						<var version="1.0" type="MC_Bool" name="SL - BP - Include alignment before ramp-up" enable="true" visible="true" readonly="false" value="true" />
+						<var version="1.0" type="MC_Int" name="SL - BP - Duration" enable="true" visible="true" readonly="false" value="700" />
+						<var version="1.0" type="MC_Int" name="SL - BP - Alignment electrical angle" enable="true" visible="true" readonly="false" value="90" />
+						<var version="1.0" type="MC_Double" name="SL - BP - Final current ramp value" enable="true" visible="true" readonly="false" value="0.6" />
 						<var version="1.0" type="MC_Int" name="SL - ACP - Initial electrical angle" enable="false" visible="true" readonly="false" value="90" />
 						<var version="1.0" type="MC_Int" name="SL - ACP - Phase1 - Duration" enable="false" visible="true" readonly="false" value="700" />
 						<var version="1.0" type="MC_Int" name="SL - ACP - Phase1 - Final speed" enable="false" visible="true" readonly="false" value="2000" />
@@ -506,13 +506,13 @@
 								<item tag="5" text="5" />
 							</items>
 						</var>
-						<var version="1.0" type="MC_Int" name="SL - Consecutive succesful start-up output tests" enable="false" visible="true" readonly="false" value="2" />
-						<var version="1.0" type="MC_Int" name="SL - Minimum start-up output speed" enable="false" visible="true" readonly="false" value="580" />
-						<var version="1.0" type="MC_Double" name="SL - Estimated speed Band tolerance upper limit" enable="false" visible="true" readonly="false" value="106.25" />
-						<var version="1.0" type="MC_Double" name="SL - Estimated speed Band tolerance lower limit" enable="false" visible="true" readonly="false" value="93.75" />
+						<var version="1.0" type="MC_Int" name="SL - Consecutive succesful start-up output tests" enable="true" visible="true" readonly="false" value="2" />
+						<var version="1.0" type="MC_Int" name="SL - Minimum start-up output speed" enable="true" visible="true" readonly="false" value="580" />
+						<var version="1.0" type="MC_Double" name="SL - Estimated speed Band tolerance upper limit" enable="true" visible="true" readonly="false" value="106.25" />
+						<var version="1.0" type="MC_Double" name="SL - Estimated speed Band tolerance lower limit" enable="true" visible="true" readonly="false" value="93.75" />
 						<var version="1.0" type="MC_Int" name="SL - Rev-up to FOC switch-over duration" enable="false" visible="true" readonly="false" value="25" />
-						<var version="1.0" type="MC_Bool" name="SL - Rev-up to FOC switch-over duration enabling" enable="true" visible="true" readonly="false" value="true" />
-						<var version="1.0" type="MC_Bool" name="SL_start_up_on_fly" enable="true" visible="true" readonly="false" value="false" />
+						<var version="1.0" type="MC_Bool" name="SL - Rev-up to FOC switch-over duration enabling" enable="false" visible="true" readonly="false" value="false" />
+						<var version="1.0" type="MC_Bool" name="SL_start_up_on_fly" enable="true" visible="true" readonly="false" value="true" />
 						<var version="1.0" type="MC_Int" name="SL_startUP_detection_duration" enable="true" visible="true" readonly="false" value="1000" />
 						<var version="1.0" type="MC_Int" name="SL_startUP_braking_duration" enable="true" visible="true" readonly="false" value="1000" />
 						<var version="1.0" type="MC_Bool" name="DAC functionality" enable="true" visible="true" readonly="false" value="true" />
@@ -904,35 +904,35 @@
 								<item tag="210" text="B10" />
 							</items>
 						</var>
-						<var version="1.0" type="MC_List" name="DIO - HIT - Timer" enable="true" visible="true" readonly="false" value="1">
+						<var version="1.0" type="MC_List" name="DIO - HIT - Timer" enable="false" visible="true" readonly="false" value="1">
 							<items>
 								<item tag="2" text="TIM2" />
 								<item tag="3" text="TIM3" />
 								<item tag="4" text="TIM4" />
 							</items>
 						</var>
-						<var version="1.0" type="MC_List" name="DIO - HIT - Remap" enable="true" visible="true" readonly="false" value="1">
+						<var version="1.0" type="MC_List" name="DIO - HIT - Remap" enable="false" visible="true" readonly="false" value="0">
 							<items>
 								<item tag="0" text="No remap" />
 								<item tag="2" text="Partial re-map" />
 								<item tag="3" text="Full re-map" />
 							</items>
 						</var>
-						<var version="1.0" type="MC_List" name="DIO - HIT - Pin - CH1" enable="true" visible="true" readonly="true" value="1">
+						<var version="1.0" type="MC_List" name="DIO - HIT - Pin - CH1" enable="false" visible="true" readonly="false" value="0">
 							<items>
 								<item tag="106" text="A6" />
 								<item tag="204" text="B4" />
 								<item tag="306" text="C6" />
 							</items>
 						</var>
-						<var version="1.0" type="MC_List" name="DIO - HIT - Pin - CH2" enable="true" visible="true" readonly="true" value="1">
+						<var version="1.0" type="MC_List" name="DIO - HIT - Pin - CH2" enable="false" visible="true" readonly="false" value="0">
 							<items>
 								<item tag="107" text="A7" />
 								<item tag="205" text="B5" />
 								<item tag="307" text="C7" />
 							</items>
 						</var>
-						<var version="1.0" type="MC_List" name="DIO - HIT - Pin - CH3" enable="true" visible="true" readonly="true" value="1">
+						<var version="1.0" type="MC_List" name="DIO - HIT - Pin - CH3" enable="false" visible="true" readonly="false" value="0">
 							<items>
 								<item tag="200" text="B0" />
 								<item tag="200" text="B0" />
@@ -1989,8 +1989,8 @@
 			<reg version="1.0" id="6" name="Speed Ki" description="$$DESCR_AS_NAME$$" unit="" type="16" access_mode="2" value="50" value_previous="50" minimum="0" maximum="65535" period="0" modified="false" visible="true" enable="false" />
 			<reg version="1.0" id="7" name="Speed Kd" description="$$DESCR_AS_NAME$$" unit="" type="16" access_mode="2" value="0" value_previous="0" minimum="0" maximum="65535" period="0" modified="false" visible="true" enable="true" />
 			<reg version="1.0" id="8" name="Torque reference (Iq)" description="$$DESCR_AS_NAME$$" unit="" type="144" access_mode="2" value="0" value_previous="0" minimum="-32768" maximum="32767" period="0" modified="false" visible="true" enable="true" />
-			<reg version="1.0" id="9" name="Torque Kp" description="$$DESCR_AS_NAME$$" unit="" type="16" access_mode="2" value="200" value_previous="3649" minimum="0" maximum="65535" period="0" modified="false" visible="true" enable="true" />
-			<reg version="1.0" id="10" name="Torque Ki" description="$$DESCR_AS_NAME$$" unit="" type="16" access_mode="2" value="50" value_previous="1995" minimum="0" maximum="65535" period="0" modified="false" visible="true" enable="true" />
+			<reg version="1.0" id="9" name="Torque Kp" description="$$DESCR_AS_NAME$$" unit="" type="16" access_mode="2" value="200" value_previous="200" minimum="0" maximum="65535" period="0" modified="false" visible="true" enable="true" />
+			<reg version="1.0" id="10" name="Torque Ki" description="$$DESCR_AS_NAME$$" unit="" type="16" access_mode="2" value="50" value_previous="50" minimum="0" maximum="65535" period="0" modified="false" visible="true" enable="true" />
 			<reg version="1.0" id="11" name="Torque Kd" description="$$DESCR_AS_NAME$$" unit="" type="16" access_mode="2" value="0" value_previous="0" minimum="0" maximum="65535" period="0" modified="false" visible="true" enable="true" />
 			<reg version="1.0" id="12" name="Flux reference (Id)" description="$$DESCR_AS_NAME$$" unit="" type="144" access_mode="2" value="0" value_previous="0" minimum="-32768" maximum="32767" period="0" modified="false" visible="true" enable="true" />
 			<reg version="1.0" id="13" name="Flux Kp" description="$$DESCR_AS_NAME$$" unit="" type="16" access_mode="2" value="3649" value_previous="3649" minimum="0" maximum="65535" period="0" modified="false" visible="true" enable="true" />
@@ -2006,7 +2006,7 @@
 			<reg version="1.0" id="23" name="Flux weakening Ki" description="$$DESCR_AS_NAME$$" unit="" type="16" access_mode="2" value="0" value_previous="0" minimum="0" maximum="65535" period="0" modified="false" visible="true" enable="false" />
 			<reg version="1.0" id="24" name="Flux weakening BUS Voltage allowed percentage reference" description="$$DESCR_AS_NAME$$" unit="" type="16" access_mode="2" value="0" value_previous="0" minimum="0" maximum="65535" period="0" modified="false" visible="true" enable="false" />
 			<reg version="1.0" id="25" name="Bus Voltage" description="$$DESCR_AS_NAME$$" unit="Volt" type="16" access_mode="0" value="36" value_previous="36" minimum="0" maximum="42" period="500" modified="false" visible="true" enable="true" />
-			<reg version="1.0" id="26" name="Heatsink Temperature" description="$$DESCR_AS_NAME$$" unit="°C" type="16" access_mode="0" value="20" value_previous="20" minimum="0" maximum="100" period="500" modified="false" visible="true" enable="true" />
+			<reg version="1.0" id="26" name="Heatsink Temperature" description="$$DESCR_AS_NAME$$" unit="°C" type="16" access_mode="0" value="18" value_previous="18" minimum="0" maximum="100" period="500" modified="false" visible="true" enable="true" />
 			<reg version="1.0" id="27" name="Motor Power" description="$$DESCR_AS_NAME$$" unit="W" type="16" access_mode="0" value="0" value_previous="0" minimum="0" maximum="200" period="500" modified="false" visible="true" enable="true" />
 			<reg version="1.0" id="28" name="DAC Out 1" description="$$DESCR_AS_NAME$$" unit="" type="8" access_mode="2" value="0" value_previous="0" minimum="0" maximum="255" period="0" modified="false" visible="true" enable="true" />
 			<reg version="1.0" id="29" name="DAC Out 2" description="$$DESCR_AS_NAME$$" unit="" type="8" access_mode="2" value="0" value_previous="0" minimum="0" maximum="255" period="0" modified="false" visible="true" enable="true" />

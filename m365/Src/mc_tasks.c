@@ -37,10 +37,12 @@
 
 /* USER CODE BEGIN Includes */
 
+#define PARK_ANGLE_COMPENSATION_FACTOR 0
 /* USER CODE END Includes */
 
 /* USER CODE BEGIN Private define */
 /* Private define ------------------------------------------------------------*/
+
 
 #define CHARGE_BOOT_CAP_MS  10
 #define CHARGE_BOOT_CAP_MS2 10
@@ -159,12 +161,22 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
   /*   Main speed sensor component initialization       */
   /******************************************************/
   pSTC[M1] = &SpeednTorqCtrlM1;
-  HALL_Init (&HALL_M1);
+  STO_PLL_Init (&STO_PLL_M1);
 
   /******************************************************/
   /*   Speed & torque component initialization          */
   /******************************************************/
-  STC_Init(pSTC[M1],pPIDSpeed[M1], &HALL_M1._Super);
+  STC_Init(pSTC[M1],pPIDSpeed[M1], &STO_PLL_M1._Super);
+
+  /****************************************************/
+  /*   Virtual speed sensor component initialization  */
+  /****************************************************/
+  VSS_Init (&VirtualSpeedSensorM1);
+
+  /**************************************/
+  /*   Rev-up component initialization  */
+  /**************************************/
+  RUC_Init(&RevUpControlM1,pSTC[M1],&VirtualSpeedSensorM1, &STO_M1, pwmcHandle[M1]);
 
   /********************************************************/
   /*   PID component initialization: current regulation   */
@@ -210,10 +222,10 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
   MCT[M1].pPIDId = pPIDId[M1];
   MCT[M1].pPIDFluxWeakening = MC_NULL; /* if M1 doesn't has FW */
   MCT[M1].pPWMnCurrFdbk = pwmcHandle[M1];
-  MCT[M1].pRevupCtrl = MC_NULL;              /* only if M1 is not sensorless*/
-  MCT[M1].pSpeedSensorMain = (SpeednPosFdbk_Handle_t *) &HALL_M1;
+  MCT[M1].pRevupCtrl = &RevUpControlM1;              /* only if M1 is sensorless*/
+  MCT[M1].pSpeedSensorMain = (SpeednPosFdbk_Handle_t *) &STO_PLL_M1;
   MCT[M1].pSpeedSensorAux = MC_NULL;
-  MCT[M1].pSpeedSensorVirtual = MC_NULL;
+  MCT[M1].pSpeedSensorVirtual = &VirtualSpeedSensorM1;  /* only if M1 is sensorless*/
   MCT[M1].pSpeednTorqueCtrl = pSTC[M1];
   MCT[M1].pStateMachine = &STM[M1];
   MCT[M1].pTemperatureSensor = (NTC_Handle_t *) pTemperatureSensor[M1];
@@ -321,7 +333,7 @@ __weak void TSK_MediumFrequencyTaskM1(void)
   State_t StateM1;
   int16_t wAux = 0;
 
-  bool IsSpeedReliable = HALL_CalcAvrgMecSpeedUnit( &HALL_M1, &wAux );
+  (void) STO_PLL_CalcAvrgMecSpeedUnit( &STO_PLL_M1, &wAux );
   PQD_CalcElMotorPower( pMPM[M1] );
 
   StateM1 = STM_GetState( &STM[M1] );
@@ -329,22 +341,9 @@ __weak void TSK_MediumFrequencyTaskM1(void)
   switch ( StateM1 )
   {
   case IDLE_START:
-    R3_2_TurnOnLowSides( pwmcHandle[M1] );
-    TSK_SetChargeBootCapDelayM1( CHARGE_BOOT_CAP_TICKS );
-    STM_NextState( &STM[M1], CHARGE_BOOT_CAP );
-    break;
-
-  case CHARGE_BOOT_CAP:
-    if ( TSK_ChargeBootCapDelayHasElapsedM1() )
-    {
-      PWMC_CurrentReadingCalibr( pwmcHandle[M1], CRC_START );
-
-      /* USER CODE BEGIN MediumFrequencyTask M1 Charge BootCap elapsed */
-
-      /* USER CODE END MediumFrequencyTask M1 Charge BootCap elapsed */
-
-      STM_NextState(&STM[M1],OFFSET_CALIB);
-    }
+    RUC_Clear( &RevUpControlM1, MCI_GetImposedMotorDirection( oMCInterface[M1] ) );
+    PWMC_CurrentReadingCalibr( pwmcHandle[M1], CRC_START );
+    STM_NextState( &STM[M1], OFFSET_CALIB );
     break;
 
   case OFFSET_CALIB:
@@ -355,7 +354,10 @@ __weak void TSK_MediumFrequencyTaskM1(void)
     break;
 
   case CLEAR:
-    HALL_Clear( &HALL_M1 );
+    /* In a sensorless configuration. Initiate the Revup procedure */
+    FOCVars[M1].bDriveInput = EXTERNAL;
+    STC_SetSpeedSensor( pSTC[M1], &VirtualSpeedSensorM1._Super );
+    STO_PLL_Clear( &STO_PLL_M1 );
 
     if ( STM_NextState( &STM[M1], START ) == true )
     {
@@ -367,11 +369,90 @@ __weak void TSK_MediumFrequencyTaskM1(void)
 
   case START:
     {
-        STM_NextState( &STM[M1], START_RUN ); /* only for sensored*/
+
+      /* Mechanical speed as imposed by the Virtual Speed Sensor during the Rev Up phase. */
+      int16_t hForcedMecSpeedUnit;
+      qd_t IqdRef;
+      bool ObserverConverged = false;
+
+      /* Execute the Rev Up procedure */
+      if ( ! RUC_OTF_Exec( &RevUpControlM1 ) )
+      {
+        /* The time allowed for the startup sequence has expired */
+        STM_FaultProcessing( &STM[M1], MC_START_UP, 0 );
+      }
+      else
+      {
+        /* Execute the torque open loop current start-up ramp:
+         * Compute the Iq reference current as configured in the Rev Up sequence */
+        IqdRef.q = STC_CalcTorqueReference( pSTC[M1] );
+        IqdRef.d = FOCVars[M1].UserIdref;
+        /* Iqd reference current used by the High Frequency Loop to generate the PWM output */
+        FOCVars[M1].Iqdref = IqdRef;
+      }
+
+      (void) VSS_CalcAvrgMecSpeedUnit( &VirtualSpeedSensorM1, &hForcedMecSpeedUnit );
+
+      {
+        ObserverConverged = STO_PLL_IsObserverConverged( &STO_PLL_M1,hForcedMecSpeedUnit );
+        STO_SetDirection(&STO_PLL_M1, MCI_GetImposedMotorDirection( &Mci[M1]));
+        (void) VSS_SetStartTransition( &VirtualSpeedSensorM1, ObserverConverged );
+      }
+
+      if ( ObserverConverged )
+      {
+        qd_t StatorCurrent = MCM_Park( FOCVars[M1].Ialphabeta, SPD_GetElAngle( &STO_PLL_M1._Super ) );
+
+        /* Start switch over ramp. This ramp will transition from the revup to the closed loop FOC. */
+        REMNG_Init( pREMNG[M1] );
+        REMNG_ExecRamp( pREMNG[M1], FOCVars[M1].Iqdref.q, 0 );
+        REMNG_ExecRamp( pREMNG[M1], StatorCurrent.q, TRANSITION_DURATION );
+
+        STM_NextState( &STM[M1], SWITCH_OVER );
+      }
     }
     break;
 
+  case SWITCH_OVER:
+    {
+      bool LoopClosed;
+      int16_t hForcedMecSpeedUnit;
+
+      if ( ! RUC_OTF_Exec( &RevUpControlM1 ) )
+      {
+          /* The time allowed for the startup sequence has expired */
+          STM_FaultProcessing( &STM[M1], MC_START_UP, 0 );
+      }
+      else
+      {
+        /* Compute the virtual speed and positions of the rotor.
+           The function returns true if the virtual speed is in the reliability range */
+        LoopClosed = VSS_CalcAvrgMecSpeedUnit(&VirtualSpeedSensorM1,&hForcedMecSpeedUnit);
+        /* Check if the transition ramp has completed. */
+        LoopClosed |= VSS_TransitionEnded( &VirtualSpeedSensorM1 );
+
+        /* If any of the above conditions is true, the loop is considered closed.
+           The state machine transitions to the START_RUN state. */
+        if ( LoopClosed == true )
+        {
+          #if ( PID_SPEED_INTEGRAL_INIT_DIV == 0 )
+          PID_SetIntegralTerm( pPIDSpeed[M1], 0 );
+          #else
+          PID_SetIntegralTerm( pPIDSpeed[M1],
+                               (int32_t) ( FOCVars[M1].Iqdref.q * PID_GetKIDivisor(pPIDSpeed[M1]) /
+                               PID_SPEED_INTEGRAL_INIT_DIV ) );
+          #endif
+
+          STM_NextState( &STM[M1], START_RUN );
+        }
+      }
+    }
+
+    break;
+
   case START_RUN:
+ /* only for sensor-less control */
+    STC_SetSpeedSensor(pSTC[M1], &STO_PLL_M1._Super); /*Observer has converged*/
     {
       /* USER CODE BEGIN MediumFrequencyTask M1 1 */
 
@@ -392,11 +473,6 @@ __weak void TSK_MediumFrequencyTaskM1(void)
 
     MCI_ExecBufferedCommands( oMCInterface[M1] );
     FOC_CalcCurrRef( M1 );
-
-    if( !IsSpeedReliable )
-    {
-      STM_FaultProcessing( &STM[M1], MC_SPEED_FDBK, 0 );
-    }
 
     /* USER CODE BEGIN MediumFrequencyTask M1 3 */
 
@@ -424,6 +500,9 @@ __weak void TSK_MediumFrequencyTaskM1(void)
     break;
 
   case STOP_IDLE:
+    STC_SetSpeedSensor( pSTC[M1],&VirtualSpeedSensorM1._Super );  	/*  sensor-less */
+    VSS_Clear( &VirtualSpeedSensorM1 ); /* Reset measured speed in IDLE */
+
     /* USER CODE BEGIN MediumFrequencyTask M1 5 */
 
     /* USER CODE END MediumFrequencyTask M1 5 */
@@ -595,21 +674,46 @@ __weak uint8_t TSK_HighFrequencyTask(void)
   uint8_t bMotorNbr = 0;
   uint16_t hFOCreturn;
 
-  HALL_CalcElAngle (&HALL_M1);
+  uint16_t hState;  /*  only if sensorless main*/
+  Observer_Inputs_t STO_Inputs; /*  only if sensorless main*/
 
-  /* USER CODE BEGIN HighFrequencyTask SINGLEDRIVE_1 */
-
-  /* USER CODE END HighFrequencyTask SINGLEDRIVE_1 */
-  hFOCreturn = FOC_CurrControllerM1();
-  /* USER CODE BEGIN HighFrequencyTask SINGLEDRIVE_2 */
-
-  /* USER CODE END HighFrequencyTask SINGLEDRIVE_2 */
+  STO_Inputs.Valfa_beta = FOCVars[M1].Valphabeta;  /* only if sensorless*/
+  if ( STM[M1].bState == SWITCH_OVER )
+  {
+    if (!REMNG_RampCompleted(pREMNG[M1]))
+    {
+      FOCVars[M1].Iqdref.q = REMNG_Calc(pREMNG[M1]);
+    }
+  }
+  if(!RUC_Get_SCLowsideOTF_Status(&RevUpControlM1))
+  {
+    hFOCreturn = FOC_CurrControllerM1();
+  }
+  else
+  {
+    hFOCreturn = MC_NO_ERROR;
+  }
   if(hFOCreturn == MC_FOC_DURATION)
   {
     STM_FaultProcessing(&STM[M1], MC_FOC_DURATION, 0);
   }
   else
   {
+    bool IsAccelerationStageReached = RUC_FirstAccelerationStageReached(&RevUpControlM1);
+    STO_Inputs.Ialfa_beta = FOCVars[M1].Ialphabeta; /*  only if sensorless*/
+    STO_Inputs.Vbus = VBS_GetAvBusVoltage_d(&(pBusSensorM1->_Super)); /*  only for sensorless*/
+    STO_PLL_CalcElAngle (&STO_PLL_M1, &STO_Inputs);
+    STO_PLL_CalcAvrgElSpeedDpp (&STO_PLL_M1); /*  Only in case of Sensor-less */
+	 if (IsAccelerationStageReached == false)
+    {
+      STO_ResetPLL(&STO_PLL_M1);
+    }
+    hState = STM_GetState(&STM[M1]);
+    if((hState == START) || (hState == SWITCH_OVER) || (hState == START_RUN)) /*  only for sensor-less*/
+    {
+      int16_t hObsAngle = SPD_GetElAngle(&STO_PLL_M1._Super);
+      VSS_CalcElAngle(&VirtualSpeedSensorM1,&hObsAngle);
+    }
     /* USER CODE BEGIN HighFrequencyTask SINGLEDRIVE_3 */
 
     /* USER CODE END HighFrequencyTask SINGLEDRIVE_3 */
@@ -649,6 +753,7 @@ inline uint16_t FOC_CurrControllerM1(void)
 
   speedHandle = STC_GetSpeedSensor(pSTC[M1]);
   hElAngle = SPD_GetElAngle(speedHandle);
+  hElAngle += SPD_GetInstElSpeedDpp(speedHandle)*PARK_ANGLE_COMPENSATION_FACTOR;
   PWMC_GetPhaseCurrents(pwmcHandle[M1], &Iab);
   Ialphabeta = MCM_Clarke(Iab);
   Iqd = MCM_Park(Ialphabeta, hElAngle);
@@ -830,9 +935,6 @@ void StartSafetyTask(void const * argument)
   */
 __weak void mc_lock_pins (void)
 {
-LL_GPIO_LockPin(M1_HALL_H3_GPIO_Port, M1_HALL_H3_Pin);
-LL_GPIO_LockPin(M1_HALL_H1_GPIO_Port, M1_HALL_H1_Pin);
-LL_GPIO_LockPin(M1_HALL_H2_GPIO_Port, M1_HALL_H2_Pin);
 LL_GPIO_LockPin(M1_PWM_UH_GPIO_Port, M1_PWM_UH_Pin);
 LL_GPIO_LockPin(M1_PWM_VH_GPIO_Port, M1_PWM_VH_Pin);
 LL_GPIO_LockPin(M1_PWM_VL_GPIO_Port, M1_PWM_VL_Pin);
