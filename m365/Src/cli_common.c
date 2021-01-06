@@ -43,7 +43,6 @@ uint8_t callback_DefaultFunction(parameter_entry * params, uint8_t index, TERMIN
 
 
 cli_config configuration;
-cli_parameter param;
 
 
 
@@ -54,8 +53,6 @@ void init_config(){
     configuration.conf1 = 123;
     configuration.conf2 = 456;
 
-    param.para1 = 222;
-	param.para2 = 333;
 }
 
 // clang-format off
@@ -66,10 +63,9 @@ void init_config(){
 
 parameter_entry confparam[] = {
     //       Parameter Type ,"Text   "         , Value ptr                     ,Min     ,Max    ,Div    ,Callback Function           ,Help text
-    ADD_PARAM(PARAM_DEFAULT ,"para1"           , param.para1                   , 0      ,10000  ,0      ,callback_DefaultFunction    ,"Test parameter 1")
-    ADD_PARAM(PARAM_DEFAULT ,"para2"           , param.para2                   , 0      ,10000  ,0      ,callback_DefaultFunction    ,"Test parameter 2")
-    ADD_PARAM(PARAM_CONFIG  ,"conf1"           , configuration.conf1           , 0      ,10000  ,0      ,callback_ConfigFunction     ,"Test config 1")
-    ADD_PARAM(PARAM_CONFIG  ,"conf2"           , configuration.conf2           , 0      ,10000  ,0      ,callback_ConfigFunction     ,"Test config 2")
+    ADD_PARAM("conf1"           , configuration.conf1           , 0      ,10000  ,0      ,callback_DefaultFunction    ,"Test parameter 1")
+    ADD_PARAM("conf2"           , configuration.conf2           , 0      ,10000  ,0      ,callback_DefaultFunction    ,"Test parameter 2")
+    ADD_PARAM("conf3"           , configuration.conf3           , 0      ,10000  ,10     ,callback_ConfigFunction     ,"Test config 1")
 };
 
 
@@ -126,9 +122,7 @@ uint8_t CMD_get(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args) {
 			return TERM_CMD_EXIT_SUCCESS;
 		}
 	}
-	TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_RED);
 	ttprintf("E: unknown param\r\n");
-	TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_WHITE);
 	return 0;
 }
 
@@ -149,33 +143,23 @@ uint8_t CMD_set(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args) {
 			if (updateDefaultFunction(confparam, args[1],current_parameter, handle)){
                 if(confparam[current_parameter].callback_function){
                     if (confparam[current_parameter].callback_function(confparam, current_parameter, handle)){
-                        TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_GREEN);
                         ttprintf("OK\r\n");
-                        TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_WHITE);
                         return TERM_CMD_EXIT_SUCCESS;
                     }else{
-                        TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_RED);
                         ttprintf("ERROR: Callback\r\n");
-                        TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_WHITE);
                         return TERM_CMD_EXIT_SUCCESS;
                     }
                 }else{
-                    TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_GREEN);
                     ttprintf("OK\r\n");
-                    TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_WHITE);
                     return TERM_CMD_EXIT_SUCCESS;
                 }
 			} else {
-				TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_RED);
 				ttprintf("NOK\r\n");
-				TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_WHITE);
 				return TERM_CMD_EXIT_SUCCESS;
 			}
 		}
 	}
-	TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_RED);
 	ttprintf("E: unknown param\r\n");
-	TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_WHITE);
 	return TERM_CMD_EXIT_SUCCESS;
 }
 
@@ -189,8 +173,21 @@ uint8_t CMD_eeprom(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args) {
         return TERM_CMD_EXIT_SUCCESS;
     }
 	if(strcmp(args[0], "save") == 0){
+		taskENTER_CRITICAL();
+
+		HAL_FLASH_Unlock();
+		uint32_t page_error = 0;
+		FLASH_EraseInitTypeDef s_eraseinit;
+		s_eraseinit.TypeErase   = FLASH_TYPEERASE_PAGES;
+		s_eraseinit.PageAddress = ADDR_FLASH_PAGE_63;
+		s_eraseinit.NbPages     = 1;
+		HAL_FLASHEx_Erase(&s_eraseinit, &page_error);
+
         EEPROM_check_hash(confparam,PARAM_SIZE(confparam),handle);
 	    EEPROM_write_conf(confparam, PARAM_SIZE(confparam),0, handle);
+
+	    HAL_FLASH_Lock();
+	    taskEXIT_CRITICAL();
 
 		return TERM_CMD_EXIT_SUCCESS;
 	}
@@ -210,76 +207,6 @@ uint8_t CMD_eeprom(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args) {
 uint8_t CMD_load_defaults(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
     ttprintf("Default parameters loaded\r\n");
     init_config();
-    return TERM_CMD_EXIT_SUCCESS;
-}
-
-
-/*****************************************************************************
-* Signal debugging
-******************************************************************************/
-
-void send_signal_state(uint8_t signal, uint8_t inverted, TERMINAL_HANDLE * handle){
-    if(inverted) signal = !signal; 
-    if(signal){
-        TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_RED);
-        ttprintf("true \r\n");
-        TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_WHITE);  
-    }else{
-        TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_GREEN);
-        ttprintf("false\r\n");
-        TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_WHITE);;
-    }
-}
-void send_signal_state_wo(uint8_t signal, uint8_t inverted, TERMINAL_HANDLE * handle){
-    if(inverted) signal = !signal; 
-    if(signal){
-        TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_RED);
-        ttprintf("true ");
-        TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_WHITE); 
-    }else{
-        TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_GREEN);
-        ttprintf("false");
-        TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_WHITE);
-    }
-}
-
-void send_signal_state_new(uint8_t signal, uint8_t inverted, TERMINAL_HANDLE * handle){
-    if(inverted) signal = !signal; 
-    if(signal){
-        TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_RED);
-        ttprintf("true \r\n");
-        TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_WHITE); 
-    }else{
-        TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_GREEN);
-        ttprintf("false\r\n");
-        TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_WHITE);
-    }
-}
-void send_signal_state_wo_new(uint8_t signal, uint8_t inverted, TERMINAL_HANDLE * handle){
-    if(inverted) signal = !signal; 
-    if(signal){
-        TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_RED);
-        ttprintf("true ");
-        TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_WHITE);
-    }else{
-        TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_GREEN);
-        ttprintf("false");
-        TERM_sendVT100Code(handle, _VT100_FOREGROUND_COLOR, _VT100_WHITE);
-    }
-}
-
-uint8_t CMD_signals(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
-    TERM_sendVT100Code(handle, _VT100_CLS, 0);
-    TERM_sendVT100Code(handle, _VT100_CURSOR_DISABLE, 0);
-    do{
-        TERM_sendVT100Code(handle, _VT100_CURSOR_POS1, 0);
-        ttprintf("Signal state [CTRL+C] for quit:\r\n");
-        ttprintf("**************************\r\n");
-
-    }while(Term_check_break(handle,250));
-    
-    TERM_sendVT100Code(handle, _VT100_RESET_ATTRIB, 0);
-
     return TERM_CMD_EXIT_SUCCESS;
 }
 

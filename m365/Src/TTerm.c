@@ -106,21 +106,21 @@ void TERM_printDebug(TERMINAL_HANDLE * handle, char * format, ...){
     //TODO implement a debug level control in the terminal handle (permission level?)
     va_list arg;
     va_start(arg, format);
-    
+
     char * buff = (char*) pvPortMalloc(256);
     vsnprintf(buff, 256,format, arg);
-    
+
     ttprintfEcho("\r\n%s", buff);
-    
+
     if(handle->currBufferLength == 0){
         ttprintfEcho("%s@%s>", handle->currUserName, TERM_DEVICE_NAME);
     }else{
         ttprintfEcho("%s@%s>%s", handle->currUserName, TERM_DEVICE_NAME, handle->inputBuffer);
         if(handle->inputBuffer[handle->currBufferPosition] != 0) TERM_sendVT100Code(handle, _VT100_CURSOR_BACK_BY, handle->currBufferLength - handle->currBufferPosition);
     }
-    
+
     vPortFree(buff);
-    
+
     va_end(arg);
 }
 
@@ -303,7 +303,7 @@ uint8_t TERM_handleInput(uint16_t c, TERMINAL_HANDLE * handle){
             if(handle->inputBuffer[handle->currBufferPosition] != 0){      //check if we are at the end of our command
                 //we are somewhere in the middle -> move back existing characters
                 strsft(handle->inputBuffer, handle->currBufferPosition - 1, -1);    
-                ttprintfEcho("\x08");   
+                ttprintfEcho("\x08");
                 TERM_sendVT100Code(handle, _VT100_ERASE_LINE_END, 0);
                 ttprintfEcho("%s", &handle->inputBuffer[handle->currBufferPosition - 1]);
                 TERM_sendVT100Code(handle, _VT100_CURSOR_BACK_BY, handle->currBufferLength - handle->currBufferPosition);
@@ -358,7 +358,7 @@ uint8_t TERM_handleInput(uint16_t c, TERMINAL_HANDLE * handle){
             
             //print out the command at the current history read position
             if(handle->currHistoryReadPosition == handle->currHistoryWritePosition){
-                ttprintfEcho("\x07");   //rings a bell doesn't it?                                                      
+                ttprintfEcho("\x07");   //rings a bell doesn't it?
                 TERM_sendVT100Code(handle, _VT100_ERASE_LINE, 0);
                 ttprintfEcho("\r%s@%s>%s", handle->currUserName, TERM_DEVICE_NAME, handle->inputBuffer);
             }else{
@@ -380,7 +380,7 @@ uint8_t TERM_handleInput(uint16_t c, TERMINAL_HANDLE * handle){
             
             //print out the command at the current history read position
             if(handle->currHistoryReadPosition == handle->currHistoryWritePosition){
-                ttprintfEcho("\x07");   //rings a bell doesn't it?                                                      
+                ttprintfEcho("\x07");   //rings a bell doesn't it?
                 TERM_sendVT100Code(handle, _VT100_ERASE_LINE, 0);
                 ttprintfEcho("\r%s@%s>%s", handle->currUserName, TERM_DEVICE_NAME, handle->inputBuffer);
             }else{
@@ -858,7 +858,7 @@ void TERM_sendVT100Code(TERMINAL_HANDLE * handle, uint16_t cmd, uint8_t var){
         case _VT100_CURSOR_DOWN_BY:
             ttprintfEcho("\x1b[%dB", var);
             break;
-            
+
     }
 }
 
@@ -996,4 +996,4 @@ void TERM_removeProgramm(TERMINAL_HANDLE * handle){
 const char TERM_startupText1[] = "            333333    666   555555\r\nmm mm mmmm     3333  66     55\r\nmmm  mm  mm   3333  666666  555555";
 const char TERM_startupText2[] = "mmm  mm  mm     333 66   66    5555\r\nmmm  mm  mm 333333   66666  555555\r\n";
 const char TERM_startupText3[] = "\tBuild: " __DATE__ " - " __TIME__ "";
-#endif   
+#endif

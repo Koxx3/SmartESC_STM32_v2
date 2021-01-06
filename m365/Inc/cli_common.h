@@ -52,18 +52,16 @@ extern parameter_entry confparam[];
 
 struct config_struct{
     uint16_t conf1;
-    uint16_t conf2;
+    float conf2;
+    int32_t conf3;
 };
 typedef struct config_struct cli_config;
 
-struct parameter_struct{
-    uint16_t    para1;
-    uint16_t    para2;
-};
+
 typedef struct parameter_struct cli_parameter;
 
 extern cli_config configuration;
-extern cli_parameter param;
+
 
 #define CONF_SIZE sizeof(confparam) / sizeof(parameter_entry)
 

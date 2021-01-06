@@ -50,7 +50,7 @@ enum cli_types{
     char*:      TYPE_STRING)
 
 #define SIZEP(x) ((char*)(&(x) + 1) - (char*)&(x))
-#define ADD_PARAM(para_type,text, value_var, min, max, div, update_func, help_text) {para_type, text, &value_var, SIZEP(value_var), typename(value_var),min, max, div, update_func, help_text},
+#define ADD_PARAM(text, value_var, min, max, div, update_func, help_text) {text, &value_var, SIZEP(value_var), typename(value_var),min, max, div, update_func, help_text},
 #define ADD_COMMAND(command, command_func, help_text) {command, command_func, help_text},
 
     
@@ -66,11 +66,10 @@ enum cli_types{
 #define CYDEV_EE_SIZE 1024
 #define CY_EEPROM_SIZE              (CYDEV_EE_SIZE)
 
-
+#define ADDR_FLASH_PAGE_63    ((uint32_t)0x0800FC00) /* Base @ of Page 63, 1 Kbytes */
    
 typedef struct parameter_entry_struct parameter_entry;
 struct parameter_entry_struct {
-    const uint8_t parameter_type;
 	const char *name;
 	void *value;
 	const uint8_t size;

@@ -35,7 +35,7 @@ uint8_t EEPROM_1_Write_Row(uint8_t row, uint8_t * buffer);
 
 uint16_t byte_cnt;
 
-#define ADDR_FLASH_PAGE_63    ((uint32_t)0x0800FC00) /* Base @ of Page 63, 1 Kbytes */
+
 
 uint8_t EEPROM_1_ReadByte(uint8_t x){
 	uint8_t data[4];
@@ -80,17 +80,64 @@ uint8_t n_number(uint32_t n){
     return 10;   
 }
 
+int ipow(int base, int exp)
+{
+    int result = 1;
+    for (;;)
+    {
+        if (exp & 1)
+            result *= base;
+        exp >>= 1;
+        if (!exp)
+            break;
+        base *= base;
+    }
+
+    return result;
+}
+
+float  get_before_comma(char* str){
+	char * save = str;
+	while(str){
+		if(*str == '.' || *str == ','){
+			*str = '\0';
+			return strtol(save, NULL, 10);
+		}
+		str++;
+	}
+	return 0;
+}
+
+float  get_behind_comma(char* str){
+	while(str){
+		if(*str == '.' || *str == ','){
+			str++;
+			if(*str || *str != ' ') return (float)strtoul(str, NULL, 10) / (float)(ipow(10,strlen(str)));
+		}
+		str++;
+	}
+	return 0;
+}
+
+float get_f_val(char * val){
+	float behind = get_behind_comma(val);
+	return behind + (get_before_comma(val));
+}
+
+
+
 uint8_t updateDefaultFunction(parameter_entry * params, char * newValue, uint8_t index, TERMINAL_HANDLE * handle) {
     int32_t value;
     float fvalue;
-    char* ch_ptr;
+
     switch (params[index].type){
     case TYPE_UNSIGNED:
         if(params[index].div){
-            fvalue=strtof(newValue,&ch_ptr);
+            fvalue=get_f_val(newValue);
+
             value = fvalue*params[index].div;
         }else{
-            value = strtoul(newValue,&ch_ptr,10);
+            value = strtoul(newValue,NULL,10);
         }
         if (value >= params[index].min && value <= params[index].max){
             if(params[index].size==1){
@@ -111,10 +158,10 @@ uint8_t updateDefaultFunction(parameter_entry * params, char * newValue, uint8_t
         break;
     case TYPE_SIGNED:
         if(params[index].div){
-            fvalue=strtof(newValue,&ch_ptr);
+        	fvalue=get_f_val(newValue);
             value = fvalue*params[index].div;
         }else{
-            value = strtol(newValue,&ch_ptr,10);
+            value = strtol(newValue,NULL,10);
         }
         if (value >= params[index].min && value <= params[index].max){
             if(params[index].size==1){
@@ -135,7 +182,7 @@ uint8_t updateDefaultFunction(parameter_entry * params, char * newValue, uint8_t
         break;
     case TYPE_FLOAT:
             if(params[index].size==4){
-                fvalue=strtof(newValue,&ch_ptr);
+            	fvalue=get_f_val(newValue);
                 if (fvalue >= (float)params[index].min && fvalue <= (float)params[index].max){
                     *(float*)params[index].value = fvalue;
                     return 1;
@@ -170,7 +217,6 @@ uint8_t updateDefaultFunction(parameter_entry * params, char * newValue, uint8_t
 
     return 0;
 }
-
 
 
 void print_param_helperfunc(parameter_entry * params, uint8_t param_size, TERMINAL_HANDLE * handle, uint8_t param_type){
@@ -271,8 +317,6 @@ void print_param_helperfunc(parameter_entry * params, uint8_t param_size, TERMIN
 }
 
 void print_param_help(parameter_entry * params, uint8_t param_size, TERMINAL_HANDLE * handle){
-    ttprintf("Parameters:\r\n");
-    print_param_helperfunc(params, param_size, handle,PARAM_DEFAULT);
     ttprintf("\r\nConfiguration:\r\n");
     print_param_helperfunc(params, param_size, handle,PARAM_CONFIG);
 }
@@ -405,27 +449,21 @@ void EEPROM_check_hash(parameter_entry * params, uint8_t param_size, TERMINAL_HA
     uint32_t temp_hash2;
     uint32_t collision=0;
     for (uint8_t  current_parameter = 0; current_parameter < param_size; current_parameter++) {
-        if(params[current_parameter].parameter_type == PARAM_CONFIG){
-            temp_hash1=djb_hash(params[current_parameter].name);
-            for (uint8_t  n = 0; n < current_parameter; n++) {
-                if(params[n].parameter_type == PARAM_CONFIG){
-                    temp_hash2=djb_hash(params[n].name);
-                    if(temp_hash1==temp_hash2){
-                        ttprintf("Found collision %s <-> %s\r\n", params[current_parameter].name, params[n].name);
-                        collision=1;
-                    }
-                }
-            }
-            for (uint8_t  n = current_parameter+1; n < param_size; n++) {
-                if(params[n].parameter_type == PARAM_CONFIG){
-                    temp_hash2=djb_hash(params[n].name);
-                    if(temp_hash1==temp_hash2){
-                        ttprintf("Found collision %s <-> %s\r\n", params[current_parameter].name, params[n].name);
-                        collision=1;
-                    }
-                }
-            }
-        }
+		temp_hash1=djb_hash(params[current_parameter].name);
+		for (uint8_t  n = 0; n < current_parameter; n++) {
+			temp_hash2=djb_hash(params[n].name);
+			if(temp_hash1==temp_hash2){
+				ttprintf("Found collision %s <-> %s\r\n", params[current_parameter].name, params[n].name);
+				collision=1;
+			}
+		}
+		for (uint8_t  n = current_parameter+1; n < param_size; n++) {
+			temp_hash2=djb_hash(params[n].name);
+			if(temp_hash1==temp_hash2){
+				ttprintf("Found collision %s <-> %s\r\n", params[current_parameter].name, params[n].name);
+				collision=1;
+			}
+		}
     }
     if(collision==0){
         ttprintf("Check for hash collision done.\r\n");   
@@ -450,28 +488,26 @@ void EEPROM_write_conf(parameter_entry * params, uint8_t param_size, uint16_t ee
 		EEPROM_buffer_write(0x00, count,0);
 		count++;
 		for (uint8_t  current_parameter = 0; current_parameter < param_size; current_parameter++) {
-            if(params[current_parameter].parameter_type == PARAM_CONFIG){
-                param_count++;
-                change_flag = 0;
-                temp_hash=djb_hash(params[current_parameter].name);
-                EEPROM_buffer_write(temp_hash, count ,0);
-                count++;
-                EEPROM_buffer_write(temp_hash>>8,count,0);
-                count++;
-                EEPROM_buffer_write(temp_hash>>16,count,0);
-                count++;
-                EEPROM_buffer_write(temp_hash>>24,count,0);
-                count++;
-                EEPROM_buffer_write(params[current_parameter].size,count,0);
-                count++;
-                for(uint8_t i=0;i<params[current_parameter].size;i++){
-                    change_flag |= EEPROM_buffer_write(*(i+(uint8_t *)params[current_parameter].value), count,0);
-                    count++;
-                }
-                if (change_flag) {
-                    change_count++;
-                }
-            }
+			param_count++;
+			change_flag = 0;
+			temp_hash=djb_hash(params[current_parameter].name);
+			EEPROM_buffer_write(temp_hash, count ,0);
+			count++;
+			EEPROM_buffer_write(temp_hash>>8,count,0);
+			count++;
+			EEPROM_buffer_write(temp_hash>>16,count,0);
+			count++;
+			EEPROM_buffer_write(temp_hash>>24,count,0);
+			count++;
+			EEPROM_buffer_write(params[current_parameter].size,count,0);
+			count++;
+			for(uint8_t i=0;i<params[current_parameter].size;i++){
+				change_flag |= EEPROM_buffer_write(*(i+(uint8_t *)params[current_parameter].value), count,0);
+				count++;
+			}
+			if (change_flag) {
+				change_count++;
+			}
 		}
 		EEPROM_buffer_write(0xDE, count,0);
 		count++;
@@ -482,7 +518,7 @@ void EEPROM_write_conf(parameter_entry * params, uint8_t param_size, uint16_t ee
 		EEPROM_buffer_write(0xEF, count,0);
         count++;
 		EEPROM_buffer_write(0x00, count,1);
-		ttprintf("%i / %i new config params written. %i bytes from 2048 used.\r\n", change_count, param_count, byte_cnt);
+		ttprintf("%i / %i   |   %i / 1024 bytes\r\n", change_count, param_count, byte_cnt);
 }
 
 void EEPROM_read_conf(parameter_entry * params, uint8_t param_size, uint16_t eeprom_offset ,TERMINAL_HANDLE * handle){
@@ -497,7 +533,7 @@ void EEPROM_read_conf(parameter_entry * params, uint8_t param_size, uint16_t eep
             addr++;
         }
         if(!(data[0]== 0x00 && data[1] == 0xC0 && data[2] == 0xFF && data[3] == 0xEE)) {
-            ttprintf("WARNING: No or old EEPROM dataset found\r\n");
+            ttprintf("No dataset found\r\n");
             return;
         }
 
@@ -510,47 +546,43 @@ void EEPROM_read_conf(parameter_entry * params, uint8_t param_size, uint16_t eep
         if(data[0]== 0xDE && data[1] == 0xAD && data[2] == 0xBE && data[3] == 0xEF) break;
         uint8_t current_parameter=0;
         for ( current_parameter = 0; current_parameter < param_size; current_parameter++) {
-            if(params[current_parameter].parameter_type==PARAM_CONFIG){
-                temp_hash=djb_hash(params[current_parameter].name);
-                if((uint8_t)temp_hash == data[0] && (uint8_t)(temp_hash>>8) == data[1]&& (uint8_t)(temp_hash>>16) == data[2]&& (uint8_t)(temp_hash>>24) == data[3]){
-                    for(uint8_t i=0;i<data[4];i++){
-                        *(i+(uint8_t * )params[current_parameter].value) = EEPROM_READ_BYTE(addr);
-                        addr++;
-                    }
-                    change_count++;
-                    change_flag=1;
-                    break;
-                }
-            }
+			temp_hash=djb_hash(params[current_parameter].name);
+			if((uint8_t)temp_hash == data[0] && (uint8_t)(temp_hash>>8) == data[1]&& (uint8_t)(temp_hash>>16) == data[2]&& (uint8_t)(temp_hash>>24) == data[3]){
+				for(uint8_t i=0;i<data[4];i++){
+					*(i+(uint8_t * )params[current_parameter].value) = EEPROM_READ_BYTE(addr);
+					addr++;
+				}
+				change_count++;
+				change_flag=1;
+				break;
+			}
         }
         if(!change_flag) addr+=data[4];
         
         if(current_parameter == param_size){
-            ttprintf("WARNING: Unknown param ID %i found in EEPROM\r\n", data[0]);
+            ttprintf("Unknown param ID %i found\r\n", data[0]);
         }
     }
     uint8_t found_param=0;
     for (uint8_t current_parameter = 0; current_parameter < param_size; current_parameter++) {
-        if(params[current_parameter].parameter_type==PARAM_CONFIG){
-            param_count++;
-            found_param=0;
-            addr = DATASET_BYTES + eeprom_offset; //Skip header
-            temp_hash=djb_hash(params[current_parameter].name);
-            while(addr<CY_EEPROM_SIZE){
-                for(int i=0;i<DATASET_BYTES;i++){
-                    data[i] = EEPROM_READ_BYTE(addr);
-                    addr++;
-                }
-                    addr += data[4];
-                if(data[0] == 0xDE && data[1] == 0xAD && data[2] == 0xBE && data[3] == 0xEF) break;
-                if((uint8_t)temp_hash == data[0] && (uint8_t)(temp_hash>>8) == data[1]&& (uint8_t)(temp_hash>>16) == data[2]&& (uint8_t)(temp_hash>>24) == data[3]){
-                        found_param = 1;
-                }
-            }
-            if(!found_param){
-                ttprintf("WARNING: Param [%s] not found in EEPROM\r\n",params[current_parameter].name);
-            }
-        }
+		param_count++;
+		found_param=0;
+		addr = DATASET_BYTES + eeprom_offset; //Skip header
+		temp_hash=djb_hash(params[current_parameter].name);
+		while(addr<CY_EEPROM_SIZE){
+			for(int i=0;i<DATASET_BYTES;i++){
+				data[i] = EEPROM_READ_BYTE(addr);
+				addr++;
+			}
+				addr += data[4];
+			if(data[0] == 0xDE && data[1] == 0xAD && data[2] == 0xBE && data[3] == 0xEF) break;
+			if((uint8_t)temp_hash == data[0] && (uint8_t)(temp_hash>>8) == data[1]&& (uint8_t)(temp_hash>>16) == data[2]&& (uint8_t)(temp_hash>>24) == data[3]){
+					found_param = 1;
+			}
+		}
+		if(!found_param){
+			ttprintf("Param [%s] not found\r\n",params[current_parameter].name);
+		}
     }
     ttprintf("%i / %i config params loaded\r\n", change_count, param_count);
 }

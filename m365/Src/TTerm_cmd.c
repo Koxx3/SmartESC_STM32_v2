@@ -207,4 +207,3 @@ uint8_t CMD_top(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
 
     return returnCode;
 }
-

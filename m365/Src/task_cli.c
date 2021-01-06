@@ -27,6 +27,7 @@
 #include "TTerm.h"
 #include "printf.h"
 #include "cli_basic.h"
+#include "cli_common.h"
 #include "mc_config.h"
 
 osThreadId_t task_cli_handle;
@@ -66,6 +67,11 @@ void task_cli(void * argument)
 
 void task_cli_init(){
 	HAL_NVIC_DisableIRQ(USART3_IRQn);
+
+	TERM_addCommand(CMD_get, "get", "Usage get [param]",0,&TERM_cmdListHead);
+	TERM_addCommand(CMD_set, "set","Usage set [param] [value]",0,&TERM_cmdListHead);
+	TERM_addCommand(CMD_eeprom, "eeprom","Save/Load config [load/save]",0,&TERM_cmdListHead);
+
 	cli_handle = TERM_createNewHandle(printf,pdTRUE,&TERM_cmdListHead,NULL,"root");
 	task_cli_handle = osThreadNew(task_cli, cli_handle, &task_cli_attributes);
 }
