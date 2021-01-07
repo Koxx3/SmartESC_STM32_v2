@@ -474,13 +474,13 @@
 						<var version="1.0" type="MC_Bool" name="SL - Basic profile" enable="true" visible="true" readonly="false" value="true" />
 						<var version="1.0" type="MC_Int" name="SL - BP - Speed ramp duration" enable="true" visible="true" readonly="false" value="1000" />
 						<var version="1.0" type="MC_Int" name="SL - BP - Speed ramp final value" enable="true" visible="true" readonly="false" value="500" />
-						<var version="1.0" type="MC_Double" name="SL - BP - Current ramp initial value" enable="false" visible="true" readonly="false" value="1" />
-						<var version="1.0" type="MC_Double" name="SL - BP - Current ramp final value" enable="true" visible="true" readonly="false" value="1" />
+						<var version="1.0" type="MC_Double" name="SL - BP - Current ramp initial value" enable="false" visible="true" readonly="false" value="5" />
+						<var version="1.0" type="MC_Double" name="SL - BP - Current ramp final value" enable="true" visible="true" readonly="false" value="5" />
 						<var version="1.0" type="MC_Int" name="SL - BP - Current ramp duration" enable="true" visible="true" readonly="false" value="1000" />
 						<var version="1.0" type="MC_Bool" name="SL - BP - Include alignment before ramp-up" enable="true" visible="true" readonly="false" value="true" />
 						<var version="1.0" type="MC_Int" name="SL - BP - Duration" enable="true" visible="true" readonly="false" value="100" />
-						<var version="1.0" type="MC_Int" name="SL - BP - Alignment electrical angle" enable="true" visible="true" readonly="false" value="120" />
-						<var version="1.0" type="MC_Double" name="SL - BP - Final current ramp value" enable="true" visible="true" readonly="false" value="1" />
+						<var version="1.0" type="MC_Int" name="SL - BP - Alignment electrical angle" enable="true" visible="true" readonly="false" value="90" />
+						<var version="1.0" type="MC_Double" name="SL - BP - Final current ramp value" enable="true" visible="true" readonly="false" value="5" />
 						<var version="1.0" type="MC_Int" name="SL - ACP - Initial electrical angle" enable="false" visible="true" readonly="false" value="90" />
 						<var version="1.0" type="MC_Int" name="SL - ACP - Phase1 - Duration" enable="false" visible="true" readonly="false" value="700" />
 						<var version="1.0" type="MC_Int" name="SL - ACP - Phase1 - Final speed" enable="false" visible="true" readonly="false" value="2000" />
