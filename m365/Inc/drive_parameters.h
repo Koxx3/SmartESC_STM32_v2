@@ -42,13 +42,13 @@
                                                             variance on speed
                                                             estimates (percentage) */
 #define CORD_F1                          16384
-#define CORD_F2                          4096
+#define CORD_F2                          16384
 #define CORD_F1_LOG                      LOG2(16384)
-#define CORD_F2_LOG                      LOG2(4096)
+#define CORD_F2_LOG                      LOG2(16384)
 
 /* State observer constants */
 #define CORD_GAIN1                       -23921
-#define CORD_GAIN2                       26440
+#define CORD_GAIN2                       30217
 
 #define CORD_MEAS_ERRORS_BEFORE_FAULTS   255  /*!< Number of consecutive errors
                                                            on variance test before a speed
@@ -137,7 +137,7 @@
 /**************************    FIRMWARE PROTECTIONS SECTION   *****************/
 #define OV_VOLTAGE_PROT_ENABLING        ENABLE
 #define UV_VOLTAGE_PROT_ENABLING        ENABLE
-#define OV_VOLTAGE_THRESHOLD_V          42 /*!< Over-voltage
+#define OV_VOLTAGE_THRESHOLD_V          60 /*!< Over-voltage
                                                          threshold */
 #define UD_VOLTAGE_THRESHOLD_V          10 /*!< Under-voltage
                                                           threshold */
@@ -146,7 +146,7 @@
                                                          TURN_ON_R_BRAKE or
                                                          TURN_ON_LOW_SIDES */
 #endif /* 0 */
-#define R_BRAKE_SWITCH_OFF_THRES_V      34
+#define R_BRAKE_SWITCH_OFF_THRES_V      48
 
 #define OV_TEMPERATURE_THRESHOLD_C      70 /*!< Celsius degrees */
 #define OV_TEMPERATURE_HYSTERESIS_C     10 /*!< Celsius degrees */
@@ -207,7 +207,7 @@
 /******************************   Temperature sensing Motor 1  **********************/
 #define  M1_TEMP_SAMPLING_TIME  LL_ADC_SAMPLING_CYCLE(1)
 /******************************   Current sensing Motor 1   **********************/
-#define ADC_SAMPLING_CYCLES (1 + SAMPLING_CYCLE_CORRECTION)
+#define ADC_SAMPLING_CYCLES (7 + SAMPLING_CYCLE_CORRECTION)
 
 /******************************   ADDITIONAL FEATURES   **********************/
 

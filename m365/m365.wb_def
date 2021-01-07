@@ -6,7 +6,7 @@
 		<define key="LS" value="0.000082" />
 		<define key="NOMINAL_CURRENT" value="4766" />
 		<define key="MOTOR_MAX_SPEED_RPM" value="2500" />
-		<define key="MOTOR_VOLTAGE_CONSTANT" value="5.0" />
+		<define key="MOTOR_VOLTAGE_CONSTANT" value="17.0" />
 		<define key="ID_DEMAG" value="-4766" />
 		<define key="HALL_SENSORS_PLACEMENT" value="DEGREES_120" />
 		<define key="HALL_PHASE_SHIFT" value="120" />
@@ -66,9 +66,9 @@
 		<define key="HALL_MTPA" value="FALSE" />
 		<define key="VARIANCE_THRESHOLD" value="0.1" />
 		<define key="F1" value="16384" />
-		<define key="F2" value="4096" />
+		<define key="F2" value="16384" />
 		<define key="GAIN1" value="-23921" />
-		<define key="GAIN2" value="26440" />
+		<define key="GAIN2" value="30217" />
 		<define key="PLL_KP_GAIN" value="1247" />
 		<define key="PLL_KI_GAIN" value="55" />
 		<define key="OBS_MEAS_ERRORS_BEFORE_FAULTS" value="255" />
@@ -80,9 +80,9 @@
 		<define key="CORD_BEMF_CONSISTENCY_TOL" value="64" />
 		<define key="CORD_BEMF_CONSISTENCY_GAIN" value="64" />
 		<define key="CORD_F1" value="16384" />
-		<define key="CORD_F2" value="4096" />
+		<define key="CORD_F2" value="16384" />
 		<define key="CORD_GAIN1" value="-23921" />
-		<define key="CORD_GAIN2" value="26440" />
+		<define key="CORD_GAIN2" value="30217" />
 		<define key="CORD_MEAS_ERRORS_BEFORE_FAULTS" value="255" />
 		<define key="CORD_FIFO_DEPTH_DPP" value="64" />
 		<define key="CORD_FIFO_DEPTH_01HZ" value="64" />
@@ -158,10 +158,10 @@
 		<define key="POSITION_CTRL_ENABLING" value="DISABLE" />
 		<define key="OV_VOLTAGE_PROT_ENABLING" value="ENABLE" />
 		<define key="UV_VOLTAGE_PROT_ENABLING" value="ENABLE" />
-		<define key="OV_VOLTAGE_THRESHOLD_V" value="42" />
+		<define key="OV_VOLTAGE_THRESHOLD_V" value="60" />
 		<define key="UD_VOLTAGE_THRESHOLD_V" value="10" />
 		<define key="ON_OVER_VOLTAGE" value="TURN_OFF_PWM" />
-		<define key="R_BRAKE_SWITCH_OFF_THRES_V" value="34" />
+		<define key="R_BRAKE_SWITCH_OFF_THRES_V" value="48" />
 		<define key="HW_OV_CURRENT_PROT_BYPASS" value="DISABLE" />
 		<define key="ALIGNMENT_DURATION" value="700" />
 		<define key="ALIGNMENT_ANGLE_DEG" value="90" />
@@ -199,7 +199,7 @@
 		<define key="FEED_FORWARD_CURRENT_REG_ENABLING" value="DISABLE" />
 		<define key="CONSTANT1_Q" value="246405" />
 		<define key="CONSTANT1_D" value="246405" />
-		<define key="CONSTANT2_QD" value="9466" />
+		<define key="CONSTANT2_QD" value="32185" />
 		<define key="IQMAX" value="4766" />
 		<define key="SEGDIV" value="0" />
 		<define key="ANGC" value="{0,0,0,0,0,0,0,0}" />
@@ -458,9 +458,9 @@
 		<define key="OVP_OUTPUTPOL" value="COMP_OutputPol_NonInverted" />
 		<define key="OCP_FILTER" value="COMP_Mode_HighSpeed" />
 		<define key="OVP_FILTER" value="COMP_Mode_HighSpeed" />
-		<define key="MAX_MODULATION_95_PER_CENT" value="TRUE" />
-		<define key="MAX_MODULATION_INDEX" value="MAX_MODULATION_95_PER_CENT" />
-		<define key="CURR_SAMPLING_TIME" value="1" />
+		<define key="MAX_MODULATION_93_PER_CENT" value="TRUE" />
+		<define key="MAX_MODULATION_INDEX" value="MAX_MODULATION_93_PER_CENT" />
+		<define key="CURR_SAMPLING_TIME" value="7" />
 		<define key="VBUS_ADC_SAMPLING_TIME" value="1" />
 		<define key="TEMP_ADC_SAMPLING_TIME" value="1" />
 		<define key="HIGH_SIDE_BRAKE_STATE" value="TURN_OFF" />
