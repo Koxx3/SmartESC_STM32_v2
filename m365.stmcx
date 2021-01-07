@@ -911,21 +911,21 @@
 								<item tag="4" text="TIM4" />
 							</items>
 						</var>
-						<var version="1.0" type="MC_List" name="DIO - HIT - Remap" enable="true" visible="true" readonly="false" value="0">
+						<var version="1.0" type="MC_List" name="DIO - HIT - Remap" enable="true" visible="true" readonly="false" value="1">
 							<items>
 								<item tag="0" text="No remap" />
 								<item tag="2" text="Partial re-map" />
 								<item tag="3" text="Full re-map" />
 							</items>
 						</var>
-						<var version="1.0" type="MC_List" name="DIO - HIT - Pin - CH1" enable="true" visible="true" readonly="true" value="0">
+						<var version="1.0" type="MC_List" name="DIO - HIT - Pin - CH1" enable="true" visible="true" readonly="true" value="1">
 							<items>
 								<item tag="106" text="A6" />
 								<item tag="204" text="B4" />
 								<item tag="306" text="C6" />
 							</items>
 						</var>
-						<var version="1.0" type="MC_List" name="DIO - HIT - Pin - CH2" enable="true" visible="true" readonly="true" value="0">
+						<var version="1.0" type="MC_List" name="DIO - HIT - Pin - CH2" enable="true" visible="true" readonly="true" value="1">
 							<items>
 								<item tag="107" text="A7" />
 								<item tag="205" text="B5" />

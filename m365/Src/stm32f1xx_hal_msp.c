@@ -263,22 +263,18 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
     /* Peripheral clock enable */
     __HAL_RCC_TIM3_CLK_ENABLE();
 
-    __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
     /**TIM3 GPIO Configuration
-    PA6     ------> TIM3_CH1
-    PA7     ------> TIM3_CH2
     PB0     ------> TIM3_CH3
+    PB4     ------> TIM3_CH1
+    PB5     ------> TIM3_CH2
     */
-    GPIO_InitStruct.Pin = M1_HALL_H1_Pin|M1_HALL_H2_Pin;
+    GPIO_InitStruct.Pin = M1_HALL_H3_Pin|M1_HALL_H1_Pin|M1_HALL_H2_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = M1_HALL_H3_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(M1_HALL_H3_GPIO_Port, &GPIO_InitStruct);
+    __HAL_AFIO_REMAP_TIM3_PARTIAL();
 
   /* USER CODE BEGIN TIM3_MspInit 1 */
 
@@ -354,13 +350,11 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
     __HAL_RCC_TIM3_CLK_DISABLE();
 
     /**TIM3 GPIO Configuration
-    PA6     ------> TIM3_CH1
-    PA7     ------> TIM3_CH2
     PB0     ------> TIM3_CH3
+    PB4     ------> TIM3_CH1
+    PB5     ------> TIM3_CH2
     */
-    HAL_GPIO_DeInit(GPIOA, M1_HALL_H1_Pin|M1_HALL_H2_Pin);
-
-    HAL_GPIO_DeInit(M1_HALL_H3_GPIO_Port, M1_HALL_H3_Pin);
+    HAL_GPIO_DeInit(GPIOB, M1_HALL_H3_Pin|M1_HALL_H1_Pin|M1_HALL_H2_Pin);
 
     /* TIM3 interrupt DeInit */
     HAL_NVIC_DisableIRQ(TIM3_IRQn);

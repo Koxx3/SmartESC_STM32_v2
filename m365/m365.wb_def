@@ -269,11 +269,11 @@
 		<define key="EMERGENCY2_STOP_GPIO_PIN" value="GPIO_Pin_12" />
 		<define key="BRKIN2_GPIO_AF" value="GPIO_AF_2" />
 		<define key="HALL_TIMER_SELECTION" value="HALL_TIM3" />
-		<define key="HALL_TIMER_REMAPPING" value="NO_REMAP_TIM3" />
-		<define key="H1_GPIO_PORT" value="GPIOA" />
-		<define key="H1_GPIO_PIN" value="GPIO_Pin_6" />
-		<define key="H2_GPIO_PORT" value="GPIOA" />
-		<define key="H2_GPIO_PIN" value="GPIO_Pin_7" />
+		<define key="HALL_TIMER_REMAPPING" value="PARTIAL_REMAP_TIM3" />
+		<define key="H1_GPIO_PORT" value="GPIOB" />
+		<define key="H1_GPIO_PIN" value="GPIO_Pin_4" />
+		<define key="H2_GPIO_PORT" value="GPIOB" />
+		<define key="H2_GPIO_PIN" value="GPIO_Pin_5" />
 		<define key="H3_GPIO_PORT" value="GPIOB" />
 		<define key="H3_GPIO_PIN" value="GPIO_Pin_0" />
 		<define key="ENC_TIMER_SELECTION" value="ENC_TIM2" />
