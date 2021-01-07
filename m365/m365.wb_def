@@ -4,10 +4,10 @@
 		<define key="POLE_PAIR_NUM" value="15" />
 		<define key="RS" value="0.07" />
 		<define key="LS" value="0.000082" />
-		<define key="NOMINAL_CURRENT" value="4766" />
+		<define key="NOMINAL_CURRENT" value="9532" />
 		<define key="MOTOR_MAX_SPEED_RPM" value="2500" />
 		<define key="MOTOR_VOLTAGE_CONSTANT" value="17.0" />
-		<define key="ID_DEMAG" value="-4766" />
+		<define key="ID_DEMAG" value="-9532" />
 		<define key="HALL_SENSORS_PLACEMENT" value="DEGREES_120" />
 		<define key="HALL_PHASE_SHIFT" value="120" />
 		<define key="ENCODER_PPR" value="400" />
@@ -15,7 +15,7 @@
 		<define key="ENCODER_AVAILABLE" value="FALSE" />
 		<define key="MOTOR_TYPE" value="PMSM" />
 		<define key="LDLQ_RATIO" value="1.000" />
-		<define key="DC_CURRENT_RS_MEAS" value="15.00" />
+		<define key="DC_CURRENT_RS_MEAS" value="30.00" />
 		<define key="PHASE_UH_POLARITY" value="H_ACTIVE_HIGH" />
 		<define key="PHASE_VH_POLARITY" value="H_ACTIVE_HIGH" />
 		<define key="PHASE_WH_POLARITY" value="H_ACTIVE_HIGH" />
@@ -51,6 +51,8 @@
 		<define key="PWBDID" value="0" />
 		<define key="STATE_OBSERVER_CORDIC" value="TRUE" />
 		<define key="SPEED_SENSOR_SELECTION" value="STATE_OBSERVER_CORDIC" />
+		<define key="AUX_HALL_SENSORS" value="TRUE" />
+		<define key="AUXILIARY_SPEED_MEASUREMENT_SELECTION" value="AUX_HALL_SENSORS" />
 		<define key="SINGLEDRIVE" value="TRUE" />
 		<define key="DRIVES_NUMBER_SELECTION" value="SINGLEDRIVE" />
 		<define key="MAX_APPLICATION_SPEED" value="2500" />
@@ -62,7 +64,7 @@
 		<define key="ENC_AVERAGING_FIFO_DEPTH" value="16" />
 		<define key="HALL_MEAS_ERRORS_BEFORE_FAULTS" value="255" />
 		<define key="HALL_ICx_FILTER" value="256" />
-		<define key="HALL_AVERAGING_FIFO_DEPTH" value="6" />
+		<define key="HALL_AVERAGING_FIFO_DEPTH" value="18" />
 		<define key="HALL_MTPA" value="FALSE" />
 		<define key="VARIANCE_THRESHOLD" value="0.1" />
 		<define key="F1" value="16384" />
@@ -129,7 +131,7 @@
 		<define key="HFI_DC_3_COEFF" value="1.889033" />
 		<define key="HFI_DC_4_COEFF" value="-0.894874" />
 		<define key="PWM_FREQUENCY" value="16000" />
-		<define key="SW_DEADTIME_NS" value="800" />
+		<define key="SW_DEADTIME_NS" value="500" />
 		<define key="HIGH_SIDE_IDLE_STATE" value="TURN_OFF" />
 		<define key="LOW_SIDE_IDLE_STATE" value="TURN_OFF" />
 		<define key="REGULATION_EXECUTION_RATE" value="1" />
@@ -176,11 +178,11 @@
 		<define key="PHASE3_DURATION" value="100" />
 		<define key="PHASE3_FINAL_SPEED_RPM" value="0" />
 		<define key="PHASE3_FINAL_CURRENT" value="1588" />
-		<define key="PHASE4_DURATION" value="1000" />
-		<define key="PHASE4_FINAL_SPEED_RPM" value="500" />
+		<define key="PHASE4_DURATION" value="500" />
+		<define key="PHASE4_FINAL_SPEED_RPM" value="200" />
 		<define key="PHASE4_FINAL_CURRENT" value="1588" />
 		<define key="PHASE5_DURATION" value="0" />
-		<define key="PHASE5_FINAL_SPEED_RPM" value="500" />
+		<define key="PHASE5_FINAL_SPEED_RPM" value="200" />
 		<define key="PHASE5_FINAL_CURRENT" value="1588" />
 		<define key="ENABLE_SL_ALGO_FROM_PHASE" value="1" />
 		<define key="TRANSITION_DURATION" value="0" />
@@ -200,7 +202,7 @@
 		<define key="CONSTANT1_Q" value="246405" />
 		<define key="CONSTANT1_D" value="246405" />
 		<define key="CONSTANT2_QD" value="32185" />
-		<define key="IQMAX" value="4766" />
+		<define key="IQMAX" value="9532" />
 		<define key="SEGDIV" value="0" />
 		<define key="ANGC" value="{0,0,0,0,0,0,0,0}" />
 		<define key="OFST" value="{0,0,0,0,0,0,0,0}" />
@@ -458,8 +460,8 @@
 		<define key="OVP_OUTPUTPOL" value="COMP_OutputPol_NonInverted" />
 		<define key="OCP_FILTER" value="COMP_Mode_HighSpeed" />
 		<define key="OVP_FILTER" value="COMP_Mode_HighSpeed" />
-		<define key="MAX_MODULATION_93_PER_CENT" value="TRUE" />
-		<define key="MAX_MODULATION_INDEX" value="MAX_MODULATION_93_PER_CENT" />
+		<define key="MAX_MODULATION_94_PER_CENT" value="TRUE" />
+		<define key="MAX_MODULATION_INDEX" value="MAX_MODULATION_94_PER_CENT" />
 		<define key="CURR_SAMPLING_TIME" value="7" />
 		<define key="VBUS_ADC_SAMPLING_TIME" value="1" />
 		<define key="TEMP_ADC_SAMPLING_TIME" value="1" />

@@ -168,6 +168,11 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
   /******************************************************/
   STC_Init(pSTC[M1],pPIDSpeed[M1], &STO_CR_M1._Super);
 
+  /******************************************************/
+  /*   Auxiliary speed sensor component initialization  */
+  /******************************************************/
+  HALL_Init (&HALL_M1);
+
   /****************************************************/
   /*   Virtual speed sensor component initialization  */
   /****************************************************/
@@ -224,7 +229,7 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
   MCT[M1].pPWMnCurrFdbk = pwmcHandle[M1];
   MCT[M1].pRevupCtrl = &RevUpControlM1;              /* only if M1 is sensorless*/
   MCT[M1].pSpeedSensorMain = (SpeednPosFdbk_Handle_t *) &STO_CR_M1;
-  MCT[M1].pSpeedSensorAux = MC_NULL;
+  MCT[M1].pSpeedSensorAux = (SpeednPosFdbk_Handle_t *) &HALL_M1;
   MCT[M1].pSpeedSensorVirtual = &VirtualSpeedSensorM1;  /* only if M1 is sensorless*/
   MCT[M1].pSpeednTorqueCtrl = pSTC[M1];
   MCT[M1].pStateMachine = &STM[M1];
@@ -333,6 +338,7 @@ __weak void TSK_MediumFrequencyTaskM1(void)
   State_t StateM1;
   int16_t wAux = 0;
 
+  (void) HALL_CalcAvrgMecSpeedUnit( &HALL_M1, &wAux );
   (void) STO_CR_CalcAvrgMecSpeedUnit( &STO_CR_M1, &wAux );
   PQD_CalcElMotorPower( pMPM[M1] );
 
@@ -358,6 +364,7 @@ __weak void TSK_MediumFrequencyTaskM1(void)
     FOCVars[M1].bDriveInput = EXTERNAL;
     STC_SetSpeedSensor( pSTC[M1], &VirtualSpeedSensorM1._Super );
     STO_CR_Clear( &STO_CR_M1 );
+    HALL_Clear( &HALL_M1 );
 
     if ( STM_NextState( &STM[M1], START ) == true )
     {
@@ -676,6 +683,8 @@ __weak uint8_t TSK_HighFrequencyTask(void)
   uint16_t hState;  /*  only if sensorless main*/
   Observer_Inputs_t STO_Inputs; /*  only if sensorless main*/
 
+  HALL_CalcElAngle (&HALL_M1);
+
   STO_Inputs.Valfa_beta = FOCVars[M1].Valphabeta;  /* only if sensorless*/
   if ( STM[M1].bState == SWITCH_OVER )
   {
@@ -929,6 +938,9 @@ void StartSafetyTask(void const * argument)
   */
 __weak void mc_lock_pins (void)
 {
+LL_GPIO_LockPin(M1_HALL_H3_GPIO_Port, M1_HALL_H3_Pin);
+LL_GPIO_LockPin(M1_HALL_H1_GPIO_Port, M1_HALL_H1_Pin);
+LL_GPIO_LockPin(M1_HALL_H2_GPIO_Port, M1_HALL_H2_Pin);
 LL_GPIO_LockPin(M1_PWM_UH_GPIO_Port, M1_PWM_UH_Pin);
 LL_GPIO_LockPin(M1_PWM_VH_GPIO_Port, M1_PWM_VH_Pin);
 LL_GPIO_LockPin(M1_PWM_VL_GPIO_Port, M1_PWM_VL_Pin);

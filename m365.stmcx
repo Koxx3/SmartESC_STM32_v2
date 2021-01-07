@@ -27,7 +27,7 @@
 						</var>
 						<var version="1.0" type="MC_Int" name="Pole Pairs" enable="true" visible="true" readonly="false" value="15" />
 						<var version="1.0" type="MC_Int" name="Max Rated Speed" enable="true" visible="true" readonly="false" value="2500" />
-						<var version="1.0" type="MC_Double" name="Nominal Current" enable="true" visible="true" readonly="false" value="15" />
+						<var version="1.0" type="MC_Double" name="Nominal Current" enable="true" visible="true" readonly="false" value="30" />
 						<var version="1.0" type="MC_Double" name="Nominal DC Voltage" enable="true" visible="true" readonly="false" value="42" />
 						<var version="1.0" type="MC_Double" name="Rs" enable="true" visible="true" readonly="false" value="0.07" />
 						<var version="1.0" type="MC_Double" name="Ld" enable="true" visible="true" readonly="false" value="0.311" />
@@ -58,7 +58,7 @@
 					<board_name>Custom</board_name>
 					<original_board_name></original_board_name>
 					<vars>
-						<var version="1.0" type="MC_Int" name="Min dead-time" enable="true" visible="true" readonly="false" value="700" />
+						<var version="1.0" type="MC_Int" name="Min dead-time" enable="true" visible="true" readonly="false" value="500" />
 						<var version="1.0" type="MC_Int" name="Max switching frequency" enable="true" visible="true" readonly="false" value="50" />
 						<var version="1.0" type="MC_Int" name="Max rated voltage" enable="true" visible="true" readonly="false" value="60" />
 						<var version="1.0" type="MC_Int" name="Min rated voltage" enable="true" visible="true" readonly="false" value="10" />
@@ -337,8 +337,8 @@
 						<var version="1.0" type="MC_Double" name="Main_HFI_Estimated_speed_Band_tolerance_LL" enable="false" visible="true" readonly="false" value="93.75" />
 						<var version="1.0" type="MC_Bool" name="Main_HFI_Debug" enable="true" visible="true" readonly="false" value="false" />
 						<var version="1.0" type="MC_Bool" name="Main_HFI_RevertDirection" enable="true" visible="true" readonly="false" value="true" />
-						<var version="1.0" type="MC_Bool" name="Aux - Enable auxiliary sensor" enable="true" visible="true" readonly="false" value="false" />
-						<var version="1.0" type="MC_List" name="Aux - Sensor selection" enable="false" visible="true" readonly="false" value="3">
+						<var version="1.0" type="MC_Bool" name="Aux - Enable auxiliary sensor" enable="true" visible="true" readonly="false" value="true" />
+						<var version="1.0" type="MC_List" name="Aux - Sensor selection" enable="true" visible="true" readonly="false" value="3">
 							<items>
 								<item tag="0" text="Sensor-less (Observer+PLL)" />
 								<item tag="1" text="Sensor-less (Observer+Cordic)" />
@@ -349,8 +349,8 @@
 						<var version="1.0" type="MC_Int" name="Aux - Max allowed speed" enable="false" visible="false" readonly="false" value="2500" />
 						<var version="1.0" type="MC_Int" name="Aux - Min allowed speed" enable="false" visible="false" readonly="false" value="0" />
 						<var version="1.0" type="MC_Int" name="Aux - Max measurement errors number before fault" enable="false" visible="true" readonly="false" value="255" />
-						<var version="1.0" type="MC_Int" name="Aux - Hall Sensors - Average speed FIFO depth" enable="true" visible="true" readonly="false" value="6" />
-						<var version="1.0" type="MC_Double" name="Aux - Hall Sensors - Input Capture filter duration" enable="true" visible="true" readonly="false" value="1.25" />
+						<var version="1.0" type="MC_Int" name="Aux - Hall Sensors - Average speed FIFO depth" enable="true" visible="true" readonly="false" value="18" />
+						<var version="1.0" type="MC_Double" name="Aux - Hall Sensors - Input Capture filter duration" enable="true" visible="true" readonly="false" value="4" />
 						<var version="1.0" type="MC_Bool" name="Aux_ObsPLL_Use_MTPA" enable="true" visible="true" readonly="false" value="false" />
 						<var version="1.0" type="MC_Int" name="Aux - Encoder - Average speed FIFO depth" enable="false" visible="true" readonly="false" value="16" />
 						<var version="1.0" type="MC_Double" name="Aux - Encoder - Input Capture filter duration" enable="false" visible="true" readonly="false" value="0.75" />
@@ -394,7 +394,7 @@
 								<item tag="1" text="Turn-off" />
 							</items>
 						</var>
-						<var version="1.0" type="MC_Int" name="Dead time" enable="true" visible="true" readonly="false" value="800" />
+						<var version="1.0" type="MC_Int" name="Dead time" enable="true" visible="true" readonly="false" value="500" />
 						<var version="1.0" type="MC_List" name="Low sides PWM idle state" enable="true" visible="true" readonly="false" value="1">
 							<items>
 								<item tag="0" text="Turn-on" />
@@ -472,11 +472,11 @@
 						<var version="1.0" type="MC_Int" name="Enc - Alignment electrical angle" enable="false" visible="true" readonly="false" value="90" />
 						<var version="1.0" type="MC_Double" name="Enc - Final current ramp value" enable="false" visible="true" readonly="false" value="1.95" />
 						<var version="1.0" type="MC_Bool" name="SL - Basic profile" enable="true" visible="true" readonly="false" value="true" />
-						<var version="1.0" type="MC_Int" name="SL - BP - Speed ramp duration" enable="true" visible="true" readonly="false" value="1000" />
-						<var version="1.0" type="MC_Int" name="SL - BP - Speed ramp final value" enable="true" visible="true" readonly="false" value="500" />
+						<var version="1.0" type="MC_Int" name="SL - BP - Speed ramp duration" enable="true" visible="true" readonly="false" value="500" />
+						<var version="1.0" type="MC_Int" name="SL - BP - Speed ramp final value" enable="true" visible="true" readonly="false" value="200" />
 						<var version="1.0" type="MC_Double" name="SL - BP - Current ramp initial value" enable="false" visible="true" readonly="false" value="5" />
 						<var version="1.0" type="MC_Double" name="SL - BP - Current ramp final value" enable="true" visible="true" readonly="false" value="5" />
-						<var version="1.0" type="MC_Int" name="SL - BP - Current ramp duration" enable="true" visible="true" readonly="false" value="1000" />
+						<var version="1.0" type="MC_Int" name="SL - BP - Current ramp duration" enable="true" visible="true" readonly="false" value="500" />
 						<var version="1.0" type="MC_Bool" name="SL - BP - Include alignment before ramp-up" enable="true" visible="true" readonly="false" value="true" />
 						<var version="1.0" type="MC_Int" name="SL - BP - Duration" enable="true" visible="true" readonly="false" value="100" />
 						<var version="1.0" type="MC_Int" name="SL - BP - Alignment electrical angle" enable="true" visible="true" readonly="false" value="90" />
@@ -904,35 +904,35 @@
 								<item tag="210" text="B10" />
 							</items>
 						</var>
-						<var version="1.0" type="MC_List" name="DIO - HIT - Timer" enable="false" visible="true" readonly="false" value="1">
+						<var version="1.0" type="MC_List" name="DIO - HIT - Timer" enable="true" visible="true" readonly="false" value="1">
 							<items>
 								<item tag="2" text="TIM2" />
 								<item tag="3" text="TIM3" />
 								<item tag="4" text="TIM4" />
 							</items>
 						</var>
-						<var version="1.0" type="MC_List" name="DIO - HIT - Remap" enable="false" visible="true" readonly="false" value="0">
+						<var version="1.0" type="MC_List" name="DIO - HIT - Remap" enable="true" visible="true" readonly="false" value="0">
 							<items>
 								<item tag="0" text="No remap" />
 								<item tag="2" text="Partial re-map" />
 								<item tag="3" text="Full re-map" />
 							</items>
 						</var>
-						<var version="1.0" type="MC_List" name="DIO - HIT - Pin - CH1" enable="false" visible="true" readonly="false" value="0">
+						<var version="1.0" type="MC_List" name="DIO - HIT - Pin - CH1" enable="true" visible="true" readonly="true" value="0">
 							<items>
 								<item tag="106" text="A6" />
 								<item tag="204" text="B4" />
 								<item tag="306" text="C6" />
 							</items>
 						</var>
-						<var version="1.0" type="MC_List" name="DIO - HIT - Pin - CH2" enable="false" visible="true" readonly="false" value="0">
+						<var version="1.0" type="MC_List" name="DIO - HIT - Pin - CH2" enable="true" visible="true" readonly="true" value="0">
 							<items>
 								<item tag="107" text="A7" />
 								<item tag="205" text="B5" />
 								<item tag="307" text="C7" />
 							</items>
 						</var>
-						<var version="1.0" type="MC_List" name="DIO - HIT - Pin - CH3" enable="false" visible="true" readonly="false" value="0">
+						<var version="1.0" type="MC_List" name="DIO - HIT - Pin - CH3" enable="true" visible="true" readonly="true" value="1">
 							<items>
 								<item tag="200" text="B0" />
 								<item tag="200" text="B0" />
@@ -1120,7 +1120,7 @@
 								<item tag="285" text="28.5" />
 							</items>
 						</var>
-						<var version="1.0" type="MC_Int" name="AI - PCF - Sens - Setting - MMI" enable="true" visible="true" readonly="true" value="93" />
+						<var version="1.0" type="MC_Int" name="AI - PCF - Sens - Setting - MMI" enable="true" visible="true" readonly="true" value="94" />
 						<var version="1.0" type="MC_Int" name="AI - PCF - Sens - Setting - Sampling Time Converted" enable="true" visible="true" readonly="true" value="625" />
 						<var version="1.0" type="MC_List" name="AI - PCF - Sens - Setting - ADC Peripheral selection" enable="true" visible="true" readonly="true" value="0">
 							<items>

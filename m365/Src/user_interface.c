@@ -668,6 +668,48 @@ __weak int32_t UI_GetReg(UI_Handle_t *pHandle, MC_Protocol_REG_t bRegID, bool * 
     }
     break;
 
+    case MC_PROTOCOL_REG_MEAS_EL_ANGLE:
+    {
+      uint32_t hUICfg = pHandle->pUICfg[pHandle->bSelectedDrive];
+      SpeednPosFdbk_Handle_t* pSPD = MC_NULL;
+      if ((MAIN_SCFG_VALUE(hUICfg) == UI_SCODE_ENC) ||
+          (MAIN_SCFG_VALUE(hUICfg) == UI_SCODE_HALL))
+      {
+        pSPD = pMCT->pSpeedSensorMain;
+      }
+      if ((AUX_SCFG_VALUE(hUICfg) == UI_SCODE_ENC) ||
+          (AUX_SCFG_VALUE(hUICfg) == UI_SCODE_HALL))
+      {
+        pSPD = pMCT->pSpeedSensorAux;
+      }
+      if (pSPD != MC_NULL)
+      {
+        bRetVal = SPD_GetElAngle(pSPD);
+      }
+    }
+    break;
+
+    case MC_PROTOCOL_REG_MEAS_ROT_SPEED:
+    {
+      uint32_t hUICfg = pHandle->pUICfg[pHandle->bSelectedDrive];
+      SpeednPosFdbk_Handle_t* pSPD = MC_NULL;
+      if ((MAIN_SCFG_VALUE(hUICfg) == UI_SCODE_ENC) ||
+          (MAIN_SCFG_VALUE(hUICfg) == UI_SCODE_HALL))
+      {
+        pSPD = pMCT->pSpeedSensorMain;
+      }
+      if ((AUX_SCFG_VALUE(hUICfg) == UI_SCODE_ENC) ||
+          (AUX_SCFG_VALUE(hUICfg) == UI_SCODE_HALL))
+      {
+        pSPD = pMCT->pSpeedSensorAux;
+      }
+      if (pSPD != MC_NULL)
+      {
+        bRetVal = SPD_GetS16Speed(pSPD);
+      }
+    }
+    break;
+
     case MC_PROTOCOL_REG_MAX_APP_SPEED:
     {
       bRetVal = (STC_GetMaxAppPositiveMecSpeedUnit(pMCT->pSpeednTorqueCtrl) * _RPM)/SPEED_UNIT ;

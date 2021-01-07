@@ -37,6 +37,16 @@
 #define MEAS_ERRORS_BEFORE_FAULTS       255 /*!< Number of speed
                                                              measurement errors before
                                                              main sensor goes in fault */
+/****** Hall sensors ************/
+#define HALL_MEAS_ERRORS_BEFORE_FAULTS  255 /*!< Number of failed
+                                                           derived class specific speed
+                                                           measurements before main sensor
+                                                           goes in fault */
+
+#define HALL_AVERAGING_FIFO_DEPTH        18 /*!< depth of the FIFO used to
+                                                           average mechanical speed in
+                                                           0.1Hz resolution */
+#define HALL_MTPA  false
 /****** State Observer + CORDIC ***/
 #define CORD_VARIANCE_THRESHOLD           4  /*!<Maxiumum accepted
                                                             variance on speed
@@ -80,7 +90,7 @@
 #define PWM_FREQ_SCALING 1
 
 #define LOW_SIDE_SIGNALS_ENABLING        LS_PWM_TIMER
-#define SW_DEADTIME_NS                   800 /*!< Dead-time to be inserted
+#define SW_DEADTIME_NS                   500 /*!< Dead-time to be inserted
                                                            by FW, only if low side
                                                            signals are enabled */
 
@@ -124,7 +134,7 @@
 /* USER CODE END PID_SPEED_INTEGRAL_INIT_DIV */
 
 #define SPD_DIFFERENTIAL_TERM_ENABLING DISABLE
-#define IQMAX                          4766
+#define IQMAX                          9532
 
 /* Default settings */
 #define DEFAULT_CONTROL_MODE           STC_TORQUE_MODE /*!< STC_TORQUE_MODE or
@@ -172,12 +182,12 @@
 #define PHASE3_FINAL_SPEED_UNIT         (0*SPEED_UNIT/_RPM)
 #define PHASE3_FINAL_CURRENT           1588
 /* Phase 4 */
-#define PHASE4_DURATION                1000 /*milliseconds */
-#define PHASE4_FINAL_SPEED_UNIT         (500*SPEED_UNIT/_RPM)
+#define PHASE4_DURATION                500 /*milliseconds */
+#define PHASE4_FINAL_SPEED_UNIT         (200*SPEED_UNIT/_RPM)
 #define PHASE4_FINAL_CURRENT           1588
 /* Phase 5 */
 #define PHASE5_DURATION                0 /* milliseconds */
-#define PHASE5_FINAL_SPEED_UNIT         (500*SPEED_UNIT/_RPM)
+#define PHASE5_FINAL_SPEED_UNIT         (200*SPEED_UNIT/_RPM)
 #define PHASE5_FINAL_CURRENT           1588
 
 #define ENABLE_SL_ALGO_FROM_PHASE      1
