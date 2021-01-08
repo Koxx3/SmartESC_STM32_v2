@@ -34,19 +34,9 @@
 #define MAX_APPLICATION_SPEED_RPM       2500 /*!< rpm, mechanical */
 #define MIN_APPLICATION_SPEED_RPM       0 /*!< rpm, mechanical,
                                                            absolute value */
-#define MEAS_ERRORS_BEFORE_FAULTS       255 /*!< Number of speed
+#define MEAS_ERRORS_BEFORE_FAULTS       3 /*!< Number of speed
                                                              measurement errors before
                                                              main sensor goes in fault */
-/****** Hall sensors ************/
-#define HALL_MEAS_ERRORS_BEFORE_FAULTS  255 /*!< Number of failed
-                                                           derived class specific speed
-                                                           measurements before main sensor
-                                                           goes in fault */
-
-#define HALL_AVERAGING_FIFO_DEPTH        18 /*!< depth of the FIFO used to
-                                                           average mechanical speed in
-                                                           0.1Hz resolution */
-#define HALL_MTPA  false
 /****** State Observer + CORDIC ***/
 #define CORD_VARIANCE_THRESHOLD           4  /*!<Maxiumum accepted
                                                             variance on speed
@@ -58,9 +48,9 @@
 
 /* State observer constants */
 #define CORD_GAIN1                       -23921
-#define CORD_GAIN2                       30217
+#define CORD_GAIN2                       7000
 
-#define CORD_MEAS_ERRORS_BEFORE_FAULTS   255  /*!< Number of consecutive errors
+#define CORD_MEAS_ERRORS_BEFORE_FAULTS   3  /*!< Number of consecutive errors
                                                            on variance test before a speed
                                                            feedback error is reported */
 #define CORD_FIFO_DEPTH_DPP              64  /*!< Depth of the FIFO used
