@@ -43,7 +43,7 @@
     #define END_OF_FLASH    0xa000ffff
 #else
     #define START_OF_FLASH  0x00000000
-    #define END_OF_FLASH    0x1FFF8000
+    #define END_OF_FLASH    0x0800FC00
 #endif
 
 enum vt100{
@@ -52,29 +52,13 @@ enum vt100{
     _VT100_FOREGROUND_COLOR,
     _VT100_BACKGROUND_COLOR,
     _VT100_RESET_ATTRIB,
-    _VT100_BRIGHT,
-    _VT100_DIM,
-    _VT100_UNDERSCORE,
-    _VT100_BLINK,
-    _VT100_REVERSE,
-    _VT100_HIDDEN,
     _VT100_ERASE_SCREEN,
     _VT100_ERASE_LINE,
-    _VT100_FONT_G0,
-    _VT100_FONT_G1,
-    _VT100_WRAP_ON,
     _VT100_WRAP_OFF,
     _VT100_ERASE_LINE_END,
     _VT100_CURSOR_BACK_BY,
     _VT100_CURSOR_FORWARD_BY,
-    _VT100_CURSOR_DOWN_BY,
-    _VT100_CURSOR_UP_BY,
-    _VT100_CURSOR_SAVE_POSITION,
-    _VT100_CURSOR_RESTORE_POSITION,
-    _VT100_CURSOR_ENABLE,
-    _VT100_CURSOR_DISABLE,
-    _VT100_CURSOR_SET_COLUMN,
-    _VT100_CLS
+    _VT100_CURSOR_SET_COLUMN
 };
 
 //VT100 cmds given to us by the terminal software (they need to be > 8 bits so the handler can tell them apart from normal characters)
@@ -89,12 +73,8 @@ enum vt100{
 
 enum color{
     _VT100_BLACK,
-    _VT100_RED,
-    _VT100_GREEN,
     _VT100_YELLOW,
     _VT100_BLUE,
-    _VT100_MAGENTA,
-    _VT100_CYAN,
     _VT100_WHITE
 };
 
@@ -125,11 +105,8 @@ const extern char TERM_startupText2[];
 const extern char TERM_startupText3[];
 #endif
 
-#define ttprintfEcho(format, ...) if(handle->echoEnabled) (*handle->print)(format, ##__VA_ARGS__)
-
 
 #define ttprintf(format, ...) (*handle->print)(format, ##__VA_ARGS__)
-#define ttprintb(buffer, len) (*handle->print)(NULL, (uint8_t*)buffer, (uint32_t)len)
 
 
 typedef struct __TERMINAL_HANDLE__ TERMINAL_HANDLE;
@@ -154,7 +131,6 @@ struct __TermCommandDescriptor__{
     const char * command;
     const char * commandDescription;
     uint32_t commandLength;
-    uint8_t minPermissionLevel;
     TermAutoCompHandler ACHandler;
     void * ACParams;
     
@@ -177,7 +153,6 @@ struct __TERMINAL_HANDLE__{
     uint32_t currHistoryReadPosition;
     uint8_t currEscSeqPos;
     uint8_t escSeqBuff[16];
-    unsigned echoEnabled;
     TermCommandDescriptor * cmdListHead;
     TermErrorPrinter errorPrinter;
 //TODO actually finish implementing this...
@@ -193,7 +168,7 @@ typedef enum{
 extern TermCommandDescriptor TERM_cmdListHead;
 
 
-TERMINAL_HANDLE * TERM_createNewHandle(TermPrintHandler printFunction, unsigned echoEnabled, TermCommandDescriptor * cmdListHead, TermErrorPrinter errorPrinter, const char * usr);    
+TERMINAL_HANDLE * TERM_createNewHandle(TermPrintHandler printFunction, unsigned echoEnabled, TermCommandDescriptor * cmdListHead, const char * usr);
 
 void TERM_destroyHandle(TERMINAL_HANDLE * handle);
 uint8_t TERM_processBuffer(uint8_t * data, uint16_t length, TERMINAL_HANDLE * handle);
@@ -209,7 +184,6 @@ void TERM_addCommandAC(TermCommandDescriptor * cmd, TermAutoCompHandler ACH, voi
 unsigned TERM_isSorted(TermCommandDescriptor * a, TermCommandDescriptor * b);
 char toLowerCase(char c);
 void TERM_setCursorPos(TERMINAL_HANDLE * handle, uint16_t x, uint16_t y);
-void TERM_Box(TERMINAL_HANDLE * handle, uint8_t row1, uint8_t col1, uint8_t row2, uint8_t col2);
 void TERM_sendVT100Code(TERMINAL_HANDLE * handle, uint16_t cmd, uint8_t var);
 const char * TERM_getVT100Code(uint16_t cmd, uint8_t var);
 uint16_t TERM_countArgs(const char * data, uint16_t dataLength);

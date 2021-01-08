@@ -76,7 +76,7 @@ struct parameter_entry_struct {
 	const uint8_t type;
 	const int32_t min;
 	const int32_t max;
-    const uint16_t div;
+    const float div;
 	uint8_t (*callback_function)(parameter_entry * params, uint8_t index, TERMINAL_HANDLE * handle);
 	const char *help;
 };

@@ -1,8 +1,7 @@
 /*
- * UD3
+ * m365
  *
- * Copyright (c) 2018 Jens Kerrinnes
- * Copyright (c) 2015 Steve Ward
+ * Copyright (c) 2021 Jens Kerrinnes
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -30,6 +29,7 @@
 #include "task_cli.h"
 #include "math.h"
 #include "system.h"
+#include "mc_config.h"
 
 
 #define UNUSED_VARIABLE(N) \
@@ -61,11 +61,13 @@ void init_config(){
 * Parameter struct
 ******************************************************************************/
 
+
+
 parameter_entry confparam[] = {
-    //       Parameter Type ,"Text   "         , Value ptr                     ,Min     ,Max    ,Div    ,Callback Function           ,Help text
-    ADD_PARAM("conf1"           , configuration.conf1           , 0      ,10000  ,0      ,callback_DefaultFunction    ,"Test parameter 1")
-    ADD_PARAM("conf2"           , configuration.conf2           , 0      ,10000  ,0      ,callback_DefaultFunction    ,"Test parameter 2")
-    ADD_PARAM("conf3"           , configuration.conf3           , 0      ,10000  ,10     ,callback_ConfigFunction     ,"Test config 1")
+    //Parameter Type ,"Text   " , Value ptr                     ,Min     ,Max    ,Div    				,Callback Function           ,Help text
+    ADD_PARAM("pole_pairs"      , HALL_M1._Super.bElToMecRatio  , 2      ,100    ,0      				,callback_DefaultFunction    ,"N Poles")
+    ADD_PARAM("hall_placement"  , HALL_M1.SensorPlacement       , 0      ,1      ,0      				,callback_DefaultFunction    ,"[0] 120 deg [1] 60 deg")
+	ADD_PARAM("hall_shift"      , HALL_M1.PhaseShift       		, 0      ,65536  ,(65536.0/360.0)       ,callback_DefaultFunction    ,"Electrical hall phase shift")
 };
 
 
@@ -108,7 +110,7 @@ uint8_t CMD_get(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args) {
     if(argCount==0){
         print_param_help(confparam, PARAM_SIZE(confparam), handle);
         return TERM_CMD_EXIT_SUCCESS;
-    }
+     }
     
     if(strcmp(args[0], "-?") == 0){
         ttprintf("Usage: get [parameter]\r\n");

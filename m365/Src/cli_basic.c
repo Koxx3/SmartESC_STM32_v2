@@ -1,8 +1,7 @@
 /*
- * UD3
+ * m365
  *
- * Copyright (c) 2018 Jens Kerrinnes
- * Copyright (c) 2015 Steve Ward
+ * Copyright (c) 2021 Jens Kerrinnes
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -21,6 +20,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
+
 #include "task_cli.h"
 #include "cli_basic.h"
 #include "printf.h"
@@ -28,7 +28,7 @@
 #include <string.h>
 #include "TTerm.h"
 #include "mc_config.h"
-
+#include "math.h"
 
 uint8_t EEPROM_Read_Row(uint8_t row, uint8_t * buffer);
 uint8_t EEPROM_1_Write_Row(uint8_t row, uint8_t * buffer);
@@ -96,35 +96,29 @@ int ipow(int base, int exp)
     return result;
 }
 
-float  get_before_comma(char* str){
-	char * save = str;
-	while(str){
-		if(*str == '.' || *str == ','){
-			*str = '\0';
-			return strtol(save, NULL, 10);
-		}
-		str++;
-	}
-	return 0;
-}
-
-float  get_behind_comma(char* str){
-	while(str){
-		if(*str == '.' || *str == ','){
-			str++;
-			if(*str || *str != ' ') return (float)strtoul(str, NULL, 10) / (float)(ipow(10,strlen(str)));
-		}
-		str++;
-	}
-	return 0;
-}
-
 float get_f_val(char * val){
-	float behind = get_behind_comma(val);
-	return behind + (get_before_comma(val));
+    float behind=0;
+    int32_t before = atoi(val);
+    while(*(val++)){
+        if(*val=='.' || *val==','){
+            val++;
+            if(*val){
+                char* str=val;
+                uint8_t count=1;
+                while(*(str++)){
+                    if(*str<48 || *str>57){ //Not a number
+                        break;
+                    }else{
+                        count++;
+                    };
+                }
+                behind = (float)atoi(val) / (ipow(10,count));
+                break;
+            }
+        }
+    }
+	return (before<0)?before-behind:before+behind;
 }
-
-
 
 uint8_t updateDefaultFunction(parameter_entry * params, char * newValue, uint8_t index, TERMINAL_HANDLE * handle) {
     int32_t value;
@@ -137,7 +131,7 @@ uint8_t updateDefaultFunction(parameter_entry * params, char * newValue, uint8_t
 
             value = fvalue*params[index].div;
         }else{
-            value = strtoul(newValue,NULL,10);
+            value = atoi(newValue);
         }
         if (value >= params[index].min && value <= params[index].max){
             if(params[index].size==1){
@@ -161,7 +155,7 @@ uint8_t updateDefaultFunction(parameter_entry * params, char * newValue, uint8_t
         	fvalue=get_f_val(newValue);
             value = fvalue*params[index].div;
         }else{
-            value = strtol(newValue,NULL,10);
+        	value = atoi(newValue);
         }
         if (value >= params[index].min && value <= params[index].max){
             if(params[index].size==1){
@@ -206,11 +200,9 @@ uint8_t updateDefaultFunction(parameter_entry * params, char * newValue, uint8_t
     return 0;
     error:
         if(params[index].div){
-            ttprintf("E:Range %i.%u-%i.%u\r\n",
-                     params[index].min/params[index].div,
-                     params[index].min%params[index].div,                
-                     params[index].max/params[index].div,
-                     params[index].max%params[index].div);
+            ttprintf("E:Range %f-%f\r\n",
+                     (float)params[index].min/params[index].div,
+                     (float)params[index].max/params[index].div);
         }else{
             ttprintf("E:Range %i-%i\r\n", params[index].min, params[index].max);
         }
@@ -252,10 +244,7 @@ void print_param_helperfunc(parameter_entry * params, uint8_t param_size, TERMIN
 
 			TERM_sendVT100Code(handle, _VT100_CURSOR_SET_COLUMN, COL_B);
 			if(params[current_parameter].div){
-				ttprintf("\033[37m| \033[32m%u.%0*u",
-					(u_temp_buffer/params[current_parameter].div),
-					n_number(params[current_parameter].div)-1,
-					(u_temp_buffer%params[current_parameter].div));
+				ttprintf("\033[37m| \033[32m%.0f", round(((float)u_temp_buffer/params[current_parameter].div)));
 			}else{
 				ttprintf("\033[37m| \033[32m%u", u_temp_buffer);
 			}
@@ -275,17 +264,8 @@ void print_param_helperfunc(parameter_entry * params, uint8_t param_size, TERMIN
 
 			TERM_sendVT100Code(handle, _VT100_CURSOR_SET_COLUMN, COL_B);
 			if(params[current_parameter].div){
-				uint32_t mod;
-				if(i_temp_buffer<0){
-					mod=(i_temp_buffer*-1)%params[current_parameter].div;
-				}else{
-					mod=i_temp_buffer%params[current_parameter].div;
-				}
 
-				ttprintf("\033[37m| \033[32m%i.%0*u",
-				(i_temp_buffer/params[current_parameter].div),
-				n_number(params[current_parameter].div)-1,
-				mod);
+				ttprintf("\033[37m| \033[32m%.0f", round(((float)i_temp_buffer/params[current_parameter].div)));
 			}else{
 				ttprintf("\033[37m| \033[32m%i", i_temp_buffer);
 			}
@@ -339,10 +319,8 @@ void print_param(parameter_entry * params, uint8_t index, TERMINAL_HANDLE * hand
                     break;
             }
             if(params[index].div){
-                ttprintf("\t%s=%u.%0*u\r\n",
-                                params[index].name,(u_temp_buffer/params[index].div),
-                                n_number(params[index].div)-1,
-                                (u_temp_buffer%params[index].div));
+                ttprintf("\t%s=%f\r\n",
+                                params[index].name, ((float)u_temp_buffer/params[index].div));
             }else{
                 ttprintf("\t%s=%u\r\n", params[index].name,u_temp_buffer);
             }
@@ -360,16 +338,8 @@ void print_param(parameter_entry * params, uint8_t index, TERMINAL_HANDLE * hand
                 break;
             }
             if(params[index].div){
-                uint32_t mod;
-                if(i_temp_buffer<0){
-                    mod=(i_temp_buffer*-1)%params[index].div;
-                }else{
-                    mod=i_temp_buffer%params[index].div;
-                }
-                ttprintf("\t%s=%i.%0*u\r\n",
-                                params[index].name,(i_temp_buffer/params[index].div),
-                                n_number(params[index].div)-1,
-                                mod);
+                ttprintf("\t%s=%f\r\n",
+                                params[index].name,((float)i_temp_buffer/params[index].div));
             }else{
                 ttprintf("\t%s=%i\r\n", params[index].name,i_temp_buffer);
             }

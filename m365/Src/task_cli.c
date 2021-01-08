@@ -72,7 +72,7 @@ void task_cli_init(){
 	TERM_addCommand(CMD_set, "set","Usage set [param] [value]",0,&TERM_cmdListHead);
 	TERM_addCommand(CMD_eeprom, "eeprom","Save/Load config [load/save]",0,&TERM_cmdListHead);
 
-	cli_handle = TERM_createNewHandle(printf,pdTRUE,&TERM_cmdListHead,NULL,"root");
+	cli_handle = TERM_createNewHandle(printf,pdTRUE,&TERM_cmdListHead,"root");
 	task_cli_handle = osThreadNew(task_cli, cli_handle, &task_cli_attributes);
 }
 
