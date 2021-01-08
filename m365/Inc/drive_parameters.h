@@ -168,11 +168,11 @@
 #define PHASE2_FINAL_SPEED_UNIT         (0*SPEED_UNIT/_RPM)
 #define PHASE2_FINAL_CURRENT           635
 /* Phase 3 */
-#define PHASE3_DURATION                1000 /*milliseconds */
-#define PHASE3_FINAL_SPEED_UNIT         (1000*SPEED_UNIT/_RPM)
+#define PHASE3_DURATION                500 /*milliseconds */
+#define PHASE3_FINAL_SPEED_UNIT         (500*SPEED_UNIT/_RPM)
 #define PHASE3_FINAL_CURRENT           1588
 /* Phase 4 */
-#define PHASE4_DURATION                0 /*milliseconds */
+#define PHASE4_DURATION                500 /*milliseconds */
 #define PHASE4_FINAL_SPEED_UNIT         (1000*SPEED_UNIT/_RPM)
 #define PHASE4_FINAL_CURRENT           1588
 /* Phase 5 */
