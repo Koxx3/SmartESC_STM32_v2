@@ -306,7 +306,7 @@
 						<var version="1.0" type="MC_Int" name="Main - ObsCRD - F1" enable="true" visible="true" readonly="false" value="16384" />
 						<var version="1.0" type="MC_Int" name="Main - ObsCRD - F2" enable="true" visible="true" readonly="false" value="16384" />
 						<var version="1.0" type="MC_Int" name="Main - ObsCRD - G1" enable="true" visible="true" readonly="false" value="-23921" />
-						<var version="1.0" type="MC_Int" name="Main - ObsCRD - G2" enable="true" visible="true" readonly="false" value="7000" />
+						<var version="1.0" type="MC_Int" name="Main - ObsCRD - G2" enable="true" visible="true" readonly="false" value="30000" />
 						<var version="1.0" type="MC_Int" name="Main - ObsCRD - K1" enable="false" visible="true" readonly="false" value="-23360" />
 						<var version="1.0" type="MC_Int" name="Main - ObsCRD - K2" enable="false" visible="true" readonly="false" value="12018" />
 						<var version="1.0" type="MC_Int" name="Main - ObsCRD - Average speed FIFO depth for speed loop" enable="true" visible="true" readonly="false" value="64" />
@@ -429,9 +429,9 @@
 						<var version="1.0" type="MC_Bool" name="Torque - Enable differential term" enable="false" visible="true" readonly="false" value="false" />
 						<var version="1.0" type="MC_Int" name="Torque - D dividend" enable="false" visible="true" readonly="false" value="100" />
 						<var version="1.0" type="MC_Int" name="Torque - D divisor" enable="true" visible="true" readonly="true" value="8192" />
-						<var version="1.0" type="MC_Int" name="Flux - P dividend" enable="true" visible="true" readonly="false" value="3649" />
+						<var version="1.0" type="MC_Int" name="Flux - P dividend" enable="true" visible="true" readonly="false" value="1800" />
 						<var version="1.0" type="MC_Int" name="Flux - P divisor" enable="true" visible="true" readonly="false" value="1024" />
-						<var version="1.0" type="MC_Int" name="Flux - I dividend" enable="true" visible="true" readonly="false" value="1995" />
+						<var version="1.0" type="MC_Int" name="Flux - I dividend" enable="true" visible="true" readonly="false" value="1000" />
 						<var version="1.0" type="MC_Int" name="Flux - I divisor" enable="true" visible="true" readonly="false" value="16384" />
 						<var version="1.0" type="MC_Bool" name="Flux - Enable differential term" enable="false" visible="true" readonly="false" value="false" />
 						<var version="1.0" type="MC_Int" name="Flux - D dividend" enable="false" visible="true" readonly="false" value="100" />
