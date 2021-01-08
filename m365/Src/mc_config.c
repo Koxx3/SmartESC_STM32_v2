@@ -126,7 +126,7 @@ RevUpCtrl_Handle_t RevUpControlM1 =
   .bFirstAccelerationStage = (ENABLE_SL_ALGO_FROM_PHASE-1u),
   .hMinStartUpValidSpeed   = OBS_MINIMUM_SPEED_UNIT,
   .hMinStartUpFlySpeed     = (int16_t)(OBS_MINIMUM_SPEED_UNIT/2),
-  .OTFStartupEnabled       = true,
+  .OTFStartupEnabled       = false,
   .OTFPhaseParams         = {(uint16_t)500,
                                          0,
                              (int16_t)PHASE5_FINAL_CURRENT,

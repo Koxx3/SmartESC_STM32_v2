@@ -168,24 +168,24 @@
 		<define key="ALIGNMENT_DURATION" value="700" />
 		<define key="ALIGNMENT_ANGLE_DEG" value="90" />
 		<define key="FINAL_I_ALIGNMENT" value="619" />
-		<define key="STARTING_ANGLE_DEG" value="90" />
-		<define key="PHASE1_DURATION" value="1000" />
+		<define key="STARTING_ANGLE_DEG" value="0" />
+		<define key="PHASE1_DURATION" value="0" />
 		<define key="PHASE1_FINAL_SPEED_RPM" value="0" />
 		<define key="PHASE1_FINAL_CURRENT" value="0" />
-		<define key="PHASE2_DURATION" value="1000" />
+		<define key="PHASE2_DURATION" value="0" />
 		<define key="PHASE2_FINAL_SPEED_RPM" value="0" />
-		<define key="PHASE2_FINAL_CURRENT" value="0" />
-		<define key="PHASE3_DURATION" value="100" />
-		<define key="PHASE3_FINAL_SPEED_RPM" value="0" />
+		<define key="PHASE2_FINAL_CURRENT" value="635" />
+		<define key="PHASE3_DURATION" value="1000" />
+		<define key="PHASE3_FINAL_SPEED_RPM" value="1000" />
 		<define key="PHASE3_FINAL_CURRENT" value="1588" />
-		<define key="PHASE4_DURATION" value="500" />
-		<define key="PHASE4_FINAL_SPEED_RPM" value="200" />
+		<define key="PHASE4_DURATION" value="0" />
+		<define key="PHASE4_FINAL_SPEED_RPM" value="1000" />
 		<define key="PHASE4_FINAL_CURRENT" value="1588" />
 		<define key="PHASE5_DURATION" value="0" />
-		<define key="PHASE5_FINAL_SPEED_RPM" value="200" />
+		<define key="PHASE5_FINAL_SPEED_RPM" value="1000" />
 		<define key="PHASE5_FINAL_CURRENT" value="1588" />
-		<define key="ENABLE_SL_ALGO_FROM_PHASE" value="1" />
-		<define key="TRANSITION_DURATION" value="0" />
+		<define key="ENABLE_SL_ALGO_FROM_PHASE" value="3" />
+		<define key="TRANSITION_DURATION" value="25" />
 		<define key="OBS_MINIMUM_SPEED_RPM" value="100" />
 		<define key="NB_CONSECUTIVE_TESTS" value="1" />
 		<define key="SPEED_BAND_UPPER_LIMIT" value="17" />
@@ -214,7 +214,6 @@
 		<define key="SERIAL_COM_CHANNEL2" value="MC_PROTOCOL_REG_I_A" />
 		<define key="SERIAL_COM_MOTOR" value="0" />
 		<define key="LOW_SIDE_SIGNALS_ENABLING" value="LS_PWM_TIMER" />
-		<define key="OTF_STARTUP" value="TRUE" />
 		<define key="RTOS" value="FREERTOS" />
 		<define key="RTOS_TIMER" value="TIM4" />
 		<define key="RTOS_USE_IRQ" value="FALSE" />

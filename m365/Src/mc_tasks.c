@@ -348,8 +348,22 @@ __weak void TSK_MediumFrequencyTaskM1(void)
   {
   case IDLE_START:
     RUC_Clear( &RevUpControlM1, MCI_GetImposedMotorDirection( oMCInterface[M1] ) );
-    PWMC_CurrentReadingCalibr( pwmcHandle[M1], CRC_START );
-    STM_NextState( &STM[M1], OFFSET_CALIB );
+    R3_2_TurnOnLowSides( pwmcHandle[M1] );
+    TSK_SetChargeBootCapDelayM1( CHARGE_BOOT_CAP_TICKS );
+    STM_NextState( &STM[M1], CHARGE_BOOT_CAP );
+    break;
+
+  case CHARGE_BOOT_CAP:
+    if ( TSK_ChargeBootCapDelayHasElapsedM1() )
+    {
+      PWMC_CurrentReadingCalibr( pwmcHandle[M1], CRC_START );
+
+      /* USER CODE BEGIN MediumFrequencyTask M1 Charge BootCap elapsed */
+
+      /* USER CODE END MediumFrequencyTask M1 Charge BootCap elapsed */
+
+      STM_NextState(&STM[M1],OFFSET_CALIB);
+    }
     break;
 
   case OFFSET_CALIB:
@@ -383,7 +397,7 @@ __weak void TSK_MediumFrequencyTaskM1(void)
       bool ObserverConverged = false;
 
       /* Execute the Rev Up procedure */
-      if ( ! RUC_OTF_Exec( &RevUpControlM1 ) )
+      if( ! RUC_Exec( &RevUpControlM1 ) )
       {
         /* The time allowed for the startup sequence has expired */
         STM_FaultProcessing( &STM[M1], MC_START_UP, 0 );
@@ -400,6 +414,8 @@ __weak void TSK_MediumFrequencyTaskM1(void)
 
       (void) VSS_CalcAvrgMecSpeedUnit( &VirtualSpeedSensorM1, &hForcedMecSpeedUnit );
 
+      /* check that startup stage where the observer has to be used has been reached */
+      if (RUC_FirstAccelerationStageReached(&RevUpControlM1) == true)
       {
 	ObserverConverged = STO_CR_IsObserverConverged( &STO_CR_M1,hForcedMecSpeedUnit );
         (void) VSS_SetStartTransition( &VirtualSpeedSensorM1, ObserverConverged );
@@ -424,7 +440,7 @@ __weak void TSK_MediumFrequencyTaskM1(void)
       bool LoopClosed;
       int16_t hForcedMecSpeedUnit;
 
-      if ( ! RUC_OTF_Exec( &RevUpControlM1 ) )
+      if( ! RUC_Exec( &RevUpControlM1 ) )
       {
           /* The time allowed for the startup sequence has expired */
           STM_FaultProcessing( &STM[M1], MC_START_UP, 0 );
@@ -693,14 +709,13 @@ __weak uint8_t TSK_HighFrequencyTask(void)
       FOCVars[M1].Iqdref.q = REMNG_Calc(pREMNG[M1]);
     }
   }
-  if(!RUC_Get_SCLowsideOTF_Status(&RevUpControlM1))
-  {
-    hFOCreturn = FOC_CurrControllerM1();
-  }
-  else
-  {
-    hFOCreturn = MC_NO_ERROR;
-  }
+  /* USER CODE BEGIN HighFrequencyTask SINGLEDRIVE_1 */
+
+  /* USER CODE END HighFrequencyTask SINGLEDRIVE_1 */
+  hFOCreturn = FOC_CurrControllerM1();
+  /* USER CODE BEGIN HighFrequencyTask SINGLEDRIVE_2 */
+
+  /* USER CODE END HighFrequencyTask SINGLEDRIVE_2 */
   if(hFOCreturn == MC_FOC_DURATION)
   {
     STM_FaultProcessing(&STM[M1], MC_FOC_DURATION, 0);
