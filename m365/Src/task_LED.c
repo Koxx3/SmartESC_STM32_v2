@@ -23,6 +23,7 @@
 
 #include "task_LED.h"
 #include "task_init.h"
+#include "task_cli.h"
 #include "main.h"
 
 
@@ -51,6 +52,9 @@ void task_LED(void * argument)
 		  prv_LED_blink(200);
 	  }else{
 		  prv_LED_blink(1000);
+	  }
+	  if(task_cli_handle != NULL){
+		  prv_LED_blink(100);
 	  }
   }
 }

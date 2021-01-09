@@ -103,6 +103,18 @@ PID_Handle_t PIDIdHandle_M1 =
 };
 
 /**
+  * @brief  FeedForwardCtrl parameters Motor 1
+  */
+FF_Handle_t FF_M1 =
+{
+  .hVqdLowPassFilterBW    = M1_VQD_SW_FILTER_BW_FACTOR,
+  .wDefConstant_1D        = (int32_t)CONSTANT1_D,
+  .wDefConstant_1Q        = (int32_t)CONSTANT1_Q,
+  .wDefConstant_2         = (int32_t)CONSTANT2_QD,
+  .hVqdLowPassFilterBWLOG = M1_VQD_SW_FILTER_BW_FACTOR_LOG
+};
+
+/**
   * @brief  SpeednTorque Controller parameters Motor 1
   */
 SpeednTorqCtrl_Handle_t SpeednTorqCtrlM1 =

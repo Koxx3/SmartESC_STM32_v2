@@ -28,7 +28,7 @@
 
 void task_init(){
 	//init_config();
-	task_cli_init();
+	//task_cli_init();
 	task_LED_init();  //Bring up the blinky
 	task_PWR_init();  //Manage power button
 

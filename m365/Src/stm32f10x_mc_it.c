@@ -26,6 +26,7 @@
 #include "ui_task.h"
 #include "parameters_conversion.h"
 #include "motorcontrol.h"
+#include "stm32f1xx_ll_exti.h"
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -272,6 +273,20 @@ void HardFault_Handler(void)
  /* USER CODE BEGIN HardFault_IRQn 1 */
 
  /* USER CODE END HardFault_IRQn 1 */
+
+}
+
+/**
+  * @brief  This function handles Button IRQ on PIN PC15.
+  */
+void EXTI15_10_IRQHandler (void)
+{
+	/* USER CODE BEGIN START_STOP_BTN */
+  if ( LL_EXTI_ReadFlag_0_31(LL_EXTI_LINE_15) )
+  {
+    LL_EXTI_ClearFlag_0_31 (LL_EXTI_LINE_15);
+    UI_HandleStartStopButton_cb ();
+  }
 
 }
 

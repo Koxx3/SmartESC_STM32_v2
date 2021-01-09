@@ -29,6 +29,7 @@
 #include "pwm_curr_fdbk.h"
 #include "r_divider_bus_voltage_sensor.h"
 #include "virtual_bus_voltage_sensor.h"
+#include "feed_forward_ctrl.h"
 #include "pqd_motor_power_measurement.h"
  #include "user_interface.h"
 
@@ -56,6 +57,7 @@ extern HALL_Handle_t HALL_M1;
 extern RDivider_Handle_t RealBusVoltageSensorParamsM1;
 extern CircleLimitation_Handle_t CircleLimitationM1;
 extern RampExtMngr_Handle_t RampExtMngrHFParamsM1;
+extern FF_Handle_t FF_M1;
 extern UI_Handle_t UI_Params;
 
 extern UFCP_Handle_t pUSART;

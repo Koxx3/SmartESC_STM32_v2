@@ -196,7 +196,7 @@
 		<define key="FW_KPDIV" value="32768" />
 		<define key="FW_KIDIV" value="32768" />
 		<define key="MTPA_ENABLING" value="DISABLE" />
-		<define key="FEED_FORWARD_CURRENT_REG_ENABLING" value="DISABLE" />
+		<define key="FEED_FORWARD_CURRENT_REG_ENABLING" value="ENABLE" />
 		<define key="CONSTANT1_Q" value="934538" />
 		<define key="CONSTANT1_D" value="934538" />
 		<define key="CONSTANT2_QD" value="75731" />
@@ -317,7 +317,7 @@
 		<define key="USART_TX_GPIO_PIN" value="GPIO_Pin_10" />
 		<define key="USART_RX_GPIO_PORT" value="GPIOB" />
 		<define key="USART_RX_GPIO_PIN" value="GPIO_Pin_11" />
-		<define key="START_STOP_BTN" value="DISABLE" />
+		<define key="START_STOP_BTN" value="ENABLE" />
 		<define key="START_STOP_POLARITY" value="DIN_ACTIVE_LOW" />
 		<define key="START_STOP_POLARITY_EDGE" value="GPIO_NOPULL" />
 		<define key="START_STOP_GPIO_PORT" value="GPIOC" />
