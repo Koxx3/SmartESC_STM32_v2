@@ -39,17 +39,17 @@
 		<link>
 			<name>Application/User/TTerm.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/TTerm.c</locationURI>
+			<location>C:/VSARM/Workspace/M365_MC_WB/m365/Src/TTerm.c</location>
 		</link>
 		<link>
 			<name>Application/User/TTerm_AC.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/TTerm_AC.c</locationURI>
+			<location>C:/VSARM/Workspace/M365_MC_WB/m365/Src/TTerm_AC.c</location>
 		</link>
 		<link>
 			<name>Application/User/TTerm_cmd.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/TTerm_cmd.c</locationURI>
+			<location>C:/VSARM/Workspace/M365_MC_WB/m365/Src/TTerm_cmd.c</location>
 		</link>
 		<link>
 			<name>Application/User/cli_basic.c</name>
@@ -325,6 +325,11 @@
 			<name>Middlewares/MotorControl/frame_communication_protocol.c</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/MCSDK_v5.4.5/MotorControl/MCSDK/UILibrary/Src/frame_communication_protocol.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/MotorControl/hall_speed_pos_fdbk.c</name>
+			<type>1</type>
+			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Src/hall_speed_pos_fdbk.c</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/MotorControl/motor_power_measurement.c</name>

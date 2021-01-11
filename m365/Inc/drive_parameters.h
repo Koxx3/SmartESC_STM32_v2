@@ -37,37 +37,16 @@
 #define MEAS_ERRORS_BEFORE_FAULTS       3 /*!< Number of speed
                                                              measurement errors before
                                                              main sensor goes in fault */
-/****** State Observer + CORDIC ***/
-#define CORD_VARIANCE_THRESHOLD           4  /*!<Maxiumum accepted
-                                                            variance on speed
-                                                            estimates (percentage) */
-#define CORD_F1                          16384
-#define CORD_F2                          16384
-#define CORD_F1_LOG                      LOG2(16384)
-#define CORD_F2_LOG                      LOG2(16384)
+/****** Hall sensors ************/
+#define HALL_MEAS_ERRORS_BEFORE_FAULTS  3 /*!< Number of failed
+                                                           derived class specific speed
+                                                           measurements before main sensor
+                                                           goes in fault */
 
-/* State observer constants */
-#define CORD_GAIN1                       -23921
-#define CORD_GAIN2                       30000
-
-#define CORD_MEAS_ERRORS_BEFORE_FAULTS   3  /*!< Number of consecutive errors
-                                                           on variance test before a speed
-                                                           feedback error is reported */
-#define CORD_FIFO_DEPTH_DPP              64  /*!< Depth of the FIFO used
-                                                            to average mechanical speed
-                                                            in dpp format */
-#define CORD_FIFO_DEPTH_DPP_LOG          LOG2(64)
-
-#define CORD_FIFO_DEPTH_UNIT            64  /*!< Depth of the FIFO used
-                                                           to average mechanical speed
-                                                           in dpp format */
-#define CORD_MAX_ACCEL_DPPP              19  /*!< Maximum instantaneous
-                                                              electrical acceleration (dpp
-                                                              per control period) */
-#define CORD_BEMF_CONSISTENCY_TOL        64  /* Parameter for B-emf
-                                                           amplitude-speed consistency */
-#define CORD_BEMF_CONSISTENCY_GAIN       64  /* Parameter for B-emf
-                                                          amplitude-speed consistency */
+#define HALL_AVERAGING_FIFO_DEPTH        6 /*!< depth of the FIFO used to
+                                                           average mechanical speed in
+                                                           0.1Hz resolution */
+#define HALL_MTPA  false
 
 /* USER CODE BEGIN angle reconstruction M1 */
 #define REV_PARK_ANGLE_COMPENSATION_FACTOR 0
@@ -161,48 +140,6 @@
                                                           power stage) */
 /******************************   START-UP PARAMETERS   **********************/
 
-/* Phase 1 */
-#define PHASE1_DURATION                0 /*milliseconds */
-#define PHASE1_FINAL_SPEED_UNIT         (0*SPEED_UNIT/_RPM)
-#define PHASE1_FINAL_CURRENT           0
-/* Phase 2 */
-#define PHASE2_DURATION                0 /*milliseconds */
-#define PHASE2_FINAL_SPEED_UNIT         (0*SPEED_UNIT/_RPM)
-#define PHASE2_FINAL_CURRENT           635
-/* Phase 3 */
-#define PHASE3_DURATION                500 /*milliseconds */
-#define PHASE3_FINAL_SPEED_UNIT         (600*SPEED_UNIT/_RPM)
-#define PHASE3_FINAL_CURRENT           1270
-/* Phase 4 */
-#define PHASE4_DURATION                0 /*milliseconds */
-#define PHASE4_FINAL_SPEED_UNIT         (600*SPEED_UNIT/_RPM)
-#define PHASE4_FINAL_CURRENT           1270
-/* Phase 5 */
-#define PHASE5_DURATION                0 /* milliseconds */
-#define PHASE5_FINAL_SPEED_UNIT         (600*SPEED_UNIT/_RPM)
-#define PHASE5_FINAL_CURRENT           1270
-
-#define ENABLE_SL_ALGO_FROM_PHASE      3
-/* Sensor-less rev-up sequence */
-#define STARTING_ANGLE_DEG             0  /*!< degrees [0...359] */
-/* Observer start-up output conditions  */
-#define OBS_MINIMUM_SPEED_RPM          100
-
-#define NB_CONSECUTIVE_TESTS           1 /* corresponding to
-                                                         former NB_CONSECUTIVE_TESTS/
-                                                         (TF_REGULATION_RATE/
-                                                         MEDIUM_FREQUENCY_TASK_RATE) */
-#define SPEED_BAND_UPPER_LIMIT         17 /*!< It expresses how much
-                                                            estimated speed can exceed
-                                                            forced stator electrical
-                                                            without being considered wrong.
-                                                            In 1/16 of forced speed */
-#define SPEED_BAND_LOWER_LIMIT         15  /*!< It expresses how much
-                                                             estimated speed can be below
-                                                             forced stator electrical
-                                                             without being considered wrong.
-                                                             In 1/16 of forced speed */
-
 #define TRANSITION_DURATION            25  /* Switch over duration, ms */
 /******************************   BUS VOLTAGE Motor 1  **********************/
 #define  M1_VBUS_SAMPLING_TIME  LL_ADC_SAMPLING_CYCLE(1)
@@ -212,13 +149,6 @@
 #define ADC_SAMPLING_CYCLES (7 + SAMPLING_CYCLE_CORRECTION)
 
 /******************************   ADDITIONAL FEATURES   **********************/
-
-/*  Maximum Torque Per Ampere strategy parameters */
-
-#define MTPA_ENABLING
-#define SEGDIV                         595
-#define ANGC                           {0,0,0,0,-55,0,-54,-54}
-#define OFST                           {0,0,0,0,4,-1,4,4}
 
 /*** On the fly start-up ***/
 

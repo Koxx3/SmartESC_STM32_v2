@@ -3,7 +3,7 @@
 	<defines>
 		<define key="POLE_PAIR_NUM" value="15" />
 		<define key="RS" value="0.07" />
-		<define key="LS" value="0.000082" />
+		<define key="LS" value="0.000311" />
 		<define key="NOMINAL_CURRENT" value="9532" />
 		<define key="MOTOR_MAX_SPEED_RPM" value="2500" />
 		<define key="MOTOR_VOLTAGE_CONSTANT" value="17.0" />
@@ -49,8 +49,8 @@
 		<define key="dV_dT" value="0.031" />
 		<define key="T_MAX" value="70" />
 		<define key="PWBDID" value="0" />
-		<define key="STATE_OBSERVER_CORDIC" value="TRUE" />
-		<define key="SPEED_SENSOR_SELECTION" value="STATE_OBSERVER_CORDIC" />
+		<define key="HALL_SENSORS" value="TRUE" />
+		<define key="SPEED_SENSOR_SELECTION" value="HALL_SENSORS" />
 		<define key="SINGLEDRIVE" value="TRUE" />
 		<define key="DRIVES_NUMBER_SELECTION" value="SINGLEDRIVE" />
 		<define key="MAX_APPLICATION_SPEED" value="2500" />
@@ -195,10 +195,10 @@
 		<define key="FW_KI_GAIN" value="5000" />
 		<define key="FW_KPDIV" value="32768" />
 		<define key="FW_KIDIV" value="32768" />
-		<define key="MTPA_ENABLING" value="ENABLE" />
+		<define key="MTPA_ENABLING" value="DISABLE" />
 		<define key="FEED_FORWARD_CURRENT_REG_ENABLING" value="DISABLE" />
-		<define key="CONSTANT1_Q" value="246405" />
-		<define key="CONSTANT1_D" value="246405" />
+		<define key="CONSTANT1_Q" value="934538" />
+		<define key="CONSTANT1_D" value="934538" />
 		<define key="CONSTANT2_QD" value="32185" />
 		<define key="IQMAX" value="9532" />
 		<define key="SEGDIV" value="0" />
@@ -266,11 +266,11 @@
 		<define key="EMERGENCY2_STOP_GPIO_PIN" value="GPIO_Pin_12" />
 		<define key="BRKIN2_GPIO_AF" value="GPIO_AF_2" />
 		<define key="HALL_TIMER_SELECTION" value="HALL_TIM3" />
-		<define key="HALL_TIMER_REMAPPING" value="NO_REMAP_TIM3" />
-		<define key="H1_GPIO_PORT" value="GPIOA" />
-		<define key="H1_GPIO_PIN" value="GPIO_Pin_6" />
-		<define key="H2_GPIO_PORT" value="GPIOA" />
-		<define key="H2_GPIO_PIN" value="GPIO_Pin_7" />
+		<define key="HALL_TIMER_REMAPPING" value="PARTIAL_REMAP_TIM3" />
+		<define key="H1_GPIO_PORT" value="GPIOB" />
+		<define key="H1_GPIO_PIN" value="GPIO_Pin_4" />
+		<define key="H2_GPIO_PORT" value="GPIOB" />
+		<define key="H2_GPIO_PIN" value="GPIO_Pin_5" />
 		<define key="H3_GPIO_PORT" value="GPIOB" />
 		<define key="H3_GPIO_PIN" value="GPIO_Pin_0" />
 		<define key="ENC_TIMER_SELECTION" value="ENC_TIM2" />
@@ -317,7 +317,7 @@
 		<define key="USART_TX_GPIO_PIN" value="GPIO_Pin_10" />
 		<define key="USART_RX_GPIO_PORT" value="GPIOB" />
 		<define key="USART_RX_GPIO_PIN" value="GPIO_Pin_11" />
-		<define key="START_STOP_BTN" value="ENABLE" />
+		<define key="START_STOP_BTN" value="DISABLE" />
 		<define key="START_STOP_POLARITY" value="DIN_ACTIVE_LOW" />
 		<define key="START_STOP_POLARITY_EDGE" value="GPIO_NOPULL" />
 		<define key="START_STOP_GPIO_PORT" value="GPIOC" />
