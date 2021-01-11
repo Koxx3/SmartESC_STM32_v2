@@ -67,7 +67,7 @@
 #define REGULATION_EXECUTION_RATE     1    /*!< FOC execution rate in
                                                            number of PWM cycles */
 /* Gains values for torque and flux control loops */
-#define PID_TORQUE_KP_DEFAULT         3649
+#define PID_TORQUE_KP_DEFAULT         3661
 #define PID_TORQUE_KI_DEFAULT         1995
 #define PID_TORQUE_KD_DEFAULT         100
 #define PID_FLUX_KP_DEFAULT           3649
@@ -148,11 +148,12 @@
 
 /******************************   ADDITIONAL FEATURES   **********************/
 
-/*  Feed-forward parameters */
-#define FEED_FORWARD_CURRENT_REG_ENABLING ENABLE
-#define CONSTANT1_Q                    934538
-#define CONSTANT1_D                    934538
-#define CONSTANT2_QD                   75731
+/*  Maximum Torque Per Ampere strategy parameters */
+
+#define MTPA_ENABLING
+#define SEGDIV                         595
+#define ANGC                           {0,0,0,0,-55,0,-54,-54}
+#define OFST                           {0,0,0,0,4,-1,4,4}
 
 /*** On the fly start-up ***/
 

@@ -103,18 +103,6 @@ PID_Handle_t PIDIdHandle_M1 =
 };
 
 /**
-  * @brief  FeedForwardCtrl parameters Motor 1
-  */
-FF_Handle_t FF_M1 =
-{
-  .hVqdLowPassFilterBW    = M1_VQD_SW_FILTER_BW_FACTOR,
-  .wDefConstant_1D        = (int32_t)CONSTANT1_D,
-  .wDefConstant_1Q        = (int32_t)CONSTANT1_Q,
-  .wDefConstant_2         = (int32_t)CONSTANT2_QD,
-  .hVqdLowPassFilterBWLOG = M1_VQD_SW_FILTER_BW_FACTOR_LOG
-};
-
-/**
   * @brief  SpeednTorque Controller parameters Motor 1
   */
 SpeednTorqCtrl_Handle_t SpeednTorqCtrlM1 =
@@ -276,6 +264,12 @@ CircleLimitation_Handle_t CircleLimitationM1 =
   .MaxVd          	  = (uint16_t)(MAX_MODULE * 950 / 1000),
   .Circle_limit_table = MMITABLE,
   .Start_index        = START_INDEX,
+};
+MTPA_Handle_t MTPARegM1 =
+{
+  .SegDiv   = (int16_t)SEGDIV,
+  .AngCoeff = ANGC,
+  .Offset   = OFST,
 };
 
 UFCP_Handle_t pUSART =

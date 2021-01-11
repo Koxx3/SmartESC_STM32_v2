@@ -3,18 +3,18 @@
 	<defines>
 		<define key="POLE_PAIR_NUM" value="15" />
 		<define key="RS" value="0.17" />
-		<define key="LS" value="0.000311" />
+		<define key="LS" value="0.000312" />
 		<define key="NOMINAL_CURRENT" value="4766" />
 		<define key="MOTOR_MAX_SPEED_RPM" value="2500" />
 		<define key="MOTOR_VOLTAGE_CONSTANT" value="40.0" />
 		<define key="ID_DEMAG" value="-4766" />
 		<define key="HALL_SENSORS_PLACEMENT" value="DEGREES_120" />
-		<define key="HALL_PHASE_SHIFT" value="120" />
+		<define key="HALL_PHASE_SHIFT" value="138" />
 		<define key="ENCODER_PPR" value="400" />
 		<define key="HALL_SENSORS_AVAILABLE" value="TRUE" />
 		<define key="ENCODER_AVAILABLE" value="FALSE" />
 		<define key="MOTOR_TYPE" value="PMSM" />
-		<define key="LDLQ_RATIO" value="1.000" />
+		<define key="LDLQ_RATIO" value="0.998" />
 		<define key="DC_CURRENT_RS_MEAS" value="15.00" />
 		<define key="PHASE_UH_POLARITY" value="H_ACTIVE_HIGH" />
 		<define key="PHASE_VH_POLARITY" value="H_ACTIVE_HIGH" />
@@ -67,8 +67,8 @@
 		<define key="VARIANCE_THRESHOLD" value="0.1" />
 		<define key="F1" value="16384" />
 		<define key="F2" value="8192" />
-		<define key="GAIN1" value="-24156" />
-		<define key="GAIN2" value="24403" />
+		<define key="GAIN1" value="-24157" />
+		<define key="GAIN2" value="24481" />
 		<define key="PLL_KP_GAIN" value="1247" />
 		<define key="PLL_KI_GAIN" value="55" />
 		<define key="OBS_MEAS_ERRORS_BEFORE_FAULTS" value="3" />
@@ -81,8 +81,8 @@
 		<define key="CORD_BEMF_CONSISTENCY_GAIN" value="64" />
 		<define key="CORD_F1" value="16384" />
 		<define key="CORD_F2" value="8192" />
-		<define key="CORD_GAIN1" value="-24156" />
-		<define key="CORD_GAIN2" value="24403" />
+		<define key="CORD_GAIN1" value="-24157" />
+		<define key="CORD_GAIN2" value="24481" />
 		<define key="CORD_MEAS_ERRORS_BEFORE_FAULTS" value="3" />
 		<define key="CORD_FIFO_DEPTH_DPP" value="64" />
 		<define key="CORD_FIFO_DEPTH_01HZ" value="64" />
@@ -133,7 +133,7 @@
 		<define key="HIGH_SIDE_IDLE_STATE" value="TURN_OFF" />
 		<define key="LOW_SIDE_IDLE_STATE" value="TURN_OFF" />
 		<define key="REGULATION_EXECUTION_RATE" value="1" />
-		<define key="PID_TORQUE_KP_DEFAULT" value="3649" />
+		<define key="PID_TORQUE_KP_DEFAULT" value="3661" />
 		<define key="PID_TORQUE_KI_DEFAULT" value="1995" />
 		<define key="PID_TORQUE_KD_DEFAULT" value="100" />
 		<define key="PID_FLUX_KP_DEFAULT" value="3649" />
@@ -195,15 +195,15 @@
 		<define key="FW_KI_GAIN" value="5000" />
 		<define key="FW_KPDIV" value="32768" />
 		<define key="FW_KIDIV" value="32768" />
-		<define key="MTPA_ENABLING" value="DISABLE" />
-		<define key="FEED_FORWARD_CURRENT_REG_ENABLING" value="ENABLE" />
-		<define key="CONSTANT1_Q" value="934538" />
+		<define key="MTPA_ENABLING" value="ENABLE" />
+		<define key="FEED_FORWARD_CURRENT_REG_ENABLING" value="DISABLE" />
+		<define key="CONSTANT1_Q" value="937543" />
 		<define key="CONSTANT1_D" value="934538" />
 		<define key="CONSTANT2_QD" value="75731" />
 		<define key="IQMAX" value="4766" />
-		<define key="SEGDIV" value="0" />
-		<define key="ANGC" value="{0,0,0,0,0,0,0,0}" />
-		<define key="OFST" value="{0,0,0,0,0,0,0,0}" />
+		<define key="SEGDIV" value="595" />
+		<define key="ANGC" value="{0,0,0,0,-55,0,-54,-54}" />
+		<define key="OFST" value="{0,0,0,0,4,-1,4,4}" />
 		<define key="LCD_JOYSTICK_FUNCTIONALITY" value="DISABLE" />
 		<define key="LCD_MODE" value="LCD_FULL" />
 		<define key="SERIAL_COMMUNICATION" value="ENABLE" />
