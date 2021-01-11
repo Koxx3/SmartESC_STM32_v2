@@ -21,44 +21,58 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "task_LED.h"
-#include "task_init.h"
 #include "task_cli.h"
+#include "task_init.h"
 #include "main.h"
+#include "TTerm.h"
+#include "printf.h"
+#include "cli_basic.h"
+#include "cli_common.h"
+#include "mc_config.h"
 
-
-osThreadId_t LEDHandle;
-const osThreadAttr_t LED_attributes = {
-  .name = "LED",
+osThreadId_t task_cli_handle;
+const osThreadAttr_t task_cli_attributes = {
+  .name = "CLI",
   .priority = (osPriority_t) osPriorityBelowNormal,
-  .stack_size = 128 * 4
+  .stack_size = 256 * 4
 };
 
-void prv_LED_blink(uint32_t ticks){
-	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, pdFALSE);
-	osDelay(ticks);
-	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, pdTRUE);
-	osDelay(ticks);
+TERMINAL_HANDLE * cli_handle;
+
+
+void _putchar(char character){
+	while(!LL_USART_IsActiveFlag_TXE(pUSART.USARTx)){
+		//vTaskDelay(1);
+	}
+	LL_USART_TransmitData8(pUSART.USARTx, character);
 }
 
 
-void task_LED(void * argument)
+void task_cli(void * argument)
 {
 
+	TERMINAL_HANDLE * handle = argument;
+	uint8_t c=0;
   /* Infinite loop */
-  for(;;)
-  {
-	  if(pMCI[M1]->pSTM->hFaultOccurred){
-		  prv_LED_blink(200);
-	  }else{
-		  prv_LED_blink(1000);
-	  }
-	  if(task_cli_handle != NULL){
-		  prv_LED_blink(100);
-	  }
-  }
+	for(;;)
+	{
+		 if (LL_USART_IsActiveFlag_RXNE(pUSART.USARTx))
+		 {
+			c = LL_USART_ReceiveData8(pUSART.USARTx);
+			TERM_processBuffer(&c,1,handle);
+		}
+		vTaskDelay(1);
+	}
 }
 
-void task_LED_init(){
-	LEDHandle = osThreadNew(task_LED, NULL, &LED_attributes);
+void task_cli_init(){
+	HAL_NVIC_DisableIRQ(USART3_IRQn);
+
+	TERM_addCommand(CMD_get, "get", "Usage get [param]",0,&TERM_cmdListHead);
+	TERM_addCommand(CMD_set, "set","Usage set [param] [value]",0,&TERM_cmdListHead);
+	TERM_addCommand(CMD_eeprom, "eeprom","Save/Load config [load/save]",0,&TERM_cmdListHead);
+
+	cli_handle = TERM_createNewHandle(printf,pdTRUE,&TERM_cmdListHead,"root");
+	task_cli_handle = osThreadNew(task_cli, cli_handle, &task_cli_attributes);
 }
+

@@ -24,6 +24,7 @@
 #include "ui_task.h"
 #include "mc_config.h"
 #include "parameters_conversion.h"
+#include "mc_api.h"
 
 #define OPT_DACX  0x20 /*!<Bit field indicating that the UI uses SPI AD7303 DAC.*/
 
@@ -115,6 +116,21 @@ __weak void UI_SerialCommunicationTimeOutStop(void)
 __weak void UI_SerialCommunicationTimeOutStart(void)
 {
   bCOMTimeoutCounter = SERIALCOM_TIMEOUT_OCCURENCE_TICKS;
+}
+
+__weak void UI_HandleStartStopButton_cb (void)
+{
+/* USER CODE BEGIN START_STOP_BTN */
+  if (MC_GetSTMStateMotor1() == IDLE)
+  {
+    /* Ramp parameters should be tuned for the actual motor */
+    MC_StartMotor1();
+  }
+  else
+  {
+    MC_StopMotor1();
+  }
+/* USER CODE END START_STOP_BTN */
 }
 
 /******************* (C) COPYRIGHT 2019 STMicroelectronics *****END OF FILE****/

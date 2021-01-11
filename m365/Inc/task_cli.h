@@ -21,44 +21,16 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "task_LED.h"
-#include "task_init.h"
-#include "task_cli.h"
-#include "main.h"
+#ifndef TASK_CLI_H_
+#define TASK_CLI_H_
+
+#include "cmsis_os.h"
+
+extern osThreadId_t task_cli_handle;
 
 
-osThreadId_t LEDHandle;
-const osThreadAttr_t LED_attributes = {
-  .name = "LED",
-  .priority = (osPriority_t) osPriorityBelowNormal,
-  .stack_size = 128 * 4
-};
-
-void prv_LED_blink(uint32_t ticks){
-	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, pdFALSE);
-	osDelay(ticks);
-	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, pdTRUE);
-	osDelay(ticks);
-}
+void task_cli_init();
 
 
-void task_LED(void * argument)
-{
+#endif /* TASK_LED_H_ */
 
-  /* Infinite loop */
-  for(;;)
-  {
-	  if(pMCI[M1]->pSTM->hFaultOccurred){
-		  prv_LED_blink(200);
-	  }else{
-		  prv_LED_blink(1000);
-	  }
-	  if(task_cli_handle != NULL){
-		  prv_LED_blink(100);
-	  }
-  }
-}
-
-void task_LED_init(){
-	LEDHandle = osThreadNew(task_LED, NULL, &LED_attributes);
-}

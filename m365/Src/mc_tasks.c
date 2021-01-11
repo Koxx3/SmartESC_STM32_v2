@@ -82,6 +82,7 @@ DOUT_handle_t *pR_Brake[NBR_OF_MOTORS];
 DOUT_handle_t *pOCPDisabling[NBR_OF_MOTORS];
 PQD_MotorPowMeas_Handle_t *pMPM[NBR_OF_MOTORS];
 CircleLimitation_Handle_t *pCLM[NBR_OF_MOTORS];
+MTPA_Handle_t *pMaxTorquePerAmpere[2] = {MC_NULL,MC_NULL};
 RampExtMngr_Handle_t *pREMNG[NBR_OF_MOTORS];   /*!< Ramp manager used to modify the Iq ref
                                                     during the start-up switch over.*/
 
@@ -137,6 +138,7 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
   bMCBootCompleted = 0;
   pCLM[M1] = &CircleLimitationM1;
 
+  pMaxTorquePerAmpere[M1] = &MTPARegM1;
   /**********************************************************/
   /*    PWM and current sensing component initialization    */
   /**********************************************************/
@@ -324,6 +326,7 @@ __weak void MC_Scheduler(void)
   * execution at a medium frequency rate (such as the speed controller for instance)
   * are executed here.
   */
+
 __weak void TSK_MediumFrequencyTaskM1(void)
 {
   /* USER CODE BEGIN MediumFrequencyTask M1 0 */
@@ -604,6 +607,10 @@ __weak void FOC_CalcCurrRef(uint8_t bMotor)
   {
     FOCVars[bMotor].hTeref = STC_CalcTorqueReference(pSTC[bMotor]);
     FOCVars[bMotor].Iqdref.q = FOCVars[bMotor].hTeref;
+    if (pMaxTorquePerAmpere[bMotor])
+    {
+      MTPA_CalcCurrRefFromIq(pMaxTorquePerAmpere[bMotor], &FOCVars[bMotor].Iqdref);
+    }
 
   }
   /* USER CODE BEGIN FOC_CalcCurrRef 1 */
@@ -750,15 +757,18 @@ __attribute__((section (".ccmram")))
   * @retval int16_t It returns MC_NO_FAULTS if the FOC has been ended before
   *         next PWM Update event, MC_FOC_DURATION otherwise
   */
+
 inline uint16_t FOC_CurrControllerM1(void)
 {
   qd_t Iqd, Vqd;
   ab_t Iab;
   alphabeta_t Ialphabeta, Valphabeta;
 
+
   int16_t hElAngle;
   uint16_t hCodeError;
   SpeednPosFdbk_Handle_t *speedHandle;
+
 
   speedHandle = STC_GetSpeedSensor(pSTC[M1]);
   hElAngle = SPD_GetElAngle(speedHandle);

@@ -42,6 +42,8 @@ bool UI_SerialCommunicationATRTimeHasElapsed(void);
 void UI_SerialCommunicationTimeOutStop(void);
 void UI_SerialCommunicationTimeOutStart(void);
 
+void UI_HandleStartStopButton_cb (void);
+
 #endif /* __UITASK_H */
 
 /******************* (C) COPYRIGHT 2019 STMicroelectronics *****END OF FILE****/

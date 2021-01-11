@@ -318,6 +318,12 @@ CircleLimitation_Handle_t CircleLimitationM1 =
   .Circle_limit_table = MMITABLE,
   .Start_index        = START_INDEX,
 };
+MTPA_Handle_t MTPARegM1 =
+{
+  .SegDiv   = (int16_t)SEGDIV,
+  .AngCoeff = ANGC,
+  .Offset   = OFST,
+};
 
 UFCP_Handle_t pUSART =
 {

@@ -1,7 +1,7 @@
 /*
- * m365
+ * TTerm
  *
- * Copyright (c) 2021 Jens Kerrinnes
+ * Copyright (c) 2020 Thorben Zethoff
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -20,45 +20,43 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
+    
+#ifndef Term_ACH
+#define Term_ACH
 
-#include "task_LED.h"
-#include "task_init.h"
-#include "task_cli.h"
-#include "main.h"
+#if PIC32 == 1
+#include <xc.h>
+#endif  
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
 
+#include "TTerm.h"
 
-osThreadId_t LEDHandle;
-const osThreadAttr_t LED_attributes = {
-  .name = "LED",
-  .priority = (osPriority_t) osPriorityBelowNormal,
-  .stack_size = 128 * 4
+typedef struct __ACL__ AC_LIST_ELEMENT;
+typedef struct __ACL_HEAD__ AC_LIST_HEAD;
+
+struct __ACL__{
+    AC_LIST_ELEMENT * next;
+    char * string;
 };
 
-void prv_LED_blink(uint32_t ticks){
-	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, pdFALSE);
-	osDelay(ticks);
-	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, pdTRUE);
-	osDelay(ticks);
-}
+struct __ACL_HEAD__{
+    unsigned isConst;
+    uint32_t elementCount;
+    AC_LIST_ELEMENT * first;
+};
 
+AC_LIST_HEAD * ACL_create();
+AC_LIST_HEAD * ACL_createConst(const char ** strings, uint32_t count);
+AC_LIST_ELEMENT * ACL_getNext(AC_LIST_ELEMENT * currElement);
+void ACL_add(AC_LIST_HEAD * head, char * string);
+void ACL_remove(AC_LIST_HEAD * head, char * string);
+uint8_t TERM_doListAC(AC_LIST_HEAD * head, char * currInput, uint8_t length, char ** buff);
+uint8_t ACL_defaultCompleter(TERMINAL_HANDLE * handle, void * params);
+unsigned ACL_isSorted(char * a, char * b);
+void ACL_remove(AC_LIST_HEAD * head, char * string);
+void ACL_add(AC_LIST_HEAD * head, char * string);
 
-void task_LED(void * argument)
-{
-
-  /* Infinite loop */
-  for(;;)
-  {
-	  if(pMCI[M1]->pSTM->hFaultOccurred){
-		  prv_LED_blink(200);
-	  }else{
-		  prv_LED_blink(1000);
-	  }
-	  if(task_cli_handle != NULL){
-		  prv_LED_blink(100);
-	  }
-  }
-}
-
-void task_LED_init(){
-	LEDHandle = osThreadNew(task_LED, NULL, &LED_attributes);
-}
+#endif

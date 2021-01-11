@@ -179,6 +179,7 @@ int main(void)
   /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  vTaskSwitchContext();
   while (1)
   {
     /* USER CODE END WHILE */

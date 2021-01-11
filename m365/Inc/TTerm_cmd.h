@@ -1,7 +1,8 @@
 /*
- * m365
+ * TTerm
  *
- * Copyright (c) 2021 Jens Kerrinnes
+ * Copyright (c) 2020 Thorben Zethoff
+ * Copyright (c) 2020 Jens Kerrinnes
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -21,44 +22,25 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "task_LED.h"
-#include "task_init.h"
-#include "task_cli.h"
-#include "main.h"
+ #if PIC32 == 1
+#include <xc.h>
+#endif  
+#include <stdint.h>
 
+#include "TTerm.h"
+#include "TTerm_AC.h"
 
-osThreadId_t LEDHandle;
-const osThreadAttr_t LED_attributes = {
-  .name = "LED",
-  .priority = (osPriority_t) osPriorityBelowNormal,
-  .stack_size = 128 * 4
-};
+#ifndef TTERM_CMD
+#define TTERM_CMD
 
-void prv_LED_blink(uint32_t ticks){
-	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, pdFALSE);
-	osDelay(ticks);
-	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, pdTRUE);
-	osDelay(ticks);
-}
+AC_LIST_HEAD * head;
 
+uint8_t CMD_testCommandHandler(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
+uint8_t TERM_testCommandAutoCompleter(TERMINAL_HANDLE * handle, void * params);
+uint8_t CMD_help(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
+uint8_t CMD_cls(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
+uint8_t CMD_top(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
+void CMD_top_task(void * handle);
+uint8_t CMD_top_handleInput(TERMINAL_HANDLE * handle, uint16_t c);
 
-void task_LED(void * argument)
-{
-
-  /* Infinite loop */
-  for(;;)
-  {
-	  if(pMCI[M1]->pSTM->hFaultOccurred){
-		  prv_LED_blink(200);
-	  }else{
-		  prv_LED_blink(1000);
-	  }
-	  if(task_cli_handle != NULL){
-		  prv_LED_blink(100);
-	  }
-  }
-}
-
-void task_LED_init(){
-	LEDHandle = osThreadNew(task_LED, NULL, &LED_attributes);
-}
+#endif

@@ -57,7 +57,7 @@
                                                  It can be either DEGREES_120 or
                                                  DEGREES_60 */
 
-#define HALL_PHASE_SHIFT        120 /*!< Define here in degrees
+#define HALL_PHASE_SHIFT        138 /*!< Define here in degrees
                                                  the electrical phase shift between
                                                  the low to high transition of
                                                  signal H1 and the maximum of

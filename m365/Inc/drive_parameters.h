@@ -213,6 +213,13 @@
 
 /******************************   ADDITIONAL FEATURES   **********************/
 
+/*  Maximum Torque Per Ampere strategy parameters */
+
+#define MTPA_ENABLING
+#define SEGDIV                         595
+#define ANGC                           {0,0,0,0,-55,0,-54,-54}
+#define OFST                           {0,0,0,0,4,-1,4,4}
+
 /*** On the fly start-up ***/
 
 /**************************

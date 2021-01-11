@@ -24,12 +24,12 @@
 #include "task_init.h"
 #include "task_LED.h"
 #include "task_pwr.h"
-
+#include "task_cli.h"
 
 void task_init(){
-
-	  task_LED_init();  //Bring up the blinky
-	  task_PWR_init();  //Manage power button
-
+	//init_config();
+	//task_cli_init();
+	task_LED_init();  //Bring up the blinky
+	task_PWR_init();  //Manage power button
 
 }
