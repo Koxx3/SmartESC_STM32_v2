@@ -71,6 +71,8 @@
 
 /* USER CODE BEGIN angle reconstruction M1 */
 #define REV_PARK_ANGLE_COMPENSATION_FACTOR 0
+
+#define SPEED_WITH_HALL_FILTERING 80
 /* USER CODE END angle reconstruction M1 */
 
 /**************************    DRIVE SETTINGS SECTION   **********************/
@@ -169,16 +171,16 @@
 #define PHASE2_FINAL_CURRENT           635
 /* Phase 3 */
 #define PHASE3_DURATION                500 /*milliseconds */
-#define PHASE3_FINAL_SPEED_UNIT         (500*SPEED_UNIT/_RPM)
-#define PHASE3_FINAL_CURRENT           1588
+#define PHASE3_FINAL_SPEED_UNIT         (600*SPEED_UNIT/_RPM)
+#define PHASE3_FINAL_CURRENT           1270
 /* Phase 4 */
-#define PHASE4_DURATION                500 /*milliseconds */
-#define PHASE4_FINAL_SPEED_UNIT         (1000*SPEED_UNIT/_RPM)
-#define PHASE4_FINAL_CURRENT           1588
+#define PHASE4_DURATION                0 /*milliseconds */
+#define PHASE4_FINAL_SPEED_UNIT         (600*SPEED_UNIT/_RPM)
+#define PHASE4_FINAL_CURRENT           1270
 /* Phase 5 */
 #define PHASE5_DURATION                0 /* milliseconds */
-#define PHASE5_FINAL_SPEED_UNIT         (1000*SPEED_UNIT/_RPM)
-#define PHASE5_FINAL_CURRENT           1588
+#define PHASE5_FINAL_SPEED_UNIT         (600*SPEED_UNIT/_RPM)
+#define PHASE5_FINAL_CURRENT           1270
 
 #define ENABLE_SL_ALGO_FROM_PHASE      3
 /* Sensor-less rev-up sequence */

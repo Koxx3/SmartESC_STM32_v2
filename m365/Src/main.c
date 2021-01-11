@@ -36,6 +36,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define SPEED_WITH_HALL_FILTERING 80
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
