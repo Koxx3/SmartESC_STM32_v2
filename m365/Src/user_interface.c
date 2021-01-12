@@ -133,8 +133,7 @@ __weak bool UI_SetReg(UI_Handle_t *pHandle, MC_Protocol_REG_t bRegID, int32_t wV
 
   case MC_PROTOCOL_REG_RAMP_FINAL_SPEED:
     {
-      //MCI_ExecSpeedRamp(pMCI,(int16_t)((wValue*SPEED_UNIT)/_RPM),0);
-      HALL_M1.PhaseShift = (int16_t)(wValue * 65536/360);
+      MCI_ExecSpeedRamp(pMCI,(int16_t)((wValue*SPEED_UNIT)/_RPM),0);
     }
     break;
 

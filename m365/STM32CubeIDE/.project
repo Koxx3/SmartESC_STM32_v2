@@ -39,17 +39,17 @@
 		<link>
 			<name>Application/User/TTerm.c</name>
 			<type>1</type>
-			<location>$%7BPARENT-1-PROJECT_LOC%7D/Src/TTerm.c</location>
+			<location>C:/VSARM/Workspace/M365_MC_WB/m365/Src/TTerm.c</location>
 		</link>
 		<link>
 			<name>Application/User/TTerm_AC.c</name>
 			<type>1</type>
-			<location>$%7BPARENT-1-PROJECT_LOC%7D/Src/TTerm_AC.c</location>
+			<location>C:/VSARM/Workspace/M365_MC_WB/m365/Src/TTerm_AC.c</location>
 		</link>
 		<link>
 			<name>Application/User/TTerm_cmd.c</name>
 			<type>1</type>
-			<location>$%7BPARENT-1-PROJECT_LOC%7D/Src/TTerm_cmd.c</location>
+			<location>C:/VSARM/Workspace/M365_MC_WB/m365/Src/TTerm_cmd.c</location>
 		</link>
 		<link>
 			<name>Application/User/cli_basic.c</name>
