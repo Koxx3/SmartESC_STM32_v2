@@ -58,6 +58,7 @@
 static const uint16_t UFCP_Usart_Timeout_none = 0;
 static const uint16_t UFCP_Usart_Timeout_start = 1;
 static const uint16_t UFCP_Usart_Timeout_stop = 2;
+static uint32_t timeLastReceiveFrame = 0;
 
 /* Functions ---------------------------------------------------------*/
 
@@ -66,6 +67,11 @@ __weak void UFCP_Init( UFCP_Handle_t * pHandle )
 
   /* Initialize generic component part */
   FCP_Init( & pHandle->_Super );
+}
+
+__weak uint32_t UFCP_Get_Time_Last_Receive_Frame()
+{
+  return timeLastReceiveFrame;
 }
 
 /*
@@ -123,6 +129,9 @@ __weak void * UFCP_RX_IRQ_Handler( UFCP_Handle_t * pHandle, unsigned short rx_da
           LL_USART_DisableIT_RXNE(pHandle->USARTx);
           /* Indicate the reception is complete. */
           pBaseHandle->RxFrameState = FCP_TRANSFER_IDLE;
+
+          /* store last time complete frame is received */
+          timeLastReceiveFrame = HAL_GetTick();
 
           /* Check the Control Sum */
           if ( FCP_CalcCRC( & pBaseHandle->RxFrame ) == pBaseHandle->RxFrame.FrameCRC )

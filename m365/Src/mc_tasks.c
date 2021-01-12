@@ -89,6 +89,8 @@ static volatile uint16_t hMFTaskCounterM1 = 0;
 static volatile uint16_t hBootCapDelayCounterM1 = 0;
 static volatile uint16_t hStopPermanencyCounterM1 = 0;
 
+uint8_t serialTimeout = 0;
+
 uint8_t bMCBootCompleted = 0;
 
 /* USER CODE BEGIN Private Variables */
@@ -237,6 +239,15 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
   /* USER CODE END MCboot 2 */
 
   bMCBootCompleted = 1;
+}
+
+/**
+ * @brief Set torque to 0 if no more serial commands are received
+ *
+ */
+__weak void MC_SetSerialTimeout(uint32_t timeout)
+{
+	serialTimeout = timeout;
 }
 
 /**
@@ -399,6 +410,18 @@ __weak void TSK_MediumFrequencyTaskM1(void)
     {
       STM_FaultProcessing( &STM[M1], MC_SPEED_FDBK, 0 );
     }
+
+
+    /* stop motor is no more serial commands received */
+	if (serialTimeout > 0) {
+		if (HAL_GetTick() > UFCP_Get_Time_Last_Receive_Frame() + serialTimeout )
+		{
+			qd_t torque;
+			torque.d = 0;
+			torque.q = 0;
+			MC_SetCurrentReferenceMotor1(torque);
+		}
+	}
 
     /* USER CODE BEGIN MediumFrequencyTask M1 3 */
 

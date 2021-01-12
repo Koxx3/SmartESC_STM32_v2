@@ -169,6 +169,7 @@ int main(void)
   /* add threads, ... */
 
   task_init(); //bring up user tasks
+  MC_SetSerialTimeout(1000); // set serial timeout protection
 
   /* USER CODE END RTOS_THREADS */
 

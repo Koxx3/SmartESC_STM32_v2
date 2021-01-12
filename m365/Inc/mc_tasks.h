@@ -60,6 +60,10 @@ void TSK_HardwareFaultTask(void);
 
  /* Locks GPIO pins used for Motor Control to prevent accidental reconfiguration */
 void mc_lock_pins (void);
+
+/* Set torque to 0 if no more serial commands are received */
+void MC_SetSerialTimeout(uint32_t timeout);
+
 /**
   * @}
   */

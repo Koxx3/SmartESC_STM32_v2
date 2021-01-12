@@ -86,6 +86,8 @@ void UFCP_OVR_IRQ_Handler( UFCP_Handle_t * pHandle );
 
 void UFCP_TIMEOUT_IRQ_Handler( UFCP_Handle_t * pHandle );
 
+uint32_t UFCP_Get_Time_Last_Receive_Frame();
+
 /**
   * @}
   */
