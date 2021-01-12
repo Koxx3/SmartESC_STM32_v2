@@ -31,6 +31,8 @@
 #include "system.h"
 #include "mc_config.h"
 
+#if TTERM_ENABLED
+
 
 #define UNUSED_VARIABLE(N) \
 	do {                   \
@@ -212,3 +214,4 @@ uint8_t CMD_load_defaults(TERMINAL_HANDLE * handle, uint8_t argCount, char ** ar
     return TERM_CMD_EXIT_SUCCESS;
 }
 
+#endif
