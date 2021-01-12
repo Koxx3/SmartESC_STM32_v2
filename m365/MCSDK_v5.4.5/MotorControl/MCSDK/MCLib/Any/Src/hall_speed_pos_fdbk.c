@@ -22,6 +22,7 @@
 #include "speed_pos_fdbk.h"
 #include "hall_speed_pos_fdbk.h"
 #include "mc_type.h"
+#include <stdlib.h> // for abs()
 
 /** @addtogroup MCSDK
   * @{
@@ -70,7 +71,7 @@
 
 /* With digit-per-PWM unit (here 2*PI rad = 0xFFFF): */
 #define HALL_MAX_PSEUDO_SPEED        ((int16_t)0x7FFF)
-
+#define MIN_SPEED_CALC_EL_ANGLE      ((uint16_t)100)
 #define CCER_CC1E_Set               ((uint16_t)0x0001)
 #define CCER_CC1E_Reset             ((uint16_t)0xFFFE)
 
@@ -230,6 +231,9 @@ __attribute__( ( section ( ".ccmram" ) ) )
 #endif
 #endif
 
+/**
+* @brief  Get hall angle without advanced computing
+*/
 int16_t HALL_GetElAngle( HALL_Handle_t * pHandle )
 {
 	  uint8_t HallState;
@@ -281,16 +285,28 @@ int16_t HALL_GetElAngle( HALL_Handle_t * pHandle )
 
 }
 
+
 /**
 * @brief  Update the rotor electrical angle integrating the last measured
 *         instantaneous electrical speed express in dpp.
 * @param  pHandle: handler of the current instance of the hall_speed_pos_fdbk component
 * @retval int16_t Measured electrical angle in s16degree format.
-*
 */
 __weak int16_t HALL_CalcElAngle( HALL_Handle_t * pHandle )
 {
-  if ( abs(pHandle->AvrElSpeedDpp) < 100 ){
+/*
+  if ( pHandle->_Super.hElSpeedDpp != HALL_MAX_PSEUDO_SPEED )
+  {
+    pHandle->MeasuredElAngle += pHandle->_Super.hElSpeedDpp;
+    pHandle->_Super.hElAngle += pHandle->_Super.hElSpeedDpp + pHandle->CompSpeed;
+    pHandle->PrevRotorFreq = pHandle->_Super.hElSpeedDpp;
+  }
+  else
+  {
+    pHandle->_Super.hElAngle += pHandle->PrevRotorFreq;
+  }
+  */
+  if ( abs(pHandle->AvrElSpeedDpp) < MIN_SPEED_CALC_EL_ANGLE ){
 	  return HALL_GetElAngle(pHandle);
   }
   else if ( pHandle->_Super.hElSpeedDpp != HALL_MAX_PSEUDO_SPEED )
@@ -306,6 +322,7 @@ __weak int16_t HALL_CalcElAngle( HALL_Handle_t * pHandle )
 
   return pHandle->_Super.hElAngle;
 }
+
 
 
 /**

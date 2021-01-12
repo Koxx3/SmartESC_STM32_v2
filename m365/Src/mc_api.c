@@ -464,3 +464,8 @@ __weak State_t  MC_GetSTMStateMotor1(void)
 	return MCI_GetSTMState( pMCI[M1] );
 }
 
+/* Set torque to 0 if no more serial commands are received */
+__weak void MX_SetSerialTimeout(uint32_t timeout) {
+	MC_SetSerialTimeout(timeout);
+}
+

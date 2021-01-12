@@ -64,6 +64,8 @@
 /* USER CODE END Private define */
 #define VBUS_TEMP_ERR_MASK (MC_OVER_VOLT| MC_UNDER_VOLT| MC_OVER_TEMP)
 
+#define PARK_ANGLE_COMPENSATION_FACTOR 0
+
 /* Private variables----------------------------------------------------------*/
 FOCVars_t FOCVars[NBR_OF_MOTORS];
 MCI_Handle_t Mci[NBR_OF_MOTORS];
@@ -89,9 +91,9 @@ static volatile uint16_t hMFTaskCounterM1 = 0;
 static volatile uint16_t hBootCapDelayCounterM1 = 0;
 static volatile uint16_t hStopPermanencyCounterM1 = 0;
 
-uint8_t serialTimeout = 0;
-
 uint8_t bMCBootCompleted = 0;
+
+uint8_t serialTimeout = 0;
 
 /* USER CODE BEGIN Private Variables */
 
@@ -242,15 +244,6 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
 }
 
 /**
- * @brief Set torque to 0 if no more serial commands are received
- *
- */
-__weak void MC_SetSerialTimeout(uint32_t timeout)
-{
-	serialTimeout = timeout;
-}
-
-/**
  * @brief Runs all the Tasks of the Motor Control cockpit
  *
  * This function is to be called periodically at least at the Medium Frequency task
@@ -273,6 +266,15 @@ __weak void MC_RunMotorControlTasks(void)
     /* ** User Interface Task ** */
     UI_Scheduler();
   }
+}
+
+/**
+ * @brief Set torque to 0 if no more serial commands are received
+ *
+ */
+__weak void MC_SetSerialTimeout(uint32_t timeout)
+{
+	serialTimeout = timeout;
 }
 
 /**
@@ -406,12 +408,6 @@ __weak void TSK_MediumFrequencyTaskM1(void)
     MCI_ExecBufferedCommands( oMCInterface[M1] );
     FOC_CalcCurrRef( M1 );
 
-    if( !IsSpeedReliable )
-    {
-      STM_FaultProcessing( &STM[M1], MC_SPEED_FDBK, 0 );
-    }
-
-
     /* stop motor is no more serial commands received */
 	if (serialTimeout > 0) {
 		if (HAL_GetTick() > UFCP_Get_Time_Last_Receive_Frame() + serialTimeout )
@@ -422,6 +418,11 @@ __weak void TSK_MediumFrequencyTaskM1(void)
 			MC_SetCurrentReferenceMotor1(torque);
 		}
 	}
+
+    if( !IsSpeedReliable )
+    {
+      STM_FaultProcessing( &STM[M1], MC_SPEED_FDBK, 0 );
+    }
 
     /* USER CODE BEGIN MediumFrequencyTask M1 3 */
 

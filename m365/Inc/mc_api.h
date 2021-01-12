@@ -132,6 +132,9 @@ uint16_t MC_GetCurrentFaultsMotor1(void);
 /* returns the current state of Motor 1 state machine */
 State_t  MC_GetSTMStateMotor1(void);
 
+/* Set torque to 0 if no more serial commands are received */
+void MC_SetSerialTimeout(uint32_t timeout);
+
 /**
   * @}
   */

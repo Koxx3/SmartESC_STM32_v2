@@ -58,11 +58,8 @@ void TSK_DualDriveFIFOUpdate(uint8_t Motor);
 /* Puts the Motor Control subsystem in in safety conditions on a Hard Fault */
 void TSK_HardwareFaultTask(void);
 
- /* Locks GPIO pins used for Motor Control to prevent accidental reconfiguration */
+/* Locks GPIO pins used for Motor Control to prevent accidental reconfiguration */
 void mc_lock_pins (void);
-
-/* Set torque to 0 if no more serial commands are received */
-void MC_SetSerialTimeout(uint32_t timeout);
 
 /**
   * @}

@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "ntc_temperature_sensor.h"
+#include "ntc.h"
 
 /** @addtogroup MCSDK
   * @{
@@ -178,10 +179,14 @@ __weak int16_t NTC_GetAvTemp_C( NTC_Handle_t * pHandle )
 
   if ( pHandle->bSensorType == REAL_SENSOR )
   {
+	  /*
     wTemp = ( int32_t )( pHandle->hAvTemp_d );
     wTemp -= ( int32_t )( pHandle->wV0 );
-    wTemp *= pHandle->hSensitivity;
+    wTemp *= -pHandle->hSensitivity;
     wTemp = wTemp / 65536 + ( int32_t )( pHandle->hT0 );
+	*/
+	
+    wTemp = NTC_ADC2Temperature(( uint32_t )( pHandle->hAvTemp_d  >> 4)) / 10;
   }
   else
   {

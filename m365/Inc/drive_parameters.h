@@ -48,6 +48,7 @@
                                                            0.1Hz resolution */
 #define HALL_MTPA  false
 
+#define PARK_ANGLE_COMPENSATION_FACTOR 0
 /* USER CODE BEGIN angle reconstruction M1 */
 #define REV_PARK_ANGLE_COMPENSATION_FACTOR 0
 
