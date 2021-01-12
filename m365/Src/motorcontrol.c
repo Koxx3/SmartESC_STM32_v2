@@ -64,6 +64,12 @@ void vPortSetupTimerInterrupt( void )
   /* Reconfigure the SysTick interrupt to fire every 500 us. */
   HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/SYS_TICK_FREQUENCY);
 }
+
+void MX_SetSerialTimeout(uint32_t timeout)
+{
+	MC_SetSerialTimeout(timeout);
+}
+
 /**
   * @}
   */
