@@ -19,7 +19,7 @@
 					<board_name>motor_loc</board_name>
 					<original_board_name></original_board_name>
 					<vars>
-						<var version="1.0" type="MC_List" name="I/SM-PMSM" enable="true" visible="true" readonly="false" value="0">
+						<var version="1.0" type="MC_List" name="I/SM-PMSM" enable="true" visible="true" readonly="false" value="1">
 							<items>
 								<item tag="1" text="Internal PMSM" />
 								<item tag="0" text="Surface Mounted PMSM" />
@@ -277,7 +277,7 @@
 						<var version="1.0" type="MC_Int" name="Main - Max measurement errors number before fault" enable="true" visible="true" readonly="false" value="3" />
 						<var version="1.0" type="MC_Int" name="Main - Hall Sensors - Average speed FIFO depth" enable="true" visible="true" readonly="false" value="6" />
 						<var version="1.0" type="MC_Double" name="Main - Hall Sensors - Input Capture filter duration" enable="true" visible="true" readonly="false" value="4" />
-						<var version="1.0" type="MC_Bool" name="Main_ObsPLL_Use_MTPA" enable="true" visible="true" readonly="false" value="false" />
+						<var version="1.0" type="MC_Bool" name="Main_ObsPLL_Use_MTPA" enable="true" visible="true" readonly="false" value="true" />
 						<var version="1.0" type="MC_Int" name="Main - Encoder - Average speed FIFO depth" enable="false" visible="true" readonly="false" value="16" />
 						<var version="1.0" type="MC_Double" name="Main - Encoder - Input Capture filter duration" enable="false" visible="true" readonly="false" value="0.70000000000000007" />
 						<var version="1.0" type="MC_Bool" name="Main - Encoder - Reverse counting direction" enable="false" visible="true" readonly="false" value="false" />
@@ -361,11 +361,11 @@
 						<var version="1.0" type="MC_Bool" name="Aux - ObsPLL - Manual editing enabled" enable="true" visible="true" readonly="false" value="false" />
 						<var version="1.0" type="MC_Bool" name="Aux - ObsPLL - Back compatibility" enable="true" visible="true" readonly="false" value="false" />
 						<var version="1.0" type="MC_Int" name="Aux - ObsPLL - F1" enable="false" visible="true" readonly="false" value="16384" />
-						<var version="1.0" type="MC_Int" name="Aux - ObsPLL - F2" enable="false" visible="true" readonly="false" value="4096" />
-						<var version="1.0" type="MC_Int" name="Aux - ObsPLL - G1" enable="false" visible="true" readonly="false" value="-24403" />
-						<var version="1.0" type="MC_Int" name="Aux - ObsPLL - G2" enable="false" visible="true" readonly="false" value="28282" />
-						<var version="1.0" type="MC_Int" name="Aux - ObsPLL - K1" enable="false" visible="true" readonly="false" value="-23831" />
-						<var version="1.0" type="MC_Int" name="Aux - ObsPLL - K2" enable="false" visible="true" readonly="false" value="44994" />
+						<var version="1.0" type="MC_Int" name="Aux - ObsPLL - F2" enable="false" visible="true" readonly="false" value="16384" />
+						<var version="1.0" type="MC_Int" name="Aux - ObsPLL - G1" enable="false" visible="true" readonly="false" value="-23921" />
+						<var version="1.0" type="MC_Int" name="Aux - ObsPLL - G2" enable="false" visible="true" readonly="false" value="30217" />
+						<var version="1.0" type="MC_Int" name="Aux - ObsPLL - K1" enable="false" visible="true" readonly="false" value="-23360" />
+						<var version="1.0" type="MC_Int" name="Aux - ObsPLL - K2" enable="false" visible="true" readonly="false" value="12018" />
 						<var version="1.0" type="MC_Int" name="Aux - ObsPLL - Average speed FIFO depth for speed loop" enable="true" visible="true" readonly="false" value="64" />
 						<var version="1.0" type="MC_Int" name="Aux - ObsPLL - Average speed FIFO depth for observer equations" enable="true" visible="true" readonly="false" value="64" />
 						<var version="1.0" type="MC_Int" name="Aux - ObsPLL - P dividend" enable="false" visible="true" readonly="false" value="1247" />
@@ -378,11 +378,11 @@
 						<var version="1.0" type="MC_Bool" name="Aux - ObsCRD - Manual editing enabled" enable="false" visible="true" readonly="false" value="false" />
 						<var version="1.0" type="MC_Bool" name="Aux - ObsCRD - Back compatibility" enable="false" visible="true" readonly="false" value="false" />
 						<var version="1.0" type="MC_Int" name="Aux - ObsCRD - F1" enable="false" visible="true" readonly="false" value="16384" />
-						<var version="1.0" type="MC_Int" name="Aux - ObsCRD - F2" enable="false" visible="true" readonly="false" value="4096" />
-						<var version="1.0" type="MC_Int" name="Aux - ObsCRD - G1" enable="false" visible="true" readonly="false" value="-24403" />
-						<var version="1.0" type="MC_Int" name="Aux - ObsCRD - G2" enable="false" visible="true" readonly="false" value="28282" />
-						<var version="1.0" type="MC_Int" name="Aux - ObsCRD - K1" enable="false" visible="true" readonly="false" value="-23831" />
-						<var version="1.0" type="MC_Int" name="Aux - ObsCRD - K2" enable="false" visible="true" readonly="false" value="44994" />
+						<var version="1.0" type="MC_Int" name="Aux - ObsCRD - F2" enable="false" visible="true" readonly="false" value="16384" />
+						<var version="1.0" type="MC_Int" name="Aux - ObsCRD - G1" enable="false" visible="true" readonly="false" value="-23921" />
+						<var version="1.0" type="MC_Int" name="Aux - ObsCRD - G2" enable="false" visible="true" readonly="false" value="30217" />
+						<var version="1.0" type="MC_Int" name="Aux - ObsCRD - K1" enable="false" visible="true" readonly="false" value="-23360" />
+						<var version="1.0" type="MC_Int" name="Aux - ObsCRD - K2" enable="false" visible="true" readonly="false" value="12018" />
 						<var version="1.0" type="MC_Int" name="Aux - ObsCRD - Average speed FIFO depth for speed loop" enable="false" visible="true" readonly="false" value="64" />
 						<var version="1.0" type="MC_Int" name="Aux - ObsCRD - Average speed FIFO depth for observer equations" enable="false" visible="true" readonly="false" value="64" />
 						<var version="1.0" type="MC_Int" name="Aux - ObsCRD - Maximum application acceleration" enable="false" visible="true" readonly="false" value="6000" />

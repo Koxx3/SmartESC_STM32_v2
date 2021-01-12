@@ -39,17 +39,17 @@
 		<link>
 			<name>Application/User/TTerm.c</name>
 			<type>1</type>
-			<location>$%7BPARENT-1-PROJECT_LOC%7D/Src/TTerm.c</location>
+			<locationURI>$%257BPARENT-1-PROJECT_LOC%257D/Src/TTerm.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/TTerm_AC.c</name>
 			<type>1</type>
-			<location>$%7BPARENT-1-PROJECT_LOC%7D/Src/TTerm_AC.c</location>
+			<locationURI>$%257BPARENT-1-PROJECT_LOC%257D/Src/TTerm_AC.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/TTerm_cmd.c</name>
 			<type>1</type>
-			<location>$%7BPARENT-1-PROJECT_LOC%7D/Src/TTerm_cmd.c</location>
+			<locationURI>$%257BPARENT-1-PROJECT_LOC%257D/Src/TTerm_cmd.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/cli_basic.c</name>

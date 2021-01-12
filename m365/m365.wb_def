@@ -3,7 +3,7 @@
 	<defines>
 		<define key="POLE_PAIR_NUM" value="15" />
 		<define key="RS" value="0.07" />
-		<define key="LS" value="0.000311" />
+		<define key="LS" value="0.000082" />
 		<define key="NOMINAL_CURRENT" value="9532" />
 		<define key="MOTOR_MAX_SPEED_RPM" value="2500" />
 		<define key="MOTOR_VOLTAGE_CONSTANT" value="17.0" />
@@ -63,7 +63,7 @@
 		<define key="HALL_MEAS_ERRORS_BEFORE_FAULTS" value="3" />
 		<define key="HALL_ICx_FILTER" value="256" />
 		<define key="HALL_AVERAGING_FIFO_DEPTH" value="6" />
-		<define key="HALL_MTPA" value="FALSE" />
+		<define key="HALL_MTPA" value="TRUE" />
 		<define key="VARIANCE_THRESHOLD" value="0.1" />
 		<define key="F1" value="16384" />
 		<define key="F2" value="16384" />
@@ -197,8 +197,8 @@
 		<define key="FW_KIDIV" value="32768" />
 		<define key="MTPA_ENABLING" value="DISABLE" />
 		<define key="FEED_FORWARD_CURRENT_REG_ENABLING" value="DISABLE" />
-		<define key="CONSTANT1_Q" value="934538" />
-		<define key="CONSTANT1_D" value="934538" />
+		<define key="CONSTANT1_Q" value="246405" />
+		<define key="CONSTANT1_D" value="246405" />
 		<define key="CONSTANT2_QD" value="32185" />
 		<define key="IQMAX" value="9532" />
 		<define key="SEGDIV" value="0" />
