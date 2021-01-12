@@ -73,8 +73,8 @@
 #define PID_TORQUE_KP_DEFAULT         200
 #define PID_TORQUE_KI_DEFAULT         50
 #define PID_TORQUE_KD_DEFAULT         100
-#define PID_FLUX_KP_DEFAULT           1800
-#define PID_FLUX_KI_DEFAULT           1000
+#define PID_FLUX_KP_DEFAULT           200
+#define PID_FLUX_KI_DEFAULT           50
 #define PID_FLUX_KD_DEFAULT           100
 
 /* Torque/Flux control loop gains dividers*/

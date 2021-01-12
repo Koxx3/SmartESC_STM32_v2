@@ -429,9 +429,9 @@
 						<var version="1.0" type="MC_Bool" name="Torque - Enable differential term" enable="false" visible="true" readonly="false" value="false" />
 						<var version="1.0" type="MC_Int" name="Torque - D dividend" enable="false" visible="true" readonly="false" value="100" />
 						<var version="1.0" type="MC_Int" name="Torque - D divisor" enable="true" visible="true" readonly="true" value="8192" />
-						<var version="1.0" type="MC_Int" name="Flux - P dividend" enable="true" visible="true" readonly="false" value="1800" />
+						<var version="1.0" type="MC_Int" name="Flux - P dividend" enable="true" visible="true" readonly="false" value="200" />
 						<var version="1.0" type="MC_Int" name="Flux - P divisor" enable="true" visible="true" readonly="false" value="1024" />
-						<var version="1.0" type="MC_Int" name="Flux - I dividend" enable="true" visible="true" readonly="false" value="1000" />
+						<var version="1.0" type="MC_Int" name="Flux - I dividend" enable="true" visible="true" readonly="false" value="50" />
 						<var version="1.0" type="MC_Int" name="Flux - I divisor" enable="true" visible="true" readonly="false" value="16384" />
 						<var version="1.0" type="MC_Bool" name="Flux - Enable differential term" enable="false" visible="true" readonly="false" value="false" />
 						<var version="1.0" type="MC_Int" name="Flux - D dividend" enable="false" visible="true" readonly="false" value="100" />

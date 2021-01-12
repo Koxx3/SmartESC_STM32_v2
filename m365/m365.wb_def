@@ -136,8 +136,8 @@
 		<define key="PID_TORQUE_KP_DEFAULT" value="200" />
 		<define key="PID_TORQUE_KI_DEFAULT" value="50" />
 		<define key="PID_TORQUE_KD_DEFAULT" value="100" />
-		<define key="PID_FLUX_KP_DEFAULT" value="1800" />
-		<define key="PID_FLUX_KI_DEFAULT" value="1000" />
+		<define key="PID_FLUX_KP_DEFAULT" value="200" />
+		<define key="PID_FLUX_KI_DEFAULT" value="50" />
 		<define key="PID_FLUX_KD_DEFAULT" value="100" />
 		<define key="TF_KPDIV" value="1024" />
 		<define key="TF_KIDIV" value="16384" />
