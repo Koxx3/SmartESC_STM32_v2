@@ -53,9 +53,12 @@ void task_LED(void * argument)
 	  }else{
 		  prv_LED_blink(1000);
 	  }
+
+#if TTERM_ENABLED
 	  if(task_cli_handle != NULL){
 		  prv_LED_blink(100);
 	  }
+#endif
   }
 }
 

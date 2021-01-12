@@ -37,6 +37,9 @@
 #include "TTerm_cmd.h"
 #include "TTerm_AC.h"
 
+
+#if TTERM_ENABLED
+
 void TERM_addCommandAC(TermCommandDescriptor * cmd, TermAutoCompHandler ACH, void * ACParams){
     cmd->ACHandler = ACH;
     cmd->ACParams = ACParams;
@@ -327,3 +330,5 @@ unsigned ACL_isSorted(char * a, char * b){
         return 1;
     }
 }
+
+#endif

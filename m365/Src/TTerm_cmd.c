@@ -39,6 +39,7 @@
 //#include "tasks/tsk_overlay.h"
 
 
+#if TTERM_ENABLED
 uint8_t CMD_testCommandHandler(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
     uint8_t currArg = 0;
     uint8_t returnCode = 0;
@@ -207,3 +208,4 @@ uint8_t CMD_top(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
 
     return returnCode;
 }
+#endif

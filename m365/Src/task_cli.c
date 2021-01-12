@@ -30,6 +30,7 @@
 #include "cli_common.h"
 #include "mc_config.h"
 
+#if TTERM_ENABLED
 osThreadId_t task_cli_handle;
 const osThreadAttr_t task_cli_attributes = {
   .name = "CLI",
@@ -75,4 +76,5 @@ void task_cli_init(){
 	cli_handle = TERM_createNewHandle(printf,pdTRUE,&TERM_cmdListHead,"root");
 	task_cli_handle = osThreadNew(task_cli, cli_handle, &task_cli_attributes);
 }
+#endif
 

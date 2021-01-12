@@ -38,6 +38,9 @@
 #include "TTerm_AC.h"
 //#include "cli_common.h"
 
+
+#if TTERM_ENABLED
+
 TermCommandDescriptor TERM_cmdListHead = {.nextCmd = 0, .commandLength = 0};
 unsigned TERM_baseCMDsAdded = 0;
 
@@ -829,4 +832,6 @@ void TERM_removeProgramm(TERMINAL_HANDLE * handle){
 const char TERM_startupText1[] = "            333333    666   555555\r\nmm mm mmmm     3333  66     55\r\nmmm  mm  mm   3333  666666  555555";
 const char TERM_startupText2[] = "mmm  mm  mm     333 66   66    5555\r\nmmm  mm  mm 333333   66666  555555\r\n";
 const char TERM_startupText3[] = "\tBuild: " __DATE__ " - " __TIME__ "";
+#endif
+
 #endif
