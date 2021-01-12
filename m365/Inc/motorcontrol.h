@@ -40,9 +40,6 @@
 /* Initializes the Motor Control Subsystem */
 void MX_MotorControl_Init(void);
 
-/* Set torque to 0 if no more serial commands are received */
-void MX_SetSerialTimeout(uint32_t timeout);
-
 /* Do not remove the definition of this symbol. */
 #define MC_HAL_IS_USED
 /**
@@ -56,6 +53,9 @@ void MX_SetSerialTimeout(uint32_t timeout);
 #ifdef __cplusplus
 }
 #endif /* __cpluplus */
+
+/* Set torque to 0 if no more serial commands are received */
+void MC_SetSerialTimeout(uint32_t timeout);
 
 #endif /* __MOTORCONTROL_H */
 /******************* (C) COPYRIGHT 2019 STMicroelectronics *****END OF FILE****/
