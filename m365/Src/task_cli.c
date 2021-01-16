@@ -71,6 +71,9 @@ void task_cli_init(){
 	TERM_addCommand(CMD_get, "get", "Usage get [param]",0,&TERM_cmdListHead);
 	TERM_addCommand(CMD_set, "set","Usage set [param] [value]",0,&TERM_cmdListHead);
 	TERM_addCommand(CMD_eeprom, "eeprom","Save/Load config [load/save]",0,&TERM_cmdListHead);
+	TERM_addCommand(CMD_tune, "tune","xxx",0,&TERM_cmdListHead);
+	TERM_addCommand(CMD_start, "start","xxx",0,&TERM_cmdListHead);
+	TERM_addCommand(CMD_stop, "stop","xxx",0,&TERM_cmdListHead);
 
 	cli_handle = TERM_createNewHandle(printf,pdTRUE,&TERM_cmdListHead,"root");
 	task_cli_handle = osThreadNew(task_cli, cli_handle, &task_cli_attributes);

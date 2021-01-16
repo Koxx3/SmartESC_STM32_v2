@@ -83,7 +83,9 @@ typedef struct
                                     It is also used to convert measured speed from the unit
                                     defined by #SPEED_UNIT to dpp and viceversa.*/
   uint32_t DPPConvFactor; /* (65536/PWM_FREQ_SCALING) */
-  
+
+  uint8_t open_loop;
+  int16_t open_angle;
 
 } SpeednPosFdbk_Handle_t;
 

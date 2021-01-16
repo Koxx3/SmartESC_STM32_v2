@@ -48,7 +48,6 @@ extern "C" {
 #define DEGREES_120 0u
 #define DEGREES_60 1u
 
-
 /* Exported types ------------------------------------------------------------*/
 
 /**
@@ -205,6 +204,8 @@ typedef struct
   uint8_t PWMFreqScaling; /*!< Scaling factor to allow to store a PWMFrequency greater than 16 bits */
   
   bool HallMtpa; /* if true at each sensor toggling, the true angle is set without ramp*/
+
+  volatile uint8_t lut[8];
 
 } HALL_Handle_t;
 /**

@@ -681,6 +681,7 @@ inline uint16_t FOC_CurrControllerM1(void)
   return(hCodeError);
 }
 
+
 /**
   * @brief  Executes safety checks (e.g. bus voltage and temperature) for all drive instances.
   *

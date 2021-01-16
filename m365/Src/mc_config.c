@@ -194,6 +194,7 @@ HALL_Handle_t HALL_M1 =
  .H2Pin              =  M1_HALL_H2_Pin<<8,
  .H3Port             =  M1_HALL_H3_GPIO_Port,
  .H3Pin              =  M1_HALL_H3_Pin<<8,
+ .lut				 = {0,1,2,3,4,5,6,7}
 };
 
 /**

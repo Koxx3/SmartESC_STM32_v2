@@ -78,6 +78,7 @@
 
 static void HALL_Init_Electrical_Angle( HALL_Handle_t * pHandle );
 
+
 /**
   * @brief  It initializes the hardware peripherals (TIMx, GPIO and NVIC)
             required for the speed position sensor management using HALL
@@ -377,15 +378,15 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
 
     if ( pHandle->SensorPlacement == DEGREES_120 )
     {
-      pHandle->HallState  =(uint8_t) ((LL_GPIO_IsInputPinSet( pHandle->H3Port, pHandle->H3Pin ) << 2)
+      pHandle->HallState  =pHandle->lut[(uint8_t) ((LL_GPIO_IsInputPinSet( pHandle->H3Port, pHandle->H3Pin ) << 2)
                             | (LL_GPIO_IsInputPinSet( pHandle->H2Port, pHandle->H2Pin ) << 1)
-                            | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin ) );
+                            | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin ) )];
     }
     else
     {
-      pHandle->HallState  = (uint8_t) ((( LL_GPIO_IsInputPinSet( pHandle->H2Port, pHandle->H2Pin ) ^ 1 ) << 2)
+      pHandle->HallState  = pHandle->lut[(uint8_t) ((( LL_GPIO_IsInputPinSet( pHandle->H2Port, pHandle->H2Pin ) ^ 1 ) << 2)
                             | (LL_GPIO_IsInputPinSet( pHandle->H3Port, pHandle->H3Pin ) << 1)
-                            | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin ) );
+                            | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin ) )];
     }
 
     switch ( pHandle->HallState )
@@ -625,7 +626,7 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
               pHandle->AvrElSpeedDpp = ( int16_t )((int32_t) pHandle->PseudoFreqConv / ( pHandle->ElPeriodSum / pHandle->SpeedBufferSize )); /* Average value */
 
             }
-            if(abs(pHandle->AvrElSpeedDpp < MIN_SPEED)){
+            if(abs(pHandle->AvrElSpeedDpp) < MIN_SPEED){
             	pHandle->HallMtpa = true;
             }else{
             	pHandle->HallMtpa = false;
@@ -710,15 +711,15 @@ static void HALL_Init_Electrical_Angle( HALL_Handle_t * pHandle )
 
   if ( pHandle->SensorPlacement == DEGREES_120 )
   {
-    pHandle->HallState  = LL_GPIO_IsInputPinSet( pHandle->H3Port, pHandle->H3Pin ) << 2
+    pHandle->HallState  = pHandle->lut[LL_GPIO_IsInputPinSet( pHandle->H3Port, pHandle->H3Pin ) << 2
                           | LL_GPIO_IsInputPinSet( pHandle->H2Port, pHandle->H2Pin ) << 1
-                          | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin );
+                          | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin )];
   }
   else
   {
-    pHandle->HallState  = ( LL_GPIO_IsInputPinSet( pHandle->H2Port, pHandle->H2Pin ) ^ 1 ) << 2
+    pHandle->HallState  = pHandle->lut[( LL_GPIO_IsInputPinSet( pHandle->H2Port, pHandle->H2Pin ) ^ 1 ) << 2
                           | LL_GPIO_IsInputPinSet( pHandle->H3Port, pHandle->H3Pin ) << 1
-                          | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin );
+                          | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin )];
   }
 
   switch ( pHandle->HallState )
