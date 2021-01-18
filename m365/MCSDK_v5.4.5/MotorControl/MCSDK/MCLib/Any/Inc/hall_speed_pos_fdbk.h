@@ -205,7 +205,7 @@ typedef struct
   
   bool HallMtpa; /* if true at each sensor toggling, the true angle is set without ramp*/
 
-  volatile uint8_t lut[8];
+  uint8_t lut[8];
 
 } HALL_Handle_t;
 /**

@@ -31,6 +31,7 @@
 #include "system.h"
 #include "mc_config.h"
 #include "mc_interface.h"
+#include "speed_pos_fdbk.h"
 
 #define NELEMS(x)  (sizeof(x) / sizeof((x)[0]))
 
@@ -41,6 +42,8 @@
 	} while (0)
         
 	
+#define CURRENT_FACTOR 317.73
+
 uint8_t callback_ConfigFunction(parameter_entry * params, uint8_t index, TERMINAL_HANDLE * handle);
 uint8_t callback_DefaultFunction(parameter_entry * params, uint8_t index, TERMINAL_HANDLE * handle);
 
@@ -48,6 +51,8 @@ uint8_t callback_DefaultFunction(parameter_entry * params, uint8_t index, TERMIN
 cli_config configuration;
 
 extern MCI_Handle_t* pMCI[NBR_OF_MOTORS];
+
+//extern SpeednTorqCtrl_Handle_t SpeednTorqCtrlM1;
 
 /*****************************************************************************
 * Initializes parameters with default values
@@ -67,10 +72,13 @@ void init_config(){
 
 
 parameter_entry confparam[] = {
-    //Parameter Type ,"Text   " , Value ptr                     ,Min     ,Max    ,Div    				,Callback Function           ,Help text
-    ADD_PARAM("pole_pairs"      , HALL_M1._Super.bElToMecRatio  , 2      ,100    ,0      				,callback_DefaultFunction    ,"N Poles")
-    ADD_PARAM("hall_placement"  , HALL_M1.SensorPlacement       , 0      ,1      ,0      				,callback_DefaultFunction    ,"[0] 120 deg [1] 60 deg")
-	ADD_PARAM("hall_shift"      , HALL_M1.PhaseShift       		, 0      ,65536  ,(65536.0/360.0)       ,callback_DefaultFunction    ,"Electrical hall phase shift")
+    //Parameter Type ,"Text   " , Value ptr                     		,Min     ,Max    ,Div    				,Callback Function           ,Help text
+    ADD_PARAM("pole_pairs"      , HALL_M1._Super.bElToMecRatio  		, 2      ,100    ,0      				,callback_DefaultFunction    ,"N Poles")
+    ADD_PARAM("hall_placement"  , HALL_M1.SensorPlacement       		, 0      ,1      ,0      				,callback_DefaultFunction    ,"[0] 120 deg [1] 60 deg")
+	ADD_PARAM("hall_shift"      , HALL_M1.PhaseShift       				, 0      ,65536  ,(65536.0/360.0)       ,callback_DefaultFunction    ,"Electrical hall phase shift")
+	ADD_PARAM("max_pos_curr"    , SpeednTorqCtrlM1.MaxPositiveTorque    , 0      ,32767  ,CURRENT_FACTOR        ,callback_DefaultFunction    ,"Max phase current positive")
+	ADD_PARAM("max_neg_curr"    , SpeednTorqCtrlM1.MinNegativeTorque    , -32768 ,0      ,CURRENT_FACTOR        ,callback_DefaultFunction    ,"Max phase current negative")
+	ADD_PARAM("hall_lut"        , HALL_M1.lut                   		, 0      ,0      ,0      				,callback_DefaultFunction    ,"Hall LUT only internal use")
 };
 
    
@@ -130,19 +138,28 @@ uint8_t CMD_get(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args) {
 	return 0;
 }
 
+int16_t calculate_curr(int16_t torque_percent){
+	if(torque_percent>0){
+		return ((int32_t)SpeednTorqCtrlM1.MaxPositiveTorque*torque_percent)/100;
+	}else{
+		return -((int32_t)SpeednTorqCtrlM1.MinNegativeTorque*torque_percent)/100;
+	}
+
+}
 
 uint8_t CMD_start(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args) {
 	if(argCount==0){
-		ttprintf("start [f|b] forwards/backwards\r\n");
+		ttprintf("start [torque]\r\n");
 		return TERM_CMD_EXIT_SUCCESS;
 	}
 	MCI_ExecTorqueRamp(pMCI[M1], MCI_GetTeref(pMCI[M1]),0);
 	MCI_StartMotor( pMCI[M1] );
 
+
+
 	qd_t currComp;
 	currComp = MCI_GetIqdref(pMCI[M1]);
-	if(args[0][0] == 'f') currComp.q = 800;
-	if(args[0][0] == 'b') currComp.q = -800;
+	currComp.q = calculate_curr(atoi(args[0]));
 	MCI_SetCurrentReferences(pMCI[M1],currComp);
 	return TERM_CMD_EXIT_SUCCESS;
 }
@@ -226,6 +243,10 @@ uint8_t CMD_eeprom(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args) {
     return TERM_CMD_EXIT_SUCCESS;
 }
 
+uint8_t TERM_eeprom_read(){
+	EEPROM_read_conf(confparam, PARAM_SIZE(confparam) ,0,NULL);
+	return 0;
+}
 
 /*****************************************************************************
 * Loads the default parametes out of flash
@@ -247,6 +268,11 @@ const uint8_t hall_arr[] = {0,5,1,3,2,6,4,7};
 
 uint8_t CMD_tune(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
 
+	if(argCount==0){
+			ttprintf("tune [current->percent]\r\n");
+			return TERM_CMD_EXIT_SUCCESS;
+		}
+
 	MCI_ExecTorqueRamp(pMCI[M1], MCI_GetTeref(pMCI[M1]),0);
 
 	MCI_StartMotor( pMCI[M1] );
@@ -255,7 +281,7 @@ uint8_t CMD_tune(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
 
 	qd_t currComp;
 	currComp = MCI_GetIqdref(pMCI[M1]);
-	currComp.q = 800;
+	currComp.q = calculate_curr(atoi(args[0]));
 
 
 	vTaskDelay(pdMS_TO_TICKS(5000));
@@ -378,4 +404,9 @@ uint8_t CMD_tune(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
 	MCI_StopMotor( pMCI[M1] );
 	return TERM_CMD_EXIT_SUCCESS;
 
+}
+
+uint8_t CMD_reset(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args) {
+    NVIC_SystemReset();
+	return TERM_CMD_EXIT_SUCCESS;
 }

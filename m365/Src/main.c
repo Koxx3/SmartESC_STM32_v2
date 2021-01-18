@@ -21,6 +21,8 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "motorcontrol.h"
+#include "cli_basic.h"
+#include "cli_common.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -127,6 +129,9 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM3_Init();
   MX_USART3_UART_Init();
+
+  TERM_eeprom_read();
+
   MX_MotorControl_Init();
 
   /* Initialize interrupts */

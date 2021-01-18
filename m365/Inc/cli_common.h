@@ -53,6 +53,11 @@ uint8_t CMD_tune(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
 uint8_t CMD_start(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
 
 uint8_t CMD_stop(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
+
+uint8_t CMD_reset(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
+
+uint8_t TERM_eeprom_read();
+
 extern parameter_entry confparam[];
 
 struct config_struct{

@@ -244,7 +244,7 @@ void print_param_helperfunc(parameter_entry * params, uint8_t param_size, TERMIN
 
 			TERM_sendVT100Code(handle, _VT100_CURSOR_SET_COLUMN, COL_B);
 			if(params[current_parameter].div){
-				ttprintf("\033[37m| \033[32m%.0f", round(((float)u_temp_buffer/params[current_parameter].div)));
+				ttprintf("\033[37m| \033[32m%.1f", ((float)u_temp_buffer/params[current_parameter].div));
 			}else{
 				ttprintf("\033[37m| \033[32m%u", u_temp_buffer);
 			}
@@ -265,7 +265,7 @@ void print_param_helperfunc(parameter_entry * params, uint8_t param_size, TERMIN
 			TERM_sendVT100Code(handle, _VT100_CURSOR_SET_COLUMN, COL_B);
 			if(params[current_parameter].div){
 
-				ttprintf("\033[37m| \033[32m%.0f", round(((float)i_temp_buffer/params[current_parameter].div)));
+				ttprintf("\033[37m| \033[32m%.1f", ((float)i_temp_buffer/params[current_parameter].div));
 			}else{
 				ttprintf("\033[37m| \033[32m%i", i_temp_buffer);
 			}
@@ -503,7 +503,7 @@ void EEPROM_read_conf(parameter_entry * params, uint8_t param_size, uint16_t eep
             addr++;
         }
         if(!(data[0]== 0x00 && data[1] == 0xC0 && data[2] == 0xFF && data[3] == 0xEE)) {
-            ttprintf("No dataset found\r\n");
+            if(handle != NULL) ttprintf("No dataset found\r\n");
             return;
         }
 
@@ -530,7 +530,7 @@ void EEPROM_read_conf(parameter_entry * params, uint8_t param_size, uint16_t eep
         if(!change_flag) addr+=data[4];
         
         if(current_parameter == param_size){
-            ttprintf("Unknown param ID %i found\r\n", data[0]);
+        	if(handle != NULL) ttprintf("Unknown param ID %i found\r\n", data[0]);
         }
     }
     uint8_t found_param=0;
@@ -551,10 +551,10 @@ void EEPROM_read_conf(parameter_entry * params, uint8_t param_size, uint16_t eep
 			}
 		}
 		if(!found_param){
-			ttprintf("Param [%s] not found\r\n",params[current_parameter].name);
+			if(handle != NULL) ttprintf("Param [%s] not found\r\n",params[current_parameter].name);
 		}
     }
-    ttprintf("%i / %i config params loaded\r\n", change_count, param_count);
+    if(handle != NULL) ttprintf("%i / %i config params loaded\r\n", change_count, param_count);
 }
 
 
