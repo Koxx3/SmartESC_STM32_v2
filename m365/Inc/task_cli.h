@@ -25,9 +25,19 @@
 #define TASK_CLI_H_
 
 #include "cmsis_os.h"
+#include "FreeRTOS.h"
+#include "stream_buffer.h"
 
 extern osThreadId_t task_cli_handle;
 
+enum uart_mode{
+	UART_MODE_ST,
+	UART_MODE_CLI
+};
+
+extern enum uart_mode task_cli_mode;
+
+extern StreamBufferHandle_t UART_RX;
 
 void task_cli_init();
 

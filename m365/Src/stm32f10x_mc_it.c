@@ -29,6 +29,8 @@
 #include "stm32f1xx_ll_exti.h"
 /* USER CODE BEGIN Includes */
 
+#include "task_cli.h"
+
 /* USER CODE END Includes */
 
 /** @addtogroup MCSDK
@@ -186,26 +188,38 @@ void USART_IRQHandler(void)
   if (hUSART_SR & USART_SR_ORE) /* Overrun error occurs before SR access */
   {
     /* Send Overrun message */
-    UFCP_OVR_IRQ_Handler(&pUSART);
+	if(task_cli_mode == UART_MODE_ST){
+		UFCP_OVR_IRQ_Handler(&pUSART);
+	}
     LL_USART_ClearFlag_ORE(pUSART.USARTx); /* Clear overrun flag */
     UI_SerialCommunicationTimeOutStop();
     /* USER CODE BEGIN USART_ORE */
 
     /* USER CODE END USART_ORE   */
   }
+  uint8_t c, len;
 
   if (hUSART_SR & USART_SR_RXNE) /* Valid data received */
   {
     uint16_t retVal;
-    retVal = *(uint16_t*)UFCP_RX_IRQ_Handler(&pUSART,LL_USART_ReceiveData8(pUSART.USARTx)); /* Flag 0 = RX */
-    if (retVal == 1)
-    {
-      UI_SerialCommunicationTimeOutStart();
+    switch (task_cli_mode) {
+		case UART_MODE_ST:
+			retVal = *(uint16_t*)UFCP_RX_IRQ_Handler(&pUSART,LL_USART_ReceiveData8(pUSART.USARTx)); /* Flag 0 = RX */
+			if (retVal == 1)
+			{
+			  UI_SerialCommunicationTimeOutStart();
+			}
+			if (retVal == 2)
+			{
+			  UI_SerialCommunicationTimeOutStop();
+			}
+			break;
+		case UART_MODE_CLI:
+			c = LL_USART_ReceiveData8(pUSART.USARTx);
+			xStreamBufferSendFromISR(UART_RX, &c, sizeof(c), 0);
+			break;
     }
-    if (retVal == 2)
-    {
-      UI_SerialCommunicationTimeOutStop();
-    }
+
   /* USER CODE BEGIN USART_RXNE */
 
   /* USER CODE END USART_RXNE   */
@@ -213,7 +227,15 @@ void USART_IRQHandler(void)
 
   if(LL_USART_IsActiveFlag_TXE(pUSART.USARTx))
   {
-    UFCP_TX_IRQ_Handler(&pUSART); /* Flag 1 = TX */
+	switch (task_cli_mode) {
+		case UART_MODE_ST:
+			UFCP_TX_IRQ_Handler(&pUSART); /* Flag 1 = TX */
+			break;
+		case UART_MODE_CLI:
+
+			break;
+	}
+
     /* USER CODE BEGIN USART_TXE */
 
     /* USER CODE END USART_TXE   */

@@ -562,27 +562,14 @@ void EEPROM_read_conf(parameter_entry * params, uint8_t param_size, uint16_t eep
 
 uint8_t getch(TERMINAL_HANDLE * handle, TickType_t xTicksToWait){
     uint8_t c=0;
-    while(xTicksToWait){
-    	if(LL_USART_IsActiveFlag_RXNE(pUSART.USARTx)){
-    		return LL_USART_ReceiveData8(pUSART.USARTx);
-    	}
-    	vTaskDelay(1);
-    	xTicksToWait--;
-    }
+    xStreamBufferReceive(UART_RX,&c,1,xTicksToWait);
     return c;
 }
 
 uint8_t getche(TERMINAL_HANDLE * handle, TickType_t xTicksToWait){
     uint8_t c=0;
 
-    while(xTicksToWait){
-		if(LL_USART_IsActiveFlag_RXNE(pUSART.USARTx)){
-			c = LL_USART_ReceiveData8(pUSART.USARTx);
-			break;
-		}
-		vTaskDelay(1);
-		xTicksToWait--;
-    }
+    xStreamBufferReceive(UART_RX,&c,1,xTicksToWait);
 
     if(c){
     	while(!LL_USART_IsActiveFlag_TXE(pUSART.USARTx)){
@@ -594,10 +581,11 @@ uint8_t getche(TERMINAL_HANDLE * handle, TickType_t xTicksToWait){
 }
 
 uint8_t kbhit(TERMINAL_HANDLE * handle){
-	if(LL_USART_IsActiveFlag_RXNE(pUSART.USARTx)){
+	if(xStreamBufferIsEmpty(UART_RX)){
+		return pdFALSE;
+	}else{
 		return pdTRUE;
 	}
-    return pdFALSE;
 }
 
 #define CTRL_C  0x03

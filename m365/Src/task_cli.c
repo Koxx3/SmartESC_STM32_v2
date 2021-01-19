@@ -30,6 +30,16 @@
 #include "cli_common.h"
 #include "mc_config.h"
 
+
+StreamBufferHandle_t UART_RX;
+
+
+
+enum uart_mode task_cli_mode = UART_MODE_ST;
+
+#define STREAMBUFFER_RX_SIZE 32
+#define STREAMBUFFER_TX_SIZE 32
+
 osThreadId_t task_cli_handle;
 const osThreadAttr_t task_cli_attributes = {
   .name = "CLI",
@@ -50,21 +60,24 @@ void _putchar(char character){
 void task_cli(void * argument)
 {
 
-	TERMINAL_HANDLE * handle = argument;
-	uint8_t c=0;
+	uint8_t c=0, len=0;
   /* Infinite loop */
 	for(;;)
 	{
-		 if (LL_USART_IsActiveFlag_RXNE(pUSART.USARTx))
-		 {
-			c = LL_USART_ReceiveData8(pUSART.USARTx);
-			TERM_processBuffer(&c,1,handle);
-		}
+		/* `#START TASK_LOOP_CODE` */
+		len = xStreamBufferReceive(UART_RX, &c,sizeof(c), portMAX_DELAY);
+		TERM_processBuffer(&c,len,(TERMINAL_HANDLE*)argument);
 	}
 }
 
 void task_cli_init(){
-	HAL_NVIC_DisableIRQ(USART3_IRQn);
+	//HAL_NVIC_DisableIRQ(USART3_IRQn);
+
+	HAL_NVIC_SetPriority(USART3_IRQn, 5, 0);
+
+	UART_RX = xStreamBufferCreate(STREAMBUFFER_RX_SIZE,1);
+
+	task_cli_mode = UART_MODE_CLI;
 
 	TERM_addCommand(CMD_get, "get", "Usage get [param]",0,&TERM_cmdListHead);
 	TERM_addCommand(CMD_set, "set","Usage set [param] [value]",0,&TERM_cmdListHead);

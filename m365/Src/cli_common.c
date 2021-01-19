@@ -269,9 +269,9 @@ const uint8_t hall_arr[] = {0,5,1,3,2,6,4,7};
 uint8_t CMD_tune(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
 
 	if(argCount==0){
-			ttprintf("tune [current->percent]\r\n");
-			return TERM_CMD_EXIT_SUCCESS;
-		}
+		ttprintf("tune [current->percent]\r\n");
+		return TERM_CMD_EXIT_SUCCESS;
+	}
 
 	MCI_ExecTorqueRamp(pMCI[M1], MCI_GetTeref(pMCI[M1]),0);
 
@@ -318,7 +318,11 @@ uint8_t CMD_tune(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
 		pMCI[M1]->pSTC->SPD->open_angle = angle+=4;
 		vTaskDelay(1);
 		if(old_hall != HALL_M1.HallState){
-			if(state_cnt>6) return 0;
+			if(state_cnt>6){
+				pMCI[M1]->pSTC->SPD->open_loop = false;
+				MCI_StopMotor( pMCI[M1] );
+				return 0;
+			}
 			ttprintf("Got: %u Expected: %u\r\n",HALL_M1.HallState, hall_arr[state_cnt]);
 			hall_lut[HALL_M1.HallState] = hall_arr[state_cnt];
 			state_cnt++;
