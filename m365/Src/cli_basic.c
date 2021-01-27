@@ -488,7 +488,7 @@ void EEPROM_write_conf(parameter_entry * params, uint8_t param_size, uint16_t ee
 		EEPROM_buffer_write(0xEF, count,0);
         count++;
 		EEPROM_buffer_write(0x00, count,1);
-		ttprintf("%i / %i   |   %i / 1024 bytes\r\n", change_count, param_count, byte_cnt);
+		if(handle != NULL) ttprintf("%i / %i   |   %i / 1024 bytes\r\n", change_count, param_count, byte_cnt);
 }
 
 void EEPROM_read_conf(parameter_entry * params, uint8_t param_size, uint16_t eeprom_offset ,TERMINAL_HANDLE * handle){

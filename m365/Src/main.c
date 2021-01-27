@@ -130,14 +130,14 @@ int main(void)
   MX_TIM3_Init();
   MX_USART3_UART_Init();
 
-  TERM_eeprom_read();
+
 
   MX_MotorControl_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
-
+  TERM_eeprom_read();
   /* USER CODE END 2 */
 
   /* Init scheduler */

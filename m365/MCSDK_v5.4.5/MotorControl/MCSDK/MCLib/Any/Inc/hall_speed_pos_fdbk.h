@@ -207,6 +207,7 @@ typedef struct
 
   uint8_t lut[8];
 
+
 } HALL_Handle_t;
 /**
   * @}

@@ -22,6 +22,7 @@
 #include "speed_pos_fdbk.h"
 #include "hall_speed_pos_fdbk.h"
 #include "mc_type.h"
+#include "mc_interface.h"
 
 /** @addtogroup MCSDK
   * @{
@@ -68,7 +69,9 @@
 #define NEGATIVE          (int8_t)-1
 #define POSITIVE          (int8_t)1
 
-#define MIN_SPEED 100
+#define MIN_SPEED 80
+extern MCI_Handle_t* pMCI[1];
+uint32_t cnt=0;
 
 /* With digit-per-PWM unit (here 2*PI rad = 0xFFFF): */
 #define HALL_MAX_PSEUDO_SPEED        ((int16_t)0x7FFF)
@@ -370,7 +373,7 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
   uint16_t hPrscBuf;
   uint16_t hHighSpeedCapture;
 
-  if ( pHandle->SensorIsReliable )
+   if ( pHandle->SensorIsReliable )
   {
     /* A capture event generated this interrupt */
     bPrevHallState = pHandle->HallState;
@@ -502,12 +505,15 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
        computed speed close to the infinite, and bring instability. */
     if (pHandle->Direction != PrevDirection)
     {
+    	cnt=0;
       /* Setting BufferFilled to 0 will prevent to compute the average speed based
        on the SpeedPeriod buffer values */
-      pHandle->BufferFilled = 0 ;
-      pHandle->SpeedFIFOIdx = 0;
     }
-
+    if(cnt<20){
+    	pHandle->BufferFilled = 0;
+    	pHandle->SpeedFIFOIdx = 0;
+    }
+    cnt++;
     if (pHandle->HallMtpa == true)
     {
       pHandle->_Super.hElAngle = pHandle->MeasuredElAngle;
@@ -626,10 +632,15 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
               pHandle->AvrElSpeedDpp = ( int16_t )((int32_t) pHandle->PseudoFreqConv / ( pHandle->ElPeriodSum / pHandle->SpeedBufferSize )); /* Average value */
 
             }
-            if(abs(pHandle->AvrElSpeedDpp) < MIN_SPEED){
+
+            if((abs(pHandle->AvrElSpeedDpp) < MIN_SPEED) ){
             	pHandle->HallMtpa = true;
             }else{
-            	pHandle->HallMtpa = false;
+            	if(cnt>20){
+            		pHandle->HallMtpa = false;
+            	}else{
+            		pHandle->HallMtpa = true;
+            	}
             }
           }
           else /* Sensor is not reliable */

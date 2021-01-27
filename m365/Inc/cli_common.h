@@ -38,7 +38,7 @@
 
 void init_config();
 void eeprom_load(TERMINAL_HANDLE * handle);
-
+void eeprom_save(TERMINAL_HANDLE * handle);
 
 uint8_t CMD_signals(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
 uint8_t CMD_con(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);

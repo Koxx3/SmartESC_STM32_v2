@@ -32,6 +32,8 @@
 #include "mc_config.h"
 #include "mc_interface.h"
 #include "speed_pos_fdbk.h"
+#include "drive_parameters.h"
+#include "mc_stm_types.h"
 
 #define NELEMS(x)  (sizeof(x) / sizeof((x)[0]))
 
@@ -58,8 +60,6 @@ extern MCI_Handle_t* pMCI[NBR_OF_MOTORS];
 * Initializes parameters with default values
 ******************************************************************************/
 void init_config(){
-    configuration.conf1 = 123;
-    configuration.conf2 = 456;
 
 }
 
@@ -70,20 +70,46 @@ void init_config(){
 ******************************************************************************/
 
 
-
 parameter_entry confparam[] = {
-    //Parameter Type ,"Text   " , Value ptr                     		,Min     ,Max    ,Div    				,Callback Function           ,Help text
-    ADD_PARAM("pole_pairs"      , HALL_M1._Super.bElToMecRatio  		, 2      ,100    ,0      				,callback_DefaultFunction    ,"N Poles")
-    ADD_PARAM("hall_placement"  , HALL_M1.SensorPlacement       		, 0      ,1      ,0      				,callback_DefaultFunction    ,"[0] 120 deg [1] 60 deg")
-	ADD_PARAM("hall_shift"      , HALL_M1.PhaseShift       				, 0      ,65536  ,(65536.0/360.0)       ,callback_DefaultFunction    ,"Electrical hall phase shift")
-	ADD_PARAM("max_pos_curr"    , SpeednTorqCtrlM1.MaxPositiveTorque    , 0      ,32767  ,CURRENT_FACTOR        ,callback_DefaultFunction    ,"Max phase current positive")
-	ADD_PARAM("max_neg_curr"    , SpeednTorqCtrlM1.MinNegativeTorque    , -32768 ,0      ,CURRENT_FACTOR        ,callback_DefaultFunction    ,"Max phase current negative")
-	ADD_PARAM("hall_lut"        , HALL_M1.lut                   		, 0      ,0      ,0      				,callback_DefaultFunction    ,"Hall LUT only internal use")
+    //Parameter Type ,"Text   " , Value ptr                     				 ,Min     ,Max    ,Div    				    ,Callback Function           ,Help text
+    ADD_PARAM("pole_pairs"      , HALL_M1._Super.bElToMecRatio  				 , 2      ,100    ,0      				    ,callback_ConfigFunction    ,"N Poles")
+    ADD_PARAM("hall_placement"  , HALL_M1.SensorPlacement       				 , 0      ,1      ,0      				    ,callback_ConfigFunction    ,"[0] 120 deg [1] 60 deg")
+	ADD_PARAM("hall_shift"      , HALL_M1.PhaseShift       						 , 0      ,65536  ,(65536.0/360.0)          ,callback_DefaultFunction   ,"Electrical hall phase shift [deg]")
+	ADD_PARAM("max_pos_curr"    , SpeednTorqCtrlM1.MaxPositiveTorque    		 , 0      ,32767  ,CURRENT_FACTOR           ,callback_ConfigFunction    ,"Max phase current positive [A]")
+	ADD_PARAM("max_neg_curr"    , SpeednTorqCtrlM1.MinNegativeTorque    		 , -32768 ,0      ,CURRENT_FACTOR           ,callback_ConfigFunction    ,"Max phase current negative [A]")
+	ADD_PARAM("max_pos_speed"   , SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit    , 0 	  ,1000   ,(1.0/(_RPM / SPEED_UNIT)),callback_ConfigFunction   ,"Max positive speed [RPM]")
+	ADD_PARAM("max_neg_speed"   , SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit    , -1000  ,0      ,(1.0/(_RPM / SPEED_UNIT)),callback_ConfigFunction    ,"Max negative speed [RPM]")
+	ADD_PARAM("pid_torque_p"    , PIDIqHandle_M1.hKpGain                         , 0      ,4096   ,0                        ,callback_DefaultFunction   ,"Torque-PID [P]")
+	ADD_PARAM("pid_torque_i"    , PIDIqHandle_M1.hKiGain                         , 0      ,4096   ,0                        ,callback_DefaultFunction   ,"Torque-PID [I]")
+	ADD_PARAM("pid_flux_p"      , PIDIdHandle_M1.hKpGain                         , 0      ,4096   ,0                        ,callback_DefaultFunction   ,"Flux-PID [P]")
+	ADD_PARAM("pid_flux_i"      , PIDIdHandle_M1.hKiGain                         , 0      ,4096   ,0                        ,callback_DefaultFunction   ,"Flux-PID [I]")
+	ADD_PARAM("hall_lut"        , HALL_M1.lut                   				 , 0      ,0      ,0      				    ,callback_DefaultFunction   ,"Hall LUT only internal use")
+
 };
 
-   
+void recalc_config(){
+	PIDSpeedHandle_M1.wUpperIntegralLimit = (uint32_t)SpeednTorqCtrlM1.MaxPositiveTorque * SP_KDDIV;
+	PIDSpeedHandle_M1.wLowerIntegralLimit = (uint32_t)SpeednTorqCtrlM1.MinNegativeTorque * SP_KDDIV;
+	PIDSpeedHandle_M1.hUpperOutputLimit = SpeednTorqCtrlM1.MaxPositiveTorque;
+	PIDSpeedHandle_M1.hLowerOutputLimit = SpeednTorqCtrlM1.MinNegativeTorque;
+	if(SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit>SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit){
+		HALL_M1._Super.hMaxReliableMecSpeedUnit = (uint16_t)(1.15*SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit);
+	}else{
+		HALL_M1._Super.hMaxReliableMecSpeedUnit = -(uint16_t)(1.15*SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit);
+	}
+	PIDIqHandle_M1.hDefKdGain = PIDIqHandle_M1.hKpGain;
+	PIDIqHandle_M1.hDefKiGain = PIDIqHandle_M1.hKiGain;
+	PIDIdHandle_M1.hDefKdGain = PIDIdHandle_M1.hKpGain;
+	PIDIdHandle_M1.hDefKiGain = PIDIdHandle_M1.hKiGain;
+}
 void eeprom_load(TERMINAL_HANDLE * handle){
     EEPROM_read_conf(confparam, PARAM_SIZE(confparam) ,0,handle);
+    recalc_config();
+
+}
+
+void eeprom_save(TERMINAL_HANDLE * handle){
+    EEPROM_write_conf(confparam, PARAM_SIZE(confparam) ,0,handle);
 }
 
 
@@ -98,7 +124,7 @@ void eeprom_load(TERMINAL_HANDLE * handle){
 * Callback if a configuration relevant parameter is changed
 ******************************************************************************/
 uint8_t callback_ConfigFunction(parameter_entry * params, uint8_t index, TERMINAL_HANDLE * handle){
-
+	recalc_config();
     return 1;
 }
 
@@ -266,6 +292,9 @@ struct _sensor{
 
 const uint8_t hall_arr[] = {0,5,1,3,2,6,4,7};
 
+#define _60DEG 60*(65536.0/360.0)
+#define _90DEG 90*(65536.0/360.0)
+
 uint8_t CMD_tune(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
 
 	if(argCount==0){
@@ -306,16 +335,16 @@ uint8_t CMD_tune(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
 
 
 	ttprintf("Getting sensor configuration...\r\n");
-	for(uint32_t i=0;i<0x10000;i+=8){
-		pMCI[M1]->pSTC->SPD->open_angle = angle+=8;
+	for(uint32_t i=0;i<0x10000;i+=16){
+		pMCI[M1]->pSTC->SPD->open_angle = angle+=16;
 		vTaskDelay(1);
 	}
 	angle=0;
 	pMCI[M1]->pSTC->SPD->open_angle = angle;
 	vTaskDelay(pdMS_TO_TICKS(!000));
-	for(uint32_t i=0;i<0x10000;i+=4){
+	for(uint32_t i=0;i<0x10000;i+=8){
 
-		pMCI[M1]->pSTC->SPD->open_angle = angle+=4;
+		pMCI[M1]->pSTC->SPD->open_angle = angle+=8;
 		vTaskDelay(1);
 		if(old_hall != HALL_M1.HallState){
 			if(state_cnt>6){
@@ -386,19 +415,24 @@ uint8_t CMD_tune(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
 			}
 		}
 	}
-
+	float el_angle = _60DEG; //60deg
+	float phase_shift=0;
+	ttprintf("Calculating phase shift...\r\n");
 	for(uint8_t u=1;u<7;u++){
 		uint16_t middle = data[hall_arr[u]].angle_back + ((data[hall_arr[u]].angle_forw - data[hall_arr[u]].angle_back)/2);
+
+		phase_shift += (el_angle-middle);
+
 		ttprintf("State: %u Angle: %.2f\r\n",u, (float)middle/(65536.0/360.0));
-		if(u==1){
-			HALL_M1.PhaseShift = middle+16384;  //90 deg
-			ttprintf("State: %u Angle: %.2f set shift to: %.2f\r\n",u, (float)middle/(65536.0/360.0), (float)HALL_M1.PhaseShift/(65536.0/360.0));
 
-		}else{
-
-		}
+		el_angle += _60DEG; //60deg
 
 	}
+	phase_shift/=6;
+	phase_shift+=_90DEG;
+	HALL_M1.PhaseShift = phase_shift;
+
+	ttprintf("Set phase shift to: %.2f\r\n", (float)HALL_M1.PhaseShift/(65536.0/360.0));
 
 	pMCI[M1]->pSTC->SPD->open_loop = false;
 	MCI_StopMotor( pMCI[M1] );
