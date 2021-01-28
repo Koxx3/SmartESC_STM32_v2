@@ -33,7 +33,40 @@
 
 StreamBufferHandle_t UART_RX;
 
+#define MSG_FLAG 0xA5
+#define MSG_BYTES 22
 
+enum _states{
+	MSG_IDLE,
+	MSG_DATA
+};
+
+struct _msg_format{
+	uint8_t type;
+	uint8_t destination;
+	uint8_t n_esc;
+	uint8_t bms_prot;
+	uint8_t esc_jumps;
+	uint8_t version_maj;
+	uint8_t version_min;
+	uint8_t power_on;
+	uint8_t throttle;
+	uint8_t brake;
+	uint8_t torque_max;
+	uint8_t brake_max;
+	uint8_t lock;
+	uint8_t regulator;
+	uint8_t motor_direction;
+	uint8_t hall_direction;
+	uint8_t light;
+	uint8_t temp_warn;
+	uint8_t temp_max;
+	uint8_t speed_lim;
+	uint8_t start_speed;
+	uint8_t crc;
+};
+
+typedef struct _msg_format msg_format;
 
 enum uart_mode task_cli_mode = UART_MODE_ST;
 
@@ -56,17 +89,67 @@ void _putchar(char character){
 	LL_USART_TransmitData8(pUSART.USARTx, character);
 }
 
+qd_t currComp;
+
+//A5 00 00 00 00 00 00 00 00 20 00 00 00 00 00 00 00 00 00 00 00 00 FF
+
+void interpret(msg_format* msg){
+
+	if(msg->brake){
+		currComp.q = pCMD_calculate_curr_8(-((int16_t)msg->brake));
+		MCI_SetCurrentReferences(pMCI[M1],currComp);
+	}else{
+		currComp.q = pCMD_calculate_curr_8((int16_t)msg->throttle);
+		MCI_SetCurrentReferences(pMCI[M1],currComp);
+	}
+}
 
 void task_cli(void * argument)
 {
 
 	uint8_t c=0, len=0;
+
+	msg_format msg;
+	uint8_t * msg_ptr = (uint8_t*)&msg;
+	enum _states state;
+	state = MSG_IDLE;
+	uint8_t byte_cnt=0;
+
+	MCI_ExecTorqueRamp(pMCI[M1], MCI_GetTeref(pMCI[M1]),0);
+	MCI_StartMotor( pMCI[M1] );
+
+	currComp = MCI_GetIqdref(pMCI[M1]);
+
   /* Infinite loop */
 	for(;;)
 	{
 		/* `#START TASK_LOOP_CODE` */
 		len = xStreamBufferReceive(UART_RX, &c,sizeof(c), portMAX_DELAY);
-		TERM_processBuffer(&c,len,(TERMINAL_HANDLE*)argument);
+		if(len){
+
+			switch(state){
+			case MSG_IDLE:
+				if(c==MSG_FLAG){
+					state = MSG_DATA;
+					byte_cnt = MSG_BYTES;
+					msg_ptr = (uint8_t*)&msg;
+					break;
+				}
+				TERM_processBuffer(&c,len,(TERMINAL_HANDLE*)argument);
+				break;
+			case MSG_DATA:
+				*msg_ptr = c;
+				msg_ptr++;
+				byte_cnt--;
+				if(byte_cnt==0){
+					interpret(&msg);
+					state=MSG_IDLE;
+				}
+				break;
+			}
+
+		}
+
 	}
 }
 

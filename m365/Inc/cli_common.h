@@ -56,6 +56,8 @@ uint8_t CMD_stop(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
 
 uint8_t CMD_reset(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
 
+int16_t pCMD_calculate_curr_8(int16_t torque_percent);
+
 uint8_t TERM_eeprom_read();
 
 extern parameter_entry confparam[];

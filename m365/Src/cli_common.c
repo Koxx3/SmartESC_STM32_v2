@@ -170,7 +170,14 @@ int16_t calculate_curr(int16_t torque_percent){
 	}else{
 		return -((int32_t)SpeednTorqCtrlM1.MinNegativeTorque*torque_percent)/100;
 	}
+}
 
+int16_t pCMD_calculate_curr_8(int16_t torque_percent){
+	if(torque_percent>0){
+		return ((int32_t)SpeednTorqCtrlM1.MaxPositiveTorque*torque_percent)/255;
+	}else{
+		return -((int32_t)SpeednTorqCtrlM1.MinNegativeTorque*torque_percent)/255;
+	}
 }
 
 uint8_t CMD_start(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args) {
