@@ -1,7 +1,7 @@
 /*
  * m365
  *
- * Copyright (c) 2021 Francois Deslandes
+ * Copyright (c) 2021 Jens Kerrinnes
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -21,16 +21,15 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef TASK_PWR_H_
-#define TASK_PWR_H_
+#ifndef TASK_TELEMETRY_H_
+#define TASK_TELEMETRY_H_
 
 #include "cmsis_os.h"
 
-extern osThreadId_t PwrHandle;
+extern osThreadId_t task_telemetry_handle;
 
-void task_PWR_init();
-void poweroff(void);
+void task_telemetry_init();
 
 
-#endif /* TASK_PWR_H_ */
+#endif /* TASK_LED_H_ */
 

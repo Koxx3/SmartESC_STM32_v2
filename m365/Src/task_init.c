@@ -25,10 +25,12 @@
 #include "task_LED.h"
 #include "task_pwr.h"
 #include "task_cli.h"
+#include "task_telemetry.h"
 
 void task_init(){
 	//init_config();
 	task_cli_init();
+	task_telemetry_init();
 	task_LED_init();  //Bring up the blinky
 	task_PWR_init();  //Manage power button
 

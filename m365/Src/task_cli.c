@@ -23,12 +23,14 @@
 
 #include "task_cli.h"
 #include "task_init.h"
+#include "task_pwr.h"
 #include "main.h"
 #include "TTerm.h"
 #include "printf.h"
 #include "cli_basic.h"
 #include "cli_common.h"
 #include "mc_config.h"
+#include <string.h>
 
 
 StreamBufferHandle_t UART_RX;
@@ -41,32 +43,13 @@ enum _states{
 	MSG_DATA
 };
 
-struct _msg_format{
-	uint8_t type;
-	uint8_t destination;
-	uint8_t n_esc;
-	uint8_t bms_prot;
-	uint8_t esc_jumps;
-	uint8_t version_maj;
-	uint8_t version_min;
-	uint8_t power_on;
-	uint8_t throttle;
-	uint8_t brake;
-	uint8_t torque_max;
-	uint8_t brake_max;
-	uint8_t lock;
-	uint8_t regulator;
-	uint8_t motor_direction;
-	uint8_t hall_direction;
-	uint8_t light;
-	uint8_t temp_warn;
-	uint8_t temp_max;
-	uint8_t speed_lim;
-	uint8_t start_speed;
-	uint8_t crc;
-};
 
-typedef struct _msg_format msg_format;
+
+
+
+reply_format msg_rep;
+msg_format msg;
+msg_format old_msg;
 
 enum uart_mode task_cli_mode = UART_MODE_ST;
 
@@ -89,19 +72,53 @@ void _putchar(char character){
 	LL_USART_TransmitData8(pUSART.USARTx, character);
 }
 
+void putbuffer(uint8_t* buf, uint16_t len){
+	while(len){
+		while(!LL_USART_IsActiveFlag_TXE(pUSART.USARTx)){}
+		LL_USART_TransmitData8(pUSART.USARTx, *buf);
+		len--;
+		buf++;
+	}
+}
+
+
 qd_t currComp;
 
 //A5 00 00 00 00 00 00 00 00 20 00 00 00 00 00 00 00 00 00 00 00 00 FF
 
-void interpret(msg_format* msg){
+void interpret(msg_format* msg, msg_format* old_msg){
 
-	if(msg->brake){
+	if(msg->brake != old_msg->brake){
 		currComp.q = pCMD_calculate_curr_8(-((int16_t)msg->brake));
 		MCI_SetCurrentReferences(pMCI[M1],currComp);
-	}else{
+	}else if(msg->throttle != old_msg->throttle){
 		currComp.q = pCMD_calculate_curr_8((int16_t)msg->throttle);
 		MCI_SetCurrentReferences(pMCI[M1],currComp);
 	}
+
+	if(msg->throttle==0 && msg->brake==0){
+		MCI_StopMotor( pMCI[M1] );
+	}else if(msg->throttle && !old_msg->throttle){
+		MCI_StartMotor( pMCI[M1] );
+	}else if(msg->brake && !old_msg->brake){
+		MCI_StartMotor( pMCI[M1] );
+	}
+
+	if(msg->power_on == 1) poweroff();
+
+
+	memcpy(old_msg,msg,sizeof(msg_format));
+
+	msg_rep.crc=0;
+	msg_rep.throttle = msg->throttle;
+	msg_rep.brake = msg->brake;
+	uint8_t * msg_rep_ptr = (uint8_t*)&msg_rep;
+	for(uint32_t i=0;i<(sizeof(msg_format)-1);i++){ //without crc field
+		msg_rep.crc ^= *msg_rep_ptr;
+		msg_rep_ptr++;
+	}
+
+	putbuffer((uint8_t*)&msg_rep, sizeof(reply_format));
 }
 
 void task_cli(void * argument)
@@ -109,7 +126,9 @@ void task_cli(void * argument)
 
 	uint8_t c=0, len=0;
 
-	msg_format msg;
+	msg_rep.frame_start = 0x5A;
+
+
 	uint8_t * msg_ptr = (uint8_t*)&msg;
 	enum _states state;
 	state = MSG_IDLE;
@@ -117,14 +136,14 @@ void task_cli(void * argument)
 
 	MCI_ExecTorqueRamp(pMCI[M1], MCI_GetTeref(pMCI[M1]),0);
 	MCI_StartMotor( pMCI[M1] );
-
 	currComp = MCI_GetIqdref(pMCI[M1]);
+
 
   /* Infinite loop */
 	for(;;)
 	{
 		/* `#START TASK_LOOP_CODE` */
-		len = xStreamBufferReceive(UART_RX, &c,sizeof(c), portMAX_DELAY);
+		len = xStreamBufferReceive(UART_RX, &c,sizeof(c), 10);
 		if(len){
 
 			switch(state){
@@ -142,7 +161,7 @@ void task_cli(void * argument)
 				msg_ptr++;
 				byte_cnt--;
 				if(byte_cnt==0){
-					interpret(&msg);
+					interpret(&msg, &old_msg);
 					state=MSG_IDLE;
 				}
 				break;

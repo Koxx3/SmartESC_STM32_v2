@@ -162,6 +162,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Src/task_init.c</locationURI>
 		</link>
 		<link>
+			<name>Application/User/task_telemetry.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/task_telemetry.c</locationURI>
+		</link>
+		<link>
 			<name>Application/User/ui_task.c</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/ui_task.c</locationURI>
