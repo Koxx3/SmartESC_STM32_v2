@@ -30,6 +30,8 @@
 
 extern osThreadId_t task_cli_handle;
 
+void cli_start_console();
+
 enum uart_mode{
 	UART_MODE_ST,
 	UART_MODE_CLI

@@ -41,7 +41,7 @@ void poweroffPressCheck(void) {
 			HAL_Delay(10);
 			cnt_press++;
 			if (cnt_press >= 4 * 100) {
-				task_cli_init();
+				cli_start_console();
 				cnt_press = 0;
 				break;
 			}

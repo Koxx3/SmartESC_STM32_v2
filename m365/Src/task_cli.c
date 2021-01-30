@@ -45,8 +45,6 @@ enum _states{
 
 
 
-
-
 reply_format msg_rep;
 msg_format msg;
 msg_format old_msg;
@@ -81,13 +79,33 @@ void putbuffer(uint8_t* buf, uint16_t len){
 	}
 }
 
+void cli_start_console(){
+
+
+
+
+
+	task_cli_mode = UART_MODE_CLI;
+
+	TERM_addCommand(CMD_get, "get", "Usage get [param]",0,&TERM_cmdListHead);
+	TERM_addCommand(CMD_set, "set","Usage set [param] [value]",0,&TERM_cmdListHead);
+	TERM_addCommand(CMD_eeprom, "eeprom","Save/Load config [load/save]",0,&TERM_cmdListHead);
+	TERM_addCommand(CMD_tune, "tune","Run autotune",0,&TERM_cmdListHead);
+	TERM_addCommand(CMD_start, "start","Start motor",0,&TERM_cmdListHead);
+	TERM_addCommand(CMD_stop, "stop","Stop motor",0,&TERM_cmdListHead);
+	TERM_addCommand(CMD_reset, "reset","Reset MCU",0,&TERM_cmdListHead);
+
+	cli_handle = TERM_createNewHandle(printf,pdTRUE,&TERM_cmdListHead,"root");
+
+};
+
 
 qd_t currComp;
 
 //A5 00 00 00 00 00 00 00 00 20 00 00 00 00 00 00 00 00 00 00 00 00 FF
+volatile uint8_t my_crc;
 
 void interpret(msg_format* msg, msg_format* old_msg){
-
 	if(msg->brake != old_msg->brake){
 		currComp.q = pCMD_calculate_curr_8(-((int16_t)msg->brake));
 		MCI_SetCurrentReferences(pMCI[M1],currComp);
@@ -95,14 +113,14 @@ void interpret(msg_format* msg, msg_format* old_msg){
 		currComp.q = pCMD_calculate_curr_8((int16_t)msg->throttle);
 		MCI_SetCurrentReferences(pMCI[M1],currComp);
 	}
-
+/*
 	if(msg->throttle==0 && msg->brake==0){
 		MCI_StopMotor( pMCI[M1] );
 	}else if(msg->throttle && !old_msg->throttle){
 		MCI_StartMotor( pMCI[M1] );
 	}else if(msg->brake && !old_msg->brake){
 		MCI_StartMotor( pMCI[M1] );
-	}
+	}*/
 
 	if(msg->power_on == 1) poweroff();
 
@@ -121,6 +139,7 @@ void interpret(msg_format* msg, msg_format* old_msg){
 	putbuffer((uint8_t*)&msg_rep, sizeof(reply_format));
 }
 
+
 void task_cli(void * argument)
 {
 
@@ -134,34 +153,42 @@ void task_cli(void * argument)
 	state = MSG_IDLE;
 	uint8_t byte_cnt=0;
 
+
+
 	MCI_ExecTorqueRamp(pMCI[M1], MCI_GetTeref(pMCI[M1]),0);
 	MCI_StartMotor( pMCI[M1] );
 	currComp = MCI_GetIqdref(pMCI[M1]);
+
+	uint8_t crc=0;
 
 
   /* Infinite loop */
 	for(;;)
 	{
 		/* `#START TASK_LOOP_CODE` */
-		len = xStreamBufferReceive(UART_RX, &c,sizeof(c), 10);
+		len = xStreamBufferReceive(UART_RX, &c,sizeof(c), 100);
 		if(len){
 
 			switch(state){
 			case MSG_IDLE:
 				if(c==MSG_FLAG){
 					state = MSG_DATA;
-					byte_cnt = MSG_BYTES;
+					byte_cnt = sizeof(msg_format);
 					msg_ptr = (uint8_t*)&msg;
+					crc = MSG_FLAG;
 					break;
 				}
-				TERM_processBuffer(&c,len,(TERMINAL_HANDLE*)argument);
+				if(cli_handle!=NULL) TERM_processBuffer(&c,len, cli_handle);
 				break;
 			case MSG_DATA:
 				*msg_ptr = c;
+				if(byte_cnt>1) crc^=c;
 				msg_ptr++;
 				byte_cnt--;
 				if(byte_cnt==0){
-					interpret(&msg, &old_msg);
+					if(crc == msg.crc){
+						interpret(&msg, &old_msg);
+					}
 					state=MSG_IDLE;
 				}
 				break;
@@ -173,23 +200,9 @@ void task_cli(void * argument)
 }
 
 void task_cli_init(){
-	//HAL_NVIC_DisableIRQ(USART3_IRQn);
-
 	HAL_NVIC_SetPriority(USART3_IRQn, 5, 0);
-
+	cli_handle = NULL;
 	UART_RX = xStreamBufferCreate(STREAMBUFFER_RX_SIZE,1);
-
-	task_cli_mode = UART_MODE_CLI;
-
-	TERM_addCommand(CMD_get, "get", "Usage get [param]",0,&TERM_cmdListHead);
-	TERM_addCommand(CMD_set, "set","Usage set [param] [value]",0,&TERM_cmdListHead);
-	TERM_addCommand(CMD_eeprom, "eeprom","Save/Load config [load/save]",0,&TERM_cmdListHead);
-	TERM_addCommand(CMD_tune, "tune","Run autotune",0,&TERM_cmdListHead);
-	TERM_addCommand(CMD_start, "start","Start motor",0,&TERM_cmdListHead);
-	TERM_addCommand(CMD_stop, "stop","Stop motor",0,&TERM_cmdListHead);
-	TERM_addCommand(CMD_reset, "reset","Reset MCU",0,&TERM_cmdListHead);
-
-	cli_handle = TERM_createNewHandle(printf,pdTRUE,&TERM_cmdListHead,"root");
 	task_cli_handle = osThreadNew(task_cli, cli_handle, &task_cli_attributes);
 }
 

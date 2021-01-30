@@ -53,7 +53,7 @@ void task_LED(void * argument)
 	  }else{
 		  prv_LED_blink(1000);
 	  }
-	  if(task_cli_handle != NULL){
+	  if(task_cli_mode == UART_MODE_CLI){
 		  prv_LED_blink(100);
 	  }
   }
