@@ -633,7 +633,7 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
 
             }
 
-            if((abs(pHandle->AvrElSpeedDpp) < MIN_SPEED) ){
+            if((abs(pHandle->AvrElSpeedDpp) < pHandle->SwitchSpeed) ){
             	pHandle->HallMtpa = true;
             }else{
             	if(cnt>20){

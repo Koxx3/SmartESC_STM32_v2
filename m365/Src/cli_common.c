@@ -61,6 +61,8 @@ extern MCI_Handle_t* pMCI[NBR_OF_MOTORS];
 ******************************************************************************/
 void init_config(){
 
+	HALL_M1.SwitchSpeed = 100;
+
 }
 
 // clang-format off
@@ -75,6 +77,7 @@ parameter_entry confparam[] = {
     ADD_PARAM("pole_pairs"      , HALL_M1._Super.bElToMecRatio  				 , 2      ,100    ,0      				    ,callback_ConfigFunction    ,"N Poles")
     ADD_PARAM("hall_placement"  , HALL_M1.SensorPlacement       				 , 0      ,1      ,0      				    ,callback_ConfigFunction    ,"[0] 120 deg [1] 60 deg")
 	ADD_PARAM("hall_shift"      , HALL_M1.PhaseShift       						 , 0      ,65536  ,(65536.0/360.0)          ,callback_DefaultFunction   ,"Electrical hall phase shift [deg]")
+	ADD_PARAM("switch_speed"    , HALL_M1.SwitchSpeed      						 , 0      ,1000   ,0         				,callback_DefaultFunction   ,"Switching from 6-Step to FOC [RPM]")
 	ADD_PARAM("max_pos_curr"    , SpeednTorqCtrlM1.MaxPositiveTorque    		 , 0      ,32767  ,CURRENT_FACTOR           ,callback_ConfigFunction    ,"Max phase current positive [A]")
 	ADD_PARAM("max_neg_curr"    , SpeednTorqCtrlM1.MinNegativeTorque    		 , -32768 ,0      ,CURRENT_FACTOR           ,callback_ConfigFunction    ,"Max phase current negative [A]")
 	ADD_PARAM("max_pos_speed"   , SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit    , 0 	  ,1000   ,(1.0/(_RPM / SPEED_UNIT)),callback_ConfigFunction   ,"Max positive speed [RPM]")
@@ -103,6 +106,7 @@ void recalc_config(){
 	PIDIdHandle_M1.hDefKiGain = PIDIdHandle_M1.hKiGain;
 }
 void eeprom_load(TERMINAL_HANDLE * handle){
+
     EEPROM_read_conf(confparam, PARAM_SIZE(confparam) ,0,handle);
     recalc_config();
 
@@ -277,6 +281,7 @@ uint8_t CMD_eeprom(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args) {
 }
 
 uint8_t TERM_eeprom_read(){
+	init_config();
 	EEPROM_read_conf(confparam, PARAM_SIZE(confparam) ,0,NULL);
 	return 0;
 }

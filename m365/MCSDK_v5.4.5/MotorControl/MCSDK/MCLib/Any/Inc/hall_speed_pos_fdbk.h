@@ -205,6 +205,8 @@ typedef struct
   
   bool HallMtpa; /* if true at each sensor toggling, the true angle is set without ramp*/
 
+  uint16_t SwitchSpeed;
+
   uint8_t lut[8];
 
 

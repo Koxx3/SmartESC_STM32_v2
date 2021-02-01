@@ -81,10 +81,7 @@ void putbuffer(uint8_t* buf, uint16_t len){
 
 void cli_start_console(){
 
-
-
-
-
+	if(cli_handle)return;
 	task_cli_mode = UART_MODE_CLI;
 
 	TERM_addCommand(CMD_get, "get", "Usage get [param]",0,&TERM_cmdListHead);
@@ -160,7 +157,7 @@ void task_cli(void * argument)
 	currComp = MCI_GetIqdref(pMCI[M1]);
 
 	uint8_t crc=0;
-
+	uint8_t magic_cnt=0;
 
   /* Infinite loop */
 	for(;;)
@@ -171,6 +168,16 @@ void task_cli(void * argument)
 
 			switch(state){
 			case MSG_IDLE:
+
+				if(!cli_handle){
+					if(c=='a'){
+						magic_cnt++;
+						if(magic_cnt>25) cli_start_console();
+					}else{
+						magic_cnt=0;
+					}
+				}
+
 				if(c==MSG_FLAG){
 					state = MSG_DATA;
 					byte_cnt = sizeof(msg_format);
@@ -202,6 +209,7 @@ void task_cli(void * argument)
 void task_cli_init(){
 	HAL_NVIC_SetPriority(USART3_IRQn, 5, 0);
 	cli_handle = NULL;
+	//cli_start_console();
 	UART_RX = xStreamBufferCreate(STREAMBUFFER_RX_SIZE,1);
 	task_cli_handle = osThreadNew(task_cli, cli_handle, &task_cli_attributes);
 }
