@@ -40,7 +40,7 @@ void poweroffPressCheck(void) {
 		while (HAL_GPIO_ReadPin(PWR_BTN_GPIO_Port, PWR_BTN_Pin)) {
 			HAL_Delay(10);
 			cnt_press++;
-			if (cnt_press >= 4 * 100) {
+			if (cnt_press >= 10 * 100) {
 				cli_start_console();
 				cnt_press = 0;
 				break;

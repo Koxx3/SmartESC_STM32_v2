@@ -91,6 +91,7 @@ void cli_start_console(){
 	TERM_addCommand(CMD_start, "start","Start motor",0,&TERM_cmdListHead);
 	TERM_addCommand(CMD_stop, "stop","Stop motor",0,&TERM_cmdListHead);
 	TERM_addCommand(CMD_reset, "reset","Reset MCU",0,&TERM_cmdListHead);
+	TERM_addCommand(CMD_ack, "ack","Clear faults",0,&TERM_cmdListHead);
 
 	cli_handle = TERM_createNewHandle(printf,pdTRUE,&TERM_cmdListHead,"root");
 

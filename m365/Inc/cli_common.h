@@ -47,6 +47,7 @@ uint8_t CMD_eeprom(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
 uint8_t CMD_load_defaults(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
 uint8_t CMD_get(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
 uint8_t CMD_set(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
+uint8_t CMD_ack(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
 
 uint8_t CMD_tune(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
 

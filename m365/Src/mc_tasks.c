@@ -709,6 +709,8 @@ __weak void TSK_SafetyTask(void)
   *         \link Motors_reference_number here \endlink
   * @retval None
   */
+uint8_t last_pwm_state=true;
+
 __weak void TSK_SafetyTask_PWMOFF(uint8_t bMotor)
 {
   /* USER CODE BEGIN TSK_SafetyTask_PWMOFF 0 */
@@ -723,7 +725,18 @@ __weak void TSK_SafetyTask_PWMOFF(uint8_t bMotor)
                                                                                  (for STM32F30x can return MC_OVER_VOLT in case of HW Overvoltage) */
   if(bMotor == M1)
   {
-    CodeReturn |=  errMask[bMotor] &RVBS_CalcAvVbus(pBusSensorM1);
+	  uint16_t voltage_fault = RVBS_CalcAvVbus(pBusSensorM1);
+	  if(voltage_fault==MC_UNDER_VOLT){
+		  CodeReturn |=  errMask[bMotor] & voltage_fault;
+	  }else if (voltage_fault==MC_OVER_VOLT){
+		  MCI_StopMotor( &Mci[M1] );
+		  last_pwm_state = false;
+	  }else if (last_pwm_state==false){
+		  if(MCT[M1].pBusVoltageSensor->LatestConv < (pBusSensorM1->OverVoltageThreshold-(1*(65535/ADC_REFERENCE_VOLTAGE*VBUS_PARTITIONING_FACTOR)))){
+			  MCI_StartMotor( &Mci[M1] );
+			  last_pwm_state=true;
+		  }
+	  }
   }
 
   STM_FaultProcessing(&STM[bMotor], CodeReturn, ~CodeReturn); /* Update the STM according error code */
@@ -826,6 +839,7 @@ void startMediumFrequencyTask(void const * argument)
 void StartSafetyTask(void const * argument)
 {
   /* USER CODE BEGIN SF task 1 */
+	vTaskDelay(200);
   /* Infinite loop */
   for(;;)
   {

@@ -34,6 +34,7 @@
 #include "speed_pos_fdbk.h"
 #include "drive_parameters.h"
 #include "mc_stm_types.h"
+#include "parameters_conversion.h"
 
 #define NELEMS(x)  (sizeof(x) / sizeof((x)[0]))
 
@@ -53,6 +54,7 @@ uint8_t callback_DefaultFunction(parameter_entry * params, uint8_t index, TERMIN
 cli_config configuration;
 
 extern MCI_Handle_t* pMCI[NBR_OF_MOTORS];
+extern RDivider_Handle_t RealBusVoltageSensorParamsM1;
 
 //extern SpeednTorqCtrl_Handle_t SpeednTorqCtrlM1;
 
@@ -62,7 +64,6 @@ extern MCI_Handle_t* pMCI[NBR_OF_MOTORS];
 void init_config(){
 
 	HALL_M1.SwitchSpeed = 100;
-
 }
 
 // clang-format off
@@ -70,23 +71,25 @@ void init_config(){
 /*****************************************************************************
 * Parameter struct
 ******************************************************************************/
-
+#define VOLT_SCALING (65535/ADC_REFERENCE_VOLTAGE*VBUS_PARTITIONING_FACTOR)
 
 parameter_entry confparam[] = {
-    //Parameter Type ,"Text   " , Value ptr                     				 ,Min     ,Max    ,Div    				    ,Callback Function           ,Help text
-    ADD_PARAM("pole_pairs"      , HALL_M1._Super.bElToMecRatio  				 , 2      ,100    ,0      				    ,callback_ConfigFunction    ,"N Poles")
-    ADD_PARAM("hall_placement"  , HALL_M1.SensorPlacement       				 , 0      ,1      ,0      				    ,callback_ConfigFunction    ,"[0] 120 deg [1] 60 deg")
-	ADD_PARAM("hall_shift"      , HALL_M1.PhaseShift       						 , 0      ,65536  ,(65536.0/360.0)          ,callback_DefaultFunction   ,"Electrical hall phase shift [deg]")
-	ADD_PARAM("switch_speed"    , HALL_M1.SwitchSpeed      						 , 0      ,1000   ,0         				,callback_DefaultFunction   ,"Switching from 6-Step to FOC [RPM]")
-	ADD_PARAM("max_pos_curr"    , SpeednTorqCtrlM1.MaxPositiveTorque    		 , 0      ,32767  ,CURRENT_FACTOR           ,callback_ConfigFunction    ,"Max phase current positive [A]")
-	ADD_PARAM("max_neg_curr"    , SpeednTorqCtrlM1.MinNegativeTorque    		 , -32768 ,0      ,CURRENT_FACTOR           ,callback_ConfigFunction    ,"Max phase current negative [A]")
-	ADD_PARAM("max_pos_speed"   , SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit    , 0 	  ,1000   ,(1.0/(_RPM / SPEED_UNIT)),callback_ConfigFunction   ,"Max positive speed [RPM]")
-	ADD_PARAM("max_neg_speed"   , SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit    , -1000  ,0      ,(1.0/(_RPM / SPEED_UNIT)),callback_ConfigFunction    ,"Max negative speed [RPM]")
-	ADD_PARAM("pid_torque_p"    , PIDIqHandle_M1.hKpGain                         , 0      ,4096   ,0                        ,callback_DefaultFunction   ,"Torque-PID [P]")
-	ADD_PARAM("pid_torque_i"    , PIDIqHandle_M1.hKiGain                         , 0      ,4096   ,0                        ,callback_DefaultFunction   ,"Torque-PID [I]")
-	ADD_PARAM("pid_flux_p"      , PIDIdHandle_M1.hKpGain                         , 0      ,4096   ,0                        ,callback_DefaultFunction   ,"Flux-PID [P]")
-	ADD_PARAM("pid_flux_i"      , PIDIdHandle_M1.hKiGain                         , 0      ,4096   ,0                        ,callback_DefaultFunction   ,"Flux-PID [I]")
-	ADD_PARAM("hall_lut"        , HALL_M1.lut                   				 , 0      ,0      ,0      				    ,callback_DefaultFunction   ,"Hall LUT only internal use")
+    //Parameter Type ,"Text   " , Value ptr                     				  	 ,Min     ,Max    			 ,Div    				    ,Callback Function           ,Help text
+    ADD_PARAM("pole_pairs"      , HALL_M1._Super.bElToMecRatio  				 	 , 2      ,100    			 ,0      				    ,callback_ConfigFunction    ,"N Poles")
+    ADD_PARAM("hall_placement"  , HALL_M1.SensorPlacement       				 	 , 0      ,1      			 ,0      				    ,callback_ConfigFunction    ,"[0] 120 deg [1] 60 deg")
+	ADD_PARAM("hall_shift"      , HALL_M1.PhaseShift       						 	 , 0      ,65536  			 ,(65536.0/360.0)          ,callback_DefaultFunction   ,"Electrical hall phase shift [deg]")
+	ADD_PARAM("switch_speed"    , HALL_M1.SwitchSpeed      						 	 , 0      ,1000   			 ,0         				,callback_DefaultFunction   ,"Switching from 6-Step to FOC [RPM]")
+	ADD_PARAM("max_pos_curr"    , SpeednTorqCtrlM1.MaxPositiveTorque    		 	 , 0      ,32767  			 ,CURRENT_FACTOR           ,callback_ConfigFunction    ,"Max phase current positive [A]")
+	ADD_PARAM("max_neg_curr"    , SpeednTorqCtrlM1.MinNegativeTorque    			 , -32768 ,0      			 ,CURRENT_FACTOR           ,callback_ConfigFunction    ,"Max phase current negative [A]")
+	ADD_PARAM("max_pos_speed"   , SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit   	 , 0 	  ,1000   			 ,(1.0/(_RPM / SPEED_UNIT)),callback_ConfigFunction   ,"Max positive speed [RPM]")
+	ADD_PARAM("max_neg_speed"   , SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit    	 , -1000  ,0      			 ,(1.0/(_RPM / SPEED_UNIT)),callback_ConfigFunction    ,"Max negative speed [RPM]")
+	ADD_PARAM("pid_torque_p"    , PIDIqHandle_M1.hKpGain                         	 , 0      ,4096   			 ,0                        ,callback_DefaultFunction   ,"Torque-PID [P]")
+	ADD_PARAM("pid_torque_i"    , PIDIqHandle_M1.hKiGain                         	 , 0      ,4096   			 ,0                        ,callback_DefaultFunction   ,"Torque-PID [I]")
+	ADD_PARAM("pid_flux_p"      , PIDIdHandle_M1.hKpGain                         	 , 0      ,4096   		     ,0                        ,callback_DefaultFunction   ,"Flux-PID [P]")
+	ADD_PARAM("pid_flux_i"      , PIDIdHandle_M1.hKiGain                             , 0      ,4096   			 ,0                        ,callback_DefaultFunction   ,"Flux-PID [I]")
+	ADD_PARAM("bus_ov"          , RealBusVoltageSensorParamsM1.OverVoltageThreshold  , 0      ,500*VOLT_SCALING  ,VOLT_SCALING             ,callback_DefaultFunction   ,"Overvoltage [V]")
+	ADD_PARAM("bus_uv"          , RealBusVoltageSensorParamsM1.UnderVoltageThreshold , 0      ,500*VOLT_SCALING  ,VOLT_SCALING             ,callback_DefaultFunction   ,"Undervoltage [V]")
+	ADD_PARAM("hall_lut"        , HALL_M1.lut                   				 	 , 0      ,0      			 ,0      				    ,callback_DefaultFunction   ,"Hall LUT only internal use")
 
 };
 
@@ -203,6 +206,12 @@ uint8_t CMD_start(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args) {
 
 uint8_t CMD_stop(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args) {
 	MCI_StopMotor( pMCI[M1] );
+	return TERM_CMD_EXIT_SUCCESS;
+}
+
+uint8_t CMD_ack(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args) {
+	ttprintf("All faults cleared...\r\n");
+	STM_FaultAcknowledged( pMCI[M1]->pSTM);
 	return TERM_CMD_EXIT_SUCCESS;
 }
 
