@@ -50,7 +50,14 @@ enum cli_types{
     char:       TYPE_CHAR, \
     char*:      TYPE_STRING)
 
-#define SIZEP(x) ((char*)(&(x) + 1) - (char*)&(x))
+#define NEWSIZE
+
+#ifndef NEWSIZE
+    #define SIZEP(x) ((char*)(&(x) + 1) - (char*)&(x))
+#else
+    #define SIZEP(x) sizeof(x)
+#endif
+
 #define ADD_PARAM(text, value_var, min, max, div, update_func, help_text) {text, &value_var, SIZEP(value_var), typename(value_var),min, max, div, update_func, help_text},
 #define ADD_COMMAND(command, command_func, help_text) {command, command_func, help_text},
 
