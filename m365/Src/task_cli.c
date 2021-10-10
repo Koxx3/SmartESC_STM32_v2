@@ -160,11 +160,20 @@ void task_cli(void * argument)
 	uint8_t crc=0;
 	uint8_t magic_cnt=0;
 
+	uint32_t last_frame = xTaskGetTickCount();
+
   /* Infinite loop */
 	for(;;)
 	{
 		/* `#START TASK_LOOP_CODE` */
 		len = xStreamBufferReceive(UART_RX, &c,sizeof(c), 100);
+
+		if((xTaskGetTickCount() - last_frame) > 200 && !cli_handle){
+			last_frame = xTaskGetTickCount();
+			currComp.q = pCMD_calculate_curr_8((int16_t)0);
+			MCI_SetCurrentReferences(pMCI[M1],currComp);
+		}
+
 		if(len){
 
 			switch(state){
@@ -195,6 +204,7 @@ void task_cli(void * argument)
 				byte_cnt--;
 				if(byte_cnt==0){
 					if(crc == msg.crc){
+						last_frame = xTaskGetTickCount();
 						interpret(&msg, &old_msg);
 					}
 					state=MSG_IDLE;
