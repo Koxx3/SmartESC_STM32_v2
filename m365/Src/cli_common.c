@@ -35,6 +35,7 @@
 #include "drive_parameters.h"
 #include "mc_stm_types.h"
 #include "parameters_conversion.h"
+#include "defines.h"
 
 #define NELEMS(x)  (sizeof(x) / sizeof((x)[0]))
 
@@ -71,7 +72,7 @@ void init_config(){
 /*****************************************************************************
 * Parameter struct
 ******************************************************************************/
-#define VOLT_SCALING (65535/ADC_REFERENCE_VOLTAGE*VBUS_PARTITIONING_FACTOR)
+
 
 parameter_entry confparam[] = {
     //Parameter Type ,"Text   " , Value ptr                     				  	 ,Min     ,Max    			 ,Div    				    ,Callback Function           ,Help text
