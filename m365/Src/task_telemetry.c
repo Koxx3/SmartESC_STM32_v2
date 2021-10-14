@@ -44,9 +44,10 @@ void task_telemetry(void * argument)
   /* Infinite loop */
   for(;;)
   {
-	  msg_rep.voltage = VBS_GetAvBusVoltage_V(pMCT[M1]->pBusVoltageSensor)*10;
+
+	  /*msg_rep.voltage = VBS_GetAvBusVoltage_V(pMCT[M1]->pBusVoltageSensor)*10;
 	  msg_rep.temperature = NTC_GetAvTemp_C(pMCT[M1]->pTemperatureSensor);
-	  msg_rep.rpm = (int32_t)((MCI_GetAvrgMecSpeedUnit(pMCI[M1]) * _RPM)/SPEED_UNIT);
+	  msg_rep.rpm = (int32_t)((MCI_GetAvrgMecSpeedUnit(pMCI[M1]) * _RPM)/SPEED_UNIT);*/
 	  osDelay(100);
   }
 }

@@ -31,23 +31,13 @@
 #include "cli_common.h"
 #include "mc_config.h"
 #include <string.h>
-
+#include "packet.h"
+#include "VescCommand.h"
 
 StreamBufferHandle_t UART_RX;
 
-#define MSG_FLAG 0xA5
-#define MSG_BYTES 22
+#define UART_HANDLE 0
 
-enum _states{
-	MSG_IDLE,
-	MSG_DATA
-};
-
-
-
-reply_format msg_rep;
-msg_format msg;
-msg_format old_msg;
 
 enum uart_mode task_cli_mode = UART_MODE_ST;
 
@@ -58,7 +48,7 @@ osThreadId_t task_cli_handle;
 const osThreadAttr_t task_cli_attributes = {
   .name = "CLI",
   .priority = (osPriority_t) osPriorityBelowNormal,
-  .stack_size = 256 * 4
+  .stack_size = 512 * 4
 };
 
 TERMINAL_HANDLE * cli_handle;
@@ -70,7 +60,7 @@ void _putchar(char character){
 	LL_USART_TransmitData8(pUSART.USARTx, character);
 }
 
-void putbuffer(uint8_t* buf, uint16_t len){
+void putbuffer(unsigned char *buf, unsigned int len){
 	while(len){
 		while(!LL_USART_IsActiveFlag_TXE(pUSART.USARTx)){}
 		LL_USART_TransmitData8(pUSART.USARTx, *buf);
@@ -98,44 +88,37 @@ void cli_start_console(){
 };
 
 
-qd_t currComp;
 
-//A5 00 00 00 00 00 00 00 00 20 00 00 00 00 00 00 00 00 00 00 00 00 FF
-volatile uint8_t my_crc;
 
-void interpret(msg_format* msg, msg_format* old_msg){
-	if(msg->brake != old_msg->brake){
-		currComp.q = pCMD_calculate_curr_8(-((int16_t)msg->brake));
+
+typedef struct
+{
+  uint8_t type;
+  uint8_t Power_ON;
+  uint8_t Throttle;
+  uint8_t Brake;
+} SerialCommand;
+
+
+void comm_uart_send_packet(unsigned char *data, unsigned int len) {
+	packet_send_packet(data, len, UART_HANDLE);
+}
+
+void process_packet(unsigned char *data, unsigned int len){
+
+	commands_process_packet(data, len, &comm_uart_send_packet);
+
+
+	/*int16_t q = pCMD_calculate_curr_8((int16_t)cmd->Throttle);
+
+	if(q != currComp.q){
+		currComp.q = q;
 		MCI_SetCurrentReferences(pMCI[M1],currComp);
-	}else if(msg->throttle != old_msg->throttle){
-		currComp.q = pCMD_calculate_curr_8((int16_t)msg->throttle);
-		MCI_SetCurrentReferences(pMCI[M1],currComp);
-	}
-/*
-	if(msg->throttle==0 && msg->brake==0){
-		MCI_StopMotor( pMCI[M1] );
-	}else if(msg->throttle && !old_msg->throttle){
-		MCI_StartMotor( pMCI[M1] );
-	}else if(msg->brake && !old_msg->brake){
-		MCI_StartMotor( pMCI[M1] );
 	}*/
 
-	if(msg->power_on == 1) poweroff();
 
-
-	memcpy(old_msg,msg,sizeof(msg_format));
-
-	msg_rep.crc=0;
-	msg_rep.throttle = msg->throttle;
-	msg_rep.brake = msg->brake;
-	uint8_t * msg_rep_ptr = (uint8_t*)&msg_rep;
-	for(uint32_t i=0;i<(sizeof(msg_format)-1);i++){ //without crc field
-		msg_rep.crc ^= *msg_rep_ptr;
-		msg_rep_ptr++;
-	}
-
-	putbuffer((uint8_t*)&msg_rep, sizeof(reply_format));
 }
+
 
 
 void task_cli(void * argument)
@@ -143,13 +126,6 @@ void task_cli(void * argument)
 
 	uint8_t c=0, len=0;
 
-	msg_rep.frame_start = 0x5A;
-
-
-	uint8_t * msg_ptr = (uint8_t*)&msg;
-	enum _states state;
-	state = MSG_IDLE;
-	uint8_t byte_cnt=0;
 
 
 
@@ -157,62 +133,27 @@ void task_cli(void * argument)
 	MCI_StartMotor( pMCI[M1] );
 	currComp = MCI_GetIqdref(pMCI[M1]);
 
-	uint8_t crc=0;
-	uint8_t magic_cnt=0;
 
 	uint32_t last_frame = xTaskGetTickCount();
+
+	packet_init(putbuffer, process_packet, UART_HANDLE);
 
   /* Infinite loop */
 	for(;;)
 	{
 		/* `#START TASK_LOOP_CODE` */
-		len = xStreamBufferReceive(UART_RX, &c,sizeof(c), 100);
+		len = xStreamBufferReceive(UART_RX, &c,sizeof(c), 20);
 
+		if(len){
+			packet_process_byte(c, UART_HANDLE);
+
+		}
+/*
 		if((xTaskGetTickCount() - last_frame) > 200 && !cli_handle){
 			last_frame = xTaskGetTickCount();
 			currComp.q = pCMD_calculate_curr_8((int16_t)0);
 			MCI_SetCurrentReferences(pMCI[M1],currComp);
-		}
-
-		if(len){
-
-			switch(state){
-			case MSG_IDLE:
-
-				if(!cli_handle){
-					if(c=='a'){
-						magic_cnt++;
-						if(magic_cnt>25) cli_start_console();
-					}else{
-						magic_cnt=0;
-					}
-				}
-
-				if(c==MSG_FLAG){
-					state = MSG_DATA;
-					byte_cnt = sizeof(msg_format);
-					msg_ptr = (uint8_t*)&msg;
-					crc = MSG_FLAG;
-					break;
-				}
-				if(cli_handle!=NULL) TERM_processBuffer(&c,len, cli_handle);
-				break;
-			case MSG_DATA:
-				*msg_ptr = c;
-				if(byte_cnt>1) crc^=c;
-				msg_ptr++;
-				byte_cnt--;
-				if(byte_cnt==0){
-					if(crc == msg.crc){
-						last_frame = xTaskGetTickCount();
-						interpret(&msg, &old_msg);
-					}
-					state=MSG_IDLE;
-				}
-				break;
-			}
-
-		}
+		}*/
 
 	}
 }

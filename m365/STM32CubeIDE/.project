@@ -52,6 +52,31 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Src/TTerm_cmd.c</locationURI>
 		</link>
 		<link>
+			<name>Application/User/VescCommand.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/VescCommand.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VescCommand.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/VescCommand.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VescDatatypes.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/VescDatatypes.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/buffer.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/buffer.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/buffer.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/buffer.h</locationURI>
+		</link>
+		<link>
 			<name>Application/User/cli_basic.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Src/cli_basic.c</locationURI>
@@ -60,6 +85,31 @@
 			<name>Application/User/cli_common.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Src/cli_common.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/confgenerator.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/confgenerator.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/confgenerator.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/confgenerator.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/crc.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/crc.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/crc.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/crc.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/defines.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/defines.h</locationURI>
 		</link>
 		<link>
 			<name>Application/User/freertos.c</name>
@@ -110,6 +160,16 @@
 			<name>Application/User/motorcontrol.c</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/motorcontrol.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/packet.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/packet.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/packet.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/packet.h</locationURI>
 		</link>
 		<link>
 			<name>Application/User/printf.c</name>
@@ -175,6 +235,16 @@
 			<name>Application/User/user_interface.c</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/user_interface.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/utils.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/utils.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/utils.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/utils.h</locationURI>
 		</link>
 		<link>
 			<name>Drivers/CMSIS/system_stm32f1xx.c</name>

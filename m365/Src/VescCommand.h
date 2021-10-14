@@ -21,17 +21,19 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "task_init.h"
-#include "task_LED.h"
-#include "task_pwr.h"
-#include "task_cli.h"
-#include "task_telemetry.h"
+#ifndef VESCCOMMAND_H_
+#define VESCCOMMAND_H_
 
-void task_init(){
-	//init_config();
-	task_cli_init();
-	//task_telemetry_init();
-	task_LED_init();  //Bring up the blinky
-	task_PWR_init();  //Manage power button
+#include "VescDatatypes.h"
+#include "mc_stm_types.h"
+#include "mc_config.h"
+#include "mc_interface.h"
+#include "speed_pos_fdbk.h"
+#include "drive_parameters.h"
 
-}
+extern qd_t currComp;
+
+void commands_process_packet(unsigned char *data, unsigned int len, void(*reply_func)(unsigned char *data, unsigned int len));
+
+
+#endif
