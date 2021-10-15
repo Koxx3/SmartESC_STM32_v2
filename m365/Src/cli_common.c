@@ -317,12 +317,14 @@ const uint8_t hall_arr[] = {0,5,1,3,2,6,4,7};
 #define _60DEG 60*(65536.0/360.0)
 #define _90DEG 90*(65536.0/360.0)
 
-uint8_t CMD_tune(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
+static int16_t current_to_torque(int32_t curr_ma){
+	float ret = curr_ma * CURRENT_FACTOR_mA;
+	return ret;
 
-	if(argCount==0){
-		ttprintf("tune [current->percent]\r\n");
-		return TERM_CMD_EXIT_SUCCESS;
-	}
+}
+
+uint8_t CMD_tune(uint32_t current){
+
 
 	MCI_ExecTorqueRamp(pMCI[M1], MCI_GetTeref(pMCI[M1]),0);
 
@@ -332,7 +334,7 @@ uint8_t CMD_tune(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
 
 	qd_t currComp;
 	currComp = MCI_GetIqdref(pMCI[M1]);
-	currComp.q = calculate_curr(atoi(args[0]));
+	currComp.q = current_to_torque(current);
 
 
 	vTaskDelay(pdMS_TO_TICKS(5000));
@@ -356,7 +358,7 @@ uint8_t CMD_tune(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
 	}
 
 
-	ttprintf("Getting sensor configuration...\r\n");
+//	ttprintf("Getting sensor configuration...\r\n");
 	for(uint32_t i=0;i<0x10000;i+=16){
 		pMCI[M1]->pSTC->SPD->open_angle = angle+=16;
 		vTaskDelay(1);
@@ -374,7 +376,7 @@ uint8_t CMD_tune(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
 				MCI_StopMotor( pMCI[M1] );
 				return 0;
 			}
-			ttprintf("Got: %u Expected: %u\r\n",HALL_M1.HallState, hall_arr[state_cnt]);
+//			ttprintf("Got: %u Expected: %u\r\n",HALL_M1.HallState, hall_arr[state_cnt]);
 			hall_lut[HALL_M1.HallState] = hall_arr[state_cnt];
 			state_cnt++;
 			old_hall=HALL_M1.HallState;
@@ -391,19 +393,19 @@ uint8_t CMD_tune(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
 	vTaskDelay(pdMS_TO_TICKS(3000));
 	old_hall = HALL_M1.HallState;
 
-	ttprintf("Getting sensor offset...\r\n");
+//	ttprintf("Getting sensor offset...\r\n");
 	for(uint8_t u=0;u<1;u++){
 		for(uint32_t i=0;i<0xFFFF;i+=4){
 			pMCI[M1]->pSTC->SPD->open_angle = angle+=4;
 			vTaskDelay(1);
 			if(old_hall != HALL_M1.HallState){
 				data[HALL_M1.HallState].angle_forw = angle;
-				ttprintf("State: %u Angle: %.2f\r\n",HALL_M1.HallState, (float)angle/(65536.0/360.0));
+//				ttprintf("State: %u Angle: %.2f\r\n",HALL_M1.HallState, (float)angle/(65536.0/360.0));
 				old_hall=HALL_M1.HallState;
 			}
 		}
 	}
-	ttprintf("Backwards:\r\n");
+//	ttprintf("Backwards:\r\n");
 	old_hall = HALL_M1.HallState;
 	vTaskDelay(pdMS_TO_TICKS(500));
 	for(uint8_t u=0;u<1;u++){
@@ -432,20 +434,20 @@ uint8_t CMD_tune(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
 					break;
 				}
 
-				ttprintf("State: %u Angle: %.2f\r\n",HALL_M1.HallState, (float)angle/(65536.0/360.0));
+//				ttprintf("State: %u Angle: %.2f\r\n",HALL_M1.HallState, (float)angle/(65536.0/360.0));
 				old_hall=HALL_M1.HallState;
 			}
 		}
 	}
 	float el_angle = _60DEG; //60deg
 	float phase_shift=0;
-	ttprintf("Calculating phase shift...\r\n");
+//	ttprintf("Calculating phase shift...\r\n");
 	for(uint8_t u=1;u<7;u++){
 		uint16_t middle = data[hall_arr[u]].angle_back + ((data[hall_arr[u]].angle_forw - data[hall_arr[u]].angle_back)/2);
 
 		phase_shift += (el_angle-middle);
 
-		ttprintf("State: %u Angle: %.2f\r\n",u, (float)middle/(65536.0/360.0));
+//		ttprintf("State: %u Angle: %.2f\r\n",u, (float)middle/(65536.0/360.0));
 
 		el_angle += _60DEG; //60deg
 
@@ -454,15 +456,22 @@ uint8_t CMD_tune(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
 	phase_shift+=_90DEG;
 	HALL_M1.PhaseShift = phase_shift;
 
-	ttprintf("Set phase shift to: %.2f\r\n", (float)HALL_M1.PhaseShift/(65536.0/360.0));
+//	ttprintf("Set phase shift to: %.2f\r\n", (float)HALL_M1.PhaseShift/(65536.0/360.0));
 
 	pMCI[M1]->pSTC->SPD->open_loop = false;
 	MCI_StopMotor( pMCI[M1] );
-	vTaskDelay(pdMS_TO_TICKS(2000));
+	vTaskDelay(pdMS_TO_TICKS(1000));
+	//MCI_StartMotor( pMCI[M1] );
+	//vTaskDelay(pdMS_TO_TICKS(4000));
+
+	currComp = MCI_GetIqdref(pMCI[M1]);
+	currComp.q = 0;
+	currComp.d = 0;
+	MCI_SetCurrentReferences(pMCI[M1],currComp);
 	MCI_StartMotor( pMCI[M1] );
-	vTaskDelay(pdMS_TO_TICKS(4000));
-	MCI_StopMotor( pMCI[M1] );
-	return TERM_CMD_EXIT_SUCCESS;
+	vTaskDelay(pdMS_TO_TICKS(2000));
+
+//	return TERM_CMD_EXIT_SUCCESS;
 
 }
 

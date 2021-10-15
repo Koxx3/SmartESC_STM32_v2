@@ -32,6 +32,7 @@
 #include "utils.h"
 #include "system.h"
 #include "parameters_conversion.h"
+#include "cli_common.h"
 
 
 static void(* volatile send_func)(unsigned char *data, unsigned int len) = 0;
@@ -85,15 +86,15 @@ void commands_populate_stconf(mc_configuration *mcconf) {
 //		float l_in_current_max;
 //		float l_in_current_min;
 		mcconf->l_abs_current_max = 60;
-//		float l_min_erpm;
-//		float l_max_erpm;
+//		mcconf->l_min_erpm = SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit / (1.0/(_RPM / SPEED_UNIT)) * HALL_M1._Super.bElToMecRatio;
+//		mcconf->l_max_erpm = SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit / (1.0/(_RPM / SPEED_UNIT)) * HALL_M1._Super.bElToMecRatio;
 //		float l_erpm_start;
 //		float l_max_erpm_fbrake;
 //		float l_max_erpm_fbrake_cc;
-//		float l_min_vin;
-//		float l_max_vin;
-		mcconf->l_battery_cut_end = RealBusVoltageSensorParamsM1.UnderVoltageThreshold / VOLT_SCALING;
-		mcconf->l_battery_cut_start = RealBusVoltageSensorParamsM1.OverVoltageThreshold / VOLT_SCALING;
+//		mcconf->l_min_vin = RealBusVoltageSensorParamsM1.UnderVoltageThreshold / VOLT_SCALING;
+//		mcconf->l_max_vin = RealBusVoltageSensorParamsM1.OverVoltageThreshold / VOLT_SCALING;
+//		mcconf->l_battery_cut_end = RealBusVoltageSensorParamsM1.UnderVoltageThreshold / VOLT_SCALING;
+//		mcconf->l_battery_cut_start = RealBusVoltageSensorParamsM1.OverVoltageThreshold / VOLT_SCALING;
 //		bool l_slow_abs_current;
 //		float l_temp_fet_start;
 //		float l_temp_fet_end;
@@ -164,7 +165,7 @@ void commands_populate_stconf(mc_configuration *mcconf) {
 	for(int i=0;i<8;i++){
 		mcconf->hall_table[i] = HALL_M1.lut[i];
 	}
-//	float foc_hall_interp_erpm;
+	HALL_M1.SwitchSpeed = (float)mcconf->foc_hall_interp_erpm / (float)HALL_M1._Super.bElToMecRatio;
 //	float foc_sl_erpm;
 //	bool foc_sample_v0_v7;
 //	bool foc_sample_high_current;
@@ -250,13 +251,13 @@ void commands_populate_mcconf(mc_configuration *mcconf) {
 //		float l_in_current_max;
 //		float l_in_current_min;
 		mcconf->l_abs_current_max = 60;
-//		float l_min_erpm;
-//		float l_max_erpm;
+		mcconf->l_min_erpm = SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit / (1.0/(_RPM / SPEED_UNIT)) * HALL_M1._Super.bElToMecRatio;
+		mcconf->l_max_erpm = SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit / (1.0/(_RPM / SPEED_UNIT)) * HALL_M1._Super.bElToMecRatio;
 //		float l_erpm_start;
 //		float l_max_erpm_fbrake;
 //		float l_max_erpm_fbrake_cc;
-//		float l_min_vin;
-//		float l_max_vin;
+		mcconf->l_min_vin = RealBusVoltageSensorParamsM1.UnderVoltageThreshold / VOLT_SCALING;
+		mcconf->l_max_vin = RealBusVoltageSensorParamsM1.OverVoltageThreshold / VOLT_SCALING;
 		mcconf->l_battery_cut_end = RealBusVoltageSensorParamsM1.UnderVoltageThreshold / VOLT_SCALING;
 		mcconf->l_battery_cut_start = RealBusVoltageSensorParamsM1.OverVoltageThreshold / VOLT_SCALING;
 //		bool l_slow_abs_current;
@@ -295,10 +296,10 @@ void commands_populate_mcconf(mc_configuration *mcconf) {
 
 	// FOC
 	mcconf->foc_current_kp = PIDIqHandle_M1.hKpGain / 100.0;
-    mcconf->foc_current_ki = PIDIqHandle_M1.hKiGain /100.0;
-//	float foc_f_sw;
+    mcconf->foc_current_ki = PIDIqHandle_M1.hKiGain / 100.0;
+    mcconf->foc_f_sw = PWM_FREQUENCY;
 //	float foc_dt_us;
-//	float foc_encoder_offset;
+    mcconf->foc_encoder_offset = ANG_TO_DEG(HALL_M1.PhaseShift);
 //	bool foc_encoder_inverted;
 //	float foc_encoder_ratio;
 //	float foc_encoder_sin_offset;
@@ -327,9 +328,9 @@ void commands_populate_mcconf(mc_configuration *mcconf) {
 	mcconf->foc_sensor_mode = FOC_SENSOR_MODE_HALL;
 
 	for(int i=0;i<8;i++){
-		mcconf->hall_table[i] = HALL_M1.lut[i];
+		mcconf->foc_hall_table[i] = HALL_M1.lut[i];
 	}
-//	float foc_hall_interp_erpm;
+	mcconf->foc_hall_interp_erpm = (float)HALL_M1.SwitchSpeed * (float)HALL_M1._Super.bElToMecRatio;
 //	float foc_sl_erpm;
 //	bool foc_sample_v0_v7;
 //	bool foc_sample_high_current;
@@ -409,8 +410,7 @@ void commands_populate_mcconf(mc_configuration *mcconf) {
 
 //Current (digit) = [Current(Amp) * 65536 * Rshunt * Aop] / Vdd micro.
 
-#define CURRENT_FACTOR_A 317.73
-#define CURRENT_FACTOR_mA 0.31773
+
 
 
 int16_t current_to_torque(int32_t curr_ma){
@@ -527,11 +527,11 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 			}
 			if (mask & ((uint32_t)1 << 4)) {
 				//buffer_append_float32(send_buffer, mc_interface_read_reset_avg_id(), 1e2, &ind);
-				buffer_append_float32(send_buffer, 0, 1e2, &ind);
+				buffer_append_float32(send_buffer, pMCI[M1]->pFOCVars->Iqd.d / CURRENT_FACTOR, 1e2, &ind);
 			}
 			if (mask & ((uint32_t)1 << 5)) {
 				//buffer_append_float32(send_buffer, mc_interface_read_reset_avg_iq(), 1e2, &ind);
-				buffer_append_float32(send_buffer, 0, 1e2, &ind);
+				buffer_append_float32(send_buffer, pMCI[M1]->pFOCVars->Iqd.q / CURRENT_FACTOR, 1e2, &ind);
 			}
 			if (mask & ((uint32_t)1 << 6)) {
 				//buffer_append_float16(send_buffer, mc_interface_get_duty_cycle_now(), 1e3, &ind);
@@ -539,7 +539,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 			}
 			if (mask & ((uint32_t)1 << 7)) {
 				//buffer_append_float32(send_buffer, mc_interface_get_rpm(), 1e0, &ind);
-				buffer_append_float32(send_buffer, MCI_GetAvrgMecSpeedUnit( pMCI[M1] ), 1e0, &ind);
+				buffer_append_float32(send_buffer, MCI_GetAvrgMecSpeedUnit( pMCI[M1] ) * HALL_M1._Super.bElToMecRatio, 1e0, &ind);
 			}
 			if (mask & ((uint32_t)1 << 8)) {
 				//buffer_append_float16(send_buffer, GET_INPUT_VOLTAGE(), 1e1, &ind);
@@ -592,11 +592,11 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 			}
 			if (mask & ((uint32_t)1 << 19)) {
 				//buffer_append_float32(send_buffer, mc_interface_read_reset_avg_vd(), 1e3, &ind);
-				buffer_append_float32(send_buffer, 0, 1e3, &ind);
+				buffer_append_float32(send_buffer, pMCI[M1]->pFOCVars->Vqd.d / VOLT_SCALING, 1e3, &ind);
 			}
 			if (mask & ((uint32_t)1 << 20)) {
 				//buffer_append_float32(send_buffer, mc_interface_read_reset_avg_vq(), 1e3, &ind);
-				buffer_append_float32(send_buffer, 0, 1e3, &ind);
+				buffer_append_float32(send_buffer, pMCI[M1]->pFOCVars->Vqd.q / VOLT_SCALING, 1e3, &ind);
 			}
 
 			reply_func(send_buffer, ind);
@@ -610,8 +610,10 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 			case COMM_SET_CURRENT: {
 				int32_t ind = 0;
-
-				int16_t q = current_to_torque(buffer_get_int32(data, &ind))*-1;
+				if(MCI_GetControlMode(pMCI[M1]) != STC_TORQUE_MODE){
+					MCI_ExecTorqueRamp(pMCI[M1], MCI_GetTeref(pMCI[M1]),0);
+				}
+				int16_t q = current_to_torque(buffer_get_int32(data, &ind));
 				if(q != currComp.q){
 					currComp.q = q;
 					MCI_SetCurrentReferences(pMCI[M1],currComp);
@@ -621,7 +623,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 			case COMM_SET_CURRENT_BRAKE: {
 				int32_t ind = 0;
-				int16_t q = current_to_torque(buffer_get_int32(data, &ind));
+				int16_t q = current_to_torque(buffer_get_int32(data, &ind))*-1;
 				if(q != currComp.q){
 					currComp.q = q;
 					MCI_SetCurrentReferences(pMCI[M1],currComp);
@@ -630,13 +632,14 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 			} break;
 
 			case COMM_SET_RPM: {
-				//int32_t ind = 0;
-				//mc_interface_set_pid_speed((float)buffer_get_int32(data, &ind));
+				int32_t ind = 0;
+				MCI_ExecSpeedRamp(pMCI[M1], buffer_get_int32(data, &ind) , 100);
 				timeout_reset();
 			} break;
 
 			case COMM_SET_POS: {
 				//int32_t ind = 0;
+				//CMD_tune();
 				//mc_interface_set_pid_pos((float)buffer_get_int32(data, &ind) / 1000000.0);
 				timeout_reset();
 			} break;
@@ -795,28 +798,16 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					int32_t ind = 0;
 					uint8_t send_buffer[50];
 					send_buffer[ind++] = COMM_GET_DECODED_BALANCE;
-					/*
-					buffer_append_int32(send_buffer, (int32_t)(app_balance_get_pid_output() * 1000000.0), &ind);
-					buffer_append_int32(send_buffer, (int32_t)(app_balance_get_pitch_angle() * 1000000.0), &ind);
-					buffer_append_int32(send_buffer, (int32_t)(app_balance_get_roll_angle() * 1000000.0), &ind);
-					buffer_append_uint32(send_buffer, app_balance_get_diff_time(), &ind);
-					buffer_append_int32(send_buffer, (int32_t)(app_balance_get_motor_current() * 1000000.0), &ind);
-					buffer_append_int32(send_buffer, (int32_t)(app_balance_get_motor_position() * 1000000.0), &ind);
-					buffer_append_uint16(send_buffer, app_balance_get_state(), &ind);
-					buffer_append_uint16(send_buffer, app_balance_get_switch_state(), &ind);
-					buffer_append_int32(send_buffer, (int32_t)(app_balance_get_adc1() * 1000000.0), &ind);
-					buffer_append_int32(send_buffer, (int32_t)(app_balance_get_adc2() * 1000000.0), &ind);*/
-
-					buffer_append_int32(send_buffer, (int32_t)(0 * 1000000.0), &ind);
-					buffer_append_int32(send_buffer, (int32_t)(0 * 1000000.0), &ind);
-					buffer_append_int32(send_buffer, (int32_t)(0 * 1000000.0), &ind);
+					buffer_append_int32(send_buffer, 0, &ind);
+					buffer_append_int32(send_buffer, 0, &ind);
+					buffer_append_int32(send_buffer, 0, &ind);
 					buffer_append_uint32(send_buffer, 0, &ind);
-					buffer_append_int32(send_buffer, (int32_t)(0* 1000000.0), &ind);
-					buffer_append_int32(send_buffer, (int32_t)(0 * 1000000.0), &ind);
+					buffer_append_int32(send_buffer, 0, &ind);
+					buffer_append_int32(send_buffer, 0, &ind);
 					buffer_append_uint16(send_buffer, 0, &ind);
 					buffer_append_uint16(send_buffer, 0, &ind);
-					buffer_append_int32(send_buffer, (int32_t)(0 * 1000000.0), &ind);
-					buffer_append_int32(send_buffer, (int32_t)(0 * 1000000.0), &ind);
+					buffer_append_int32(send_buffer, 0, &ind);
+					buffer_append_int32(send_buffer, 0, &ind);
 					reply_func(send_buffer, ind);
 				} break;
 
@@ -1344,7 +1335,11 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				case COMM_BM_MAP_PINS_NRF5X:
 				case COMM_BM_MEM_READ:
 				case COMM_GET_IMU_CALIBRATION:
-					/*if (!is_blocking) {
+					if(packet_id == COMM_DETECT_HALL_FOC){
+						int32_t ind = 0;
+						CMD_tune(buffer_get_int32(data, &ind));
+					}/*
+					if (!is_blocking) {
 						memcpy(blocking_thread_cmd_buffer, data - 1, len + 1);
 						blocking_thread_cmd_len = len + 1;
 						is_blocking = true;

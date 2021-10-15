@@ -77,7 +77,7 @@ void cli_start_console(){
 	TERM_addCommand(CMD_get, "get", "Usage get [param]",0,&TERM_cmdListHead);
 	TERM_addCommand(CMD_set, "set","Usage set [param] [value]",0,&TERM_cmdListHead);
 	TERM_addCommand(CMD_eeprom, "eeprom","Save/Load config [load/save]",0,&TERM_cmdListHead);
-	TERM_addCommand(CMD_tune, "tune","Run autotune",0,&TERM_cmdListHead);
+	//TERM_addCommand(CMD_tune, "tune","Run autotune",0,&TERM_cmdListHead);
 	TERM_addCommand(CMD_start, "start","Start motor",0,&TERM_cmdListHead);
 	TERM_addCommand(CMD_stop, "stop","Stop motor",0,&TERM_cmdListHead);
 	TERM_addCommand(CMD_reset, "reset","Reset MCU",0,&TERM_cmdListHead);
@@ -89,17 +89,6 @@ void cli_start_console(){
 
 
 
-
-
-typedef struct
-{
-  uint8_t type;
-  uint8_t Power_ON;
-  uint8_t Throttle;
-  uint8_t Brake;
-} SerialCommand;
-
-
 void comm_uart_send_packet(unsigned char *data, unsigned int len) {
 	packet_send_packet(data, len, UART_HANDLE);
 }
@@ -107,15 +96,6 @@ void comm_uart_send_packet(unsigned char *data, unsigned int len) {
 void process_packet(unsigned char *data, unsigned int len){
 
 	commands_process_packet(data, len, &comm_uart_send_packet);
-
-
-	/*int16_t q = pCMD_calculate_curr_8((int16_t)cmd->Throttle);
-
-	if(q != currComp.q){
-		currComp.q = q;
-		MCI_SetCurrentReferences(pMCI[M1],currComp);
-	}*/
-
 
 }
 
@@ -125,8 +105,6 @@ void task_cli(void * argument)
 {
 
 	uint8_t c=0, len=0;
-
-
 
 
 	MCI_ExecTorqueRamp(pMCI[M1], MCI_GetTeref(pMCI[M1]),0);
@@ -148,12 +126,6 @@ void task_cli(void * argument)
 			packet_process_byte(c, UART_HANDLE);
 
 		}
-/*
-		if((xTaskGetTickCount() - last_frame) > 200 && !cli_handle){
-			last_frame = xTaskGetTickCount();
-			currComp.q = pCMD_calculate_curr_8((int16_t)0);
-			MCI_SetCurrentReferences(pMCI[M1],currComp);
-		}*/
 
 	}
 }
