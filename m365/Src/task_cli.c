@@ -69,25 +69,6 @@ void putbuffer(unsigned char *buf, unsigned int len){
 	}
 }
 
-void cli_start_console(){
-
-	if(cli_handle)return;
-	task_cli_mode = UART_MODE_CLI;
-
-	TERM_addCommand(CMD_get, "get", "Usage get [param]",0,&TERM_cmdListHead);
-	TERM_addCommand(CMD_set, "set","Usage set [param] [value]",0,&TERM_cmdListHead);
-	TERM_addCommand(CMD_eeprom, "eeprom","Save/Load config [load/save]",0,&TERM_cmdListHead);
-	//TERM_addCommand(CMD_tune, "tune","Run autotune",0,&TERM_cmdListHead);
-	TERM_addCommand(CMD_start, "start","Start motor",0,&TERM_cmdListHead);
-	TERM_addCommand(CMD_stop, "stop","Stop motor",0,&TERM_cmdListHead);
-	TERM_addCommand(CMD_reset, "reset","Reset MCU",0,&TERM_cmdListHead);
-	TERM_addCommand(CMD_ack, "ack","Clear faults",0,&TERM_cmdListHead);
-
-	cli_handle = TERM_createNewHandle(printf,pdTRUE,&TERM_cmdListHead,"root");
-
-};
-
-
 
 void comm_uart_send_packet(unsigned char *data, unsigned int len) {
 	packet_send_packet(data, len, UART_HANDLE);
@@ -112,8 +93,6 @@ void task_cli(void * argument)
 	currComp = MCI_GetIqdref(pMCI[M1]);
 
 
-	uint32_t last_frame = xTaskGetTickCount();
-
 	packet_init(putbuffer, process_packet, UART_HANDLE);
 
   /* Infinite loop */
@@ -133,7 +112,6 @@ void task_cli(void * argument)
 void task_cli_init(){
 	HAL_NVIC_SetPriority(USART3_IRQn, 5, 0);
 	cli_handle = NULL;
-	//cli_start_console();
 	UART_RX = xStreamBufferCreate(STREAMBUFFER_RX_SIZE,1);
 	task_cli_handle = osThreadNew(task_cli, cli_handle, &task_cli_attributes);
 }

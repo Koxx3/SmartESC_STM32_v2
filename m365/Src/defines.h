@@ -3,6 +3,9 @@
 
 #define HW_NAME					"40"
 
+#include "parameters_conversion.h"
+#include "mc_config.h"
+
 // Firmware version
 #define FW_VERSION_MAJOR			5
 #define FW_VERSION_MINOR			02
@@ -20,6 +23,12 @@
 
 #define CURRENT_FACTOR_A 317.73
 #define CURRENT_FACTOR_mA 0.31773
+#define CURRENT_FACTOR 317.73
+
+
+extern MCT_Handle_t* pMCT[NBR_OF_MOTORS];
+extern MCI_Handle_t* pMCI[NBR_OF_MOTORS];
+extern PQD_MotorPowMeas_Handle_t *pMPM[NBR_OF_MOTORS];
 
 
 #endif

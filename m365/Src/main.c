@@ -23,6 +23,7 @@
 #include "motorcontrol.h"
 #include "cli_basic.h"
 #include "cli_common.h"
+#include "conf_general.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -137,7 +138,7 @@ int main(void)
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
-  TERM_eeprom_read();
+  conf_general_init();
   /* USER CODE END 2 */
 
   /* Init scheduler */

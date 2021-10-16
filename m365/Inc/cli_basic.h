@@ -75,7 +75,7 @@ enum cli_types{
 #define CY_EEPROM_SIZE              (CYDEV_EE_SIZE)
 
 //#define ADDR_FLASH_PAGE_63    ((uint32_t)0x0800FC00) /* Base @ of Page 63, 1 Kbytes */
-#define ADDR_FLASH_PAGE_63    ((uint32_t)0x0801FC00) /* Base @ of Page 127, 1 Kbytes */
+
    
 typedef struct parameter_entry_struct parameter_entry;
 struct parameter_entry_struct {

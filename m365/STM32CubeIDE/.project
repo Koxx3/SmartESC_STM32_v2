@@ -77,14 +77,14 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Src/buffer.h</locationURI>
 		</link>
 		<link>
-			<name>Application/User/cli_basic.c</name>
+			<name>Application/User/conf_general.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/cli_basic.c</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/conf_general.c</locationURI>
 		</link>
 		<link>
-			<name>Application/User/cli_common.c</name>
+			<name>Application/User/conf_general.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/cli_common.c</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/conf_general.h</locationURI>
 		</link>
 		<link>
 			<name>Application/User/confgenerator.c</name>
@@ -225,6 +225,16 @@
 			<name>Application/User/task_telemetry.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Src/task_telemetry.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/tune.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/tune.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/tune.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/tune.h</locationURI>
 		</link>
 		<link>
 			<name>Application/User/ui_task.c</name>

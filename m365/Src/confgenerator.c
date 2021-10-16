@@ -3,6 +3,8 @@
 #include "buffer.h"
 //#include "conf_general.h"
 #include "confgenerator.h"
+#include "tune.h"
+#include <string.h>
 
 int32_t confgenerator_serialize_mcconf(uint8_t *buffer, const mc_configuration *conf) {
 	int32_t ind = 0;
@@ -645,309 +647,168 @@ bool confgenerator_deserialize_appconf(const uint8_t *buffer, app_configuration 
 
 	return true;
 }
-/*
-void confgenerator_set_defaults_mcconf(mc_configuration *conf) {
-	conf->pwm_mode = MCCONF_PWM_MODE;
-	conf->comm_mode = MCCONF_COMM_MODE;
-	conf->motor_type = MCCONF_DEFAULT_MOTOR_TYPE;
-	conf->sensor_mode = MCCONF_SENSOR_MODE;
-	conf->l_current_max = MCCONF_L_CURRENT_MAX;
-	conf->l_current_min = MCCONF_L_CURRENT_MIN;
-	conf->l_in_current_max = MCCONF_L_IN_CURRENT_MAX;
-	conf->l_in_current_min = MCCONF_L_IN_CURRENT_MIN;
-	conf->l_abs_current_max = MCCONF_L_MAX_ABS_CURRENT;
-	conf->l_min_erpm = MCCONF_L_RPM_MIN;
-	conf->l_max_erpm = MCCONF_L_RPM_MAX;
-	conf->l_erpm_start = MCCONF_L_RPM_START;
-	conf->l_max_erpm_fbrake = MCCONF_L_CURR_MAX_RPM_FBRAKE;
-	conf->l_max_erpm_fbrake_cc = MCCONF_L_CURR_MAX_RPM_FBRAKE_CC;
-	conf->l_min_vin = MCCONF_L_MIN_VOLTAGE;
-	conf->l_max_vin = MCCONF_L_MAX_VOLTAGE;
-	conf->l_battery_cut_start = MCCONF_L_BATTERY_CUT_START;
-	conf->l_battery_cut_end = MCCONF_L_BATTERY_CUT_END;
-	conf->l_slow_abs_current = MCCONF_L_SLOW_ABS_OVERCURRENT;
-	conf->l_temp_fet_start = MCCONF_L_LIM_TEMP_FET_START;
-	conf->l_temp_fet_end = MCCONF_L_LIM_TEMP_FET_END;
-	conf->l_temp_motor_start = MCCONF_L_LIM_TEMP_MOTOR_START;
-	conf->l_temp_motor_end = MCCONF_L_LIM_TEMP_MOTOR_END;
-	conf->l_temp_accel_dec = MCCONF_L_LIM_TEMP_ACCEL_DEC;
-	conf->l_min_duty = MCCONF_L_MIN_DUTY;
-	conf->l_max_duty = MCCONF_L_MAX_DUTY;
-	conf->l_watt_max = MCCONF_L_WATT_MAX;
-	conf->l_watt_min = MCCONF_L_WATT_MIN;
-	conf->l_current_max_scale = MCCONF_L_CURRENT_MAX_SCALE;
-	conf->l_current_min_scale = MCCONF_L_CURRENT_MIN_SCALE;
-	conf->l_duty_start = MCCONF_L_DUTY_START;
-	conf->sl_min_erpm = MCCONF_SL_MIN_RPM;
-	conf->sl_min_erpm_cycle_int_limit = MCCONF_SL_MIN_ERPM_CYCLE_INT_LIMIT;
-	conf->sl_max_fullbreak_current_dir_change = MCCONF_SL_MAX_FB_CURR_DIR_CHANGE;
-	conf->sl_cycle_int_limit = MCCONF_SL_CYCLE_INT_LIMIT;
-	conf->sl_phase_advance_at_br = MCCONF_SL_PHASE_ADVANCE_AT_BR;
-	conf->sl_cycle_int_rpm_br = MCCONF_SL_CYCLE_INT_BR;
-	conf->sl_bemf_coupling_k = MCCONF_SL_BEMF_COUPLING_K;
-	conf->hall_table[0] = MCCONF_HALL_TAB_0;
-	conf->hall_table[1] = MCCONF_HALL_TAB_1;
-	conf->hall_table[2] = MCCONF_HALL_TAB_2;
-	conf->hall_table[3] = MCCONF_HALL_TAB_3;
-	conf->hall_table[4] = MCCONF_HALL_TAB_4;
-	conf->hall_table[5] = MCCONF_HALL_TAB_5;
-	conf->hall_table[6] = MCCONF_HALL_TAB_6;
-	conf->hall_table[7] = MCCONF_HALL_TAB_7;
-	conf->hall_sl_erpm = MCCONF_HALL_ERPM;
-	conf->foc_current_kp = MCCONF_FOC_CURRENT_KP;
-	conf->foc_current_ki = MCCONF_FOC_CURRENT_KI;
-	conf->foc_f_sw = MCCONF_FOC_F_SW;
-	conf->foc_dt_us = MCCONF_FOC_DT_US;
-	conf->foc_encoder_inverted = MCCONF_FOC_ENCODER_INVERTED;
-	conf->foc_encoder_offset = MCCONF_FOC_ENCODER_OFFSET;
-	conf->foc_encoder_ratio = MCCONF_FOC_ENCODER_RATIO;
-	conf->foc_encoder_sin_gain = MCCONF_FOC_ENCODER_SIN_GAIN;
-	conf->foc_encoder_cos_gain = MCCONF_FOC_ENCODER_COS_GAIN;
-	conf->foc_encoder_sin_offset = MCCONF_FOC_ENCODER_SIN_OFFSET;
-	conf->foc_encoder_cos_offset = MCCONF_FOC_ENCODER_COS_OFFSET;
-	conf->foc_encoder_sincos_filter_constant = MCCONF_FOC_ENCODER_SINCOS_FILTER;
-	conf->foc_sensor_mode = MCCONF_FOC_SENSOR_MODE;
-	conf->foc_pll_kp = MCCONF_FOC_PLL_KP;
-	conf->foc_pll_ki = MCCONF_FOC_PLL_KI;
-	conf->foc_motor_l = MCCONF_FOC_MOTOR_L;
-	conf->foc_motor_ld_lq_diff = MCCONF_FOC_MOTOR_LD_LQ_DIFF;
-	conf->foc_motor_r = MCCONF_FOC_MOTOR_R;
-	conf->foc_motor_flux_linkage = MCCONF_FOC_MOTOR_FLUX_LINKAGE;
-	conf->foc_observer_gain = MCCONF_FOC_OBSERVER_GAIN;
-	conf->foc_observer_gain_slow = MCCONF_FOC_OBSERVER_GAIN_SLOW;
-	conf->foc_duty_dowmramp_kp = MCCONF_FOC_DUTY_DOWNRAMP_KP;
-	conf->foc_duty_dowmramp_ki = MCCONF_FOC_DUTY_DOWNRAMP_KI;
-	conf->foc_openloop_rpm = MCCONF_FOC_OPENLOOP_RPM;
-	conf->foc_openloop_rpm_low = MCCONF_FOC_OPENLOOP_RPM_LOW;
-	conf->foc_d_gain_scale_start = MCCONF_FOC_D_GAIN_SCALE_START;
-	conf->foc_d_gain_scale_max_mod = MCCONF_FOC_D_GAIN_SCALE_MAX_MOD;
-	conf->foc_sl_openloop_hyst = MCCONF_FOC_SL_OPENLOOP_HYST;
-	conf->foc_sl_openloop_time_lock = MCCONF_FOC_SL_OPENLOOP_T_LOCK;
-	conf->foc_sl_openloop_time_ramp = MCCONF_FOC_SL_OPENLOOP_T_RAMP;
-	conf->foc_sl_openloop_time = MCCONF_FOC_SL_OPENLOOP_TIME;
-	conf->foc_hall_table[0] = MCCONF_FOC_HALL_TAB_0;
-	conf->foc_hall_table[1] = MCCONF_FOC_HALL_TAB_1;
-	conf->foc_hall_table[2] = MCCONF_FOC_HALL_TAB_2;
-	conf->foc_hall_table[3] = MCCONF_FOC_HALL_TAB_3;
-	conf->foc_hall_table[4] = MCCONF_FOC_HALL_TAB_4;
-	conf->foc_hall_table[5] = MCCONF_FOC_HALL_TAB_5;
-	conf->foc_hall_table[6] = MCCONF_FOC_HALL_TAB_6;
-	conf->foc_hall_table[7] = MCCONF_FOC_HALL_TAB_7;
-	conf->foc_hall_interp_erpm = MCCONF_FOC_HALL_INTERP_ERPM;
-	conf->foc_sl_erpm = MCCONF_FOC_SL_ERPM;
-	conf->foc_sample_v0_v7 = MCCONF_FOC_SAMPLE_V0_V7;
-	conf->foc_sample_high_current = MCCONF_FOC_SAMPLE_HIGH_CURRENT;
-	conf->foc_sat_comp = MCCONF_FOC_SAT_COMP;
-	conf->foc_temp_comp = MCCONF_FOC_TEMP_COMP;
-	conf->foc_temp_comp_base_temp = MCCONF_FOC_TEMP_COMP_BASE_TEMP;
-	conf->foc_current_filter_const = MCCONF_FOC_CURRENT_FILTER_CONST;
-	conf->foc_cc_decoupling = MCCONF_FOC_CC_DECOUPLING;
-	conf->foc_observer_type = MCCONF_FOC_OBSERVER_TYPE;
-	conf->foc_hfi_voltage_start = MCCONF_FOC_HFI_VOLTAGE_START;
-	conf->foc_hfi_voltage_run = MCCONF_FOC_HFI_VOLTAGE_RUN;
-	conf->foc_hfi_voltage_max = MCCONF_FOC_HFI_VOLTAGE_MAX;
-	conf->foc_sl_erpm_hfi = MCCONF_FOC_SL_ERPM_HFI;
-	conf->foc_hfi_start_samples = MCCONF_FOC_HFI_START_SAMPLES;
-	conf->foc_hfi_obs_ovr_sec = MCCONF_FOC_HFI_OBS_OVR_SEC;
-	conf->foc_hfi_samples = MCCONF_FOC_HFI_SAMPLES;
-	conf->gpd_buffer_notify_left = MCCONF_GPD_BUFFER_NOTIFY_LEFT;
-	conf->gpd_buffer_interpol = MCCONF_GPD_BUFFER_INTERPOL;
-	conf->gpd_current_filter_const = MCCONF_GPD_CURRENT_FILTER_CONST;
-	conf->gpd_current_kp = MCCONF_GPD_CURRENT_KP;
-	conf->gpd_current_ki = MCCONF_GPD_CURRENT_KI;
-	conf->s_pid_kp = MCCONF_S_PID_KP;
-	conf->s_pid_ki = MCCONF_S_PID_KI;
-	conf->s_pid_kd = MCCONF_S_PID_KD;
-	conf->s_pid_kd_filter = MCCONF_S_PID_KD_FILTER;
-	conf->s_pid_min_erpm = MCCONF_S_PID_MIN_RPM;
-	conf->s_pid_allow_braking = MCCONF_S_PID_ALLOW_BRAKING;
-	conf->s_pid_ramp_erpms_s = MCCONF_S_PID_RAMP_ERPMS_S;
-	conf->p_pid_kp = MCCONF_P_PID_KP;
-	conf->p_pid_ki = MCCONF_P_PID_KI;
-	conf->p_pid_kd = MCCONF_P_PID_KD;
-	conf->p_pid_kd_filter = MCCONF_P_PID_KD_FILTER;
-	conf->p_pid_ang_div = MCCONF_P_PID_ANG_DIV;
-	conf->cc_startup_boost_duty = MCCONF_CC_STARTUP_BOOST_DUTY;
-	conf->cc_min_current = MCCONF_CC_MIN_CURRENT;
-	conf->cc_gain = MCCONF_CC_GAIN;
-	conf->cc_ramp_step_max = MCCONF_CC_RAMP_STEP;
-	conf->m_fault_stop_time_ms = MCCONF_M_FAULT_STOP_TIME;
-	conf->m_duty_ramp_step = MCCONF_M_RAMP_STEP;
-	conf->m_current_backoff_gain = MCCONF_M_CURRENT_BACKOFF_GAIN;
-	conf->m_encoder_counts = MCCONF_M_ENCODER_COUNTS;
-	conf->m_sensor_port_mode = MCCONF_M_SENSOR_PORT_MODE;
-	conf->m_invert_direction = MCCONF_M_INVERT_DIRECTION;
-	conf->m_drv8301_oc_mode = MCCONF_M_DRV8301_OC_MODE;
-	conf->m_drv8301_oc_adj = MCCONF_M_DRV8301_OC_ADJ;
-	conf->m_bldc_f_sw_min = MCCONF_M_BLDC_F_SW_MIN;
-	conf->m_bldc_f_sw_max = MCCONF_M_BLDC_F_SW_MAX;
-	conf->m_dc_f_sw = MCCONF_M_DC_F_SW;
-	conf->m_ntc_motor_beta = MCCONF_M_NTC_MOTOR_BETA;
-	conf->m_out_aux_mode = MCCONF_M_OUT_AUX_MODE;
-	conf->m_motor_temp_sens_type = MCCONF_M_MOTOR_TEMP_SENS_TYPE;
-	conf->m_ptc_motor_coeff = MCCONF_M_PTC_MOTOR_COEFF;
-	conf->m_hall_extra_samples = MCCONF_M_HALL_EXTRA_SAMPLES;
-	conf->si_motor_poles = MCCONF_SI_MOTOR_POLES;
-	conf->si_gear_ratio = MCCONF_SI_GEAR_RATIO;
-	conf->si_wheel_diameter = MCCONF_SI_WHEEL_DIAMETER;
-	conf->si_battery_type = MCCONF_SI_BATTERY_TYPE;
-	conf->si_battery_cells = MCCONF_SI_BATTERY_CELLS;
-	conf->si_battery_ah = MCCONF_SI_BATTERY_AH;
-	conf->bms.type = MCCONF_BMS_TYPE;
-	conf->bms.t_limit_start = MCCONF_BMS_T_LIMIT_START;
-	conf->bms.t_limit_end = MCCONF_BMS_T_LIMIT_END;
-	conf->bms.soc_limit_start = MCCONF_BMS_SOC_LIMIT_START;
-	conf->bms.soc_limit_end = MCCONF_BMS_SOC_LIMIT_END;
-}
 
-void confgenerator_set_defaults_appconf(app_configuration *conf) {
-	conf->controller_id = HW_DEFAULT_ID;
-	conf->timeout_msec = APPCONF_TIMEOUT_MSEC;
-	conf->timeout_brake_current = APPCONF_TIMEOUT_BRAKE_CURRENT;
-	conf->send_can_status = APPCONF_SEND_CAN_STATUS;
-	conf->send_can_status_rate_hz = APPCONF_SEND_CAN_STATUS_RATE_HZ;
-	conf->can_baud_rate = APPCONF_CAN_BAUD_RATE;
-	conf->pairing_done = APPCONF_PAIRING_DONE;
-	conf->permanent_uart_enabled = APPCONF_PERMANENT_UART_ENABLED;
-	conf->shutdown_mode = APPCONF_SHUTDOWN_MODE;
-	conf->can_mode = APPCONF_CAN_MODE;
-	conf->uavcan_esc_index = APPCONF_UAVCAN_ESC_INDEX;
-	conf->uavcan_raw_mode = APPCONF_UAVCAN_RAW_MODE;
-	conf->app_to_use = APPCONF_APP_TO_USE;
-	conf->app_ppm_conf.ctrl_type = APPCONF_PPM_CTRL_TYPE;
-	conf->app_ppm_conf.pid_max_erpm = APPCONF_PPM_PID_MAX_ERPM;
-	conf->app_ppm_conf.hyst = APPCONF_PPM_HYST;
-	conf->app_ppm_conf.pulse_start = APPCONF_PPM_PULSE_START;
-	conf->app_ppm_conf.pulse_end = APPCONF_PPM_PULSE_END;
-	conf->app_ppm_conf.pulse_center = APPCONF_PPM_PULSE_CENTER;
-	conf->app_ppm_conf.median_filter = APPCONF_PPM_MEDIAN_FILTER;
-	conf->app_ppm_conf.safe_start = APPCONF_PPM_SAFE_START;
-	conf->app_ppm_conf.throttle_exp = APPCONF_PPM_THROTTLE_EXP;
-	conf->app_ppm_conf.throttle_exp_brake = APPCONF_PPM_THROTTLE_EXP_BRAKE;
-	conf->app_ppm_conf.throttle_exp_mode = APPCONF_PPM_THROTTLE_EXP_MODE;
-	conf->app_ppm_conf.ramp_time_pos = APPCONF_PPM_RAMP_TIME_POS;
-	conf->app_ppm_conf.ramp_time_neg = APPCONF_PPM_RAMP_TIME_NEG;
-	conf->app_ppm_conf.multi_esc = APPCONF_PPM_MULTI_ESC;
-	conf->app_ppm_conf.tc = APPCONF_PPM_TC;
-	conf->app_ppm_conf.tc_max_diff = APPCONF_PPM_TC_MAX_DIFF;
-	conf->app_ppm_conf.max_erpm_for_dir = APPCONF_PPM_MAX_ERPM_FOR_DIR;
-	conf->app_ppm_conf.smart_rev_max_duty = APPCONF_PPM_SMART_REV_MAX_DUTY;
-	conf->app_ppm_conf.smart_rev_ramp_time = APPCONF_PPM_SMART_REV_RAMP_TIME;
-	conf->app_adc_conf.ctrl_type = APPCONF_ADC_CTRL_TYPE;
-	conf->app_adc_conf.hyst = APPCONF_ADC_HYST;
-	conf->app_adc_conf.voltage_start = APPCONF_ADC_VOLTAGE_START;
-	conf->app_adc_conf.voltage_end = APPCONF_ADC_VOLTAGE_END;
-	conf->app_adc_conf.voltage_center = APPCONF_ADC_VOLTAGE_CENTER;
-	conf->app_adc_conf.voltage2_start = APPCONF_ADC_VOLTAGE2_START;
-	conf->app_adc_conf.voltage2_end = APPCONF_ADC_VOLTAGE2_END;
-	conf->app_adc_conf.use_filter = APPCONF_ADC_USE_FILTER;
-	conf->app_adc_conf.safe_start = APPCONF_ADC_SAFE_START;
-	conf->app_adc_conf.cc_button_inverted = APPCONF_ADC_CC_BUTTON_INVERTED;
-	conf->app_adc_conf.rev_button_inverted = APPCONF_ADC_REV_BUTTON_INVERTED;
-	conf->app_adc_conf.voltage_inverted = APPCONF_ADC_VOLTAGE_INVERTED;
-	conf->app_adc_conf.voltage2_inverted = APPCONF_ADC_VOLTAGE2_INVERTED;
-	conf->app_adc_conf.throttle_exp = APPCONF_ADC_THROTTLE_EXP;
-	conf->app_adc_conf.throttle_exp_brake = APPCONF_ADC_THROTTLE_EXP_BRAKE;
-	conf->app_adc_conf.throttle_exp_mode = APPCONF_ADC_THROTTLE_EXP_MODE;
-	conf->app_adc_conf.ramp_time_pos = APPCONF_ADC_RAMP_TIME_POS;
-	conf->app_adc_conf.ramp_time_neg = APPCONF_ADC_RAMP_TIME_NEG;
-	conf->app_adc_conf.multi_esc = APPCONF_ADC_MULTI_ESC;
-	conf->app_adc_conf.tc = APPCONF_ADC_TC;
-	conf->app_adc_conf.tc_max_diff = APPCONF_ADC_TC_MAX_DIFF;
-	conf->app_adc_conf.update_rate_hz = APPCONF_ADC_UPDATE_RATE_HZ;
-	conf->app_uart_baudrate = APPCONF_UART_BAUDRATE;
-	conf->app_chuk_conf.ctrl_type = APPCONF_CHUK_CTRL_TYPE;
-	conf->app_chuk_conf.hyst = APPCONF_CHUK_HYST;
-	conf->app_chuk_conf.ramp_time_pos = APPCONF_CHUK_RAMP_TIME_POS;
-	conf->app_chuk_conf.ramp_time_neg = APPCONF_CHUK_RAMP_TIME_NEG;
-	conf->app_chuk_conf.stick_erpm_per_s_in_cc = APPCONF_STICK_ERPM_PER_S_IN_CC;
-	conf->app_chuk_conf.throttle_exp = APPCONF_CHUK_THROTTLE_EXP;
-	conf->app_chuk_conf.throttle_exp_brake = APPCONF_CHUK_THROTTLE_EXP_BRAKE;
-	conf->app_chuk_conf.throttle_exp_mode = APPCONF_CHUK_THROTTLE_EXP_MODE;
-	conf->app_chuk_conf.multi_esc = APPCONF_CHUK_MULTI_ESC;
-	conf->app_chuk_conf.tc = APPCONF_CHUK_TC;
-	conf->app_chuk_conf.tc_max_diff = APPCONF_CHUK_TC_MAX_DIFF;
-	conf->app_chuk_conf.use_smart_rev = APPCONF_CHUK_USE_SMART_REV;
-	conf->app_chuk_conf.smart_rev_max_duty = APPCONF_CHUK_SMART_REV_MAX_DUTY;
-	conf->app_chuk_conf.smart_rev_ramp_time = APPCONF_CHUK_SMART_REV_RAMP_TIME;
-	conf->app_nrf_conf.speed = APPCONF_NRF_SPEED;
-	conf->app_nrf_conf.power = APPCONF_NRF_POWER;
-	conf->app_nrf_conf.crc_type = APPCONF_NRF_CRC;
-	conf->app_nrf_conf.retry_delay = APPCONF_NRF_RETR_DELAY;
-	conf->app_nrf_conf.retries = APPCONF_NRF_RETRIES;
-	conf->app_nrf_conf.channel = APPCONF_NRF_CHANNEL;
-	conf->app_nrf_conf.address[0] = APPCONF_NRF_ADDR_B0;
-	conf->app_nrf_conf.address[1] = APPCONF_NRF_ADDR_B1;
-	conf->app_nrf_conf.address[2] = APPCONF_NRF_ADDR_B2;
-	conf->app_nrf_conf.send_crc_ack = APPCONF_NRF_SEND_CRC_ACK;
-	conf->app_balance_conf.kp = APPCONF_BALANCE_KP;
-	conf->app_balance_conf.ki = APPCONF_BALANCE_KI;
-	conf->app_balance_conf.kd = APPCONF_BALANCE_KD;
-	conf->app_balance_conf.hertz = APPCONF_BALANCE_HERTZ;
-	conf->app_balance_conf.fault_pitch = APPCONF_BALANCE_FAULT_PITCH;
-	conf->app_balance_conf.fault_roll = APPCONF_BALANCE_FAULT_ROLL;
-	conf->app_balance_conf.fault_duty = APPCONF_BALANCE_FAULT_DUTY;
-	conf->app_balance_conf.fault_adc1 = APPCONF_BALANCE_FAULT_ADC1;
-	conf->app_balance_conf.fault_adc2 = APPCONF_BALANCE_FAULT_ADC2;
-	conf->app_balance_conf.fault_delay_pitch = APPCONF_BALANCE_FAULT_DELAY_PITCH;
-	conf->app_balance_conf.fault_delay_roll = APPCONF_BALANCE_FAULT_DELAY_ROLL;
-	conf->app_balance_conf.fault_delay_duty = APPCONF_BALANCE_FAULT_DELAY_DUTY;
-	conf->app_balance_conf.fault_delay_switch_half = APPCONF_BALANCE_FAULT_DELAY_SWITCH_HALF;
-	conf->app_balance_conf.fault_delay_switch_full = APPCONF_BALANCE_FAULT_DELAY_SWITCH_FULL;
-	conf->app_balance_conf.fault_adc_half_erpm = APPCONF_BALANCE_FAULT_ADC_HALF_ERPM;
-	conf->app_balance_conf.tiltback_angle = APPCONF_BALANCE_TILTBACK_ANGLE;
-	conf->app_balance_conf.tiltback_speed = APPCONF_BALANCE_TILTBACK_SPEED;
-	conf->app_balance_conf.tiltback_duty = APPCONF_BALANCE_TILTBACK_DUTY;
-	conf->app_balance_conf.tiltback_high_voltage = APPCONF_BALANCE_TILTBACK_HIGH_V;
-	conf->app_balance_conf.tiltback_low_voltage = APPCONF_BALANCE_TILTBACK_LOW_V;
-	conf->app_balance_conf.tiltback_constant = APPCONF_BALANCE_TILTBACK_CONSTANT;
-	conf->app_balance_conf.tiltback_constant_erpm = APPCONF_BALANCE_TILTBACK_CONSTANT_ERPM;
-	conf->app_balance_conf.startup_pitch_tolerance = APPCONF_BALANCE_STARTUP_PITCH_TOLERANCE;
-	conf->app_balance_conf.startup_roll_tolerance = APPCONF_BALANCE_STARTUP_ROLL_TOLERANCE;
-	conf->app_balance_conf.startup_speed = APPCONF_BALANCE_STARTUP_SPEED;
-	conf->app_balance_conf.deadzone = APPCONF_BALANCE_DEADZONE;
-	conf->app_balance_conf.current_boost = APPCONF_BALANCE_CURRENT_BOOST;
-	conf->app_balance_conf.multi_esc = APPCONF_BALANCE_MULTI_ESC;
-	conf->app_balance_conf.yaw_kp = APPCONF_BALANCE_YAW_KP;
-	conf->app_balance_conf.yaw_ki = APPCONF_BALANCE_YAW_KI;
-	conf->app_balance_conf.yaw_kd = APPCONF_BALANCE_YAW_KD;
-	conf->app_balance_conf.roll_steer_kp = APPCONF_BALANCE_ROLL_STEER_KP;
-	conf->app_balance_conf.roll_steer_erpm_kp = APPCONF_BALANCE_ROLL_STEER_ERPM_KP;
-	conf->app_balance_conf.brake_current = APPCONF_BALANCE_BRAKE_CURRENT;
-	conf->app_balance_conf.yaw_current_clamp = APPCONF_BALANCE_YAW_CURRENT_CLAMP;
-	conf->app_balance_conf.setpoint_pitch_filter = APPCONF_BALANCE_SETPOINT_PITCH_FILTER;
-	conf->app_balance_conf.setpoint_target_filter = APPCONF_BALANCE_SETPOINT_TARGET_FILTER;
-	conf->app_balance_conf.setpoint_filter_clamp = APPCONF_BALANCE_SETPOINT_FILTER_CLAMP;
-	conf->app_balance_conf.kd_pt1_frequency = APPCONF_BALANCE_KD_PT1_FREQUENCY;
-	conf->app_pas_conf.ctrl_type = APPCONF_PAS_CTRL_TYPE;
-	conf->app_pas_conf.sensor_type = APPCONF_PAS_SENSOR_TYPE;
-	conf->app_pas_conf.current_scaling = APPCONF_PAS_CURRENT_SCALING;
-	conf->app_pas_conf.pedal_rpm_start = APPCONF_PAS_PEDAL_RPM_START;
-	conf->app_pas_conf.pedal_rpm_end = APPCONF_PAS_PEDAL_RPM_END;
-	conf->app_pas_conf.invert_pedal_direction = APPCONF_PAS_INVERT_PEDAL_DIRECTION;
-	conf->app_pas_conf.magnets = APPCONF_PAS_MAGNETS;
-	conf->app_pas_conf.use_filter = APPCONF_PAS_USE_FILTER;
-	conf->app_pas_conf.ramp_time_pos = APPCONF_PAS_RAMP_TIME_POS;
-	conf->app_pas_conf.ramp_time_neg = APPCONF_PAS_RAMP_TIME_NEG;
-	conf->app_pas_conf.update_rate_hz = APPCONF_PAS_UPDATE_RATE_HZ;
-	conf->imu_conf.type = APPCONF_IMU_TYPE;
-	conf->imu_conf.mode = APPCONF_IMU_AHRS_MODE;
-	conf->imu_conf.sample_rate_hz = APPCONF_IMU_SAMPLE_RATE_HZ;
-	conf->imu_conf.accel_confidence_decay = APPCONF_IMU_ACCEL_CONFIDENCE_DECAY;
-	conf->imu_conf.mahony_kp = APPCONF_IMU_MAHONY_KP;
-	conf->imu_conf.mahony_ki = APPCONF_IMU_MAHONY_KI;
-	conf->imu_conf.madgwick_beta = APPCONF_IMU_MADGWICK_BETA;
-	conf->imu_conf.rot_roll = APPCONF_IMU_ROT_ROLL;
-	conf->imu_conf.rot_pitch = APPCONF_IMU_ROT_PITCH;
-	conf->imu_conf.rot_yaw = APPCONF_IMU_ROT_YAW;
-	conf->imu_conf.accel_offsets[0] = APPCONF_IMU_A_OFFSET_0;
-	conf->imu_conf.accel_offsets[1] = APPCONF_IMU_A_OFFSET_1;
-	conf->imu_conf.accel_offsets[2] = APPCONF_IMU_A_OFFSET_2;
-	conf->imu_conf.gyro_offsets[0] = APPCONF_IMU_G_OFFSET_0;
-	conf->imu_conf.gyro_offsets[1] = APPCONF_IMU_G_OFFSET_1;
-	conf->imu_conf.gyro_offsets[2] = APPCONF_IMU_G_OFFSET_2;
-	conf->imu_conf.gyro_offset_comp_fact[0] = APPCONF_IMU_G_OFFSET_COMP_FACT_0;
-	conf->imu_conf.gyro_offset_comp_fact[1] = APPCONF_IMU_G_OFFSET_COMP_FACT_1;
-	conf->imu_conf.gyro_offset_comp_fact[2] = APPCONF_IMU_G_OFFSET_COMP_FACT_2;
-	conf->imu_conf.gyro_offset_comp_clamp = APPCONF_IMU_G_OFFSET_COMP_CLAMP;
-}*/
+void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
+	memset(mcconf,0,sizeof(mc_configuration));
+	// Limits
+		mcconf->l_current_max = 10;
+		mcconf->l_current_min  = -10;
+//		float l_in_current_max;
+//		float l_in_current_min;
+		mcconf->l_abs_current_max = 60;
+		mcconf->l_min_erpm = -35000;
+		mcconf->l_max_erpm = 35000;
+//		float l_erpm_start;
+//		float l_max_erpm_fbrake;
+//		float l_max_erpm_fbrake_cc;
+		mcconf->l_min_vin = 10;
+		mcconf->l_max_vin = 56;
+		mcconf->l_battery_cut_end = 10;
+		mcconf->l_battery_cut_start = 56;
+//		bool l_slow_abs_current;
+//		float l_temp_fet_start;
+//		float l_temp_fet_end;
+//		float l_temp_motor_start;
+//		float l_temp_motor_end;
+//		float l_temp_accel_dec;
+//		float l_min_duty;
+//		float l_max_duty;
+//		float l_watt_max;
+//		float l_watt_min;
+//		float l_current_max_scale;
+//		float l_current_min_scale;
+//		float l_duty_start;
+//		// Overridden limits (Computed during runtime)
+//		float lo_current_max;
+//		float lo_current_min;
+//		float lo_in_current_max;
+//		float lo_in_current_min;
+//		float lo_current_motor_max_now;
+//		float lo_current_motor_min_now;
+
+
+
+
+	// Hall sensor
+	for(int i=0;i<8;i++){
+		mcconf->hall_table[i] = hall_arr[i];
+	}
+
+	// BLDC switching and drive
+	mcconf->motor_type = MOTOR_TYPE_FOC;
+	mcconf->sensor_mode = SENSOR_MODE_SENSORED;
+	mcconf->pwm_mode = PWM_MODE_SYNCHRONOUS;
+
+	// FOC
+	mcconf->foc_current_kp = 5;
+    mcconf->foc_current_ki = 3;
+    mcconf->foc_f_sw = 16000;
+//	float foc_dt_us;
+    mcconf->foc_encoder_offset = 120;
+//	bool foc_encoder_inverted;
+//	float foc_encoder_ratio;
+//	float foc_encoder_sin_offset;
+//	float foc_encoder_sin_gain;
+//	float foc_encoder_cos_offset;
+//	float foc_encoder_cos_gain;
+//	float foc_encoder_sincos_filter_constant;
+//	float foc_motor_l;
+//	float foc_motor_ld_lq_diff;
+//	float foc_motor_r;
+//	float foc_motor_flux_linkage;
+//	float foc_observer_gain;
+//	float foc_observer_gain_slow;
+//	float foc_pll_kp;
+//	float foc_pll_ki;
+//	float foc_duty_dowmramp_kp;
+//	float foc_duty_dowmramp_ki;
+//	float foc_openloop_rpm;
+//	float foc_openloop_rpm_low;
+//	float foc_d_gain_scale_start;
+//	float foc_d_gain_scale_max_mod;
+//	float foc_sl_openloop_hyst;
+//	float foc_sl_openloop_time;
+//	float foc_sl_openloop_time_lock;
+//	float foc_sl_openloop_time_ramp;
+	mcconf->foc_sensor_mode = FOC_SENSOR_MODE_HALL;
+
+	for(int i=0;i<8;i++){
+		mcconf->foc_hall_table[i] = hall_arr[i];
+	}
+	mcconf->foc_hall_interp_erpm = 200;
+//	float foc_sl_erpm;
+//	bool foc_sample_v0_v7;
+//	bool foc_sample_high_current;
+//	float foc_sat_comp;
+//	bool foc_temp_comp;
+//	float foc_temp_comp_base_temp;
+//	float foc_current_filter_const;
+//	mc_foc_cc_decoupling_mode foc_cc_decoupling;
+//	mc_foc_observer_type foc_observer_type;
+//	float foc_hfi_voltage_start;
+//	float foc_hfi_voltage_run;
+//	float foc_hfi_voltage_max;
+//	float foc_sl_erpm_hfi;
+//	uint16_t foc_hfi_start_samples;
+//	float foc_hfi_obs_ovr_sec;
+//	uint8_t foc_hfi_samples;
+
+	// GPDrive
+//	int gpd_buffer_notify_left;
+//	int gpd_buffer_interpol;
+//	float gpd_current_filter_const;
+//	float gpd_current_kp;
+//	float gpd_current_ki;
+
+	// Speed PID
+//	float s_pid_kp;
+//	float s_pid_ki;
+//	float s_pid_kd;
+//	float s_pid_kd_filter;
+//	float s_pid_min_erpm;
+//	bool s_pid_allow_braking;
+//	float s_pid_ramp_erpms_s;
+
+	// Pos PID
+//	float p_pid_kp;
+//	float p_pid_ki;
+//	float p_pid_kd;
+//	float p_pid_kd_filter;
+//	float p_pid_ang_div;
+
+	// Current controller
+//	float cc_startup_boost_duty;
+//	float cc_min_current;
+//	float cc_gain;
+//	float cc_ramp_step_max;
+
+	// Misc
+//	int32_t m_fault_stop_time_ms;
+//	float m_duty_ramp_step;
+//	float m_current_backoff_gain;
+//	uint32_t m_encoder_counts;
+//	sensor_port_mode m_sensor_port_mode;
+//	bool m_invert_direction;
+//	drv8301_oc_mode m_drv8301_oc_mode;
+//	int m_drv8301_oc_adj;
+//	float m_bldc_f_sw_min;
+//	float m_bldc_f_sw_max;
+//	float m_dc_f_sw;
+//	float m_ntc_motor_beta;
+//	out_aux_mode m_out_aux_mode;
+//	temp_sensor_type m_motor_temp_sens_type;
+//	float m_ptc_motor_coeff;
+//	int m_hall_extra_samples;
+
+	// Setup info
+	mcconf->si_motor_poles = 15;
+//	float si_gear_ratio;
+//	float si_wheel_diameter;
+	mcconf->si_battery_type = BATTERY_TYPE_LIION_3_0__4_2;
+	//	int si_battery_cells;
+//	float si_battery_ah;
+
+	// BMS Configuration
+//	bms_config bms;
+
+}

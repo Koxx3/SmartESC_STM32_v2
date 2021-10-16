@@ -33,16 +33,14 @@
 #include "system.h"
 #include "parameters_conversion.h"
 #include "cli_common.h"
+#include "tune.h"
+#include "conf_general.h"
 
 
 static void(* volatile send_func)(unsigned char *data, unsigned int len) = 0;
 static volatile int fw_version_sent_cnt = 0;
 static uint8_t send_buffer_global[PACKET_MAX_PL_LEN];
 static disp_pos_mode display_position_mode;
-
-extern MCT_Handle_t* pMCT[NBR_OF_MOTORS];
-extern MCI_Handle_t* pMCI[NBR_OF_MOTORS];
-extern PQD_MotorPowMeas_Handle_t *pMPM[NBR_OF_MOTORS];
 
 
 qd_t currComp;
@@ -69,351 +67,18 @@ void commands_send_packet(unsigned char *data, unsigned int len) {
 }
 
 void commands_send_mcconf(COMM_PACKET_ID packet_id, mc_configuration *mcconf) {
-	//chMtxLock(&send_buffer_mutex);
 	send_buffer_global[0] = packet_id;
 	int32_t len = confgenerator_serialize_mcconf(send_buffer_global + 1, mcconf);
 	commands_send_packet(send_buffer_global, len + 1);
-	//chMtxUnlock(&send_buffer_mutex);
 }
 
-#define CURRENT_FACTOR 317.73
-
-void commands_populate_stconf(mc_configuration *mcconf) {
-
-	// Limits
-		mcconf->l_current_max = SpeednTorqCtrlM1.MaxPositiveTorque / CURRENT_FACTOR;
-		mcconf->l_current_min  = SpeednTorqCtrlM1.MinNegativeTorque  / CURRENT_FACTOR;
-//		float l_in_current_max;
-//		float l_in_current_min;
-		mcconf->l_abs_current_max = 60;
-//		mcconf->l_min_erpm = SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit / (1.0/(_RPM / SPEED_UNIT)) * HALL_M1._Super.bElToMecRatio;
-//		mcconf->l_max_erpm = SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit / (1.0/(_RPM / SPEED_UNIT)) * HALL_M1._Super.bElToMecRatio;
-//		float l_erpm_start;
-//		float l_max_erpm_fbrake;
-//		float l_max_erpm_fbrake_cc;
-//		mcconf->l_min_vin = RealBusVoltageSensorParamsM1.UnderVoltageThreshold / VOLT_SCALING;
-//		mcconf->l_max_vin = RealBusVoltageSensorParamsM1.OverVoltageThreshold / VOLT_SCALING;
-//		mcconf->l_battery_cut_end = RealBusVoltageSensorParamsM1.UnderVoltageThreshold / VOLT_SCALING;
-//		mcconf->l_battery_cut_start = RealBusVoltageSensorParamsM1.OverVoltageThreshold / VOLT_SCALING;
-//		bool l_slow_abs_current;
-//		float l_temp_fet_start;
-//		float l_temp_fet_end;
-//		float l_temp_motor_start;
-//		float l_temp_motor_end;
-//		float l_temp_accel_dec;
-//		float l_min_duty;
-//		float l_max_duty;
-//		float l_watt_max;
-//		float l_watt_min;
-//		float l_current_max_scale;
-//		float l_current_min_scale;
-//		float l_duty_start;
-//		// Overridden limits (Computed during runtime)
-//		float lo_current_max;
-//		float lo_current_min;
-//		float lo_in_current_max;
-//		float lo_in_current_min;
-//		float lo_current_motor_max_now;
-//		float lo_current_motor_min_now;
 
 
-
-
-	// Hall sensor
-	for(int i=0;i<8;i++){
-		mcconf->hall_table[i] = HALL_M1.lut[i];
-	}
-
-	// BLDC switching and drive
-	mcconf->motor_type = MOTOR_TYPE_FOC;
-	mcconf->sensor_mode = SENSOR_MODE_SENSORED;
-	mcconf->pwm_mode = PWM_MODE_SYNCHRONOUS;
-
-	// FOC
-	PIDIqHandle_M1.hKpGain = mcconf->foc_current_kp * 100;
-    PIDIqHandle_M1.hKiGain = mcconf->foc_current_ki * 100;
-//	float foc_f_sw;
-//	float foc_dt_us;
-//	float foc_encoder_offset;
-//	bool foc_encoder_inverted;
-//	float foc_encoder_ratio;
-//	float foc_encoder_sin_offset;
-//	float foc_encoder_sin_gain;
-//	float foc_encoder_cos_offset;
-//	float foc_encoder_cos_gain;
-//	float foc_encoder_sincos_filter_constant;
-//	float foc_motor_l;
-//	float foc_motor_ld_lq_diff;
-//	float foc_motor_r;
-//	float foc_motor_flux_linkage;
-//	float foc_observer_gain;
-//	float foc_observer_gain_slow;
-//	float foc_pll_kp;
-//	float foc_pll_ki;
-//	float foc_duty_dowmramp_kp;
-//	float foc_duty_dowmramp_ki;
-//	float foc_openloop_rpm;
-//	float foc_openloop_rpm_low;
-//	float foc_d_gain_scale_start;
-//	float foc_d_gain_scale_max_mod;
-//	float foc_sl_openloop_hyst;
-//	float foc_sl_openloop_time;
-//	float foc_sl_openloop_time_lock;
-//	float foc_sl_openloop_time_ramp;
-	mcconf->foc_sensor_mode = FOC_SENSOR_MODE_HALL;
-
-	for(int i=0;i<8;i++){
-		mcconf->hall_table[i] = HALL_M1.lut[i];
-	}
-	HALL_M1.SwitchSpeed = (float)mcconf->foc_hall_interp_erpm / (float)HALL_M1._Super.bElToMecRatio;
-//	float foc_sl_erpm;
-//	bool foc_sample_v0_v7;
-//	bool foc_sample_high_current;
-//	float foc_sat_comp;
-//	bool foc_temp_comp;
-//	float foc_temp_comp_base_temp;
-//	float foc_current_filter_const;
-//	mc_foc_cc_decoupling_mode foc_cc_decoupling;
-//	mc_foc_observer_type foc_observer_type;
-//	float foc_hfi_voltage_start;
-//	float foc_hfi_voltage_run;
-//	float foc_hfi_voltage_max;
-//	float foc_sl_erpm_hfi;
-//	uint16_t foc_hfi_start_samples;
-//	float foc_hfi_obs_ovr_sec;
-//	uint8_t foc_hfi_samples;
-
-	// GPDrive
-//	int gpd_buffer_notify_left;
-//	int gpd_buffer_interpol;
-//	float gpd_current_filter_const;
-//	float gpd_current_kp;
-//	float gpd_current_ki;
-
-	// Speed PID
-//	float s_pid_kp;
-//	float s_pid_ki;
-//	float s_pid_kd;
-//	float s_pid_kd_filter;
-//	float s_pid_min_erpm;
-//	bool s_pid_allow_braking;
-//	float s_pid_ramp_erpms_s;
-
-	// Pos PID
-//	float p_pid_kp;
-//	float p_pid_ki;
-//	float p_pid_kd;
-//	float p_pid_kd_filter;
-//	float p_pid_ang_div;
-
-	// Current controller
-//	float cc_startup_boost_duty;
-//	float cc_min_current;
-//	float cc_gain;
-//	float cc_ramp_step_max;
-
-	// Misc
-//	int32_t m_fault_stop_time_ms;
-//	float m_duty_ramp_step;
-//	float m_current_backoff_gain;
-//	uint32_t m_encoder_counts;
-//	sensor_port_mode m_sensor_port_mode;
-//	bool m_invert_direction;
-//	drv8301_oc_mode m_drv8301_oc_mode;
-//	int m_drv8301_oc_adj;
-//	float m_bldc_f_sw_min;
-//	float m_bldc_f_sw_max;
-//	float m_dc_f_sw;
-//	float m_ntc_motor_beta;
-//	out_aux_mode m_out_aux_mode;
-//	temp_sensor_type m_motor_temp_sens_type;
-//	float m_ptc_motor_coeff;
-//	int m_hall_extra_samples;
-
-	// Setup info
-	mcconf->si_motor_poles = HALL_M1._Super.bElToMecRatio;
-//	float si_gear_ratio;
-//	float si_wheel_diameter;
-	mcconf->si_battery_type = BATTERY_TYPE_LIION_3_0__4_2;
-	//	int si_battery_cells;
-//	float si_battery_ah;
-
-	// BMS Configuration
-//	bms_config bms;
-
-}
-
-void commands_populate_mcconf(mc_configuration *mcconf) {
-
-	// Limits
-		mcconf->l_current_max = SpeednTorqCtrlM1.MaxPositiveTorque / CURRENT_FACTOR;
-		mcconf->l_current_min  = SpeednTorqCtrlM1.MinNegativeTorque  / CURRENT_FACTOR;
-//		float l_in_current_max;
-//		float l_in_current_min;
-		mcconf->l_abs_current_max = 60;
-		mcconf->l_min_erpm = SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit / (1.0/(_RPM / SPEED_UNIT)) * HALL_M1._Super.bElToMecRatio;
-		mcconf->l_max_erpm = SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit / (1.0/(_RPM / SPEED_UNIT)) * HALL_M1._Super.bElToMecRatio;
-//		float l_erpm_start;
-//		float l_max_erpm_fbrake;
-//		float l_max_erpm_fbrake_cc;
-		mcconf->l_min_vin = RealBusVoltageSensorParamsM1.UnderVoltageThreshold / VOLT_SCALING;
-		mcconf->l_max_vin = RealBusVoltageSensorParamsM1.OverVoltageThreshold / VOLT_SCALING;
-		mcconf->l_battery_cut_end = RealBusVoltageSensorParamsM1.UnderVoltageThreshold / VOLT_SCALING;
-		mcconf->l_battery_cut_start = RealBusVoltageSensorParamsM1.OverVoltageThreshold / VOLT_SCALING;
-//		bool l_slow_abs_current;
-//		float l_temp_fet_start;
-//		float l_temp_fet_end;
-//		float l_temp_motor_start;
-//		float l_temp_motor_end;
-//		float l_temp_accel_dec;
-//		float l_min_duty;
-//		float l_max_duty;
-//		float l_watt_max;
-//		float l_watt_min;
-//		float l_current_max_scale;
-//		float l_current_min_scale;
-//		float l_duty_start;
-//		// Overridden limits (Computed during runtime)
-//		float lo_current_max;
-//		float lo_current_min;
-//		float lo_in_current_max;
-//		float lo_in_current_min;
-//		float lo_current_motor_max_now;
-//		float lo_current_motor_min_now;
-
-
-
-
-	// Hall sensor
-	for(int i=0;i<8;i++){
-		mcconf->hall_table[i] = HALL_M1.lut[i];
-	}
-
-	// BLDC switching and drive
-	mcconf->motor_type = MOTOR_TYPE_FOC;
-	mcconf->sensor_mode = SENSOR_MODE_SENSORED;
-	mcconf->pwm_mode = PWM_MODE_SYNCHRONOUS;
-
-	// FOC
-	mcconf->foc_current_kp = PIDIqHandle_M1.hKpGain / 100.0;
-    mcconf->foc_current_ki = PIDIqHandle_M1.hKiGain / 100.0;
-    mcconf->foc_f_sw = PWM_FREQUENCY;
-//	float foc_dt_us;
-    mcconf->foc_encoder_offset = ANG_TO_DEG(HALL_M1.PhaseShift);
-//	bool foc_encoder_inverted;
-//	float foc_encoder_ratio;
-//	float foc_encoder_sin_offset;
-//	float foc_encoder_sin_gain;
-//	float foc_encoder_cos_offset;
-//	float foc_encoder_cos_gain;
-//	float foc_encoder_sincos_filter_constant;
-//	float foc_motor_l;
-//	float foc_motor_ld_lq_diff;
-//	float foc_motor_r;
-//	float foc_motor_flux_linkage;
-//	float foc_observer_gain;
-//	float foc_observer_gain_slow;
-//	float foc_pll_kp;
-//	float foc_pll_ki;
-//	float foc_duty_dowmramp_kp;
-//	float foc_duty_dowmramp_ki;
-//	float foc_openloop_rpm;
-//	float foc_openloop_rpm_low;
-//	float foc_d_gain_scale_start;
-//	float foc_d_gain_scale_max_mod;
-//	float foc_sl_openloop_hyst;
-//	float foc_sl_openloop_time;
-//	float foc_sl_openloop_time_lock;
-//	float foc_sl_openloop_time_ramp;
-	mcconf->foc_sensor_mode = FOC_SENSOR_MODE_HALL;
-
-	for(int i=0;i<8;i++){
-		mcconf->foc_hall_table[i] = HALL_M1.lut[i];
-	}
-	mcconf->foc_hall_interp_erpm = (float)HALL_M1.SwitchSpeed * (float)HALL_M1._Super.bElToMecRatio;
-//	float foc_sl_erpm;
-//	bool foc_sample_v0_v7;
-//	bool foc_sample_high_current;
-//	float foc_sat_comp;
-//	bool foc_temp_comp;
-//	float foc_temp_comp_base_temp;
-//	float foc_current_filter_const;
-//	mc_foc_cc_decoupling_mode foc_cc_decoupling;
-//	mc_foc_observer_type foc_observer_type;
-//	float foc_hfi_voltage_start;
-//	float foc_hfi_voltage_run;
-//	float foc_hfi_voltage_max;
-//	float foc_sl_erpm_hfi;
-//	uint16_t foc_hfi_start_samples;
-//	float foc_hfi_obs_ovr_sec;
-//	uint8_t foc_hfi_samples;
-
-	// GPDrive
-//	int gpd_buffer_notify_left;
-//	int gpd_buffer_interpol;
-//	float gpd_current_filter_const;
-//	float gpd_current_kp;
-//	float gpd_current_ki;
-
-	// Speed PID
-//	float s_pid_kp;
-//	float s_pid_ki;
-//	float s_pid_kd;
-//	float s_pid_kd_filter;
-//	float s_pid_min_erpm;
-//	bool s_pid_allow_braking;
-//	float s_pid_ramp_erpms_s;
-
-	// Pos PID
-//	float p_pid_kp;
-//	float p_pid_ki;
-//	float p_pid_kd;
-//	float p_pid_kd_filter;
-//	float p_pid_ang_div;
-
-	// Current controller
-//	float cc_startup_boost_duty;
-//	float cc_min_current;
-//	float cc_gain;
-//	float cc_ramp_step_max;
-
-	// Misc
-//	int32_t m_fault_stop_time_ms;
-//	float m_duty_ramp_step;
-//	float m_current_backoff_gain;
-//	uint32_t m_encoder_counts;
-//	sensor_port_mode m_sensor_port_mode;
-//	bool m_invert_direction;
-//	drv8301_oc_mode m_drv8301_oc_mode;
-//	int m_drv8301_oc_adj;
-//	float m_bldc_f_sw_min;
-//	float m_bldc_f_sw_max;
-//	float m_dc_f_sw;
-//	float m_ntc_motor_beta;
-//	out_aux_mode m_out_aux_mode;
-//	temp_sensor_type m_motor_temp_sens_type;
-//	float m_ptc_motor_coeff;
-//	int m_hall_extra_samples;
-
-	// Setup info
-	mcconf->si_motor_poles = HALL_M1._Super.bElToMecRatio;
-//	float si_gear_ratio;
-//	float si_wheel_diameter;
-	mcconf->si_battery_type = BATTERY_TYPE_LIION_3_0__4_2;
-	//	int si_battery_cells;
-//	float si_battery_ah;
-
-	// BMS Configuration
-//	bms_config bms;
-
-}
 
 //Current (digit) = [Current(Amp) * 65536 * Rshunt * Aop] / Vdd micro.
 
 
-
-
-int16_t current_to_torque(int32_t curr_ma){
+int32_t current_to_torque(int32_t curr_ma){
 	float ret = curr_ma * CURRENT_FACTOR_mA;
 	return ret;
 
@@ -523,7 +188,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 			}
 			if (mask & ((uint32_t)1 << 3)) {
 				//buffer_append_float32(send_buffer, mc_interface_read_reset_avg_input_current(), 1e2, &ind);
-				buffer_append_float32(send_buffer, (float)MPM_GetAvrgElMotorPowerW(pMPM[M1])/(float)VBS_GetAvBusVoltage_V(pMCT[M1]->pBusVoltageSensor), 1e2, &ind);
+				buffer_append_float32(send_buffer, (float)pMPM[M1]->_super.hAvrgElMotorPowerW/(float)VBS_GetAvBusVoltage_V(pMCT[M1]->pBusVoltageSensor), 1e2, &ind);
 			}
 			if (mask & ((uint32_t)1 << 4)) {
 				//buffer_append_float32(send_buffer, mc_interface_read_reset_avg_id(), 1e2, &ind);
@@ -614,7 +279,13 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					MCI_ExecTorqueRamp(pMCI[M1], MCI_GetTeref(pMCI[M1]),0);
 				}
 				int16_t q = current_to_torque(buffer_get_int32(data, &ind));
+
 				if(q != currComp.q){
+					if(q > SpeednTorqCtrlM1.MaxPositiveTorque){
+						q = SpeednTorqCtrlM1.MaxPositiveTorque;
+					}else if (q < SpeednTorqCtrlM1.MinNegativeTorque){
+						q = SpeednTorqCtrlM1.MinNegativeTorque;
+					}
 					currComp.q = q;
 					MCI_SetCurrentReferences(pMCI[M1],currComp);
 				}
@@ -623,8 +294,13 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 			case COMM_SET_CURRENT_BRAKE: {
 				int32_t ind = 0;
-				int16_t q = current_to_torque(buffer_get_int32(data, &ind))*-1;
+				int32_t q = current_to_torque(buffer_get_int32(data, &ind))*-1;
 				if(q != currComp.q){
+					if(q > SpeednTorqCtrlM1.MaxPositiveTorque){
+						q = SpeednTorqCtrlM1.MaxPositiveTorque;
+					}else if (q < SpeednTorqCtrlM1.MinNegativeTorque){
+						q = SpeednTorqCtrlM1.MinNegativeTorque;
+					}
 					currComp.q = q;
 					MCI_SetCurrentReferences(pMCI[M1],currComp);
 				}
@@ -671,8 +347,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 				case COMM_SET_MCCONF: {
 					mc_configuration *mcconf = pvPortMalloc(sizeof(mc_configuration));
-					//*mcconf = *mc_interface_get_configuration();
-					memset(mcconf,0,sizeof(mc_configuration));
+					*mcconf = *mc_interface_get_configuration();
 
 
 					if (confgenerator_deserialize_mcconf(data, mcconf)) {
@@ -687,7 +362,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						mcconf->lo_current_motor_max_now = mcconf->lo_current_max;
 						mcconf->lo_current_motor_min_now = mcconf->lo_current_min;
 
-						commands_populate_stconf(mcconf);
+						conf_general_setup_mc(mcconf);
 
 						//commands_apply_mcconf_hw_limits(mcconf);
 						//conf_general_store_mc_configuration(mcconf, mc_interface_get_motor_thread() == 2);
@@ -715,13 +390,10 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					mc_configuration *mcconf = pvPortMalloc(sizeof(mc_configuration));
 
 					if (packet_id == COMM_GET_MCCONF) {
-						//*mcconf = *mc_interface_get_configuration();
-						memset(mcconf,0,sizeof(mc_configuration));
+						*mcconf = *mc_interface_get_configuration();
 					} else {
-						//confgenerator_set_defaults_mcconf(mcconf);
-						memset(mcconf,0,sizeof(mc_configuration));
+						confgenerator_set_defaults_mcconf(mcconf);
 					}
-					commands_populate_mcconf(mcconf);
 					commands_send_mcconf(packet_id, mcconf);
 					vPortFree(mcconf);
 				} break;
@@ -998,8 +670,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				case COMM_SET_MCCONF_TEMP:
 				case COMM_SET_MCCONF_TEMP_SETUP: {
 					mc_configuration *mcconf = pvPortMalloc(sizeof(mc_configuration));
-					//*mcconf = *mc_interface_get_configuration();
-					memset(mcconf,0,sizeof(mc_configuration));
+					*mcconf = *mc_interface_get_configuration();
 
 					int32_t ind = 0;
 					bool store = data[ind++];
@@ -1099,8 +770,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 				case COMM_GET_MCCONF_TEMP: {
 					mc_configuration *mcconf = pvPortMalloc(sizeof(mc_configuration));
-					//*mcconf = *mc_interface_get_configuration();
-					memset(mcconf,0,sizeof(mc_configuration));
+					*mcconf = *mc_interface_get_configuration();
 					int32_t ind = 0;
 					uint8_t send_buffer[60];
 
@@ -1321,7 +991,20 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				case COMM_DETECT_MOTOR_R_L:
 				case COMM_DETECT_MOTOR_FLUX_LINKAGE:
 				case COMM_DETECT_ENCODER:
-				case COMM_DETECT_HALL_FOC:
+					break;
+				case COMM_DETECT_HALL_FOC:{
+					int32_t ind = 0;
+					uint8_t hall_tab[8];
+					uint8_t send_buffer[50];
+					bool res = tune_hall_detect(buffer_get_int32(data, &ind), hall_tab);
+					ind=0;
+					send_buffer[ind++] = COMM_DETECT_HALL_FOC;
+					memcpy(send_buffer + ind, hall_tab, 8);
+					ind += 8;
+					send_buffer[ind++] = res ? 0 : 1;
+					reply_func(send_buffer, ind);
+
+				} break;
 				case COMM_DETECT_MOTOR_FLUX_LINKAGE_OPENLOOP:
 				case COMM_DETECT_APPLY_ALL_FOC:
 				case COMM_PING_CAN:
@@ -1335,10 +1018,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				case COMM_BM_MAP_PINS_NRF5X:
 				case COMM_BM_MEM_READ:
 				case COMM_GET_IMU_CALIBRATION:
-					if(packet_id == COMM_DETECT_HALL_FOC){
-						int32_t ind = 0;
-						CMD_tune(buffer_get_int32(data, &ind));
-					}/*
+					/*
 					if (!is_blocking) {
 						memcpy(blocking_thread_cmd_buffer, data - 1, len + 1);
 						blocking_thread_cmd_len = len + 1;
