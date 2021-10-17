@@ -35,6 +35,7 @@
 #include "cli_common.h"
 #include "tune.h"
 #include "conf_general.h"
+#include "VescToSTM.h"
 
 
 static void(* volatile send_func)(unsigned char *data, unsigned int len) = 0;
@@ -43,13 +44,8 @@ static uint8_t send_buffer_global[PACKET_MAX_PL_LEN];
 static disp_pos_mode display_position_mode;
 
 
-qd_t currComp;
 
 
-void timeout_reset(){
-
-
-};
 
 /**
  * Send a packet using the set send function.
@@ -72,17 +68,6 @@ void commands_send_mcconf(COMM_PACKET_ID packet_id, mc_configuration *mcconf) {
 	commands_send_packet(send_buffer_global, len + 1);
 }
 
-
-
-
-//Current (digit) = [Current(Amp) * 65536 * Rshunt * Aop] / Vdd micro.
-
-
-int32_t current_to_torque(int32_t curr_ma){
-	float ret = curr_ma * CURRENT_FACTOR_mA;
-	return ret;
-
-}
 
 
 
@@ -175,40 +160,33 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 			}
 
 			if (mask & ((uint32_t)1 << 0)) {
-				//buffer_append_float16(send_buffer, mc_interface_temp_fet_filtered(), 1e1, &ind);
-				buffer_append_float16(send_buffer, NTC_GetAvTemp_C(pMCT[M1]->pTemperatureSensor) , 1e1, &ind);
+				buffer_append_float16(send_buffer, VescToSTM_get_temperature() , 1e1, &ind);
 			}
 			if (mask & ((uint32_t)1 << 1)) {
 				//buffer_append_float16(send_buffer, mc_interface_temp_motor_filtered(), 1e1, &ind);
 				buffer_append_float16(send_buffer, 0 , 1e1, &ind);
 			}
 			if (mask & ((uint32_t)1 << 2)) {
-				//buffer_append_float32(send_buffer, mc_interface_read_reset_avg_motor_current(), 1e2, &ind);
-				buffer_append_float32(send_buffer, MCI_GetPhaseCurrentAmplitude(pMCI[M1])/CURRENT_FACTOR, 1e2, &ind);
+				buffer_append_float32(send_buffer, VescToSTM_get_phase_current(), 1e2, &ind);
 			}
 			if (mask & ((uint32_t)1 << 3)) {
-				//buffer_append_float32(send_buffer, mc_interface_read_reset_avg_input_current(), 1e2, &ind);
-				buffer_append_float32(send_buffer, (float)pMPM[M1]->_super.hAvrgElMotorPowerW/(float)VBS_GetAvBusVoltage_V(pMCT[M1]->pBusVoltageSensor), 1e2, &ind);
+				buffer_append_float32(send_buffer, VescToSTM_get_input_current(), 1e2, &ind);
 			}
 			if (mask & ((uint32_t)1 << 4)) {
-				//buffer_append_float32(send_buffer, mc_interface_read_reset_avg_id(), 1e2, &ind);
-				buffer_append_float32(send_buffer, pMCI[M1]->pFOCVars->Iqd.d / CURRENT_FACTOR, 1e2, &ind);
+				buffer_append_float32(send_buffer, VescToSTM_get_id(), 1e2, &ind);
 			}
 			if (mask & ((uint32_t)1 << 5)) {
-				//buffer_append_float32(send_buffer, mc_interface_read_reset_avg_iq(), 1e2, &ind);
-				buffer_append_float32(send_buffer, pMCI[M1]->pFOCVars->Iqd.q / CURRENT_FACTOR, 1e2, &ind);
+				buffer_append_float32(send_buffer, VescToSTM_get_iq(), 1e2, &ind);
 			}
 			if (mask & ((uint32_t)1 << 6)) {
 				//buffer_append_float16(send_buffer, mc_interface_get_duty_cycle_now(), 1e3, &ind);
 				buffer_append_float16(send_buffer, 0, 1e3, &ind);
 			}
 			if (mask & ((uint32_t)1 << 7)) {
-				//buffer_append_float32(send_buffer, mc_interface_get_rpm(), 1e0, &ind);
-				buffer_append_float32(send_buffer, MCI_GetAvrgMecSpeedUnit( pMCI[M1] ) * HALL_M1._Super.bElToMecRatio, 1e0, &ind);
+				buffer_append_float32(send_buffer, VescToSTM_get_erpm(), 1e0, &ind);
 			}
 			if (mask & ((uint32_t)1 << 8)) {
-				//buffer_append_float16(send_buffer, GET_INPUT_VOLTAGE(), 1e1, &ind);
-				buffer_append_float16(send_buffer, VBS_GetAvBusVoltage_V(pMCT[M1]->pBusVoltageSensor), 1e1, &ind);
+				buffer_append_float16(send_buffer, VescToSTM_get_bus_voltage(), 1e1, &ind);
 			}
 			if (mask & ((uint32_t)1 << 9)) {
 				//buffer_append_float32(send_buffer, mc_interface_get_amp_hours(false), 1e4, &ind);
@@ -257,11 +235,11 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 			}
 			if (mask & ((uint32_t)1 << 19)) {
 				//buffer_append_float32(send_buffer, mc_interface_read_reset_avg_vd(), 1e3, &ind);
-				buffer_append_float32(send_buffer, pMCI[M1]->pFOCVars->Vqd.d / VOLT_SCALING, 1e3, &ind);
+				buffer_append_float32(send_buffer, VescToSTM_get_Vd(), 1e3, &ind);
 			}
 			if (mask & ((uint32_t)1 << 20)) {
 				//buffer_append_float32(send_buffer, mc_interface_read_reset_avg_vq(), 1e3, &ind);
-				buffer_append_float32(send_buffer, pMCI[M1]->pFOCVars->Vqd.q / VOLT_SCALING, 1e3, &ind);
+				buffer_append_float32(send_buffer, VescToSTM_get_Vq(), 1e3, &ind);
 			}
 
 			reply_func(send_buffer, ind);
@@ -270,60 +248,38 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 			case COMM_SET_DUTY: {
 				//int32_t ind = 0;
 				//mc_interface_set_duty((float)buffer_get_int32(data, &ind) / 100000.0);
-				timeout_reset();
+				VescToSTM_timeout_reset();
 			} break;
 
 			case COMM_SET_CURRENT: {
 				int32_t ind = 0;
-				if(MCI_GetControlMode(pMCI[M1]) != STC_TORQUE_MODE){
-					MCI_ExecTorqueRamp(pMCI[M1], MCI_GetTeref(pMCI[M1]),0);
-				}
-				int16_t q = current_to_torque(buffer_get_int32(data, &ind));
-
-				if(q != currComp.q){
-					if(q > SpeednTorqCtrlM1.MaxPositiveTorque){
-						q = SpeednTorqCtrlM1.MaxPositiveTorque;
-					}else if (q < SpeednTorqCtrlM1.MinNegativeTorque){
-						q = SpeednTorqCtrlM1.MinNegativeTorque;
-					}
-					currComp.q = q;
-					MCI_SetCurrentReferences(pMCI[M1],currComp);
-				}
-				timeout_reset();
+				VescToSTM_set_torque(buffer_get_int32(data, &ind));
+				VescToSTM_timeout_reset();
 			} break;
 
 			case COMM_SET_CURRENT_BRAKE: {
 				int32_t ind = 0;
-				int32_t q = current_to_torque(buffer_get_int32(data, &ind))*-1;
-				if(q != currComp.q){
-					if(q > SpeednTorqCtrlM1.MaxPositiveTorque){
-						q = SpeednTorqCtrlM1.MaxPositiveTorque;
-					}else if (q < SpeednTorqCtrlM1.MinNegativeTorque){
-						q = SpeednTorqCtrlM1.MinNegativeTorque;
-					}
-					currComp.q = q;
-					MCI_SetCurrentReferences(pMCI[M1],currComp);
-				}
-				timeout_reset();
+				VescToSTM_set_brake(buffer_get_int32(data, &ind)*-1);
+				VescToSTM_timeout_reset();
 			} break;
 
 			case COMM_SET_RPM: {
 				int32_t ind = 0;
-				MCI_ExecSpeedRamp(pMCI[M1], buffer_get_int32(data, &ind) , 100);
-				timeout_reset();
+				VescToSTM_set_speed(buffer_get_int32(data, &ind));
+				VescToSTM_timeout_reset();
 			} break;
 
 			case COMM_SET_POS: {
 				//int32_t ind = 0;
 				//CMD_tune();
 				//mc_interface_set_pid_pos((float)buffer_get_int32(data, &ind) / 1000000.0);
-				timeout_reset();
+				VescToSTM_timeout_reset();
 			} break;
 
 			case COMM_SET_HANDBRAKE: {
 				//int32_t ind = 0;
 				//mc_interface_set_handbrake(buffer_get_float32(data, 1e3, &ind));
-				timeout_reset();
+				VescToSTM_timeout_reset();
 			} break;
 
 			case COMM_SET_DETECT: {
@@ -338,51 +294,49 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					}
 				}*/
 
-				timeout_reset();
+				VescToSTM_timeout_reset();
 			} break;
 
 			case COMM_SET_SERVO_POS: {
 
 				} break;
 
-				case COMM_SET_MCCONF: {
-					mc_configuration *mcconf = pvPortMalloc(sizeof(mc_configuration));
-					*mcconf = *mc_interface_get_configuration();
+			case COMM_SET_MCCONF: {
+				mc_configuration *mcconf = pvPortMalloc(sizeof(mc_configuration));
+				*mcconf = *mc_interface_get_configuration();
 
 
-					if (confgenerator_deserialize_mcconf(data, mcconf)) {
-						utils_truncate_number(&mcconf->l_current_max_scale , 0.0, 1.0);
-						utils_truncate_number(&mcconf->l_current_min_scale , 0.0, 1.0);
+				if (confgenerator_deserialize_mcconf(data, mcconf)) {
+					utils_truncate_number(&mcconf->l_current_max_scale , 0.0, 1.0);
+					utils_truncate_number(&mcconf->l_current_min_scale , 0.0, 1.0);
 
 
-						mcconf->lo_current_max = mcconf->l_current_max * mcconf->l_current_max_scale;
-						mcconf->lo_current_min = mcconf->l_current_min * mcconf->l_current_min_scale;
-						mcconf->lo_in_current_max = mcconf->l_in_current_max;
-						mcconf->lo_in_current_min = mcconf->l_in_current_min;
-						mcconf->lo_current_motor_max_now = mcconf->lo_current_max;
-						mcconf->lo_current_motor_min_now = mcconf->lo_current_min;
+					mcconf->lo_current_max = mcconf->l_current_max * mcconf->l_current_max_scale;
+					mcconf->lo_current_min = mcconf->l_current_min * mcconf->l_current_min_scale;
+					mcconf->lo_in_current_max = mcconf->l_in_current_max;
+					mcconf->lo_in_current_min = mcconf->l_in_current_min;
+					mcconf->lo_current_motor_max_now = mcconf->lo_current_max;
+					mcconf->lo_current_motor_min_now = mcconf->lo_current_min;
 
-						conf_general_setup_mc(mcconf);
+					conf_general_setup_mc(mcconf);
+					conf_general_store_mc_configuration(mcconf, 0);
 
-						//commands_apply_mcconf_hw_limits(mcconf);
-						//conf_general_store_mc_configuration(mcconf, mc_interface_get_motor_thread() == 2);
-						//mc_interface_set_configuration(mcconf);
-						//chThdSleepMilliseconds(200);
-
-						int32_t ind = 0;
-						uint8_t send_buffer[50];
-						send_buffer[ind++] = packet_id;
-						reply_func(send_buffer, ind);
-					} else {
-						//commands_printf("Warning: Could not set mcconf due to wrong signature");
-					}
+					vTaskDelay(100);
 
 					int32_t ind = 0;
 					uint8_t send_buffer[50];
 					send_buffer[ind++] = packet_id;
 					reply_func(send_buffer, ind);
+				} else {
+					//commands_printf("Warning: Could not set mcconf due to wrong signature");
+				}
 
-					vPortFree(mcconf);
+				int32_t ind = 0;
+				uint8_t send_buffer[50];
+				send_buffer[ind++] = packet_id;
+				reply_func(send_buffer, ind);
+
+				vPortFree(mcconf);
 				} break;
 
 				case COMM_GET_MCCONF:
@@ -426,7 +380,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 				case COMM_ALIVE:
 					//SHUTDOWN_RESET();
-					timeout_reset();
+					VescToSTM_timeout_reset();
 					break;
 
 				case COMM_GET_DECODED_PPM: {
@@ -504,7 +458,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				} break;
 
 				case COMM_GPD_SET_FSW: {
-					timeout_reset();
+					VescToSTM_timeout_reset();
 					//int32_t ind = 0;
 					//gpdrive_set_switching_frequency((float)buffer_get_int32(data, &ind));
 				} break;
@@ -519,7 +473,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				} break;
 
 				case COMM_GPD_FILL_BUFFER: {
-					timeout_reset();
+					VescToSTM_timeout_reset();
 					//int32_t ind = 0;
 					//while (ind < (int)len) {
 						//gpdrive_add_buffer_sample(buffer_get_float32_auto(data, &ind));
@@ -527,19 +481,19 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				} break;
 
 				case COMM_GPD_OUTPUT_SAMPLE: {
-					timeout_reset();
+					VescToSTM_timeout_reset();
 					//int32_t ind = 0;
 					//gpdrive_output_sample(buffer_get_float32_auto(data, &ind));
 				} break;
 
 				case COMM_GPD_SET_MODE: {
-					timeout_reset();
+					VescToSTM_timeout_reset();
 					//int32_t ind = 0;
 					//gpdrive_set_mode(data[ind++]);
 				} break;
 
 				case COMM_GPD_FILL_BUFFER_INT8: {
-					timeout_reset();
+					VescToSTM_timeout_reset();
 					//int32_t ind = 0;
 					//while (ind < (int)len) {
 						//gpdrive_add_buffer_sample_int((int8_t)data[ind++]);
@@ -547,7 +501,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				} break;
 
 				case COMM_GPD_FILL_BUFFER_INT16: {
-					timeout_reset();
+					VescToSTM_timeout_reset();
 					//int32_t ind = 0;
 					//while (ind < (int)len) {
 						//gpdrive_add_buffer_sample_int(buffer_get_int16(data, &ind));
@@ -664,7 +618,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				case COMM_SET_ODOMETER: {
 					//int32_t ind = 0;
 					//mc_interface_set_odometer(buffer_get_uint32(data, &ind));
-					timeout_reset();
+					VescToSTM_timeout_reset();
 				} break;
 
 				case COMM_SET_MCCONF_TEMP:
@@ -679,15 +633,6 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					bool divide_by_controllers = data[ind++];
 
 					float controller_num = 1.0;
-
-					/*if (divide_by_controllers) {
-						for (int i = 0;i < CAN_STATUS_MSGS_TO_STORE;i++) {
-							can_status_msg *msg = comm_can_get_status_msg_index(i);
-							if (msg->id >= 0 && UTILS_AGE_S(msg->rx_time) < 0.1) {
-								controller_num += 1.0;
-							}
-						}
-					}*/
 
 					mcconf->l_current_min_scale = buffer_get_float32_auto(data, &ind);
 					mcconf->l_current_max_scale = buffer_get_float32_auto(data, &ind);
@@ -741,22 +686,6 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					//	conf_general_store_mc_configuration(mcconf, mc_interface_get_motor_thread() == 2);
 					//}
 
-					//mc_interface_set_configuration(mcconf);
-
-					if (forward_can) {
-						data[-1] = COMM_SET_MCCONF_TEMP;
-						data[1] = 0; // No more forward
-						data[2] = 0; // No ack
-						data[3] = 0; // No dividing, see comment above
-
-						// TODO: Maybe broadcast on CAN-bus?
-						/*for (int i = 0;i < CAN_STATUS_MSGS_TO_STORE;i++) {
-							can_status_msg *msg = comm_can_get_status_msg_index(i);
-							if (msg->id >= 0 && UTILS_AGE_S(msg->rx_time) < 0.1) {
-								comm_can_send_buffer(msg->id, data - 1, len + 1, 0);
-							}
-						}*/
-					}
 
 					if (ack) {
 						ind = 0;
@@ -904,7 +833,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				case COMM_SET_CURRENT_REL: {
 					//int32_t ind = 0;
 					//mc_interface_set_current_rel(buffer_get_float32(data, 1e5, &ind));
-					timeout_reset();
+					VescToSTM_timeout_reset();
 				} break;
 
 				case COMM_CAN_FWD_FRAME: {
@@ -996,7 +925,11 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					int32_t ind = 0;
 					uint8_t hall_tab[8];
 					uint8_t send_buffer[50];
-					bool res = tune_hall_detect(buffer_get_int32(data, &ind), hall_tab);
+					int32_t offset;
+					bool res = tune_hall_detect(buffer_get_int32(data, &ind), hall_tab, &offset);
+					if(res){
+						mc_conf.foc_encoder_offset = offset;
+					}
 					ind=0;
 					send_buffer[ind++] = COMM_DETECT_HALL_FOC;
 					memcpy(send_buffer + ind, hall_tab, 8);

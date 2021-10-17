@@ -32,6 +32,7 @@ mc_configuration mc_conf;
 
 void conf_general_init(void) {
 	conf_general_read_mc_configuration(&mc_conf, 0);
+	conf_general_setup_mc(&mc_conf);
 
 }
 
@@ -57,7 +58,7 @@ unsigned conf_calc_crc(mc_configuration* conf_in, bool is_motor_2) {
 	return crc_new;
 }
 
-uint8_t Flash_ReadByte(uint8_t x){
+uint8_t Flash_ReadByte(uint32_t x){
 	uint8_t data[4];
 	*(uint32_t*)data = (*(__IO uint32_t*)(ADDR_FLASH_PAGE_63+((x/4)*4)));
 	return data[x%4];
@@ -104,7 +105,8 @@ void conf_general_read_mc_configuration(mc_configuration *conf, bool is_motor_2)
  * A pointer to the configuration that should be stored.
  */
 bool conf_general_store_mc_configuration(mc_configuration *conf, bool is_motor_2) {
-
+	VescToSTM_stop_motor();
+	vTaskDelay(300);
 
 	bool is_ok = true;
 	uint8_t *conf_addr = (uint8_t*)conf;
@@ -141,6 +143,9 @@ bool conf_general_store_mc_configuration(mc_configuration *conf, bool is_motor_2
 	}
 
 	HAL_FLASH_Lock();
+	vTaskDelay(500);
+	VescToSTM_start_motor();
+	VescToSTM_set_torque(0);
 
 	return is_ok;
 }
@@ -247,9 +252,8 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 //	float foc_sl_openloop_time_lock;
 //	float foc_sl_openloop_time_ramp;
 	mcconf->foc_sensor_mode = FOC_SENSOR_MODE_HALL;
-
 	for(int i=0;i<8;i++){
-		 HALL_M1.lut[i] = mcconf->hall_table[i];
+		 HALL_M1.lut[i] = mcconf->foc_hall_table[i];
 	}
 	HALL_M1.SwitchSpeed = (float)mcconf->foc_hall_interp_erpm / (float)HALL_M1._Super.bElToMecRatio;
 //	float foc_sl_erpm;

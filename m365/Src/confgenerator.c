@@ -733,7 +733,7 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 	mcconf->foc_sensor_mode = FOC_SENSOR_MODE_HALL;
 
 	for(int i=0;i<8;i++){
-		mcconf->foc_hall_table[i] = hall_arr[i];
+		mcconf->foc_hall_table[i] = i;
 	}
 	mcconf->foc_hall_interp_erpm = 200;
 //	float foc_sl_erpm;

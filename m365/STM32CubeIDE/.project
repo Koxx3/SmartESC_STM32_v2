@@ -67,6 +67,16 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Src/VescDatatypes.h</locationURI>
 		</link>
 		<link>
+			<name>Application/User/VescToSTM.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/VescToSTM.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VescToSTM.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/VescToSTM.h</locationURI>
+		</link>
+		<link>
 			<name>Application/User/buffer.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Src/buffer.c</locationURI>

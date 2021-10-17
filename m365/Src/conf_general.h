@@ -31,7 +31,7 @@
 #define ADDR_FLASH_PAGE_63    ((uint32_t)0x0801FC00) /* Base @ of Page 127, 1 Kbytes */
 
 
-
+extern mc_configuration mc_conf;
 
 // Functions
 void conf_general_init(void);

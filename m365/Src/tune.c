@@ -26,7 +26,7 @@ static int16_t current_to_torque(int32_t curr_ma){
 
 }
 
-uint8_t tune_hall_detect(uint32_t current, uint8_t *hall_table){
+uint8_t tune_hall_detect(uint32_t current, uint8_t *hall_table, int32_t *offset){
 
 
 	MCI_ExecTorqueRamp(pMCI[M1], MCI_GetTeref(pMCI[M1]),0);
@@ -150,6 +150,7 @@ uint8_t tune_hall_detect(uint32_t current, uint8_t *hall_table){
 	phase_shift/=6;
 	phase_shift+=_90DEG;
 	HALL_M1.PhaseShift = phase_shift;
+	*offset = phase_shift;
 
 //	ttprintf("Set phase shift to: %.2f\r\n", (float)HALL_M1.PhaseShift/(65536.0/360.0));
 

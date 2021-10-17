@@ -33,6 +33,7 @@
 #include <string.h>
 #include "packet.h"
 #include "VescCommand.h"
+#include "VescToSTM.h"
 
 StreamBufferHandle_t UART_RX;
 
@@ -52,6 +53,15 @@ const osThreadAttr_t task_cli_attributes = {
 };
 
 TERMINAL_HANDLE * cli_handle;
+
+osThreadId_t task_regulator_handle;
+const osThreadAttr_t task_regulator_attributes = {
+  .name = "REG",
+  .priority = (osPriority_t) osPriorityAboveNormal,
+  .stack_size = 128 * 4
+};
+
+TERMINAL_HANDLE * regulator_handle;
 
 
 void _putchar(char character){
@@ -109,10 +119,24 @@ void task_cli(void * argument)
 	}
 }
 
+void task_regulator(void * argument)
+{
+
+  /* Infinite loop */
+	for(;;)
+	{
+		VescToSTM_handle_brake();
+		VescToSTM_handle_timeout();
+
+		vTaskDelay(100);
+	}
+}
+
 void task_cli_init(){
 	HAL_NVIC_SetPriority(USART3_IRQn, 5, 0);
 	cli_handle = NULL;
 	UART_RX = xStreamBufferCreate(STREAMBUFFER_RX_SIZE,1);
 	task_cli_handle = osThreadNew(task_cli, cli_handle, &task_cli_attributes);
+	task_regulator_handle = osThreadNew(task_regulator, regulator_handle, &task_regulator_attributes);
 }
 
