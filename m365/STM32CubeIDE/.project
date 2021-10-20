@@ -37,21 +37,6 @@
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/m365.ioc</locationURI>
 		</link>
 		<link>
-			<name>Application/User/TTerm.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/TTerm.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/TTerm_AC.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/TTerm_AC.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/TTerm_cmd.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/TTerm_cmd.c</locationURI>
-		</link>
-		<link>
 			<name>Application/User/VescCommand.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Src/VescCommand.c</locationURI>
@@ -230,11 +215,6 @@
 			<name>Application/User/task_init.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Src/task_init.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/task_telemetry.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/task_telemetry.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/tune.c</name>

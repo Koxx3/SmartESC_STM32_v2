@@ -17,12 +17,19 @@ int32_t current_to_torque(int32_t curr_ma){
 
 qd_t currComp;
 uint32_t is_braking=0;
+uint8_t last_direction = 0;
 uint32_t last_reset=0;
+
+
+float VescToSTM_get_pid_pos_now(){
+	return 360.0 / 65536.0 * (float)pMCI[M1]->pSTC->SPD->hElAngle;
+}
+
 
 void VescToSTM_handle_brake(){
 
 	if(is_braking){
-		if(VescToSTM_get_rpm() < 10){
+		if((VescToSTM_get_rpm() < -10 && !last_direction) || (VescToSTM_get_rpm() > 10 && last_direction)){
 			is_braking=0;
 			pMCI[M1]->pSTC->SPD->open_angle = pMCI[M1]->pSTC->SPD->hElAngle;
 			pMCI[M1]->pSTC->SPD->open_loop = true;
@@ -52,6 +59,7 @@ void VescToSTM_set_torque(int32_t current){
 		MCI_ExecTorqueRamp(pMCI[M1], MCI_GetTeref(pMCI[M1]),0);
 	}
 	int16_t q = current_to_torque(current);
+	last_direction = q > 0 ? 0 : 1;
 
 	if(q != currComp.q){
 		if(q > SpeednTorqCtrlM1.MaxPositiveTorque){
@@ -65,9 +73,24 @@ void VescToSTM_set_torque(int32_t current){
 }
 
 void VescToSTM_set_brake(int32_t current){
+	int16_t q = current_to_torque(current);
+
+	if(currComp.q < 0){
+		q = q *-1;
+	}
+
+	if(q<0){
+		if (q < SpeednTorqCtrlM1.MinNegativeTorque){
+			q = SpeednTorqCtrlM1.MinNegativeTorque;
+		}
+	}else{
+		if ((q*-1) < SpeednTorqCtrlM1.MinNegativeTorque){
+			q = SpeednTorqCtrlM1.MinNegativeTorque * -1;
+		}
+	}
 
 	if(MCI_GetControlMode(pMCI[M1]) != STC_TORQUE_MODE){
-		MCI_ExecTorqueRamp(pMCI[M1], MCI_GetTeref(pMCI[M1]),0);
+		MCI_ExecTorqueRamp(pMCI[M1], q,0);
 	}
 
 	if(MCI_GetAvrgMecSpeedUnit( pMCI[M1] ) == 0){
@@ -75,27 +98,13 @@ void VescToSTM_set_brake(int32_t current){
 		pMCI[M1]->pSTC->SPD->open_loop = true;
 	}
 
-
-	int16_t q = current_to_torque(current);
-
-
-	if(currComp.q < 0){
-		q = q *-1;
-		is_braking = q;
-	}
-	is_braking = q;
-	if(q != currComp.q){
-		if(q > SpeednTorqCtrlM1.MaxPositiveTorque){
-			q = SpeednTorqCtrlM1.MaxPositiveTorque;
-		}else if (q < SpeednTorqCtrlM1.MinNegativeTorque){
-			q = SpeednTorqCtrlM1.MinNegativeTorque;
-		}
-		currComp.q = q;
-		MCI_SetCurrentReferences(pMCI[M1],currComp);
-	}
+	is_braking = 1;
+	currComp.q = q;
+	MCI_SetCurrentReferences(pMCI[M1],currComp);
 }
 
 void VescToSTM_set_speed(int32_t rpm){
+	last_direction = rpm > 0 ? 0 : 1;
 	MCI_ExecSpeedRamp(pMCI[M1], rpm , 0);
 }
 

@@ -26,6 +26,7 @@
 #include "defines.h"
 #include "drive_parameters.h"
 #include "mc_config.h"
+#include "VescToSTM.h"
 
 mc_configuration mc_conf;
 
@@ -178,8 +179,12 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 //		float l_in_current_max;
 //		float l_in_current_min;
 		mcconf->l_abs_current_max = 60;
-		//mcconf->l_min_erpm = SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit / (1.0/(_RPM / SPEED_UNIT)) * HALL_M1._Super.bElToMecRatio;
-		//mcconf->l_max_erpm = SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit / (1.0/(_RPM / SPEED_UNIT)) * HALL_M1._Super.bElToMecRatio;
+		SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit = (mcconf->l_min_erpm / (float)HALL_M1._Super.bElToMecRatio);
+		SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit = (mcconf->l_max_erpm / (float)HALL_M1._Super.bElToMecRatio);
+		HALL_M1._Super.hMinReliableMecSpeedUnit = (mcconf->l_min_erpm * 1.15 / (float)HALL_M1._Super.bElToMecRatio);
+		HALL_M1._Super.hMaxReliableMecSpeedUnit = (mcconf->l_max_erpm * 1.15 / (float)HALL_M1._Super.bElToMecRatio);
+		HALL_Init(&HALL_M1);
+
 //		float l_erpm_start;
 //		float l_max_erpm_fbrake;
 //		float l_max_erpm_fbrake_cc;
@@ -344,8 +349,8 @@ void conf_general_readback_mc(mc_configuration *mcconf) {
 //		float l_in_current_max;
 //		float l_in_current_min;
 		mcconf->l_abs_current_max = 60;
-		mcconf->l_min_erpm = SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit / (1.0/(_RPM / SPEED_UNIT)) * HALL_M1._Super.bElToMecRatio;
-		mcconf->l_max_erpm = SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit / (1.0/(_RPM / SPEED_UNIT)) * HALL_M1._Super.bElToMecRatio;
+		mcconf->l_min_erpm = SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit * HALL_M1._Super.bElToMecRatio;
+		mcconf->l_max_erpm = SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit * HALL_M1._Super.bElToMecRatio;
 //		float l_erpm_start;
 //		float l_max_erpm_fbrake;
 //		float l_max_erpm_fbrake_cc;

@@ -69,7 +69,6 @@
 #define NEGATIVE          (int8_t)-1
 #define POSITIVE          (int8_t)1
 
-#define MIN_SPEED 80
 extern MCI_Handle_t* pMCI[1];
 uint32_t cnt=0;
 

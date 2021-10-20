@@ -34,6 +34,31 @@
 extern qd_t currComp;
 
 void commands_process_packet(unsigned char *data, unsigned int len, void(*reply_func)(unsigned char *data, unsigned int len));
+void send_sample();
 
+typedef enum {
+	SAMP_IDLE,
+	SAMP_START,
+	SAMP_SAMPLING,
+	SAMP_FINISHED,
+	SAMP_SENDING
+}SAMP_STATES;
+
+#define ADC_SAMPLE_MAX_LEN 700
+
+typedef struct samp_struct samp_str;
+struct samp_struct{
+	SAMP_STATES state;
+	uint8_t dec;
+	uint8_t dec_state;
+	uint16_t index;
+	uint16_t n_samp;
+	debug_sampling_mode mode;
+	int16_t m_curr0_samples[ADC_SAMPLE_MAX_LEN];
+	int16_t m_curr1_samples[ADC_SAMPLE_MAX_LEN];
+	int8_t m_phase_samples[ADC_SAMPLE_MAX_LEN];
+};
+
+extern volatile samp_str samples;
 
 #endif

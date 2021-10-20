@@ -27,8 +27,6 @@
 #include "main.h"
 #include "TTerm.h"
 #include "printf.h"
-#include "cli_basic.h"
-#include "cli_common.h"
 #include "mc_config.h"
 #include <string.h>
 #include "packet.h"
@@ -43,7 +41,6 @@ StreamBufferHandle_t UART_RX;
 enum uart_mode task_cli_mode = UART_MODE_ST;
 
 #define STREAMBUFFER_RX_SIZE 32
-#define STREAMBUFFER_TX_SIZE 32
 
 osThreadId_t task_cli_handle;
 const osThreadAttr_t task_cli_attributes = {
@@ -91,7 +88,6 @@ void process_packet(unsigned char *data, unsigned int len){
 }
 
 
-
 void task_cli(void * argument)
 {
 
@@ -109,12 +105,14 @@ void task_cli(void * argument)
 	for(;;)
 	{
 		/* `#START TASK_LOOP_CODE` */
-		len = xStreamBufferReceive(UART_RX, &c,sizeof(c), 20);
+		len = xStreamBufferReceive(UART_RX, &c,sizeof(c), 1);
 
 		if(len){
 			packet_process_byte(c, UART_HANDLE);
 
 		}
+
+		send_sample();
 
 	}
 }

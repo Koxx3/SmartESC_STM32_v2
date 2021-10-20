@@ -32,7 +32,6 @@
 #include "utils.h"
 #include "system.h"
 #include "parameters_conversion.h"
-#include "cli_common.h"
 #include "tune.h"
 #include "conf_general.h"
 #include "VescToSTM.h"
@@ -44,6 +43,22 @@ static uint8_t send_buffer_global[PACKET_MAX_PL_LEN];
 static disp_pos_mode display_position_mode;
 
 
+
+
+
+
+
+
+//#define  MC_NO_ERROR  (uint16_t)(0x0000u)      /**< @brief No error.*/
+//#define  MC_NO_FAULTS  (uint16_t)(0x0000u)     /**< @brief No error.*/
+//#define  MC_FOC_DURATION  (uint16_t)(0x0001u)  /**< @brief Error: FOC rate to high.*/
+//#define  MC_OVER_VOLT  (uint16_t)(0x0002u)     /**< @brief Error: Software over voltage.*/
+//#define  MC_UNDER_VOLT  (uint16_t)(0x0004u)    /**< @brief Error: Software under voltage.*/
+//#define  MC_OVER_TEMP  (uint16_t)(0x0008u)     /**< @brief Error: Software over temperature.*/
+//#define  MC_START_UP  (uint16_t)(0x0010u)      /**< @brief Error: Startup failed.*/
+//#define  MC_SPEED_FDBK  (uint16_t)(0x0020u)    /**< @brief Error: Speed feedback.*/
+//#define  MC_BREAK_IN  (uint16_t)(0x0040u)      /**< @brief Error: Emergency input (Over current).*/
+//#define  MC_SW_ERROR  (uint16_t)(0x0080u)      /**< @brief Software Error.*/
 
 
 
@@ -68,7 +83,45 @@ void commands_send_mcconf(COMM_PACKET_ID packet_id, mc_configuration *mcconf) {
 	commands_send_packet(send_buffer_global, len + 1);
 }
 
+volatile samp_str samples;
+/*
+samples.data[0][samples.index] = FOCVars[M1].Iab.a;
+samples.data[1][samples.index] = FOCVars[M1].Iab.b;
+samples.data[2][samples.index] = PWM_Handle_M1._Super.CntPhA;
+samples.data[3][samples.index] = PWM_Handle_M1._Super.CntPhB;
+samples.data[4][samples.index] = PWM_Handle_M1._Super.CntPhC;
+samples.data[5][samples.index] = HALL_M1.MeasuredElAngle;
+*/
+void send_sample(){
+	if(samples.state == SAMP_FINISHED){
 
+		uint8_t buffer[40];
+		int32_t index = 0;
+		buffer[index++] = COMM_SAMPLE_PRINT;
+		buffer_append_float32_auto(buffer, (float)samples.m_curr0_samples[samples.index] / CURRENT_FACTOR, &index);
+		buffer_append_float32_auto(buffer, (float)samples.m_curr1_samples[samples.index] / CURRENT_FACTOR, &index);
+		buffer_append_float32_auto(buffer, 0, &index);
+		buffer_append_float32_auto(buffer, 0, &index);
+		buffer_append_float32_auto(buffer, 0, &index);
+		buffer_append_float32_auto(buffer, 0, &index);
+		buffer_append_float32_auto(buffer, 0, &index);
+		buffer_append_float32_auto(buffer, 16000, &index);
+		buffer[index++] = 1;
+		buffer[index++] = samples.m_phase_samples[samples.index];
+
+
+		samples.index++;
+
+		if(samples.index == samples.n_samp){
+
+			samples.index = 0;
+			samples.state = SAMP_IDLE;
+		}
+
+
+		commands_send_packet(buffer, index);
+	}
+}
 
 
 const char test[13] = "1234567890123";
@@ -163,8 +216,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				buffer_append_float16(send_buffer, VescToSTM_get_temperature() , 1e1, &ind);
 			}
 			if (mask & ((uint32_t)1 << 1)) {
-				//buffer_append_float16(send_buffer, mc_interface_temp_motor_filtered(), 1e1, &ind);
-				buffer_append_float16(send_buffer, 0 , 1e1, &ind);
+				buffer_append_float16(send_buffer, VescToSTM_get_pid_pos_now(), 1e1, &ind);
 			}
 			if (mask & ((uint32_t)1 << 2)) {
 				buffer_append_float32(send_buffer, VescToSTM_get_phase_current(), 1e2, &ind);
@@ -217,8 +269,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				send_buffer[ind++] = 0;
 			}
 			if (mask & ((uint32_t)1 << 16)) {
-				//buffer_append_float32(send_buffer, mc_interface_get_pid_pos_now(), 1e6, &ind);
-				buffer_append_float32(send_buffer, 0, 1e6, &ind);
+				buffer_append_float32(send_buffer, VescToSTM_get_pid_pos_now(), 1e6, &ind);
 			}
 			if (mask & ((uint32_t)1 << 17)) {
 				//uint8_t current_controller_id = app_get_configuration()->controller_id;
@@ -362,16 +413,21 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				} break;
 
 				case COMM_SAMPLE_PRINT: {
-					/*
+
 					uint16_t sample_len;
-					uint8_t decimation;
-					debug_sampling_mode mode;
 
 					int32_t ind = 0;
-					mode = data[ind++];
+					samples.mode = data[ind++];
 					sample_len = buffer_get_uint16(data, &ind);
-					decimation = data[ind++];
-					mc_interface_sample_print_data(mode, sample_len, decimation);*/
+					samples.dec = data[ind++];
+
+					sample_len = sample_len > ADC_SAMPLE_MAX_LEN ? ADC_SAMPLE_MAX_LEN : sample_len;
+
+					samples.n_samp = sample_len;
+					samples.index = 0;
+					samples.dec_state = 0;
+					samples.state = SAMP_START;
+
 				} break;
 
 				case COMM_REBOOT:

@@ -20,6 +20,7 @@ float VescToSTM_get_Vq();
 float VescToSTM_get_bus_voltage();
 int32_t VescToSTM_get_erpm();
 int32_t VescToSTM_get_rpm();
+float VescToSTM_get_pid_pos_now();
 
 void VescToSTM_timeout_reset();
 void VescToSTM_handle_timeout();

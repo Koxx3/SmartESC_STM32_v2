@@ -31,7 +31,7 @@
 #include "digital_output.h"
 #include "state_machine.h"
 #include "pwm_common.h"
-
+#include "VescCommand.h"
 #include "mc_tasks.h"
 #include "parameters_conversion.h"
 
@@ -595,37 +595,69 @@ __attribute__((section (".ccmram")))
   */
 __weak uint8_t TSK_HighFrequencyTask(void)
 {
-  /* USER CODE BEGIN HighFrequencyTask 0 */
+	/* USER CODE BEGIN HighFrequencyTask 0 */
 
-  /* USER CODE END HighFrequencyTask 0 */
+	/* USER CODE END HighFrequencyTask 0 */
 
-  uint8_t bMotorNbr = 0;
-  uint16_t hFOCreturn;
+	uint8_t bMotorNbr = 0;
+	uint16_t hFOCreturn;
 
-  HALL_CalcElAngle (&HALL_M1);
+	HALL_CalcElAngle (&HALL_M1);
 
-  /* USER CODE BEGIN HighFrequencyTask SINGLEDRIVE_1 */
+	/* USER CODE BEGIN HighFrequencyTask SINGLEDRIVE_1 */
 
-  /* USER CODE END HighFrequencyTask SINGLEDRIVE_1 */
-  hFOCreturn = FOC_CurrControllerM1();
-  /* USER CODE BEGIN HighFrequencyTask SINGLEDRIVE_2 */
+	/* USER CODE END HighFrequencyTask SINGLEDRIVE_1 */
+	hFOCreturn = FOC_CurrControllerM1();
+	/* USER CODE BEGIN HighFrequencyTask SINGLEDRIVE_2 */
 
-  /* USER CODE END HighFrequencyTask SINGLEDRIVE_2 */
-  if(hFOCreturn == MC_FOC_DURATION)
-  {
-    STM_FaultProcessing(&STM[M1], MC_FOC_DURATION, 0);
-  }
-  else
-  {
-    /* USER CODE BEGIN HighFrequencyTask SINGLEDRIVE_3 */
 
-    /* USER CODE END HighFrequencyTask SINGLEDRIVE_3 */
-  }
-  /* USER CODE BEGIN HighFrequencyTask 1 */
+	if(samples.state == SAMP_START){
+		switch(samples.mode){
+		case DEBUG_SAMPLING_NOW:
+			samples.state = SAMP_SAMPLING;
+			break;
+		case DEBUG_SAMPLING_START:
+			if(FOCVars[M1].Iqdref.q){
+				samples.state = SAMP_SAMPLING;
+			}
+			break;
+		default:
+			break;
+		}
+	}
 
-  /* USER CODE END HighFrequencyTask 1 */
+	if(samples.state == SAMP_SAMPLING){
+		samples.dec_state++;
+		if(samples.dec_state == samples.dec){
+			samples.dec_state = 0;
+			samples.m_curr0_samples[samples.index] = FOCVars[M1].Iab.a;
+			samples.m_curr1_samples[samples.index] = FOCVars[M1].Iab.b;
+			samples.m_phase_samples[samples.index] = HALL_M1.MeasuredElAngle / 256;
 
-  return bMotorNbr;
+			samples.index++;
+			if(samples.index == samples.n_samp){
+				samples.dec_state = 0;
+				samples.index = 0;
+				samples.state = SAMP_FINISHED;
+			}
+		}
+	}
+
+	/* USER CODE END HighFrequencyTask SINGLEDRIVE_2 */
+	if(hFOCreturn == MC_FOC_DURATION){
+		STM_FaultProcessing(&STM[M1], MC_FOC_DURATION, 0);
+	}
+	else
+	{
+	/* USER CODE BEGIN HighFrequencyTask SINGLEDRIVE_3 */
+
+	/* USER CODE END HighFrequencyTask SINGLEDRIVE_3 */
+	}
+	/* USER CODE BEGIN HighFrequencyTask 1 */
+
+	/* USER CODE END HighFrequencyTask 1 */
+
+	return bMotorNbr;
 }
 
 #if defined (CCMRAM)

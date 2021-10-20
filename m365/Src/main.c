@@ -21,8 +21,6 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "motorcontrol.h"
-#include "cli_basic.h"
-#include "cli_common.h"
 #include "conf_general.h"
 
 /* Private includes ----------------------------------------------------------*/
