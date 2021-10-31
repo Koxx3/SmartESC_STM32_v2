@@ -35,6 +35,8 @@
 #include "tune.h"
 #include "conf_general.h"
 #include "VescToSTM.h"
+#include "stdarg.h"
+#include <printf.h>
 
 
 static void(* volatile send_func)(unsigned char *data, unsigned int len) = 0;
@@ -44,7 +46,24 @@ static disp_pos_mode display_position_mode;
 
 
 
+#define PRINTF_STACK_SIZE 50u
+void commands_printf(const char* format, ...) {
 
+	va_list arg;
+	va_start (arg, format);
+	int len;
+	static char print_buffer[PRINTF_STACK_SIZE];
+
+	print_buffer[0] = COMM_PRINT;
+	len = vsnprintf(print_buffer + 1, PRINTF_STACK_SIZE - 1, format, arg);
+	va_end (arg);
+
+	if(len > 0) {
+		commands_send_packet((unsigned char*)print_buffer,
+				(len < 254) ? len + 1 : 255);
+	}
+
+}
 
 
 
@@ -118,7 +137,7 @@ void send_sample(){
 			samples.state = SAMP_IDLE;
 		}
 
-
+		if(samples.vesc_tool_samples == 1000) commands_send_packet(buffer, index);
 		commands_send_packet(buffer, index);
 	}
 }
@@ -420,6 +439,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					samples.mode = data[ind++];
 					sample_len = buffer_get_uint16(data, &ind);
 					samples.dec = data[ind++];
+					samples.vesc_tool_samples = sample_len;
 
 					sample_len = sample_len > ADC_SAMPLE_MAX_LEN ? ADC_SAMPLE_MAX_LEN : sample_len;
 
@@ -794,9 +814,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 				case COMM_TERMINAL_CMD_SYNC:
 					data[len] = '\0';
-					//chMtxLock(&terminal_mutex);
-					//terminal_process_string((char*)data);
-					//chMtxUnlock(&terminal_mutex);
+					terminal_process_string((char*)data);
 					break;
 
 				case COMM_GET_IMU_DATA: {
@@ -972,6 +990,9 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				// own thread. If other blocking commands come before the previous one has
 				// finished, they are discarded.
 				case COMM_TERMINAL_CMD:
+					data[len] = '\0';
+					terminal_process_string((char*)data);
+					break;
 				case COMM_DETECT_MOTOR_PARAM:
 				case COMM_DETECT_MOTOR_R_L:
 				case COMM_DETECT_MOTOR_FLUX_LINKAGE:
@@ -982,10 +1003,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					uint8_t hall_tab[8];
 					uint8_t send_buffer[50];
 					int32_t offset;
-					bool res = tune_hall_detect(buffer_get_int32(data, &ind), hall_tab, &offset);
-					if(res){
-						mc_conf.foc_encoder_offset = offset;
-					}
+					bool res = tune_mcpwm_foc_hall_detect(buffer_get_int32(data, &ind), hall_tab);
 					ind=0;
 					send_buffer[ind++] = COMM_DETECT_HALL_FOC;
 					memcpy(send_buffer + ind, hall_tab, 8);

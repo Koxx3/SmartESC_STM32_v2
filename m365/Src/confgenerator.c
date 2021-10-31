@@ -648,6 +648,8 @@ bool confgenerator_deserialize_appconf(const uint8_t *buffer, app_configuration 
 	return true;
 }
 
+const uint8_t hall_def[8] = {255, 214, 40, 253, 123, 167, 85, 255};
+
 void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 	memset(mcconf,0,sizeof(mc_configuration));
 	// Limits
@@ -704,7 +706,7 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
     mcconf->foc_current_ki = 3;
     mcconf->foc_f_sw = 16000;
 //	float foc_dt_us;
-    mcconf->foc_encoder_offset = 120;
+    mcconf->foc_encoder_offset = 90;
 //	bool foc_encoder_inverted;
 //	float foc_encoder_ratio;
 //	float foc_encoder_sin_offset;
@@ -733,9 +735,9 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 	mcconf->foc_sensor_mode = FOC_SENSOR_MODE_HALL;
 
 	for(int i=0;i<8;i++){
-		mcconf->foc_hall_table[i] = i;
+		mcconf->foc_hall_table[i] = hall_def[i];
 	}
-	mcconf->foc_hall_interp_erpm = 200;
+	mcconf->foc_hall_interp_erpm = 100;
 //	float foc_sl_erpm;
 //	bool foc_sample_v0_v7;
 //	bool foc_sample_high_current;

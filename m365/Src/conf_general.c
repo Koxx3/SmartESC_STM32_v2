@@ -230,6 +230,7 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
     PIDIqHandle_M1.hKiGain = mcconf->foc_current_ki * 100;
 //	float foc_f_sw;
 //	float foc_dt_us;
+    HALL_M1.PhaseShift = DEG_TO_ANG(mcconf->foc_encoder_offset);
 //	float foc_encoder_offset;
 //	bool foc_encoder_inverted;
 //	float foc_encoder_ratio;

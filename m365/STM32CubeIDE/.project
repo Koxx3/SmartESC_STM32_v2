@@ -217,6 +217,16 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Src/task_init.c</locationURI>
 		</link>
 		<link>
+			<name>Application/User/terminal.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/terminal.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/terminal.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/terminal.h</locationURI>
+		</link>
+		<link>
 			<name>Application/User/tune.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Src/tune.c</locationURI>

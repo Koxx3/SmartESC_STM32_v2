@@ -9,6 +9,8 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+
+
 int32_t current_to_torque(int32_t curr_ma){
 	float ret = curr_ma * CURRENT_FACTOR_mA;
 	return ret;

@@ -375,129 +375,35 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
    if ( pHandle->SensorIsReliable )
   {
     /* A capture event generated this interrupt */
-    bPrevHallState = pHandle->HallState;
+    bPrevHallState = pHandle->lut[pHandle->HallState];
     PrevDirection = pHandle->Direction;
 
     if ( pHandle->SensorPlacement == DEGREES_120 )
     {
-      pHandle->HallState  =pHandle->lut[(uint8_t) ((LL_GPIO_IsInputPinSet( pHandle->H3Port, pHandle->H3Pin ) << 2)
+      pHandle->HallState  = (uint8_t) ((LL_GPIO_IsInputPinSet( pHandle->H3Port, pHandle->H3Pin ) << 2)
                             | (LL_GPIO_IsInputPinSet( pHandle->H2Port, pHandle->H2Pin ) << 1)
-                            | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin ) )];
+                            | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin ) );
     }
     else
     {
-      pHandle->HallState  = pHandle->lut[(uint8_t) ((( LL_GPIO_IsInputPinSet( pHandle->H2Port, pHandle->H2Pin ) ^ 1 ) << 2)
+      pHandle->HallState  = (uint8_t) ((( LL_GPIO_IsInputPinSet( pHandle->H2Port, pHandle->H2Pin ) ^ 1 ) << 2)
                             | (LL_GPIO_IsInputPinSet( pHandle->H3Port, pHandle->H3Pin ) << 1)
-                            | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin ) )];
+                            | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin ) );
     }
 
-    switch ( pHandle->HallState )
-    {
-      case STATE_5:
-        if ( bPrevHallState == STATE_4 )
-        {
-          pHandle->Direction = POSITIVE;
-          pHandle->MeasuredElAngle = pHandle->PhaseShift;
-        }
-        else if ( bPrevHallState == STATE_1 )
-        {
-          pHandle->Direction = NEGATIVE;
-          pHandle->MeasuredElAngle = ( int16_t )( pHandle->PhaseShift + S16_60_PHASE_SHIFT );
-        }
-        else
-        {
-        }
-        break;
+    int diff = pHandle->lut[pHandle->HallState] - bPrevHallState;
 
-      case STATE_1:
-        if ( bPrevHallState == STATE_5 )
-        {
-          pHandle->Direction = POSITIVE;
-          pHandle->MeasuredElAngle = pHandle->PhaseShift + S16_60_PHASE_SHIFT;
-        }
-        else if ( bPrevHallState == STATE_3 )
-        {
-          pHandle->Direction = NEGATIVE;
-          pHandle->MeasuredElAngle = ( int16_t )( pHandle->PhaseShift + S16_120_PHASE_SHIFT );
-        }
-        else
-        {
-        }
-        break;
+    if (diff > 100) {
+		diff -= 255;
+	} else if (diff < -100) {
+		diff += 255;
+	}
 
-      case STATE_3:
-        if ( bPrevHallState == STATE_1 )
-        {
-          pHandle->Direction = POSITIVE;
-          pHandle->MeasuredElAngle = ( int16_t )( pHandle->PhaseShift + S16_120_PHASE_SHIFT );
-        }
-        else if ( bPrevHallState == STATE_2 )
-        {
-          pHandle->Direction = NEGATIVE;
-          pHandle->MeasuredElAngle = ( int16_t )( pHandle->PhaseShift + S16_120_PHASE_SHIFT +
-                                                  S16_60_PHASE_SHIFT );
-        }
-        else
-        {
-        }
+    pHandle->Direction = diff > 0 ? POSITIVE : NEGATIVE;
 
-        break;
+    pHandle->MeasuredElAngle = pHandle->PhaseShift + (((uint16_t)pHandle->lut[pHandle->HallState])<<8);
 
-      case STATE_2:
-        if ( bPrevHallState == STATE_3 )
-        {
-          pHandle->Direction = POSITIVE;
-          pHandle->MeasuredElAngle = ( int16_t )( pHandle->PhaseShift + S16_120_PHASE_SHIFT
-                                                  + S16_60_PHASE_SHIFT );
-        }
-        else if ( bPrevHallState == STATE_6 )
-        {
-          pHandle->Direction = NEGATIVE;
-          pHandle->MeasuredElAngle = ( int16_t )( pHandle->PhaseShift - S16_120_PHASE_SHIFT );
-        }
-        else
-        {
-        }
-        break;
 
-      case STATE_6:
-        if ( bPrevHallState == STATE_2 )
-        {
-          pHandle->Direction = POSITIVE;
-          pHandle->MeasuredElAngle = ( int16_t )( pHandle->PhaseShift - S16_120_PHASE_SHIFT );
-        }
-        else if ( bPrevHallState == STATE_4 )
-        {
-          pHandle->Direction = NEGATIVE;
-          pHandle->MeasuredElAngle = ( int16_t )( pHandle->PhaseShift - S16_60_PHASE_SHIFT );
-        }
-        else
-        {
-        }
-        break;
-
-      case STATE_4:
-        if ( bPrevHallState == STATE_6 )
-        {
-          pHandle->Direction = POSITIVE;
-          pHandle->MeasuredElAngle = ( int16_t )( pHandle->PhaseShift - S16_60_PHASE_SHIFT );
-        }
-        else if ( bPrevHallState == STATE_5 )
-        {
-          pHandle->Direction = NEGATIVE;
-          pHandle->MeasuredElAngle = ( int16_t )( pHandle->PhaseShift );
-        }
-        else
-        {
-        }
-        break;
-
-      default:
-        /* Bad hall sensor configutarion so update the speed reliability */
-        pHandle->SensorIsReliable = false;
-
-        break;
-    }
     /* We need to check that the direction has not changed.
        If it is the case, the sign of the current speed can be the opposite of the
        average speed, and the average time can be close to 0 which lead to a 
@@ -719,48 +625,21 @@ __weak void * HALL_TIMx_UP_IRQHandler( void * pHandleVoid )
 static void HALL_Init_Electrical_Angle( HALL_Handle_t * pHandle )
 {
 
-  if ( pHandle->SensorPlacement == DEGREES_120 )
-  {
-    pHandle->HallState  = pHandle->lut[LL_GPIO_IsInputPinSet( pHandle->H3Port, pHandle->H3Pin ) << 2
-                          | LL_GPIO_IsInputPinSet( pHandle->H2Port, pHandle->H2Pin ) << 1
-                          | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin )];
-  }
-  else
-  {
-    pHandle->HallState  = pHandle->lut[( LL_GPIO_IsInputPinSet( pHandle->H2Port, pHandle->H2Pin ) ^ 1 ) << 2
-                          | LL_GPIO_IsInputPinSet( pHandle->H3Port, pHandle->H3Pin ) << 1
-                          | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin )];
-  }
+    if ( pHandle->SensorPlacement == DEGREES_120 )
+    {
+      pHandle->HallState  =(uint8_t) ((LL_GPIO_IsInputPinSet( pHandle->H3Port, pHandle->H3Pin ) << 2)
+                            | (LL_GPIO_IsInputPinSet( pHandle->H2Port, pHandle->H2Pin ) << 1)
+                            | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin ) );
+    }
+    else
+    {
+      pHandle->HallState  = (uint8_t) ((( LL_GPIO_IsInputPinSet( pHandle->H2Port, pHandle->H2Pin ) ^ 1 ) << 2)
+                            | (LL_GPIO_IsInputPinSet( pHandle->H3Port, pHandle->H3Pin ) << 1)
+                            | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin ) );
+    }
 
-  switch ( pHandle->HallState )
-  {
-    case STATE_5:
-      pHandle->_Super.hElAngle = ( int16_t )( pHandle->PhaseShift + S16_60_PHASE_SHIFT / 2 );
-      break;
-    case STATE_1:
-      pHandle->_Super.hElAngle = ( int16_t )( pHandle->PhaseShift + S16_60_PHASE_SHIFT +
-                                              S16_60_PHASE_SHIFT / 2 );
-      break;
-    case STATE_3:
-      pHandle->_Super.hElAngle = ( int16_t )( pHandle->PhaseShift + S16_120_PHASE_SHIFT +
-                                              S16_60_PHASE_SHIFT / 2 );
-      break;
-    case STATE_2:
-      pHandle->_Super.hElAngle = ( int16_t )( pHandle->PhaseShift - S16_120_PHASE_SHIFT -
-                                              S16_60_PHASE_SHIFT / 2 );
-      break;
-    case STATE_6:
-      pHandle->_Super.hElAngle = ( int16_t )( pHandle->PhaseShift - S16_60_PHASE_SHIFT -
-                                              S16_60_PHASE_SHIFT / 2 );
-      break;
-    case STATE_4:
-      pHandle->_Super.hElAngle = ( int16_t )( pHandle->PhaseShift - S16_60_PHASE_SHIFT / 2 );
-      break;
-    default:
-      /* Bad hall sensor configutarion so update the speed reliability */
-      pHandle->SensorIsReliable = false;
-      break;
-  }
+    pHandle->MeasuredElAngle = pHandle->PhaseShift + (((uint16_t)pHandle->lut[pHandle->HallState])<<8);
+
 
   /* Initialize the measured angle */
   pHandle->MeasuredElAngle = pHandle->_Super.hElAngle;
