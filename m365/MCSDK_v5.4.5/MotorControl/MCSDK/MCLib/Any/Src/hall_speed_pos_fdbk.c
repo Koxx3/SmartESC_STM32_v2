@@ -638,7 +638,7 @@ static void HALL_Init_Electrical_Angle( HALL_Handle_t * pHandle )
                             | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin ) );
     }
 
-    pHandle->MeasuredElAngle = pHandle->PhaseShift + (((uint16_t)pHandle->lut[pHandle->HallState])<<8);
+    pHandle->_Super.hElAngle = pHandle->PhaseShift + (((uint16_t)pHandle->lut[pHandle->HallState])<<8);
 
 
   /* Initialize the measured angle */
