@@ -395,9 +395,13 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
 
     if (diff > 100) {
 		diff -= 255;
+		if(cnt>20) pHandle->odometer++;
 	} else if (diff < -100) {
 		diff += 255;
+		if(cnt>20) pHandle->odometer++;
 	}
+
+
 
     pHandle->Direction = diff > 0 ? POSITIVE : NEGATIVE;
 
@@ -542,6 +546,7 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
             	pHandle->HallMtpa = true;
             }else{
             	if(cnt>20){
+            		cnt = 21;
             		pHandle->HallMtpa = false;
             	}else{
             		pHandle->HallMtpa = true;

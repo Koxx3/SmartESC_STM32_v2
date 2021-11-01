@@ -179,11 +179,10 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 //		float l_in_current_max;
 //		float l_in_current_min;
 		mcconf->l_abs_current_max = 60;
-		SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit = (mcconf->l_min_erpm / (float)HALL_M1._Super.bElToMecRatio);
-		SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit = (mcconf->l_max_erpm / (float)HALL_M1._Super.bElToMecRatio);
-		HALL_M1._Super.hMinReliableMecSpeedUnit = (mcconf->l_min_erpm * 1.15 / (float)HALL_M1._Super.bElToMecRatio);
-		HALL_M1._Super.hMaxReliableMecSpeedUnit = (mcconf->l_max_erpm * 1.15 / (float)HALL_M1._Super.bElToMecRatio);
-		HALL_Init(&HALL_M1);
+		//SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit = (mcconf->l_min_erpm / (float)HALL_M1._Super.bElToMecRatio);
+		//SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit = (mcconf->l_max_erpm / (float)HALL_M1._Super.bElToMecRatio);
+		//HALL_M1._Super.hMinReliableMecSpeedUnit = (mcconf->l_min_erpm * 1.15 / (float)HALL_M1._Super.bElToMecRatio);
+		//HALL_M1._Super.hMaxReliableMecSpeedUnit = (mcconf->l_max_erpm * 1.15 / (float)HALL_M1._Super.bElToMecRatio);
 
 //		float l_erpm_start;
 //		float l_max_erpm_fbrake;
@@ -212,7 +211,6 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 //		float lo_in_current_min;
 //		float lo_current_motor_max_now;
 //		float lo_current_motor_min_now;
-
 
 
 	// Hall sensor
@@ -338,8 +336,9 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 //	bms_config bms;
 
 	conf_general_recalc();
+	HALL_Init(&HALL_M1);
+	VescToSTM_init_odometer(mcconf);
 	mc_conf = *mcconf;
-
 }
 
 void conf_general_readback_mc(mc_configuration *mcconf) {

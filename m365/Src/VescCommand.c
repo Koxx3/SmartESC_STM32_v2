@@ -629,12 +629,10 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						buffer_append_float16(send_buffer, 0, 1e3, &ind);
 					}
 					if (mask & ((uint32_t)1 << 5)) {
-						//buffer_append_float32(send_buffer, mc_interface_get_rpm(), 1e0, &ind);
-						buffer_append_float32(send_buffer, 0, 1e0, &ind);
+						buffer_append_float32(send_buffer, VescToSTM_get_erpm(), 1e0, &ind);
 					}
 					if (mask & ((uint32_t)1 << 6)) {
-						//buffer_append_float32(send_buffer, mc_interface_get_speed(), 1e3, &ind);
-						buffer_append_float32(send_buffer, 0, 1e3, &ind);
+						buffer_append_float32(send_buffer, VescToSTM_get_odometer(), 1e3, &ind);
 					}
 					if (mask & ((uint32_t)1 << 7)) {
 						//buffer_append_float16(send_buffer, GET_INPUT_VOLTAGE(), 1e1, &ind);
@@ -683,8 +681,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						buffer_append_float32(send_buffer, wh_batt_left, 1e3, &ind);
 					}
 					if (mask & ((uint32_t)1 << 20)) {
-						//buffer_append_uint32(send_buffer, mc_interface_get_odometer(), &ind);
-						buffer_append_uint32(send_buffer, 0, &ind);
+						buffer_append_uint32(send_buffer, VescToSTM_get_odometer(), &ind);
 					}
 
 					reply_func(send_buffer, ind);
@@ -692,8 +689,8 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				    } break;
 
 				case COMM_SET_ODOMETER: {
-					//int32_t ind = 0;
-					//mc_interface_set_odometer(buffer_get_uint32(data, &ind));
+					int32_t ind = 0;
+					VescToSTM_set_odometer(buffer_get_uint32(data, &ind));
 					VescToSTM_timeout_reset();
 				} break;
 

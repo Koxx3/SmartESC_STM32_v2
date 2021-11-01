@@ -94,10 +94,10 @@ void task_cli(void * argument)
 	uint8_t c=0, len=0;
 
 
-	MCI_ExecTorqueRamp(pMCI[M1], MCI_GetTeref(pMCI[M1]),0);
 	MCI_StartMotor( pMCI[M1] );
-	currComp = MCI_GetIqdref(pMCI[M1]);
 
+	vTaskDelay(200);
+	VescToSTM_set_brake(0);
 
 	packet_init(putbuffer, process_packet, UART_HANDLE);
 

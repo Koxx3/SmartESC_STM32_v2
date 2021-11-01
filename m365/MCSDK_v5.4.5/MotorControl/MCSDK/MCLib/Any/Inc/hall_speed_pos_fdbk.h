@@ -209,6 +209,8 @@ typedef struct
 
   uint8_t lut[8];
 
+  uint32_t odometer;
+
 
 } HALL_Handle_t;
 /**

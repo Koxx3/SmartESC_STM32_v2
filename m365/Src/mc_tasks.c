@@ -708,6 +708,8 @@ inline uint16_t FOC_CurrControllerM1(void)
   FOCVars[M1].Iab = Iab;
   FOCVars[M1].Ialphabeta = Ialphabeta;
   FOCVars[M1].Iqd = Iqd;
+  FOCVars[M1].Iq_sum += Iqd.q;
+  FOCVars[M1].Iq_samples++;
   FOCVars[M1].Valphabeta = Valphabeta;
   FOCVars[M1].hElAngle = hElAngle;
   return(hCodeError);

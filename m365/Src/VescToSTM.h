@@ -4,6 +4,7 @@
 #define VESCTOSTM_H_
 
 #include <stdint.h>
+#include "VescDatatypes.h"
 
 
 void VescToSTM_set_torque(int32_t current);
@@ -27,6 +28,9 @@ void VescToSTM_handle_timeout();
 
 void VescToSTM_stop_motor();
 void VescToSTM_start_motor();
+void VescToSTM_init_odometer(mc_configuration* mcconf);
+void VescToSTM_set_odometer(uint32_t meters);
+uint32_t VescToSTM_get_odometer();
 
 
 #endif /* VESCTOSTM_H_ */
