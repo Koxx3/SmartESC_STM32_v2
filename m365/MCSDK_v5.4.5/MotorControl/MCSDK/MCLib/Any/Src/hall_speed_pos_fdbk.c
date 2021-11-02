@@ -395,15 +395,19 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
 
     if (diff > 100) {
 		diff -= 255;
-		if(cnt>20) pHandle->odometer++;
 	} else if (diff < -100) {
 		diff += 255;
-		if(cnt>20) pHandle->odometer++;
 	}
 
+    if(diff > 0){
+    	pHandle->Direction = POSITIVE;
+    	pHandle->tachometer++;
+    }else{
+    	pHandle->Direction = NEGATIVE;
+    	pHandle->tachometer--;
+    }
+    pHandle->tachometer_abs++;
 
-
-    pHandle->Direction = diff > 0 ? POSITIVE : NEGATIVE;
 
     pHandle->MeasuredElAngle = pHandle->PhaseShift + (((uint16_t)pHandle->lut[pHandle->HallState])<<8);
 

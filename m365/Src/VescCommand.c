@@ -37,6 +37,7 @@
 #include "VescToSTM.h"
 #include "stdarg.h"
 #include <printf.h>
+#include "terminal.h"
 
 
 static void(* volatile send_func)(unsigned char *data, unsigned int len) = 0;
@@ -235,7 +236,8 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				buffer_append_float16(send_buffer, VescToSTM_get_temperature() , 1e1, &ind);
 			}
 			if (mask & ((uint32_t)1 << 1)) {
-				buffer_append_float16(send_buffer, VescToSTM_get_pid_pos_now(), 1e1, &ind);
+				//buffer_append_float16(send_buffer, mc_interface_temp_motor_filtered(), 1e1, &ind);
+				buffer_append_float16(send_buffer, 0, 1e1, &ind);
 			}
 			if (mask & ((uint32_t)1 << 2)) {
 				buffer_append_float32(send_buffer, VescToSTM_get_phase_current(), 1e2, &ind);
@@ -250,8 +252,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				buffer_append_float32(send_buffer, VescToSTM_get_iq(), 1e2, &ind);
 			}
 			if (mask & ((uint32_t)1 << 6)) {
-				//buffer_append_float16(send_buffer, mc_interface_get_duty_cycle_now(), 1e3, &ind);
-				buffer_append_float16(send_buffer, 0, 1e3, &ind);
+				buffer_append_float16(send_buffer, VescToSTM_get_duty_cycle_now(), 1e3, &ind);
 			}
 			if (mask & ((uint32_t)1 << 7)) {
 				buffer_append_float32(send_buffer, VescToSTM_get_erpm(), 1e0, &ind);
@@ -276,12 +277,10 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				buffer_append_float32(send_buffer, 0, 1e4, &ind);
 			}
 			if (mask & ((uint32_t)1 << 13)) {
-				//buffer_append_int32(send_buffer, mc_interface_get_tachometer_value(false), &ind);
-				buffer_append_int32(send_buffer, 0, &ind);
+				buffer_append_int32(send_buffer, VescToSTM_get_tachometer_value(false), &ind);
 			}
 			if (mask & ((uint32_t)1 << 14)) {
-				//buffer_append_int32(send_buffer, mc_interface_get_tachometer_abs_value(false), &ind);
-				buffer_append_int32(send_buffer, 0, &ind);
+				buffer_append_int32(send_buffer, VescToSTM_get_tachometer_abs_value(false), &ind);
 			}
 			if (mask & ((uint32_t)1 << 15)) {
 				//send_buffer[ind++] = mc_interface_get_fault();
@@ -347,8 +346,8 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 			} break;
 
 			case COMM_SET_HANDBRAKE: {
-				//int32_t ind = 0;
-				//mc_interface_set_handbrake(buffer_get_float32(data, 1e3, &ind));
+				int32_t ind = 0;
+				VescToSTM_set_handbrake(buffer_get_float32(data, 1e3, &ind));
 				VescToSTM_timeout_reset();
 			} break;
 
@@ -593,10 +592,16 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				case COMM_GET_VALUES_SETUP_SELECTIVE: {
 					//setup_values val = mc_interface_get_setup_values();
 					setup_values val;
+					val.ah_charge_tot = 0;
+					val.ah_tot = 0;
+					val.current_in_tot = 0;
+					val.current_tot = 0;
+					val.num_vescs = 0;
+					val.wh_charge_tot = 0;
+					val.wh_tot = 0;
 
 					float wh_batt_left = 0.0;
-					//float battery_level = mc_interface_get_battery_level(&wh_batt_left);
-					float battery_level = 100;
+					float battery_level = VescToSTM_get_battery_level(&wh_batt_left);
 
 					int32_t ind = 0;
 					//chMtxLock(&send_buffer_mutex);
@@ -611,8 +616,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					}
 
 					if (mask & ((uint32_t)1 << 0)) {
-						//buffer_append_float16(send_buffer, mc_interface_temp_fet_filtered(), 1e1, &ind);
-						buffer_append_float16(send_buffer, 0, 1e1, &ind);
+						buffer_append_float16(send_buffer, VescToSTM_get_temperature(), 1e1, &ind);
 					}
 					if (mask & ((uint32_t)1 << 1)) {
 						//buffer_append_float16(send_buffer, mc_interface_temp_motor_filtered(), 1e1, &ind);
@@ -625,8 +629,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						buffer_append_float32(send_buffer, val.current_in_tot, 1e2, &ind);
 					}
 					if (mask & ((uint32_t)1 << 4)) {
-						//buffer_append_float16(send_buffer, mc_interface_get_duty_cycle_now(), 1e3, &ind);
-						buffer_append_float16(send_buffer, 0, 1e3, &ind);
+						buffer_append_float16(send_buffer, VescToSTM_get_duty_cycle_now(), 1e3, &ind);
 					}
 					if (mask & ((uint32_t)1 << 5)) {
 						buffer_append_float32(send_buffer, VescToSTM_get_erpm(), 1e0, &ind);
@@ -635,8 +638,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						buffer_append_float32(send_buffer, VescToSTM_get_odometer(), 1e3, &ind);
 					}
 					if (mask & ((uint32_t)1 << 7)) {
-						//buffer_append_float16(send_buffer, GET_INPUT_VOLTAGE(), 1e1, &ind);
-						buffer_append_float16(send_buffer, 0, 1e1, &ind);
+						buffer_append_float16(send_buffer, VescToSTM_get_bus_voltage(), 1e1, &ind);
 					}
 					if (mask & ((uint32_t)1 << 8)) {
 						buffer_append_float16(send_buffer, battery_level, 1e3, &ind);
@@ -654,16 +656,13 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						buffer_append_float32(send_buffer, val.wh_charge_tot, 1e4, &ind);
 					}
 					if (mask & ((uint32_t)1 << 13)) {
-						//buffer_append_float32(send_buffer, mc_interface_get_distance(), 1e3, &ind);
-						buffer_append_float32(send_buffer, 0, 1e3, &ind);
+						buffer_append_float32(send_buffer, VescToSTM_get_distance(), 1e3, &ind);
 					}
 					if (mask & ((uint32_t)1 << 14)) {
-						//buffer_append_float32(send_buffer, mc_interface_get_distance_abs(), 1e3, &ind);
-						buffer_append_float32(send_buffer, 0, 1e3, &ind);
+						buffer_append_float32(send_buffer, VescToSTM_get_distance_abs(), 1e3, &ind);
 					}
 					if (mask & ((uint32_t)1 << 15)) {
-						//buffer_append_float32(send_buffer, mc_interface_get_pid_pos_now(), 1e6, &ind);
-						buffer_append_float32(send_buffer, 0, 1e6, &ind);
+						buffer_append_float32(send_buffer, VescToSTM_get_pid_pos_now(), 1e6, &ind);
 					}
 					if (mask & ((uint32_t)1 << 16)) {
 						//send_buffer[ind++] = mc_interface_get_fault();
@@ -696,8 +695,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 				case COMM_SET_MCCONF_TEMP:
 				case COMM_SET_MCCONF_TEMP_SETUP: {
-					mc_configuration *mcconf = pvPortMalloc(sizeof(mc_configuration));
-					*mcconf = *mc_interface_get_configuration();
+					mc_configuration *mcconf = &mc_conf;
 
 					int32_t ind = 0;
 					bool store = data[ind++];
@@ -767,12 +765,10 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						reply_func(send_buffer, ind);
 					}
 
-					vPortFree(mcconf);
 				} break;
 
 				case COMM_GET_MCCONF_TEMP: {
-					mc_configuration *mcconf = pvPortMalloc(sizeof(mc_configuration));
-					*mcconf = *mc_interface_get_configuration();
+					mc_configuration *mcconf = &mc_conf;
 					int32_t ind = 0;
 					uint8_t send_buffer[60];
 
@@ -792,7 +788,6 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					buffer_append_float32_auto(send_buffer, mcconf->si_gear_ratio, &ind);
 					buffer_append_float32_auto(send_buffer, mcconf->si_wheel_diameter, &ind);
 
-					vPortFree(mcconf);
 					reply_func(send_buffer, ind);
 				} break;
 
@@ -822,66 +817,12 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					int32_t ind2 = 0;
 					uint32_t mask = buffer_get_uint16(data, &ind2);
 
-					float rpy[3], acc[3], gyro[3], mag[3], q[4];
-					//imu_get_rpy(rpy);
-					//imu_get_accel(acc);
-					//imu_get_gyro(gyro);
-					//imu_get_mag(mag);
-					//imu_get_quaternions(q);
-
 					buffer_append_uint16(send_buffer, mask, &ind);
 
-					if (mask & ((uint32_t)1 << 0)) {
-						buffer_append_float32_auto(send_buffer, rpy[0], &ind);
-					}
-					if (mask & ((uint32_t)1 << 1)) {
-						buffer_append_float32_auto(send_buffer, rpy[1], &ind);
-					}
-					if (mask & ((uint32_t)1 << 2)) {
-						buffer_append_float32_auto(send_buffer, rpy[2], &ind);
-					}
-
-					if (mask & ((uint32_t)1 << 3)) {
-						buffer_append_float32_auto(send_buffer, acc[0], &ind);
-					}
-					if (mask & ((uint32_t)1 << 4)) {
-						buffer_append_float32_auto(send_buffer, acc[1], &ind);
-					}
-					if (mask & ((uint32_t)1 << 5)) {
-						buffer_append_float32_auto(send_buffer, acc[2], &ind);
-					}
-
-					if (mask & ((uint32_t)1 << 6)) {
-						buffer_append_float32_auto(send_buffer, gyro[0], &ind);
-					}
-					if (mask & ((uint32_t)1 << 7)) {
-						buffer_append_float32_auto(send_buffer, gyro[1], &ind);
-					}
-					if (mask & ((uint32_t)1 << 8)) {
-						buffer_append_float32_auto(send_buffer, gyro[2], &ind);
-					}
-
-					if (mask & ((uint32_t)1 << 9)) {
-						buffer_append_float32_auto(send_buffer, mag[0], &ind);
-					}
-					if (mask & ((uint32_t)1 << 10)) {
-						buffer_append_float32_auto(send_buffer, mag[1], &ind);
-					}
-					if (mask & ((uint32_t)1 << 11)) {
-						buffer_append_float32_auto(send_buffer, mag[2], &ind);
-					}
-
-					if (mask & ((uint32_t)1 << 12)) {
-						buffer_append_float32_auto(send_buffer, q[0], &ind);
-					}
-					if (mask & ((uint32_t)1 << 13)) {
-						buffer_append_float32_auto(send_buffer, q[1], &ind);
-					}
-					if (mask & ((uint32_t)1 << 14)) {
-						buffer_append_float32_auto(send_buffer, q[2], &ind);
-					}
-					if (mask & ((uint32_t)1 << 15)) {
-						buffer_append_float32_auto(send_buffer, q[3], &ind);
+					for(uint8_t i=0;i<16;i++){
+						if (mask & ((uint32_t)1 << i)) {
+							buffer_append_float32_auto(send_buffer, 0, &ind);
+						}
 					}
 
 					reply_func(send_buffer, ind);
@@ -902,8 +843,8 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				} break;
 
 				case COMM_SET_CURRENT_REL: {
-					//int32_t ind = 0;
-					//mc_interface_set_current_rel(buffer_get_float32(data, 1e5, &ind));
+					int32_t ind = 0;
+					VescToSTM_set_current_rel(buffer_get_float32(data, 1e5, &ind));
 					VescToSTM_timeout_reset();
 				} break;
 
@@ -922,9 +863,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						comm_can_conf_battery_cut(255, store, start, end);
 					}*/
 
-					mc_configuration *mcconf = pvPortMalloc(sizeof(mc_configuration));
-					//*mcconf = *mc_interface_get_configuration();
-					memset(mcconf,0,sizeof(mc_configuration));
+					mc_configuration *mcconf = &mc_conf;
 
 					if (mcconf->l_battery_cut_start != start || mcconf->l_battery_cut_end != end) {
 						mcconf->l_battery_cut_start = start;
@@ -938,7 +877,6 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						//mc_interface_set_configuration(mcconf);
 					}
 
-					vPortFree(mcconf);
 
 					// Send ack
 					ind = 0;
@@ -949,22 +887,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 				case COMM_SET_CAN_MODE: {
 					int32_t ind = 0;
-					bool store = data[ind++];
 					bool ack = data[ind++];
-					int mode = data[ind++];
-
-					/*app_configuration *appconf = mempools_alloc_appconf();
-					*appconf = *app_get_configuration();
-					appconf->can_mode = mode;
-
-					if (store) {
-						conf_general_store_app_configuration(appconf);
-					}
-
-					app_set_configuration(appconf);
-
-					mempools_free_appconf(appconf);*/
-
 					if (ack) {
 						ind = 0;
 						uint8_t send_buffer[50];
@@ -999,7 +922,6 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					int32_t ind = 0;
 					uint8_t hall_tab[8];
 					uint8_t send_buffer[50];
-					int32_t offset;
 					bool res = tune_mcpwm_foc_hall_detect(buffer_get_int32(data, &ind), hall_tab);
 					ind=0;
 					send_buffer[ind++] = COMM_DETECT_HALL_FOC;
