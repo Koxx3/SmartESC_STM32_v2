@@ -5,6 +5,8 @@
 #include "confgenerator.h"
 #include "tune.h"
 #include <string.h>
+#include "drive_parameters.h"
+#include "mc_stm_types.h"
 
 int32_t confgenerator_serialize_mcconf(uint8_t *buffer, const mc_configuration *conf) {
 	int32_t ind = 0;
@@ -763,12 +765,12 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 //	float gpd_current_ki;
 
 	// Speed PID
-//	float s_pid_kp;
-//	float s_pid_ki;
-//	float s_pid_kd;
+	mcconf->s_pid_kp = (PID_SPEED_KP_DEFAULT)/100.0;
+	mcconf->s_pid_ki = (PID_SPEED_KI_DEFAULT)/100.0;
+	mcconf->s_pid_kd = (PID_SPEED_KD_DEFAULT)/100.0;
 //	float s_pid_kd_filter;
 //	float s_pid_min_erpm;
-//	bool s_pid_allow_braking;
+	mcconf->s_pid_allow_braking = false;
 //	float s_pid_ramp_erpms_s;
 
 	// Pos PID

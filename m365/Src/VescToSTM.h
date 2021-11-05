@@ -38,6 +38,8 @@ int32_t VescToSTM_get_tachometer_abs_value(bool reset);
 float VescToSTM_get_battery_level(float *wh_left);
 void VescToSTM_set_current_rel(float val);
 float VescToSTM_get_duty_cycle_now(void);
+mc_fault_code VescToSTM_get_fault(void);
+uint8_t VescToSTM_get_uid(uint8_t * ptr, uint8_t size);
 
 
 #endif /* VESCTOSTM_H_ */

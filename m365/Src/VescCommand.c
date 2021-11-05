@@ -144,7 +144,7 @@ void send_sample(){
 }
 
 
-const char test[13] = "1234567890123";
+
 
 void commands_process_packet(unsigned char *data, unsigned int len,
 		void(*reply_func)(unsigned char *data, unsigned int len)) {
@@ -180,8 +180,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 		strcpy((char*)(send_buffer + ind), HW_NAME);
 		ind += strlen(HW_NAME) + 1;
 
-		memcpy(send_buffer + ind, test, 12);
-		ind += 12;
+		ind += VescToSTM_get_uid(send_buffer + ind, 12);
 
 		send_buffer[ind++] = 1;
 		send_buffer[ind++] = FW_TEST_VERSION_NUMBER;
@@ -283,8 +282,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				buffer_append_int32(send_buffer, VescToSTM_get_tachometer_abs_value(false), &ind);
 			}
 			if (mask & ((uint32_t)1 << 15)) {
-				//send_buffer[ind++] = mc_interface_get_fault();
-				send_buffer[ind++] = 0;
+				send_buffer[ind++] = VescToSTM_get_fault();
 			}
 			if (mask & ((uint32_t)1 << 16)) {
 				buffer_append_float32(send_buffer, VescToSTM_get_pid_pos_now(), 1e6, &ind);
@@ -303,11 +301,9 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				buffer_append_float16(send_buffer, 0, 1e1, &ind);
 			}
 			if (mask & ((uint32_t)1 << 19)) {
-				//buffer_append_float32(send_buffer, mc_interface_read_reset_avg_vd(), 1e3, &ind);
 				buffer_append_float32(send_buffer, VescToSTM_get_Vd(), 1e3, &ind);
 			}
 			if (mask & ((uint32_t)1 << 20)) {
-				//buffer_append_float32(send_buffer, mc_interface_read_reset_avg_vq(), 1e3, &ind);
 				buffer_append_float32(send_buffer, VescToSTM_get_Vq(), 1e3, &ind);
 			}
 
@@ -340,7 +336,6 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 			case COMM_SET_POS: {
 				//int32_t ind = 0;
-				//CMD_tune();
 				//mc_interface_set_pid_pos((float)buffer_get_int32(data, &ind) / 1000000.0);
 				VescToSTM_timeout_reset();
 			} break;
@@ -366,9 +361,8 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				VescToSTM_timeout_reset();
 			} break;
 
-			case COMM_SET_SERVO_POS: {
-
-				} break;
+			case COMM_SET_SERVO_POS:
+				break;
 
 			case COMM_SET_MCCONF: {
 				mc_configuration *mcconf = pvPortMalloc(sizeof(mc_configuration));
@@ -380,12 +374,12 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					utils_truncate_number(&mcconf->l_current_min_scale , 0.0, 1.0);
 
 
-					mcconf->lo_current_max = mcconf->l_current_max * mcconf->l_current_max_scale;
+					/*mcconf->lo_current_max = mcconf->l_current_max * mcconf->l_current_max_scale;
 					mcconf->lo_current_min = mcconf->l_current_min * mcconf->l_current_min_scale;
 					mcconf->lo_in_current_max = mcconf->l_in_current_max;
 					mcconf->lo_in_current_min = mcconf->l_in_current_min;
 					mcconf->lo_current_motor_max_now = mcconf->lo_current_max;
-					mcconf->lo_current_motor_min_now = mcconf->lo_current_min;
+					mcconf->lo_current_motor_min_now = mcconf->lo_current_min;*/
 
 					conf_general_setup_mc(mcconf);
 					conf_general_store_mc_configuration(mcconf, 0);
@@ -421,14 +415,12 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					vPortFree(mcconf);
 				} break;
 
-				case COMM_SET_APPCONF: {
-
-				} break;
+				case COMM_SET_APPCONF:
+					break;
 
 				case COMM_GET_APPCONF:
-				case COMM_GET_APPCONF_DEFAULT: {
-
-				} break;
+				case COMM_GET_APPCONF_DEFAULT:
+					break;
 
 				case COMM_SAMPLE_PRINT: {
 
@@ -463,9 +455,9 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					uint8_t send_buffer[50];
 					send_buffer[ind++] = COMM_GET_DECODED_PPM;
 					//buffer_append_int32(send_buffer, (int32_t)(app_ppm_get_decoded_level() * 1000000.0), &ind);
-					buffer_append_int32(send_buffer, (int32_t)(0 * 1000000.0), &ind);
+					buffer_append_int32(send_buffer, 0, &ind);
 					//buffer_append_int32(send_buffer, (int32_t)(servodec_get_last_pulse_len(0) * 1000000.0), &ind);
-					buffer_append_int32(send_buffer, (int32_t)(0 * 1000000.0), &ind);
+					buffer_append_int32(send_buffer, 0, &ind);
 					reply_func(send_buffer, ind);
 
 				} break;
@@ -475,14 +467,13 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					int32_t ind = 0;
 					uint8_t send_buffer[50];
 					send_buffer[ind++] = COMM_GET_DECODED_ADC;
-					//buffer_append_int32(send_buffer, (int32_t)(app_adc_get_decoded_level() * 1000000.0), &ind);
-					buffer_append_int32(send_buffer, (int32_t)(100 * 1000000.0), &ind);
+					buffer_append_int32(send_buffer, (int32_t)(VescToSTM_get_battery_level(NULL) * 1000000.0), &ind);
 					//buffer_append_int32(send_buffer, (int32_t)(app_adc_get_voltage() * 1000000.0), &ind);
 					buffer_append_int32(send_buffer, (int32_t)(VBS_GetAvBusVoltage_V(pMCT[M1]->pBusVoltageSensor) * 1000000.0), &ind);
 					//buffer_append_int32(send_buffer, (int32_t)(app_adc_get_decoded_level2() * 1000000.0), &ind);
-					buffer_append_int32(send_buffer, (int32_t)(0 * 1000000.0), &ind);
+					buffer_append_int32(send_buffer, 0, &ind);
 					//buffer_append_int32(send_buffer, (int32_t)(app_adc_get_voltage2() * 1000000.0), &ind);
-					buffer_append_int32(send_buffer, (int32_t)(0 * 1000000.0), &ind);
+					buffer_append_int32(send_buffer, 0, &ind);
 					reply_func(send_buffer, ind);
 				} break;
 
@@ -491,7 +482,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					uint8_t send_buffer[50];
 					send_buffer[ind++] = COMM_GET_DECODED_CHUK;
 					//buffer_append_int32(send_buffer, (int32_t)(app_nunchuk_get_decoded_chuk() * 1000000.0), &ind);
-					buffer_append_int32(send_buffer, (int32_t)(0 * 1000000.0), &ind);
+					buffer_append_int32(send_buffer, 0, &ind);
 					reply_func(send_buffer, ind);
 				} break;
 
@@ -499,29 +490,18 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					int32_t ind = 0;
 					uint8_t send_buffer[50];
 					send_buffer[ind++] = COMM_GET_DECODED_BALANCE;
-					buffer_append_int32(send_buffer, 0, &ind);
-					buffer_append_int32(send_buffer, 0, &ind);
-					buffer_append_int32(send_buffer, 0, &ind);
-					buffer_append_uint32(send_buffer, 0, &ind);
-					buffer_append_int32(send_buffer, 0, &ind);
-					buffer_append_int32(send_buffer, 0, &ind);
-					buffer_append_uint16(send_buffer, 0, &ind);
-					buffer_append_uint16(send_buffer, 0, &ind);
-					buffer_append_int32(send_buffer, 0, &ind);
-					buffer_append_int32(send_buffer, 0, &ind);
+					memset(send_buffer,0,36);
+					ind+=36;
 					reply_func(send_buffer, ind);
 				} break;
 
-				case COMM_FORWARD_CAN: {
+				case COMM_FORWARD_CAN:
+					break;
 
-				} break;
-
-				case COMM_SET_CHUCK_DATA: {
-
-				} break;
+				case COMM_SET_CHUCK_DATA:
+					break;
 
 				case COMM_CUSTOM_APP_DATA:
-
 					break;
 
 				case COMM_NRF_START_PAIRING: {
@@ -532,12 +512,6 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					reply_func(send_buffer, ind);
 				} break;
 
-				case COMM_GPD_SET_FSW: {
-					VescToSTM_timeout_reset();
-					//int32_t ind = 0;
-					//gpdrive_set_switching_frequency((float)buffer_get_int32(data, &ind));
-				} break;
-
 				case COMM_GPD_BUFFER_SIZE_LEFT: {
 					int32_t ind = 0;
 					uint8_t send_buffer[50];
@@ -546,47 +520,14 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					buffer_append_int32(send_buffer, 128, &ind);
 					reply_func(send_buffer, ind);
 				} break;
-
-				case COMM_GPD_FILL_BUFFER: {
-					VescToSTM_timeout_reset();
-					//int32_t ind = 0;
-					//while (ind < (int)len) {
-						//gpdrive_add_buffer_sample(buffer_get_float32_auto(data, &ind));
-					//}
-				} break;
-
-				case COMM_GPD_OUTPUT_SAMPLE: {
-					VescToSTM_timeout_reset();
-					//int32_t ind = 0;
-					//gpdrive_output_sample(buffer_get_float32_auto(data, &ind));
-				} break;
-
-				case COMM_GPD_SET_MODE: {
-					VescToSTM_timeout_reset();
-					//int32_t ind = 0;
-					//gpdrive_set_mode(data[ind++]);
-				} break;
-
-				case COMM_GPD_FILL_BUFFER_INT8: {
-					VescToSTM_timeout_reset();
-					//int32_t ind = 0;
-					//while (ind < (int)len) {
-						//gpdrive_add_buffer_sample_int((int8_t)data[ind++]);
-					//}
-				} break;
-
-				case COMM_GPD_FILL_BUFFER_INT16: {
-					VescToSTM_timeout_reset();
-					//int32_t ind = 0;
-					//while (ind < (int)len) {
-						//gpdrive_add_buffer_sample_int(buffer_get_int16(data, &ind));
-					//}
-				} break;
-
-				case COMM_GPD_SET_BUFFER_INT_SCALE: {
-					//int32_t ind = 0;
-					//gpdrive_set_buffer_int_scale(buffer_get_float32_auto(data, &ind));
-				} break;
+				case COMM_GPD_SET_FSW:
+				case COMM_GPD_FILL_BUFFER:
+				case COMM_GPD_OUTPUT_SAMPLE:
+				case COMM_GPD_SET_MODE:
+				case COMM_GPD_FILL_BUFFER_INT8:
+				case COMM_GPD_FILL_BUFFER_INT16:
+				case COMM_GPD_SET_BUFFER_INT_SCALE:
+				break;
 
 				case COMM_GET_VALUES_SETUP:
 				case COMM_GET_VALUES_SETUP_SELECTIVE: {
@@ -665,8 +606,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						buffer_append_float32(send_buffer, VescToSTM_get_pid_pos_now(), 1e6, &ind);
 					}
 					if (mask & ((uint32_t)1 << 16)) {
-						//send_buffer[ind++] = mc_interface_get_fault();
-						send_buffer[ind++] = 0;
+						send_buffer[ind++] = VescToSTM_get_fault();
 					}
 					if (mask & ((uint32_t)1 << 17)) {
 						//uint8_t current_controller_id = app_get_configuration()->controller_id;
@@ -791,18 +731,10 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					reply_func(send_buffer, ind);
 				} break;
 
-				case COMM_EXT_NRF_PRESENT: {
-
-
-				} break;
-
-				case COMM_EXT_NRF_ESB_RX_DATA: {
-
-				} break;
-
-				case COMM_APP_DISABLE_OUTPUT: {
-
-				} break;
+				case COMM_EXT_NRF_PRESENT:
+				case COMM_EXT_NRF_ESB_RX_DATA:
+				case COMM_APP_DISABLE_OUTPUT:
+					break;
 
 				case COMM_TERMINAL_CMD_SYNC:
 					data[len] = '\0';
@@ -829,13 +761,8 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				} break;
 
 				case COMM_ERASE_BOOTLOADER_ALL_CAN:
-
-					/* Falls through. */
-					/* no break */
 				case COMM_ERASE_BOOTLOADER: {
 					int32_t ind = 0;
-
-					ind = 0;
 					uint8_t send_buffer[50];
 					send_buffer[ind++] = COMM_ERASE_BOOTLOADER;
 					send_buffer[ind++] = 1;
@@ -848,10 +775,8 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					VescToSTM_timeout_reset();
 				} break;
 
-				case COMM_CAN_FWD_FRAME: {
-
-				} break;
-
+				case COMM_CAN_FWD_FRAME:
+					break;
 				case COMM_SET_BATTERY_CUT: {
 					int32_t ind = 0;
 					float start = buffer_get_float32(data, 1e3, &ind);

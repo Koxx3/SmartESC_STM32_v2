@@ -144,7 +144,7 @@ bool conf_general_store_mc_configuration(mc_configuration *conf, bool is_motor_2
 	}
 
 	HAL_FLASH_Lock();
-	vTaskDelay(500);
+	vTaskDelay(200);
 	VescToSTM_start_motor();
 	VescToSTM_set_torque(0);
 
@@ -175,7 +175,7 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 
 	// Limits
 		SpeednTorqCtrlM1.MaxPositiveTorque = mcconf->l_current_max * CURRENT_FACTOR;
-		 SpeednTorqCtrlM1.MinNegativeTorque = mcconf->l_current_min * CURRENT_FACTOR;
+		SpeednTorqCtrlM1.MinNegativeTorque = mcconf->l_current_min * CURRENT_FACTOR;
 //		float l_in_current_max;
 //		float l_in_current_min;
 		mcconf->l_abs_current_max = 60;
@@ -285,8 +285,8 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 //	float gpd_current_ki;
 
 	// Speed PID
-//	float s_pid_kp;
-//	float s_pid_ki;
+	PIDSpeedHandle_M1.hDefKpGain = mcconf->s_pid_kp * 100;
+	PIDSpeedHandle_M1.hDefKiGain = mcconf->s_pid_ki * 100;
 //	float s_pid_kd;
 //	float s_pid_kd_filter;
 //	float s_pid_min_erpm;
