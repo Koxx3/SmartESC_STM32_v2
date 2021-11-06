@@ -667,8 +667,8 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 //		float l_max_erpm_fbrake_cc;
 		mcconf->l_min_vin = 10;
 		mcconf->l_max_vin = 56;
-		mcconf->l_battery_cut_end = 10;
-		mcconf->l_battery_cut_start = 56;
+		mcconf->l_battery_cut_end = 31;
+		mcconf->l_battery_cut_start = 34;
 //		bool l_slow_abs_current;
 //		float l_temp_fet_start;
 //		float l_temp_fet_end;
@@ -690,13 +690,6 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 //		float lo_current_motor_max_now;
 //		float lo_current_motor_min_now;
 
-
-
-
-	// Hall sensor
-	for(int i=0;i<8;i++){
-		mcconf->hall_table[i] = hall_arr[i];
-	}
 
 	// BLDC switching and drive
 	mcconf->motor_type = MOTOR_TYPE_FOC;
@@ -771,7 +764,7 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 //	float s_pid_kd_filter;
 //	float s_pid_min_erpm;
 	mcconf->s_pid_allow_braking = false;
-//	float s_pid_ramp_erpms_s;
+	mcconf->s_pid_ramp_erpms_s = 0;
 
 	// Pos PID
 //	float p_pid_kp;
@@ -806,11 +799,12 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 
 	// Setup info
 	mcconf->si_motor_poles = 15;
-//	float si_gear_ratio;
-//	float si_wheel_diameter;
+
+	mcconf->si_gear_ratio = 1;
+	mcconf->si_wheel_diameter = 250;
 	mcconf->si_battery_type = BATTERY_TYPE_LIION_3_0__4_2;
-	//	int si_battery_cells;
-//	float si_battery_ah;
+	mcconf->si_battery_cells = 10;
+	mcconf->si_battery_ah = 10;
 
 	// BMS Configuration
 //	bms_config bms;

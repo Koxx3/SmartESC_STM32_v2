@@ -260,7 +260,7 @@ __weak void MC_RunMotorControlTasks(void)
     MC_Scheduler();
 
     /* ** User Interface Task ** */
-    UI_Scheduler();
+    //UI_Scheduler();
   }
 }
 

@@ -274,7 +274,7 @@ void EXTI15_10_IRQHandler (void)
   if ( LL_EXTI_ReadFlag_0_31(LL_EXTI_LINE_15) )
   {
     LL_EXTI_ClearFlag_0_31 (LL_EXTI_LINE_15);
-    UI_HandleStartStopButton_cb ();
+    //UI_HandleStartStopButton_cb ();
   }
 
 }

@@ -40,6 +40,6 @@ void VescToSTM_set_current_rel(float val);
 float VescToSTM_get_duty_cycle_now(void);
 mc_fault_code VescToSTM_get_fault(void);
 uint8_t VescToSTM_get_uid(uint8_t * ptr, uint8_t size);
-
+void VescToSTM_enable_timeout(bool enbale);
 
 #endif /* VESCTOSTM_H_ */

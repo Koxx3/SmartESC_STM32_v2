@@ -25,9 +25,9 @@ void VescToSTM_init_odometer(mc_configuration* conf){
 }
 
 
-uint32_t last_reset=0;
 
-const uint8_t test[13] = "123456789012";
+
+const uint8_t test[12] = {1,2,3,4,5,6,7,8,9,10,11,12};
 uint8_t VescToSTM_get_uid(uint8_t * ptr, uint8_t size){
 	if(size>12) size=12;
 	memcpy(ptr, test, size);
@@ -39,18 +39,20 @@ float VescToSTM_get_pid_pos_now(){
 	return 360.0 / 65536.0 * (float)pMCI[M1]->pSTC->SPD->hElAngle;
 }
 
-
+uint32_t last_reset=0;
+bool timeout_enable = true;
 void VescToSTM_timeout_reset(){
 	last_reset = xTaskGetTickCount();
 };
-
 void VescToSTM_handle_timeout(){
+	if(!timeout_enable) return;
 	if((xTaskGetTickCount() - last_reset) > 1000){
-		if(pMCI[M1]->pSTC->SPD->open_loop == false){
-			VescToSTM_set_brake(0);
-		}
+		VescToSTM_set_brake(0);
 	}
 };
+void VescToSTM_enable_timeout(bool enbale){
+	timeout_enable = enbale;
+}
 
 void VescToSTM_set_torque(int32_t current){
 	pMCI[M1]->pSTC->SPD->open_loop = false;
@@ -59,6 +61,13 @@ void VescToSTM_set_torque(int32_t current){
 		q = SpeednTorqCtrlM1.MaxPositiveTorque;
 	}else if (q < SpeednTorqCtrlM1.MinNegativeTorque){
 		q = SpeednTorqCtrlM1.MinNegativeTorque;
+	}
+	uint16_t Vin = VBS_GetAvBusVoltage_V(pMCT[M1]->pBusVoltageSensor);
+	if(Vin < mc_conf.l_battery_cut_start){
+		float diff = mc_conf.l_battery_cut_start - mc_conf.l_battery_cut_end;
+		float VinDiff = Vin - mc_conf.l_battery_cut_end;
+		float qRed = (float)q / diff * VinDiff;
+		q = qRed;
 	}
 	if(q > 0){
 		pMCI[M1]->pSTC->PISpeed->wUpperIntegralLimit = (uint32_t)q * SP_KDDIV;
@@ -113,7 +122,9 @@ void VescToSTM_set_speed(int32_t rpm){
 		pMCI[M1]->pSTC->PISpeed->hUpperOutputLimit = mc_conf.s_pid_allow_braking ? SpeednTorqCtrlM1.MaxPositiveTorque : 0;
 		pMCI[M1]->pSTC->PISpeed->hLowerOutputLimit = SpeednTorqCtrlM1.MinNegativeTorque;
 	}
-	MCI_ExecSpeedRamp(pMCI[M1], erpm / mc_conf.si_motor_poles, 0);
+	int32_t ramp_time = 0;
+	if(mc_conf.s_pid_ramp_erpms_s) ramp_time = (float)(erpm * 1000) / mc_conf.s_pid_ramp_erpms_s;
+	MCI_ExecSpeedRamp(pMCI[M1], erpm / mc_conf.si_motor_poles, ramp_time);
 }
 
 float VescToSTM_get_temperature(){
