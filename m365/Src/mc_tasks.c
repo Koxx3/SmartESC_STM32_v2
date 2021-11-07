@@ -515,10 +515,10 @@ __weak void FOC_CalcCurrRef(uint8_t bMotor)
   {
     FOCVars[bMotor].hTeref = STC_CalcTorqueReference(pSTC[bMotor]);
     FOCVars[bMotor].Iqdref.q = FOCVars[bMotor].hTeref;
-    if (pMaxTorquePerAmpere[bMotor])
+    /*if (pMaxTorquePerAmpere[bMotor])
     {
-      MTPA_CalcCurrRefFromIq(pMaxTorquePerAmpere[bMotor], &FOCVars[bMotor].Iqdref);
-    }
+     // MTPA_CalcCurrRefFromIq(pMaxTorquePerAmpere[bMotor], &FOCVars[bMotor].Iqdref);
+    }*/
 
   }
   /* USER CODE BEGIN FOC_CalcCurrRef 1 */

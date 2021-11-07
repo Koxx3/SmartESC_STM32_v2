@@ -62,11 +62,6 @@
 			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/encoder_speed_pos_fdbk.c</locationURI>
 		</link>
 		<link>
-			<name>Application/MotorControl/gap_gate_driver_ctrl.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/gap_gate_driver_ctrl.c</locationURI>
-		</link>
-		<link>
 			<name>Application/MotorControl/hall_speed_pos_fdbk.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/hall_speed_pos_fdbk.c</locationURI>
@@ -239,32 +234,32 @@
 		<link>
 			<name>Application/User/mc_config.c</name>
 			<type>1</type>
-			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/mc_config.c</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/mc_config.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/mc_interface.c</name>
 			<type>1</type>
-			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/mc_interface.c</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/mc_interface.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/mc_math.c</name>
 			<type>1</type>
-			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/mc_math.c</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/mc_math.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/mc_parameters.c</name>
 			<type>1</type>
-			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/mc_parameters.c</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/mc_parameters.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/mc_tasks.c</name>
 			<type>1</type>
-			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/mc_tasks.c</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/mc_tasks.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/motorcontrol.c</name>
 			<type>1</type>
-			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/motorcontrol.c</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/motorcontrol.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/packet.c</name>
@@ -284,12 +279,12 @@
 		<link>
 			<name>Application/User/regular_conversion_manager.c</name>
 			<type>1</type>
-			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/regular_conversion_manager.c</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/regular_conversion_manager.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/stm32f10x_mc_it.c</name>
 			<type>1</type>
-			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/stm32f10x_mc_it.c</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/stm32f10x_mc_it.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/stm32f1xx_hal_msp.c</name>

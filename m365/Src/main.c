@@ -20,13 +20,13 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
-#include "motorcontrol.h"
-#include "conf_general.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
 #include "task_init.h"
+#include "motorcontrol.h"
+#include "conf_general.h"
 
 /* USER CODE END Includes */
 
@@ -129,13 +129,10 @@ int main(void)
   MX_TIM3_Init();
   MX_USART3_UART_Init();
 
-
-
-  MX_MotorControl_Init();
-
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
+  MX_MotorControl_Init();
   conf_general_init();
   /* USER CODE END 2 */
 
@@ -144,8 +141,9 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
-  /* USER CODE END RTOS_MUTEX */
   HAL_GPIO_WritePin(TPS_ENA_GPIO_Port, TPS_ENA_Pin, GPIO_PIN_SET);
+  /* USER CODE END RTOS_MUTEX */
+
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
@@ -169,9 +167,10 @@ int main(void)
   /* add threads, ... */
 
   task_init(); //bring up user tasks
+  HAL_GPIO_WritePin(TPS_ENA_GPIO_Port, TPS_ENA_Pin, GPIO_PIN_SET);
 
   /* USER CODE END RTOS_THREADS */
-  HAL_GPIO_WritePin(TPS_ENA_GPIO_Port, TPS_ENA_Pin, GPIO_PIN_SET);
+
   /* USER CODE BEGIN RTOS_EVENTS */
   /* add events, ... */
   /* USER CODE END RTOS_EVENTS */
