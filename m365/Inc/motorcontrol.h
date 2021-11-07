@@ -23,7 +23,6 @@
 #define __MOTORCONTROL_H
 #include "mc_config.h"
 #include "parameters_conversion.h"
-#include "mc_api.h"
 
 #ifdef __cplusplus
  extern "C" {

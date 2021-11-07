@@ -117,11 +117,6 @@
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/main.c</locationURI>
 		</link>
 		<link>
-			<name>Application/User/mc_api.c</name>
-			<type>1</type>
-			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/mc_api.c</locationURI>
-		</link>
-		<link>
 			<name>Application/User/mc_config.c</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/mc_config.c</locationURI>
@@ -145,11 +140,6 @@
 			<name>Application/User/mc_tasks.c</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/mc_tasks.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/motor_control_protocol.c</name>
-			<type>1</type>
-			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/motor_control_protocol.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/motorcontrol.c</name>
@@ -235,16 +225,6 @@
 			<name>Application/User/tune.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Src/tune.h</locationURI>
-		</link>
-		<link>
-			<name>Application/User/ui_task.c</name>
-			<type>1</type>
-			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/ui_task.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/user_interface.c</name>
-			<type>1</type>
-			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/user_interface.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/utils.c</name>
@@ -407,11 +387,6 @@
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Src/digital_output.c</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/MotorControl/frame_communication_protocol.c</name>
-			<type>1</type>
-			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/MCSDK_v5.4.5/MotorControl/MCSDK/UILibrary/Src/frame_communication_protocol.c</locationURI>
-		</link>
-		<link>
 			<name>Middlewares/MotorControl/hall_speed_pos_fdbk.c</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/MCSDK_v5.4.5/MotorControl/MCSDK/MCLib/Any/Src/hall_speed_pos_fdbk.c</locationURI>
@@ -485,11 +460,6 @@
 			<name>Middlewares/MotorControl/ui_irq_handler.c</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/MCSDK_v5.4.5/MotorControl/MCSDK/UILibrary/Src/ui_irq_handler.c</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/MotorControl/usart_frame_communication_protocol.c</name>
-			<type>1</type>
-			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/MCSDK_v5.4.5/MotorControl/MCSDK/UILibrary/Src/usart_frame_communication_protocol.c</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/MotorControl/virtual_speed_sensor.c</name>

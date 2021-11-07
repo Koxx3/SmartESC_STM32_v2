@@ -23,7 +23,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "mc_type.h"
 #include "mc_tasks.h"
-#include "ui_task.h"
 #include "parameters_conversion.h"
 #include "motorcontrol.h"
 #include "stm32f1xx_ll_exti.h"
@@ -183,12 +182,12 @@ void USART_IRQHandler(void)
   /* USER CODE BEGIN USART_IRQn 0 */
 
   /* USER CODE END USART_IRQn 0 */
-  uint16_t hUSART_SR = pUSART.USARTx->SR;
+  uint16_t hUSART_SR = USART3->SR;
 
   if (hUSART_SR & USART_SR_ORE) /* Overrun error occurs before SR access */
   {
     /* Send Overrun message */
-    LL_USART_ClearFlag_ORE(pUSART.USARTx); /* Clear overrun flag */
+    LL_USART_ClearFlag_ORE(USART3); /* Clear overrun flag */
     /* USER CODE BEGIN USART_ORE */
 
     /* USER CODE END USART_ORE   */
@@ -199,7 +198,7 @@ void USART_IRQHandler(void)
   {
 
 
-	c = LL_USART_ReceiveData8(pUSART.USARTx);
+	c = LL_USART_ReceiveData8(USART3);
 	if(UART_RX!=NULL) xStreamBufferSendFromISR(UART_RX, &c, sizeof(c), 0);
 
   /* USER CODE BEGIN USART_RXNE */
@@ -228,20 +227,20 @@ void HardFault_Handler(void)
   while (1)
   {
     {
-      if (LL_USART_IsActiveFlag_ORE(pUSART.USARTx)) /* Overrun error occurs */
+      if (LL_USART_IsActiveFlag_ORE(USART3)) /* Overrun error occurs */
       {
         /* Send Overrun message */
         //UFCP_OVR_IRQ_Handler(&pUSART);
-        LL_USART_ClearFlag_ORE(pUSART.USARTx); /* Clear overrun flag */
+        LL_USART_ClearFlag_ORE(USART3); /* Clear overrun flag */
         //UI_SerialCommunicationTimeOutStop();
       }
 
-      if (LL_USART_IsActiveFlag_TXE(pUSART.USARTx))
+      if (LL_USART_IsActiveFlag_TXE(USART3))
       {
         //UFCP_TX_IRQ_Handler(&pUSART);
       }
 
-      if (LL_USART_IsActiveFlag_RXNE(pUSART.USARTx)) /* Valid data have been received */
+      if (LL_USART_IsActiveFlag_RXNE(USART3)) /* Valid data have been received */
       {
         //uint16_t retVal;
         //retVal = *(uint16_t*)(UFCP_RX_IRQ_Handler(&pUSART,LL_USART_ReceiveData8(pUSART.USARTx)));

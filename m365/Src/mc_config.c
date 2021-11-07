@@ -242,11 +242,11 @@ RDivider_Handle_t RealBusVoltageSensorParamsM1 =
   .UnderVoltageThreshold =  UNDERVOLTAGE_THRESHOLD_d,
   .aBuffer = RealBusVoltageSensorFilterBufferM1,
 };
-
+/*
 UI_Handle_t UI_Params =
 {
   .bDriveNum = 0,
-};
+};*/
 
 /** RAMP for Motor1.
   *
@@ -273,12 +273,6 @@ MTPA_Handle_t MTPARegM1 =
   .Offset   = OFST,
 };
 
-UFCP_Handle_t pUSART =
-{
-  ._Super.RxTimeout = 0,
-  .USARTx = USART3,
-
-};
 
 /* USER CODE BEGIN Additional configuration */
 

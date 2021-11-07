@@ -316,16 +316,16 @@ typedef struct {
 	mc_sensor_mode sensor_mode;
 
 	// Sensorless (bldc)
-	float sl_min_erpm;
-	float sl_min_erpm_cycle_int_limit;
-	float sl_max_fullbreak_current_dir_change;
-	float sl_cycle_int_limit;
-	float sl_phase_advance_at_br;
-	float sl_cycle_int_rpm_br;
-	float sl_bemf_coupling_k;
+//	float sl_min_erpm;
+//	float sl_min_erpm_cycle_int_limit;
+//	float sl_max_fullbreak_current_dir_change;
+//	float sl_cycle_int_limit;
+//	float sl_phase_advance_at_br;
+//	float sl_cycle_int_rpm_br;
+//	float sl_bemf_coupling_k;
 	// Hall sensor
-	int8_t hall_table[8];
-	float hall_sl_erpm;
+//	int8_t hall_table[8];
+//	float hall_sl_erpm;
 
 	// FOC
 	float foc_current_kp;
@@ -333,13 +333,13 @@ typedef struct {
 	float foc_f_sw;
 	float foc_dt_us;
 	float foc_encoder_offset;
-	bool foc_encoder_inverted;
-	float foc_encoder_ratio;
-	float foc_encoder_sin_offset;
-	float foc_encoder_sin_gain;
-	float foc_encoder_cos_offset;
-	float foc_encoder_cos_gain;
-	float foc_encoder_sincos_filter_constant;
+//	bool foc_encoder_inverted;
+//	float foc_encoder_ratio;
+//	float foc_encoder_sin_offset;
+//	float foc_encoder_sin_gain;
+//	float foc_encoder_cos_offset;
+//	float foc_encoder_cos_gain;
+//	float foc_encoder_sincos_filter_constant;
 	float foc_motor_l;
 	float foc_motor_ld_lq_diff;
 	float foc_motor_r;
@@ -370,20 +370,20 @@ typedef struct {
 	float foc_current_filter_const;
 	mc_foc_cc_decoupling_mode foc_cc_decoupling;
 	mc_foc_observer_type foc_observer_type;
-	float foc_hfi_voltage_start;
-	float foc_hfi_voltage_run;
-	float foc_hfi_voltage_max;
-	float foc_sl_erpm_hfi;
-	uint16_t foc_hfi_start_samples;
-	float foc_hfi_obs_ovr_sec;
-	uint8_t foc_hfi_samples;
+//	float foc_hfi_voltage_start;
+//	float foc_hfi_voltage_run;
+//	float foc_hfi_voltage_max;
+//	float foc_sl_erpm_hfi;
+//	uint16_t foc_hfi_start_samples;
+//	float foc_hfi_obs_ovr_sec;
+//	uint8_t foc_hfi_samples;
 
 	// GPDrive
-	int gpd_buffer_notify_left;
-	int gpd_buffer_interpol;
-	float gpd_current_filter_const;
-	float gpd_current_kp;
-	float gpd_current_ki;
+//	int gpd_buffer_notify_left;
+//	int gpd_buffer_interpol;
+//	float gpd_current_filter_const;
+//	float gpd_current_kp;
+//	float gpd_current_ki;
 
 	// Speed PID
 	float s_pid_kp;
@@ -395,11 +395,11 @@ typedef struct {
 	float s_pid_ramp_erpms_s;
 
 	// Pos PID
-	float p_pid_kp;
-	float p_pid_ki;
-	float p_pid_kd;
-	float p_pid_kd_filter;
-	float p_pid_ang_div;
+//	float p_pid_kp;
+//	float p_pid_ki;
+//	float p_pid_kd;
+//	float p_pid_kd_filter;
+//	float p_pid_ang_div;
 
 	// Current controller
 	float cc_startup_boost_duty;
@@ -433,7 +433,7 @@ typedef struct {
 	float si_battery_ah;
 
 	// BMS Configuration
-	bms_config bms;
+//	bms_config bms;
 
 	// Protect from flash corruption.
 	uint16_t crc;

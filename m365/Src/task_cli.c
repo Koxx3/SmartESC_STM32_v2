@@ -54,15 +54,15 @@ TERMINAL_HANDLE * cli_handle;
 
 
 void _putchar(char character){
-	while(!LL_USART_IsActiveFlag_TXE(pUSART.USARTx)){
+	while(!LL_USART_IsActiveFlag_TXE(USART3)){
 	}
-	LL_USART_TransmitData8(pUSART.USARTx, character);
+	LL_USART_TransmitData8(USART3, character);
 }
 
 void putbuffer(unsigned char *buf, unsigned int len){
 	while(len){
-		while(!LL_USART_IsActiveFlag_TXE(pUSART.USARTx)){}
-		LL_USART_TransmitData8(pUSART.USARTx, *buf);
+		while(!LL_USART_IsActiveFlag_TXE(USART3)){}
+		LL_USART_TransmitData8(USART3, *buf);
 		len--;
 		buf++;
 	}
@@ -91,8 +91,11 @@ void task_cli(void * argument)
 	vTaskDelay(200);
 	VescToSTM_set_brake(0);
 
+
+
 	packet_init(putbuffer, process_packet, UART_HANDLE);
 
+	LL_USART_EnableIT_RXNE(USART3);
   /* Infinite loop */
 	for(;;)
 	{

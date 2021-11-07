@@ -417,7 +417,6 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 				case COMM_SET_APPCONF:
 					break;
-
 				case COMM_GET_APPCONF:
 				case COMM_GET_APPCONF_DEFAULT:
 					break;

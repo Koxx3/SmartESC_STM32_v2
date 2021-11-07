@@ -34,6 +34,8 @@
 #include "VescCommand.h"
 #include "mc_tasks.h"
 #include "parameters_conversion.h"
+#include "FreeRTOS.h"
+#include "task.h"
 
 /* USER CODE BEGIN Includes */
 

@@ -27,6 +27,8 @@
 #include "drive_parameters.h"
 #include "mc_config.h"
 #include "VescToSTM.h"
+#include "FreeRTOS.h"
+#include "task.h"
 
 mc_configuration mc_conf;
 
@@ -49,7 +51,7 @@ void conf_general_init(void) {
  * @return
  * CRC16 (with crc field in struct temporarily set to zero).
  */
-unsigned conf_calc_crc(mc_configuration* conf_in, bool is_motor_2) {
+unsigned conf_calc_crc(mc_configuration* conf_in) {
 	volatile mc_configuration* conf = conf_in;
 
 	unsigned crc_old = conf->crc;
@@ -85,7 +87,7 @@ void conf_general_read_mc_configuration(mc_configuration *conf, bool is_motor_2)
 #ifdef TEST_BAD_MC_CRC
 	conf->crc++;
 #endif
-	if(conf->crc != conf_calc_crc(conf, is_motor_2)) {
+	if(conf->crc != conf_calc_crc(conf)) {
 		is_ok = false;
 //		mc_interface_fault_stop(FAULT_CODE_FLASH_CORRUPTION_MC_CFG, is_motor_2, false);
 		//fault_data f;
@@ -117,7 +119,7 @@ bool conf_general_store_mc_configuration(mc_configuration *conf, bool is_motor_2
 	uint32_t word;
 	uint8_t * word_ptr = (uint8_t*)&word;
 
-	conf->crc = conf_calc_crc(conf, is_motor_2);
+	conf->crc = conf_calc_crc(conf);
 
 	HAL_FLASH_Unlock();
 
@@ -383,9 +385,9 @@ void conf_general_readback_mc(mc_configuration *mcconf) {
 
 
 	// Hall sensor
-	for(int i=0;i<8;i++){
-		mcconf->hall_table[i] = HALL_M1.lut[i];
-	}
+//	for(int i=0;i<8;i++){
+//		mcconf->hall_table[i] = HALL_M1.lut[i];
+//	}
 
 	// BLDC switching and drive
 	mcconf->motor_type = MOTOR_TYPE_FOC;

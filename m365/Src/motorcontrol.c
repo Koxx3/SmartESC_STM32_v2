@@ -20,7 +20,6 @@
 #include "mc_tuning.h"
 #include "mc_interface.h"
 #include "mc_tasks.h"
-#include "ui_task.h"
 #include "motorcontrol.h"
 
 /** @addtogroup MCSDK
@@ -31,12 +30,9 @@
   * @{
   */
 
-#define FIRMWARE_VERS "ST MC SDK\tVer.5.4.5"
-const char s_fwVer[32] = FIRMWARE_VERS;
 
 MCI_Handle_t* pMCI[NBR_OF_MOTORS];
 MCT_Handle_t* pMCT[NBR_OF_MOTORS];
-uint32_t wConfig[NBR_OF_MOTORS] = {UI_CONFIG_M1,UI_CONFIG_M2};
 
 /**
  * @brief Initializes and configures the Motor Control Subsystem
@@ -55,8 +51,6 @@ __weak void MX_MotorControl_Init(void)
   MCboot(pMCI,pMCT);
   mc_lock_pins();
 
-  /* Initialize the MC User Interface */
-  UI_TaskInit(wConfig,NBR_OF_MOTORS,pMCI,pMCT,s_fwVer);
 }
 
 void vPortSetupTimerInterrupt( void )
