@@ -133,11 +133,11 @@ int32_t confgenerator_serialize_mcconf(uint8_t *buffer, const mc_configuration *
 	//buffer_append_float32_auto(buffer, conf->foc_sl_erpm_hfi, &ind);
 	buffer_append_float32_auto(buffer, 0, &ind);
 	//buffer_append_uint16(buffer, conf->foc_hfi_start_samples, &ind);
-	buffer_append_uint16(buffer, 0, &ind);
+	buffer_append_uint16(buffer, 2, &ind);
 	//buffer_append_float32_auto(buffer, conf->foc_hfi_obs_ovr_sec, &ind);
 	buffer_append_float32_auto(buffer, 0, &ind);
 	//buffer[ind++] = conf->foc_hfi_samples;
-	ind++;
+	buffer[ind++] = 8;
 
 //	buffer_append_int16(buffer, conf->gpd_buffer_notify_left, &ind);
 	buffer_append_int16(buffer, 0, &ind);
@@ -738,8 +738,8 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 //		float l_in_current_max;
 //		float l_in_current_min;
 		mcconf->l_abs_current_max = 60;
-		mcconf->l_min_erpm = -35000;
-		mcconf->l_max_erpm = 35000;
+		mcconf->l_min_erpm = -10000;
+		mcconf->l_max_erpm = 10000;
 //		float l_erpm_start;
 //		float l_max_erpm_fbrake;
 //		float l_max_erpm_fbrake_cc;

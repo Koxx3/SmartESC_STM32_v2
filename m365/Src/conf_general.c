@@ -146,7 +146,7 @@ bool conf_general_store_mc_configuration(mc_configuration *conf, bool is_motor_2
 	}
 
 	HAL_FLASH_Lock();
-	vTaskDelay(200);
+	vTaskDelay(500);
 	VescToSTM_start_motor();
 	VescToSTM_set_torque(0);
 

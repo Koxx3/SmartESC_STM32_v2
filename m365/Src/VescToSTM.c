@@ -48,7 +48,7 @@ void VescToSTM_handle_timeout(){
 	if(!timeout_enable) {
 		VescToSTM_timeout_reset();
 	}
-	if((xTaskGetTickCount() - last_reset) > 1000){
+	if((xTaskGetTickCount() - last_reset) > 2000){
 		VescToSTM_set_brake(0);
 	}
 };
