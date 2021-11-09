@@ -50,6 +50,7 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 
   /* Enable the TIM4 global Interrupt */
   HAL_NVIC_EnableIRQ(TIM4_IRQn);
+
   /* Enable TIM4 clock */
   __HAL_RCC_TIM4_CLK_ENABLE();
 
@@ -74,6 +75,7 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   htim4.Init.Prescaler = uwPrescalerValue;
   htim4.Init.ClockDivision = 0;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
+
   if(HAL_TIM_Base_Init(&htim4) == HAL_OK)
   {
     /* Start the TIM time Base generation in interrupt mode */

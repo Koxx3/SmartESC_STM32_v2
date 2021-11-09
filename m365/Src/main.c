@@ -24,6 +24,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "FreeRTOS.h"
+#include "task.h"
 #include "task_init.h"
 #include "motorcontrol.h"
 #include "conf_general.h"
@@ -58,15 +60,15 @@ UART_HandleTypeDef huart3;
 osThreadId_t mediumFrequencyHandle;
 const osThreadAttr_t mediumFrequency_attributes = {
   .name = "mediumFrequency",
+  .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 128 * 4
 };
 /* Definitions for safety */
 osThreadId_t safetyHandle;
 const osThreadAttr_t safety_attributes = {
   .name = "safety",
+  .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityAboveNormal,
-  .stack_size = 128 * 4
 };
 /* USER CODE BEGIN PV */
 
@@ -381,7 +383,7 @@ static void MX_ADC2_Init(void)
   /** Configure Injected Channel
   */
   sConfigInjected.InjectedChannel = ADC_CHANNEL_3;
-  sConfigInjected.InjectedRank = ADC_INJECTED_RANK_1;
+  sConfigInjected.InjectedRank = 1;
   sConfigInjected.InjectedNbrOfConversion = 3;
   sConfigInjected.InjectedSamplingTime = ADC_SAMPLETIME_1CYCLE_5;
   sConfigInjected.ExternalTrigInjecConv = ADC_EXTERNALTRIGINJECCONV_T1_CC4;
@@ -395,7 +397,7 @@ static void MX_ADC2_Init(void)
   /** Configure Injected Channel
   */
   sConfigInjected.InjectedChannel = ADC_CHANNEL_4;
-  sConfigInjected.InjectedRank = ADC_INJECTED_RANK_2;
+  sConfigInjected.InjectedRank = 2;
   if (HAL_ADCEx_InjectedConfigChannel(&hadc2, &sConfigInjected) != HAL_OK)
   {
     Error_Handler();
@@ -403,7 +405,7 @@ static void MX_ADC2_Init(void)
   /** Configure Injected Channel
   */
   sConfigInjected.InjectedChannel = ADC_CHANNEL_5;
-  sConfigInjected.InjectedRank = ADC_INJECTED_RANK_3;
+  sConfigInjected.InjectedRank = 3;
   if (HAL_ADCEx_InjectedConfigChannel(&hadc2, &sConfigInjected) != HAL_OK)
   {
     Error_Handler();
@@ -670,7 +672,7 @@ __weak void startMediumFrequencyTask(void *argument)
   /* USER CODE END 5 */
 }
 
- /**
+/**
   * @brief  Period elapsed callback in non blocking mode
   * @note   This function is called  when TIM4 interrupt took place, inside
   * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment

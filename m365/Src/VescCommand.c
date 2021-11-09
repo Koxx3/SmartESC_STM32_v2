@@ -838,7 +838,20 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					terminal_process_string((char*)data);
 					break;
 				case COMM_DETECT_MOTOR_PARAM:
-				case COMM_DETECT_MOTOR_R_L:
+				case COMM_DETECT_MOTOR_R_L:{
+					float r = 0.0;
+					float l = 1.0;
+					uint8_t send_buffer[50];
+
+					tune_foc_measure_res_ind(&r, &l);
+
+					int32_t ind = 0;
+					send_buffer[ind++] = COMM_DETECT_MOTOR_R_L;
+					buffer_append_float32(send_buffer, r, 1e6, &ind);
+					buffer_append_float32(send_buffer, l, 1e3, &ind);
+					reply_func(send_buffer, ind);
+				}
+					break;
 				case COMM_DETECT_MOTOR_FLUX_LINKAGE:
 				case COMM_DETECT_ENCODER:
 					break;
@@ -855,7 +868,27 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					reply_func(send_buffer, ind);
 
 				} break;
-				case COMM_DETECT_MOTOR_FLUX_LINKAGE_OPENLOOP:
+				case COMM_DETECT_MOTOR_FLUX_LINKAGE_OPENLOOP: {
+					uint8_t send_buffer[50];
+					int32_t ind = 0;
+					float current = buffer_get_float32(data, 1e3, &ind);
+					float min_rpm = buffer_get_float32(data, 1e3, &ind);
+					float duty = buffer_get_float32(data, 1e3, &ind);
+					float resistance = buffer_get_float32(data, 1e6, &ind);
+
+					float linkage;
+					bool res = tune_foc_measure_flux_linkage(current, duty, min_rpm, resistance, &linkage);
+
+					if (!res) {
+						linkage = 0.0;
+					}
+
+					ind = 0;
+					send_buffer[ind++] = COMM_DETECT_MOTOR_FLUX_LINKAGE;
+					buffer_append_float32(send_buffer, linkage, 1e7, &ind);
+					reply_func(send_buffer, ind);
+				} break;
+
 				case COMM_DETECT_APPLY_ALL_FOC:
 				case COMM_PING_CAN:
 				case COMM_BM_CONNECT:
