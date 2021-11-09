@@ -738,8 +738,8 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 //		float l_in_current_max;
 //		float l_in_current_min;
 		mcconf->l_abs_current_max = 60;
-		mcconf->l_min_erpm = -10000;
-		mcconf->l_max_erpm = 10000;
+		mcconf->l_min_erpm = -5000;
+		mcconf->l_max_erpm = 5000;
 //		float l_erpm_start;
 //		float l_max_erpm_fbrake;
 //		float l_max_erpm_fbrake_cc;
@@ -775,8 +775,8 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 	mcconf->pwm_mode = PWM_MODE_SYNCHRONOUS;
 
 	// FOC
-	mcconf->foc_current_kp = 5;
-    mcconf->foc_current_ki = 3;
+	mcconf->foc_current_kp = 0.3;
+    mcconf->foc_current_ki = 152.0;
     mcconf->foc_f_sw = 16000;
 //	float foc_dt_us;
     mcconf->foc_encoder_offset = 90;
@@ -836,9 +836,9 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 //	float gpd_current_ki;
 
 	// Speed PID
-	mcconf->s_pid_kp = (PID_SPEED_KP_DEFAULT)/100.0;
-	mcconf->s_pid_ki = (PID_SPEED_KI_DEFAULT)/100.0;
-	mcconf->s_pid_kd = (PID_SPEED_KD_DEFAULT)/100.0;
+	mcconf->s_pid_kp = 0.25;
+	mcconf->s_pid_ki = 0.0002;
+	mcconf->s_pid_kd = 0.0;
 //	float s_pid_kd_filter;
 //	float s_pid_min_erpm;
 	mcconf->s_pid_allow_braking = false;

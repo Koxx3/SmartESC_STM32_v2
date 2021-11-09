@@ -214,7 +214,8 @@ float VescToSTM_get_Vq(){
 }
 
 float VescToSTM_get_bus_voltage(){
-	return VBS_GetAvBusVoltage_V(pMCT[M1]->pBusVoltageSensor);
+	//return VBS_GetAvBusVoltage_V(pMCT[M1]->pBusVoltageSensor);
+	return (float)VBS_GetAvBusVoltage_d(pMCT[M1]->pBusVoltageSensor)*(ADC_REFERENCE_VOLTAGE / VBUS_PARTITIONING_FACTOR)/65536.0;
 }
 
 int32_t VescToSTM_get_erpm(){

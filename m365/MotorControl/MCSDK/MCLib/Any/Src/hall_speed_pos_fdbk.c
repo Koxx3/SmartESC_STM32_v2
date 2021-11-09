@@ -23,6 +23,7 @@
 #include "hall_speed_pos_fdbk.h"
 #include "mc_type.h"
 #include "mc_interface.h"
+#include <stdlib.h>
 
 /** @addtogroup MCSDK
   * @{

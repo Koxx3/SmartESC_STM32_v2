@@ -226,8 +226,10 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	mcconf->pwm_mode = PWM_MODE_SYNCHRONOUS;
 
 	// FOC
-	PIDIqHandle_M1.hKpGain = mcconf->foc_current_kp * 100;
-    PIDIqHandle_M1.hKiGain = mcconf->foc_current_ki * 100;
+	float kp = mcconf->foc_current_kp * (float)TF_KPDIV;
+	float ki = mcconf->foc_current_ki * (float)TF_KIDIV / (float)PWM_FREQUENCY;
+	PIDIqHandle_M1.hKpGain = kp;
+    PIDIqHandle_M1.hKiGain = ki;
 //	float foc_f_sw;
 //	float foc_dt_us;
     HALL_M1.PhaseShift = DEG_TO_ANG(mcconf->foc_encoder_offset);
@@ -287,8 +289,10 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 //	float gpd_current_ki;
 
 	// Speed PID
-	PIDSpeedHandle_M1.hDefKpGain = mcconf->s_pid_kp * 100;
-	PIDSpeedHandle_M1.hDefKiGain = mcconf->s_pid_ki * 100;
+	kp = mcconf->s_pid_kp * (float)SP_KPDIV;
+	ki = mcconf->s_pid_ki * (float)SP_KIDIV / (float)SPEED_LOOP_FREQUENCY_HZ;
+	PIDSpeedHandle_M1.hDefKpGain = kp;
+	PIDSpeedHandle_M1.hDefKiGain = ki;
 //	float s_pid_kd;
 //	float s_pid_kd_filter;
 //	float s_pid_min_erpm;
@@ -395,8 +399,8 @@ void conf_general_readback_mc(mc_configuration *mcconf) {
 	mcconf->pwm_mode = PWM_MODE_SYNCHRONOUS;
 
 	// FOC
-	mcconf->foc_current_kp = PIDIqHandle_M1.hKpGain / 100.0;
-    mcconf->foc_current_ki = PIDIqHandle_M1.hKiGain / 100.0;
+	mcconf->foc_current_kp = PIDIqHandle_M1.hKpGain / (float)TF_KPDIV;
+    mcconf->foc_current_ki = PIDIqHandle_M1.hKiGain / ((float)TF_KIDIV / (float)PWM_FREQUENCY);
     mcconf->foc_f_sw = PWM_FREQUENCY;
 //	float foc_dt_us;
     mcconf->foc_encoder_offset = ANG_TO_DEG(HALL_M1.PhaseShift);
@@ -456,6 +460,8 @@ void conf_general_readback_mc(mc_configuration *mcconf) {
 //	float gpd_current_ki;
 
 	// Speed PID
+	mcconf->s_pid_kp = PIDSpeedHandle_M1.hDefKpGain / (float)SP_KPDIV;
+	mcconf->s_pid_ki = PIDSpeedHandle_M1.hDefKiGain / ((float)SP_KIDIV / (float)SPEED_LOOP_FREQUENCY_HZ);
 //	float s_pid_kp;
 //	float s_pid_ki;
 //	float s_pid_kd;
