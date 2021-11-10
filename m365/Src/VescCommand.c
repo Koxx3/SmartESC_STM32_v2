@@ -869,22 +869,33 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 				} break;
 				case COMM_DETECT_MOTOR_FLUX_LINKAGE_OPENLOOP: {
-					uint8_t send_buffer[50];
 					int32_t ind = 0;
+					uint8_t send_buffer[50];
 					float current = buffer_get_float32(data, 1e3, &ind);
-					float min_rpm = buffer_get_float32(data, 1e3, &ind);
+					float erpm_per_sec = buffer_get_float32(data, 1e3, &ind);
 					float duty = buffer_get_float32(data, 1e3, &ind);
 					float resistance = buffer_get_float32(data, 1e6, &ind);
+					float inductance = 0.0;
 
-					float linkage;
-					bool res = tune_foc_measure_flux_linkage(current, duty, min_rpm, resistance, &linkage);
+					if (len >= (uint32_t)ind + 4) {
+						inductance = buffer_get_float32(data, 1e8, &ind);
+					}
+
+					float linkage, linkage_undriven, undriven_samples;
+					bool res = tune_foc_measure_flux_linkage_openloop(current, duty,
+							erpm_per_sec, resistance, inductance,
+							&linkage, &linkage_undriven, &undriven_samples);
+
+					if (undriven_samples > 60) {
+						linkage = linkage_undriven;
+					}
 
 					if (!res) {
 						linkage = 0.0;
 					}
 
 					ind = 0;
-					send_buffer[ind++] = COMM_DETECT_MOTOR_FLUX_LINKAGE;
+					send_buffer[ind++] = COMM_DETECT_MOTOR_FLUX_LINKAGE_OPENLOOP;
 					buffer_append_float32(send_buffer, linkage, 1e7, &ind);
 					reply_func(send_buffer, ind);
 				} break;

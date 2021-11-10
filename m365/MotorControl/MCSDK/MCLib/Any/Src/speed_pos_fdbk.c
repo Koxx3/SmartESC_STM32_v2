@@ -62,6 +62,7 @@ __attribute__((section (".ccmram")))
 __weak int16_t SPD_GetElAngle( SpeednPosFdbk_Handle_t * pHandle )
 {
 	if(pHandle->open_loop){
+		pHandle->open_angle += pHandle->open_speed;
 		return ( pHandle->open_angle );
 	}else{
 		return ( pHandle->hElAngle );

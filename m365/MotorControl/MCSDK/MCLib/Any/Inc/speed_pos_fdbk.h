@@ -86,6 +86,7 @@ typedef struct
 
   uint8_t open_loop;
   int16_t open_angle;
+  int16_t open_speed;
 
 } SpeednPosFdbk_Handle_t;
 

@@ -20,6 +20,7 @@ float VescToSTM_get_Vd();
 float VescToSTM_get_Vq();
 float VescToSTM_get_bus_voltage();
 int32_t VescToSTM_get_erpm();
+int32_t VescToSTM_get_erpm_fast();
 int32_t VescToSTM_get_rpm();
 float VescToSTM_get_pid_pos_now();
 
@@ -41,5 +42,7 @@ float VescToSTM_get_duty_cycle_now(void);
 mc_fault_code VescToSTM_get_fault(void);
 uint8_t VescToSTM_get_uid(uint8_t * ptr, uint8_t size);
 void VescToSTM_enable_timeout(bool enbale);
+void VescToSTM_set_open_loop(bool enabled, int16_t init_angle, int16_t erpm);
+void VescToSTM_set_open_loop_rpm(int16_t erpm);
 
 #endif /* VESCTOSTM_H_ */

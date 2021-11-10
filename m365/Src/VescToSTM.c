@@ -24,7 +24,25 @@ void VescToSTM_init_odometer(mc_configuration* conf){
 	tacho_scale = (conf->si_wheel_diameter * M_PI) / (3.0 * conf->si_motor_poles * conf->si_gear_ratio);
 }
 
+static int16_t erpm_to_int16(int32_t erpm){
+	int32_t out = ((int32_t)HALL_M1._Super.DPPConvFactor * erpm) / ((int32_t) SPEED_UNIT * (int32_t)HALL_M1._Super.hMeasurementFrequency);
+	return out;
+}
 
+void VescToSTM_set_open_loop(bool enabled, int16_t init_angle, int16_t erpm){
+	if(enabled){
+		pMCI[M1]->pSTC->SPD->open_angle = init_angle;
+		pMCI[M1]->pSTC->SPD->open_loop = true;
+		pMCI[M1]->pSTC->SPD->open_speed = erpm_to_int16(erpm);
+	}else{
+		pMCI[M1]->pSTC->SPD->open_loop = false;
+		pMCI[M1]->pSTC->SPD->open_speed = 0;
+	}
+}
+
+void VescToSTM_set_open_loop_rpm(int16_t erpm){
+	pMCI[M1]->pSTC->SPD->open_speed = erpm_to_int16(erpm);
+}
 
 
 const uint8_t test[12] = {1,2,3,4,5,6,7,8,9,10,11,12};
@@ -107,6 +125,7 @@ void VescToSTM_set_brake(int32_t current){
 	}
 }
 
+
 void VescToSTM_set_speed(int32_t rpm){
 	int32_t erpm = rpm * mc_conf.si_motor_poles;
 	if(erpm>0){
@@ -128,6 +147,9 @@ void VescToSTM_set_speed(int32_t rpm){
 	if(mc_conf.s_pid_ramp_erpms_s) ramp_time = (float)(erpm * 1000) / mc_conf.s_pid_ramp_erpms_s;
 	MCI_ExecSpeedRamp(pMCI[M1], erpm / mc_conf.si_motor_poles, ramp_time);
 }
+
+
+
 
 float VescToSTM_get_temperature(){
 	return NTC_GetAvTemp_C(pMCT[M1]->pTemperatureSensor);
@@ -193,10 +215,12 @@ float VescToSTM_get_iq(){
  */
 float VescToSTM_get_Vd(){
 	if(!pMCI[M1]->pFOCVars->Vd_samples) return 0;
+	float Vin = VescToSTM_get_bus_voltage();
 	int32_t Vd = pMCI[M1]->pFOCVars->Vd_sum / pMCI[M1]->pFOCVars->Vd_samples;
 	pMCI[M1]->pFOCVars->Vd_sum = 0;
 	pMCI[M1]->pFOCVars->Vd_samples = 0;
-	return Vd / VOLT_SCALING;
+	float fVd = Vin / 65536.0 * (float)Vd;
+	return fVd;
 }
 
 /**
@@ -207,10 +231,12 @@ float VescToSTM_get_Vd(){
  */
 float VescToSTM_get_Vq(){
 	if(!pMCI[M1]->pFOCVars->Vq_samples) return 0;
+	float Vin = VescToSTM_get_bus_voltage();
 	int32_t Vq = pMCI[M1]->pFOCVars->Vq_sum / pMCI[M1]->pFOCVars->Vq_samples;
 	pMCI[M1]->pFOCVars->Vq_sum = 0;
 	pMCI[M1]->pFOCVars->Vq_samples = 0;
-	return Vq / VOLT_SCALING;
+	float fVq = Vin / 65536.0 * (float)Vq;
+	return fVq;
 }
 
 float VescToSTM_get_bus_voltage(){
@@ -220,6 +246,10 @@ float VescToSTM_get_bus_voltage(){
 
 int32_t VescToSTM_get_erpm(){
 	return MCI_GetAvrgMecSpeedUnit( pMCI[M1] ) * HALL_M1._Super.bElToMecRatio;
+}
+
+int32_t VescToSTM_get_erpm_fast(){
+	return ( int16_t )( (  HALL_M1._Super.hElSpeedDpp * ( int32_t )HALL_M1._Super.hMeasurementFrequency * (int32_t) SPEED_UNIT ) / (( int32_t ) HALL_M1._Super.DPPConvFactor));
 }
 
 int32_t VescToSTM_get_rpm(){
@@ -396,7 +426,7 @@ float VescToSTM_get_battery_level(float *wh_left) {
 
 float VescToSTM_get_duty_cycle_now(void) {
 	qd_t Vqd = 	MCI_GetVqd(pMCI[M1]);
-	float amplitude = (MCI_GetPhaseVoltageAmplitude(pMCI[M1]) * SIGN(Vqd.q)) / 65536.0;
+	float amplitude = (MCI_GetPhaseVoltageAmplitude(pMCI[M1]) * SIGN(Vqd.q)) / 32768.0;
 	return amplitude;
 }
 
