@@ -103,7 +103,14 @@ void VescToSTM_set_torque(int32_t current){
 		pMCI[M1]->pSTC->PISpeed->hLowerOutputLimit = q;
 		MCI_ExecSpeedRamp(pMCI[M1], mc_conf.l_min_erpm / mc_conf.si_motor_poles , 0);
 	}
+}
 
+void VescToSTM_set_erpm_limits(mc_configuration * mc){
+	if(pMCI[M1]->pSTC->SpeedRefUnitExt > 0){
+		MCI_ExecSpeedRamp(pMCI[M1], mc->l_max_erpm / mc->si_motor_poles , 0);
+	}else{
+		MCI_ExecSpeedRamp(pMCI[M1], mc->l_min_erpm / mc->si_motor_poles , 0);
+	}
 }
 
 void VescToSTM_set_brake(int32_t current){
@@ -219,7 +226,7 @@ float VescToSTM_get_Vd(){
 	int32_t Vd = pMCI[M1]->pFOCVars->Vd_sum / pMCI[M1]->pFOCVars->Vd_samples;
 	pMCI[M1]->pFOCVars->Vd_sum = 0;
 	pMCI[M1]->pFOCVars->Vd_samples = 0;
-	float fVd = Vin / 65536.0 * (float)Vd;
+	float fVd = Vin / 32768.0* (float)Vd;
 	return fVd;
 }
 
@@ -235,7 +242,7 @@ float VescToSTM_get_Vq(){
 	int32_t Vq = pMCI[M1]->pFOCVars->Vq_sum / pMCI[M1]->pFOCVars->Vq_samples;
 	pMCI[M1]->pFOCVars->Vq_sum = 0;
 	pMCI[M1]->pFOCVars->Vq_samples = 0;
-	float fVq = Vin / 65536.0 * (float)Vq;
+	float fVq = Vin / 32768.0 * (float)Vq;
 	return fVq;
 }
 

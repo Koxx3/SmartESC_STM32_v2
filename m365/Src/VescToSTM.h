@@ -44,5 +44,6 @@ uint8_t VescToSTM_get_uid(uint8_t * ptr, uint8_t size);
 void VescToSTM_enable_timeout(bool enbale);
 void VescToSTM_set_open_loop(bool enabled, int16_t init_angle, int16_t erpm);
 void VescToSTM_set_open_loop_rpm(int16_t erpm);
+void VescToSTM_set_erpm_limits(mc_configuration * mc);
 
 #endif /* VESCTOSTM_H_ */

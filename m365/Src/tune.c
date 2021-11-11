@@ -184,8 +184,8 @@ float tune_foc_measure_resistance(float current, int samples) {
 	int32_t Id = pMCI[M1]->pFOCVars->Id_sum / pMCI[M1]->pFOCVars->Id_samples;
 
 	float Vin = VescToSTM_get_bus_voltage();
-	float fVq = Vin / 65536.0 * (float)Vq;
-	float fVd = Vin / 65536.0 * (float)Vd;
+	float fVq = Vin / 32768.0 * (float)Vq;
+	float fVd = Vin / 32768.0 * (float)Vd;
 	float fIq = (float)Iq / CURRENT_FACTOR_A;
 	float fId = (float)Id / CURRENT_FACTOR_A;
 
@@ -199,7 +199,7 @@ float tune_foc_measure_resistance(float current, int samples) {
 	// Enable timeout
 	VescToSTM_enable_timeout(true);
 
-	return (voltage_avg / current_avg) * (2.0 / 3.0);
+	return (voltage_avg / current_avg) / (SQRT_3) / 2.0;
 }
 
 /**
@@ -224,7 +224,7 @@ extern PID_Handle_t *pPIDIq[NBR_OF_MOTORS];
 extern PID_Handle_t *pPIDId[NBR_OF_MOTORS];
 float tune_foc_measure_inductance(float voltage, float * used_current, uint32_t samples) {
 
-	float voltage_calc = 65536.0 / VescToSTM_get_bus_voltage() * voltage;
+	float voltage_calc = 32768.0 / VescToSTM_get_bus_voltage() * voltage;
 
 	int32_t volt_int = voltage_calc;
 
@@ -294,7 +294,7 @@ float tune_foc_measure_inductance(float voltage, float * used_current, uint32_t 
 	// Enable timeout
 	VescToSTM_enable_timeout(true);
 
-	return inductance * (2.0 / 3.0);
+	return inductance / SQRT_3 / 2.0;
 }
 
 /**
@@ -500,7 +500,7 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 				break;
 			}
 
-			linkage_sum += VescToSTM_get_Vq() / rad_s_now;
+			linkage_sum += VescToSTM_get_Vq() / SQRT_3 / rad_s_now;
 			linkage_samples += 1.0;
 			vTaskDelay(2);
 		}

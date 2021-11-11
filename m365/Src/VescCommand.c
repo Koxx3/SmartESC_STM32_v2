@@ -690,6 +690,8 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					mcconf->lo_in_current_min = mcconf->l_in_current_min;
 					mcconf->lo_in_current_max = mcconf->l_in_current_max;
 
+					VescToSTM_set_erpm_limits(mcconf);
+
 					//commands_apply_mcconf_hw_limits(mcconf);
 
 					//if (store) {
