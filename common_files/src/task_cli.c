@@ -39,8 +39,6 @@ StreamBufferHandle_t UART_RX;
 #define UART_HANDLE 0
 
 
-enum uart_mode task_cli_mode = UART_MODE_ST;
-
 #define STREAMBUFFER_RX_SIZE 32
 
 osThreadId_t task_cli_handle;

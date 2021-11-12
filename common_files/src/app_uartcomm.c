@@ -108,5 +108,6 @@ void task_app_usart(void * argument){
 				//}
 			}
 		}
+		vTaskDelay(500);
 	}
 }

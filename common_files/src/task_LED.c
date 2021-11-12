@@ -25,6 +25,9 @@
 #include "task_init.h"
 #include "task_cli.h"
 #include "main.h"
+#include "conf_general.h"
+#include "FreeRTOS.h"
+#include "task.h"
 
 
 osThreadId_t LEDHandle;
@@ -44,19 +47,31 @@ void prv_LED_blink(uint32_t ticks){
 
 void task_LED(void * argument)
 {
+	volatile uint32_t last_fault_time=0;
+	volatile uint16_t last_fault = 0;
+	/* Infinite loop */
+	for(;;)
+	{
+		if(pMCI[M1]->pSTM->hFaultOccurred){
+			if(last_fault != pMCI[M1]->pSTM->hFaultOccurred){
+				last_fault_time = (xTaskGetTickCount() / 2) + mc_conf.m_fault_stop_time_ms;
+			}
+			last_fault = pMCI[M1]->pSTM->hFaultOccurred;
+			if((xTaskGetTickCount() / 2) > last_fault_time){
+				MCI_FaultAcknowledged(pMCI[M1]);
+				vTaskDelay(100);
+				MCI_StopMotor(pMCI[M1]);
+				vTaskDelay(100);
+				MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
+				MCI_StartMotor(pMCI[M1]);
+				last_fault = 0;
+			}
+			prv_LED_blink(200);
+		}else{
+			prv_LED_blink(1000);
+		}
 
-  /* Infinite loop */
-  for(;;)
-  {
-	  if(pMCI[M1]->pSTM->hFaultOccurred){
-		  prv_LED_blink(200);
-	  }else{
-		  prv_LED_blink(1000);
-	  }
-	  if(task_cli_mode == UART_MODE_CLI){
-		  prv_LED_blink(100);
-	  }
-  }
+	}
 }
 
 void task_LED_init(){

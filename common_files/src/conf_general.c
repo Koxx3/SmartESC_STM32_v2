@@ -161,6 +161,8 @@ bool conf_general_store_mc_configuration(mc_configuration *conf, bool is_motor_2
 
 	HAL_FLASH_Unlock();
 
+	vTaskDelay(200);
+
 	uint32_t page_error = 0;
 	FLASH_EraseInitTypeDef s_eraseinit;
 	s_eraseinit.TypeErase   = FLASH_TYPEERASE_PAGES;
@@ -183,6 +185,7 @@ bool conf_general_store_mc_configuration(mc_configuration *conf, bool is_motor_2
 		HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, ADDR_FLASH_PAGE_63+(flash_incr*4), *((uint32_t*)word_ptr));
 	}
 
+	vTaskDelay(200);
 	HAL_FLASH_Lock();
 	vTaskDelay(500);
 	VescToSTM_start_motor();
@@ -218,11 +221,11 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 		SpeednTorqCtrlM1.MinNegativeTorque = mcconf->l_current_min * CURRENT_FACTOR;
 //		float l_in_current_max;
 //		float l_in_current_min;
-		mcconf->l_abs_current_max = 60;
-		//SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit = (mcconf->l_min_erpm / (float)HALL_M1._Super.bElToMecRatio);
-		//SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit = (mcconf->l_max_erpm / (float)HALL_M1._Super.bElToMecRatio);
-		//HALL_M1._Super.hMinReliableMecSpeedUnit = (mcconf->l_min_erpm * 1.15 / (float)HALL_M1._Super.bElToMecRatio);
-		//HALL_M1._Super.hMaxReliableMecSpeedUnit = (mcconf->l_max_erpm * 1.15 / (float)HALL_M1._Super.bElToMecRatio);
+		//mcconf->l_abs_current_max = 60;
+		SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit = (mcconf->l_min_erpm * 1.15/ (float)HALL_M1._Super.bElToMecRatio);
+		SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit = (mcconf->l_max_erpm * 1.15/ (float)HALL_M1._Super.bElToMecRatio);
+		HALL_M1._Super.hMinReliableMecSpeedUnit = (mcconf->l_min_erpm * 1.5 / (float)HALL_M1._Super.bElToMecRatio);
+		HALL_M1._Super.hMaxReliableMecSpeedUnit = (mcconf->l_max_erpm * 1.5 / (float)HALL_M1._Super.bElToMecRatio);
 
 //		float l_erpm_start;
 //		float l_max_erpm_fbrake;
@@ -367,10 +370,10 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 //	int m_hall_extra_samples;
 
 	// Setup info
-	mcconf->si_motor_poles = HALL_M1._Super.bElToMecRatio;
+	HALL_M1._Super.bElToMecRatio = mcconf->si_motor_poles;
 //	float si_gear_ratio;
 //	float si_wheel_diameter;
-	mcconf->si_battery_type = BATTERY_TYPE_LIION_3_0__4_2;
+	//mcconf->si_battery_type = BATTERY_TYPE_LIION_3_0__4_2;
 	//	int si_battery_cells;
 //	float si_battery_ah;
 

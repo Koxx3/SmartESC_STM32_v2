@@ -38,8 +38,6 @@ enum uart_mode{
 };
 
 
-extern enum uart_mode task_cli_mode;
-
 extern StreamBufferHandle_t UART_RX;
 
 void task_cli_init();
