@@ -1,0 +1,3 @@
+task_LED.c:45:6:task_LED	8	static
+task_LED.c:37:6:prv_LED_blink	16	static
+task_LED.c:62:6:task_LED_init	8	static

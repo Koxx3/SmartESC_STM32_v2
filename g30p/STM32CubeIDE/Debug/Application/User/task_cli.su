@@ -1,0 +1,6 @@
+task_cli.c:63:6:putbuffer	0	static
+task_cli.c:74:6:comm_uart_send_packet	0	static
+task_cli.c:78:6:process_packet	0	static
+task_cli.c:85:6:task_cli	16	static
+task_cli.c:57:6:_putchar	0	static
+task_cli.c:120:6:task_cli_init	16	static

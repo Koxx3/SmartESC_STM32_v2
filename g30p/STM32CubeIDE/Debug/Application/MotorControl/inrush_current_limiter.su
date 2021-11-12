@@ -1,0 +1,3 @@
+inrush_current_limiter.c:58:13:ICL_Init	8	static
+inrush_current_limiter.c:88:20:ICL_Exec	8	static
+inrush_current_limiter.c:161:20:ICL_GetState	0	static

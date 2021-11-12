@@ -39,187 +39,122 @@
 		<link>
 			<name>Application/MotorControl/bus_voltage_sensor.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/bus_voltage_sensor.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/bus_voltage_sensor.c</locationURI>
 		</link>
 		<link>
 			<name>Application/MotorControl/circle_limitation.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/circle_limitation.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/circle_limitation.c</locationURI>
 		</link>
 		<link>
 			<name>Application/MotorControl/digital_output.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/digital_output.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/digital_output.c</locationURI>
 		</link>
 		<link>
 			<name>Application/MotorControl/enc_align_ctrl.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/enc_align_ctrl.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/enc_align_ctrl.c</locationURI>
 		</link>
 		<link>
 			<name>Application/MotorControl/encoder_speed_pos_fdbk.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/encoder_speed_pos_fdbk.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/encoder_speed_pos_fdbk.c</locationURI>
 		</link>
 		<link>
 			<name>Application/MotorControl/hall_speed_pos_fdbk.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/hall_speed_pos_fdbk.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/hall_speed_pos_fdbk.c</locationURI>
 		</link>
 		<link>
 			<name>Application/MotorControl/inrush_current_limiter.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/inrush_current_limiter.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/inrush_current_limiter.c</locationURI>
 		</link>
 		<link>
 			<name>Application/MotorControl/motor_power_measurement.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/motor_power_measurement.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/motor_power_measurement.c</locationURI>
 		</link>
 		<link>
 			<name>Application/MotorControl/ntc_temperature_sensor.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/ntc_temperature_sensor.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/ntc_temperature_sensor.c</locationURI>
 		</link>
 		<link>
 			<name>Application/MotorControl/open_loop.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/open_loop.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/open_loop.c</locationURI>
 		</link>
 		<link>
 			<name>Application/MotorControl/pid_regulator.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/pid_regulator.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/pid_regulator.c</locationURI>
 		</link>
 		<link>
 			<name>Application/MotorControl/pqd_motor_power_measurement.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/pqd_motor_power_measurement.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/pqd_motor_power_measurement.c</locationURI>
 		</link>
 		<link>
 			<name>Application/MotorControl/pwm_common.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/pwm_common.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/pwm_common.c</locationURI>
 		</link>
 		<link>
 			<name>Application/MotorControl/pwm_curr_fdbk.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/pwm_curr_fdbk.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/pwm_curr_fdbk.c</locationURI>
 		</link>
 		<link>
 			<name>Application/MotorControl/r3_2_f1xx_pwm_curr_fdbk.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/F1xx/Src/r3_2_f1xx_pwm_curr_fdbk.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/F1xx/Src/r3_2_f1xx_pwm_curr_fdbk.c</locationURI>
 		</link>
 		<link>
 			<name>Application/MotorControl/r_divider_bus_voltage_sensor.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/r_divider_bus_voltage_sensor.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/r_divider_bus_voltage_sensor.c</locationURI>
 		</link>
 		<link>
 			<name>Application/MotorControl/ramp_ext_mngr.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/ramp_ext_mngr.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/ramp_ext_mngr.c</locationURI>
 		</link>
 		<link>
 			<name>Application/MotorControl/speed_pos_fdbk.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/speed_pos_fdbk.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/speed_pos_fdbk.c</locationURI>
 		</link>
 		<link>
 			<name>Application/MotorControl/speed_torq_ctrl.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/speed_torq_ctrl.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/speed_torq_ctrl.c</locationURI>
 		</link>
 		<link>
 			<name>Application/MotorControl/state_machine.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/state_machine.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/state_machine.c</locationURI>
 		</link>
 		<link>
 			<name>Application/MotorControl/trajectory_ctrl.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/trajectory_ctrl.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/trajectory_ctrl.c</locationURI>
 		</link>
 		<link>
 			<name>Application/MotorControl/virtual_bus_voltage_sensor.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/virtual_bus_voltage_sensor.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/virtual_bus_voltage_sensor.c</locationURI>
 		</link>
 		<link>
 			<name>Application/MotorControl/virtual_speed_sensor.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/MotorControl/MCSDK/MCLib/Any/Src/virtual_speed_sensor.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/VescCommand.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/VescCommand.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/VescCommand.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/VescCommand.h</locationURI>
-		</link>
-		<link>
-			<name>Application/User/VescDatatypes.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/VescDatatypes.h</locationURI>
-		</link>
-		<link>
-			<name>Application/User/VescToSTM.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/VescToSTM.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/VescToSTM.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/VescToSTM.h</locationURI>
-		</link>
-		<link>
-			<name>Application/User/buffer.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/buffer.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/buffer.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/buffer.h</locationURI>
-		</link>
-		<link>
-			<name>Application/User/conf_general.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/conf_general.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/conf_general.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/conf_general.h</locationURI>
-		</link>
-		<link>
-			<name>Application/User/confgenerator.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/confgenerator.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/confgenerator.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/confgenerator.h</locationURI>
-		</link>
-		<link>
-			<name>Application/User/crc.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/crc.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/crc.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/crc.h</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/virtual_speed_sensor.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/defines.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/defines.h</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/defines.h</locationURI>
 		</link>
 		<link>
 			<name>Application/User/freertos.c</name>
@@ -232,59 +167,29 @@
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/main.c</locationURI>
 		</link>
 		<link>
-			<name>Application/User/mc_config.c</name>
+			<name>Application/User/main.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/mc_config.c</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/Inc/main.h</locationURI>
 		</link>
 		<link>
-			<name>Application/User/mc_interface.c</name>
+			<name>Application/User/parameters_conversion.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/mc_interface.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/mc_math.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/mc_math.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/mc_parameters.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/mc_parameters.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/mc_tasks.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/mc_tasks.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/motorcontrol.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/motorcontrol.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/packet.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/packet.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/packet.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/packet.h</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/parameters_conversion.h</locationURI>
 		</link>
 		<link>
 			<name>Application/User/printf.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/printf.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/printf.c</locationURI>
 		</link>
 		<link>
-			<name>Application/User/regular_conversion_manager.c</name>
+			<name>Application/User/product.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/regular_conversion_manager.c</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/Inc/product.h</locationURI>
 		</link>
 		<link>
 			<name>Application/User/stm32f10x_mc_it.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/stm32f10x_mc_it.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/stm32f10x_mc_it.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/stm32f1xx_hal_msp.c</name>
@@ -304,52 +209,22 @@
 		<link>
 			<name>Application/User/system.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/system.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/system.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/task_LED.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/task_LED.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/task_LED.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/task_cli.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/task_cli.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/task_cli.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/task_init.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/task_init.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/terminal.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/terminal.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/terminal.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/terminal.h</locationURI>
-		</link>
-		<link>
-			<name>Application/User/tune.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/tune.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/tune.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/tune.h</locationURI>
-		</link>
-		<link>
-			<name>Application/User/utils.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/utils.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/utils.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/utils.h</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/task_init.c</locationURI>
 		</link>
 		<link>
 			<name>Drivers/CMSIS/system_stm32f1xx.c</name>
@@ -485,6 +360,161 @@
 			<name>Middlewares/FreeRTOS/timers.c</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Middlewares/Third_Party/FreeRTOS/Source/timers.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/BLDC/mc_config.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/mc_config.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/BLDC/mc_interface.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/mc_interface.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/BLDC/mc_math.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/mc_math.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/BLDC/mc_parameters.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/mc_parameters.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/BLDC/mc_tasks.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/mc_tasks.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/BLDC/motorcontrol.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/motorcontrol.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/BLDC/regular_conversion_manager.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/regular_conversion_manager.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/inc/VescCommand.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/VescCommand.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/inc/VescDatatypes.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/VescDatatypes.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/inc/VescToSTM.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/VescToSTM.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/inc/app.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/app.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/inc/buffer.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/buffer.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/inc/conf_general.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/conf_general.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/inc/confgenerator.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/confgenerator.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/inc/crc.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/crc.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/inc/packet.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/packet.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/inc/terminal.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/terminal.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/inc/tune.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/tune.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/inc/utils.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/utils.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/src/VescCommand.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/VescCommand.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/src/VescToSTM.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/VescToSTM.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/src/app.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/app.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/src/app_uartcomm.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/app_uartcomm.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/src/buffer.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/buffer.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/src/conf_general.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/conf_general.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/src/confgenerator.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/confgenerator.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/src/crc.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/crc.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/src/packet.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/packet.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/src/terminal.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/terminal.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/src/tune.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/tune.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/src/utils.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/utils.c</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

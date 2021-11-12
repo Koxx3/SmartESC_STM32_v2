@@ -1,0 +1,4 @@
+bus_voltage_sensor.c:50:17:VBS_GetBusVoltage_d	0	static
+bus_voltage_sensor.c:67:17:VBS_GetAvBusVoltage_d	0	static
+bus_voltage_sensor.c:77:17:VBS_GetAvBusVoltage_V	0	static
+bus_voltage_sensor.c:94:17:VBS_CheckVbus	0	static

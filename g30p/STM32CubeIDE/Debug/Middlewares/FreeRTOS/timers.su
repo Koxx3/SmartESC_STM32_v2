@@ -1,0 +1,17 @@
+timers.c:835:13:prvSwitchTimerLists	48	static,ignoring_inline_asm
+timers.c:502:13:prvTimerTask	80	static,ignoring_inline_asm
+timers.c:223:12:xTimerCreateTimerTask	56	static,ignoring_inline_asm
+timers.c:278:16:xTimerCreate	56	static,ignoring_inline_asm
+timers.c:310:16:xTimerCreateStatic	64	static,ignoring_inline_asm
+timers.c:381:12:xTimerGenericCommand	32	static,ignoring_inline_asm
+timers.c:424:14:xTimerGetTimerDaemonTaskHandle	0	static,ignoring_inline_asm
+timers.c:433:12:xTimerGetPeriod	0	static,ignoring_inline_asm
+timers.c:442:12:xTimerGetExpiryTime	0	static,ignoring_inline_asm
+timers.c:453:14:pcTimerGetName	0	static,ignoring_inline_asm
+timers.c:945:12:xTimerIsTimerActive	8	static,ignoring_inline_asm
+timers.c:966:7:pvTimerGetTimerID	8	static,ignoring_inline_asm
+timers.c:983:6:vTimerSetTimerID	16	static,ignoring_inline_asm
+timers.c:999:13:xTimerPendFunctionCallFromISR	32	static
+timers.c:1023:13:xTimerPendFunctionCall	32	static,ignoring_inline_asm
+timers.c:1052:14:uxTimerGetTimerNumber	0	static
+timers.c:1062:7:vTimerSetTimerNumber	0	static

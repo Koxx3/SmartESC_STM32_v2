@@ -1,0 +1,7 @@
+regular_conversion_manager.c:179:9:RCM_RegisterRegConv	16	static,ignoring_inline_asm
+regular_conversion_manager.c:146:9:RCM_RegisterRegConv_WithCB	16	static
+regular_conversion_manager.c:246:10:RCM_ExecRegularConv	4	static,ignoring_inline_asm
+regular_conversion_manager.c:275:6:RCM_RequestUserConv	0	static
+regular_conversion_manager.c:296:10:RCM_GetUserConv	0	static
+regular_conversion_manager.c:314:6:RCM_ExecUserConv	12	static,ignoring_inline_asm
+regular_conversion_manager.c:339:21:RCM_GetUserConvState	0	static

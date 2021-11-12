@@ -1,0 +1,11 @@
+conf_general.c:59:10:conf_calc_crc	16	static
+conf_general.c:69:9:Flash_ReadByte_MC	8	static
+conf_general.c:75:9:Flash_ReadByte_APP	8	static
+conf_general.c:87:6:conf_general_read_app_configuration	24	static
+conf_general.c:119:6:conf_general_read_mc_configuration	24	static
+conf_general.c:148:6:conf_general_store_mc_configuration	48	static
+conf_general.c:194:6:conf_general_recalc	16	static
+conf_general.c:210:19:mc_interface_get_configuration	0	static
+conf_general.c:214:6:conf_general_setup_mc	56	static
+conf_general.c:38:6:conf_general_init	24	static
+conf_general.c:386:6:conf_general_readback_mc	24	static
