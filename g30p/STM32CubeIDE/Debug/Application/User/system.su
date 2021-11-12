@@ -1,2 +1,0 @@
-system.c:7:10:SYS_getCPULoadFine	32	static
-system.c:17:14:SYS_getTaskStateString	0	static

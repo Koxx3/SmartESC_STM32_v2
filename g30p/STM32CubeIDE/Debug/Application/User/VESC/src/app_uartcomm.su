@@ -1,8 +1,0 @@
-app_uartcomm.c:96:6:task_app_usart	0	static
-app_uartcomm.c:50:13:process_packet	0	static
-app_uartcomm.c:84:6:app_uartcomm_send_packet	0	static
-app_uartcomm.c:54:13:send_packet	16	static
-app_uartcomm.c:64:6:app_uartcomm_start	8	static
-app_uartcomm.c:73:6:app_uartcomm_start_permanent	0	static
-app_uartcomm.c:77:6:app_uartcomm_stop	8	static
-app_uartcomm.c:89:6:app_uartcomm_configure	0	static

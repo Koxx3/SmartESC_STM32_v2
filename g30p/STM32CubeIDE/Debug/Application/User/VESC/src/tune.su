@@ -1,6 +1,0 @@
-tune.c:40:6:tune_mcpwm_foc_hall_detect	160	static
-tune.c:133:7:tune_foc_measure_resistance	56	static
-tune.c:225:7:tune_foc_measure_inductance	72	static
-tune.c:317:7:tune_foc_measure_inductance_current	80	static
-tune.c:345:6:tune_foc_measure_res_ind	16	static
-tune.c:382:6:tune_foc_measure_flux_linkage_openloop	64	static

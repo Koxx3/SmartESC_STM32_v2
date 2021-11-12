@@ -1,5 +1,0 @@
-VescCommand.c:94:6:commands_send_packet	0	static
-VescCommand.c:51:6:commands_printf	16	static
-VescCommand.c:100:6:commands_send_mcconf	8	static
-VescCommand.c:115:6:send_sample	64	static
-VescCommand.c:149:6:commands_process_packet	216	static,ignoring_inline_asm

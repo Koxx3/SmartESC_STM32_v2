@@ -1,5 +1,0 @@
-app.c:11:26:app_get_configuration	0	static
-app.c:21:6:app_set_configuration	8	static
-app.c:46:6:app_disable_output	0	static
-app.c:63:6:app_is_output_disabled	0	static
-app.c:81:10:app_calc_crc	16	static

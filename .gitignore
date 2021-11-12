@@ -9,3 +9,6 @@ m365/STM32CubeIDE/.settings/language.settings.xml
 m365/m365.settings
 
 m365/STM32CubeIDE/m365 Release.launch
+
+*.d
+*.o

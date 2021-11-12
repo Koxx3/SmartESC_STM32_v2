@@ -1,5 +1,0 @@
-packet.c:51:6:packet_init	16	static
-packet.c:58:6:packet_reset	0	static
-packet.c:64:6:packet_send_packet	24	static
-packet.c:103:6:packet_timerfunc	0	static
-packet.c:113:6:packet_process_byte	56	static

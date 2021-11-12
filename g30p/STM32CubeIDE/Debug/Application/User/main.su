@@ -1,5 +1,0 @@
-main.c:746:13:startMediumFrequencyTask	8	static
-main.c:213:6:SystemClock_Config	104	static,ignoring_inline_asm
-main.c:112:5:main	128	static,ignoring_inline_asm
-main.c:765:6:HAL_TIM_PeriodElapsedCallback	0	static
-main.c:782:6:Error_Handler	0	static,ignoring_inline_asm

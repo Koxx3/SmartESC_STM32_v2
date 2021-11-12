@@ -1,4 +1,0 @@
-task_pwr.c:51:6:task_PWR	8	static
-task_pwr.c:33:6:poweroff	0	static
-task_pwr.c:37:6:poweroffPressCheck	16	static
-task_pwr.c:60:6:task_PWR_init	8	static

@@ -1,6 +1,0 @@
-confgenerator.c:10:9:confgenerator_serialize_mcconf	40	static
-confgenerator.c:209:9:confgenerator_serialize_appconf	32	static
-confgenerator.c:367:6:confgenerator_deserialize_mcconf	24	static
-confgenerator.c:570:6:confgenerator_deserialize_appconf	24	static
-confgenerator.c:733:6:confgenerator_set_defaults_mcconf	24	static
-confgenerator.c:892:6:confgenerator_set_defaults_appconf	8	static

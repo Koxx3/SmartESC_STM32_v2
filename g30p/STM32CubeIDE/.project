@@ -184,7 +184,7 @@
 		<link>
 			<name>Application/User/product.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Inc/product.h</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/product.h</locationURI>
 		</link>
 		<link>
 			<name>Application/User/stm32f10x_mc_it.c</name>
