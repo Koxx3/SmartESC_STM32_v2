@@ -93,7 +93,6 @@ void task_cli(void * argument)
 	HAL_UART_Receive_DMA(&huart3, usart_rx_dma_buffer, sizeof(usart_rx_dma_buffer));
 	CLEAR_BIT(huart3.Instance->CR3, USART_CR3_EIE);
 
-	uint8_t c=0, len=0;
 	uint32_t rd_ptr=0;
 	MCI_StartMotor( pMCI[M1] );
 
@@ -110,8 +109,7 @@ void task_cli(void * argument)
 		/* `#START TASK_LOOP_CODE` */
 
 		while(rd_ptr != DMA_WRITE_PTR) {
-			c = usart_rx_dma_buffer[rd_ptr];
-			packet_process_byte(c, UART_HANDLE);
+			packet_process_byte(usart_rx_dma_buffer[rd_ptr], UART_HANDLE);
 			rd_ptr++;
 			rd_ptr &= (CIRC_BUF_SZ - 1);
 		}

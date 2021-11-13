@@ -161,7 +161,6 @@ bool conf_general_store_mc_configuration(mc_configuration *conf, bool is_motor_2
 
 	HAL_FLASH_Unlock();
 
-	vTaskDelay(200);
 
 	uint32_t page_error = 0;
 	FLASH_EraseInitTypeDef s_eraseinit;
@@ -184,11 +183,10 @@ bool conf_general_store_mc_configuration(mc_configuration *conf, bool is_motor_2
 	if(byte!=0){
 		HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, ADDR_FLASH_PAGE_63+(flash_incr*4), *((uint32_t*)word_ptr));
 	}
-
-	vTaskDelay(200);
 	HAL_FLASH_Lock();
 	vTaskDelay(500);
 	VescToSTM_start_motor();
+	vTaskDelay(100);
 	VescToSTM_set_torque(0);
 
 	return is_ok;
