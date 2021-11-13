@@ -21,6 +21,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+#include "main.h"
 #include "task_cli.h"
 #include "task_init.h"
 #include "task_pwr.h"
@@ -34,12 +35,23 @@
 #include "VescToSTM.h"
 #include "product.h"
 
-StreamBufferHandle_t UART_RX;
-
 #define UART_HANDLE 0
 
+extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart3;
+extern DMA_HandleTypeDef hdma_usart1_tx;
+extern DMA_HandleTypeDef hdma_usart1_rx;
+extern DMA_HandleTypeDef hdma_usart3_rx;
+extern DMA_HandleTypeDef hdma_usart3_tx;
 
-#define STREAMBUFFER_RX_SIZE 32
+/**
+ * \brief           Calculate length of statically allocated array
+ */
+
+#define CIRC_BUF_SZ       64  /* must be power of two */
+#define DMA_WRITE_PTR ( (CIRC_BUF_SZ - huart3.hdmarx->Instance->CNDTR) & (CIRC_BUF_SZ - 1) )  //huart_cobs->hdmarx->Instance->NDTR.
+uint8_t usart_rx_dma_buffer[CIRC_BUF_SZ];
+
 
 osThreadId_t task_cli_handle;
 const osThreadAttr_t task_cli_attributes = {
@@ -51,41 +63,38 @@ const osThreadAttr_t task_cli_attributes = {
 TERMINAL_HANDLE * cli_handle;
 
 
-
 void _putchar(char character){
 	while(!LL_USART_IsActiveFlag_TXE(VESC_USART)){
 	}
 	LL_USART_TransmitData8(VESC_USART, character);
+
 }
 
 void putbuffer(unsigned char *buf, unsigned int len){
-	while(len){
-		while(!LL_USART_IsActiveFlag_TXE(VESC_USART)){
-		}
-		LL_USART_TransmitData8(VESC_USART, *buf);
-		len--;
-		buf++;
+	HAL_UART_Transmit_DMA(&huart3, buf, len);
+	while(hdma_usart3_tx.State != HAL_DMA_STATE_READY){
+		huart3.gState = HAL_UART_STATE_READY;
+		vTaskDelay(1);
 	}
 }
-
 
 void comm_uart_send_packet(unsigned char *data, unsigned int len) {
 	packet_send_packet(data, len, UART_HANDLE);
 }
 
 void process_packet(unsigned char *data, unsigned int len){
-
 	commands_process_packet(data, len, &comm_uart_send_packet);
-
 }
 
 
 void task_cli(void * argument)
 {
 
+	HAL_UART_Receive_DMA(&huart3, usart_rx_dma_buffer, sizeof(usart_rx_dma_buffer));
+	CLEAR_BIT(huart3.Instance->CR3, USART_CR3_EIE);
+
 	uint8_t c=0, len=0;
-
-
+	uint32_t rd_ptr=0;
 	MCI_StartMotor( pMCI[M1] );
 
 	vTaskDelay(200);
@@ -95,21 +104,21 @@ void task_cli(void * argument)
 
 	packet_init(putbuffer, process_packet, UART_HANDLE);
 
-	LL_USART_EnableIT_RXNE(VESC_USART);
   /* Infinite loop */
 	for(;;)
 	{
 		/* `#START TASK_LOOP_CODE` */
-		len = xStreamBufferReceive(UART_RX, &c,sizeof(c), 1);
 
-		if(len){
+		while(rd_ptr != DMA_WRITE_PTR) {
+			c = usart_rx_dma_buffer[rd_ptr];
 			packet_process_byte(c, UART_HANDLE);
-
+			rd_ptr++;
+			rd_ptr &= (CIRC_BUF_SZ - 1);
 		}
 
 		send_sample();
 		VescToSTM_handle_timeout();
-
+		vTaskDelay(1);
 	}
 }
 
@@ -118,6 +127,5 @@ void task_cli(void * argument)
 void task_cli_init(){
 	HAL_NVIC_SetPriority(VESC_USART_IRQn, 5, 0);
 	cli_handle = NULL;
-	UART_RX = xStreamBufferCreate(STREAMBUFFER_RX_SIZE,1);
 	task_cli_handle = osThreadNew(task_cli, cli_handle, &task_cli_attributes);
 }

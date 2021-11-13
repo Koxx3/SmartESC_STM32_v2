@@ -197,10 +197,6 @@ void USART_IRQHandler(void)
   if (hUSART_SR & USART_SR_RXNE) /* Valid data received */
   {
 
-
-	c = LL_USART_ReceiveData8(VESC_USART);
-	if(UART_RX!=NULL) xStreamBufferSendFromISR(UART_RX, &c, sizeof(c), 0);
-
   /* USER CODE BEGIN USART_RXNE */
 
   /* USER CODE END USART_RXNE   */
