@@ -28,10 +28,10 @@
 #include "mc_config.h"
 #include <string.h>
 #include "product.h"
-#include "ninebot.h"
 
 #define CIRC_BUF_SZ       32  /* must be power of two */
 #define DMA_WRITE_PTR ( (CIRC_BUF_SZ - APP_USART_DMA.hdmarx->Instance->CNDTR) & (CIRC_BUF_SZ - 1) )  //huart_cobs->hdmarx->Instance->NDTR.
+
 uint8_t usart2_rx_dma_buffer[CIRC_BUF_SZ];
 
 uint8_t app_connection_timout = 8;
@@ -62,7 +62,7 @@ void task_app(void * argument)
 	for(;;)
 	{
 		while(rd_ptr != DMA_WRITE_PTR) {
-			ninebot_parse_usart_frame(usart2_rx_dma_buffer[rd_ptr], 1);
+			//ninebot_parse_usart_frame(usart2_rx_dma_buffer[rd_ptr], 1);
 
 			rd_ptr++;
 			rd_ptr &= (CIRC_BUF_SZ - 1);

@@ -4,6 +4,7 @@
 #define APP_PRODUCT_H_
 
 #ifdef G30P
+
 #define VBUS_ADC_CHANNEL                                                     MC_ADC_CHANNEL_1
 #define VOLTAGE_DIVIDER_GAIN     											 (float)3363.5
 
@@ -31,7 +32,7 @@
 
 #define APP_USART_DMA														 huart1
 #define APP_USART_TX_DMA												     hdma_usart1_tx
-#define APP_USART_TX_DMA													 hdma_usart1_tx
+#define APP_USART_RX_DMA													 hdma_usart1_rx
 
 #define POLE_PAIR_NUM                                                 	 	 (uint8_t)15
 #define USART_IRQHandler 													 USART3_IRQHandler
