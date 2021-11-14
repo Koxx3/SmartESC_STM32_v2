@@ -417,6 +417,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/regular_conversion_manager.c</locationURI>
 		</link>
 		<link>
+			<name>Application/User/VESC/inc/TTerm.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/TTerm.h</locationURI>
+		</link>
+		<link>
 			<name>Application/User/VESC/inc/VescCommand.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/VescCommand.h</locationURI>
