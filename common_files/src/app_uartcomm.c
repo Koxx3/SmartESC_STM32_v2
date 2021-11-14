@@ -58,7 +58,6 @@ void task_app(void * argument)
 	CLEAR_BIT(APP_USART_DMA.Instance->CR3, USART_CR3_EIE);
 
 	uint32_t rd_ptr=0;
-
   /* Infinite loop */
 	for(;;)
 	{

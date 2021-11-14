@@ -192,7 +192,6 @@ void USART_IRQHandler(void)
 
     /* USER CODE END USART_ORE   */
   }
-  uint8_t c;
 
   if (hUSART_SR & USART_SR_RXNE) /* Valid data received */
   {
