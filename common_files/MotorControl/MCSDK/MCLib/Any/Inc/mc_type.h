@@ -214,6 +214,8 @@ typedef struct
   uint16_t Vq_samples;
   int32_t Vd_sum;
   uint16_t Vd_samples;
+  uint32_t cycles_last;
+  uint32_t cycles_max;
 } FOCVars_t, *pFOCVars_t;
 
 /**

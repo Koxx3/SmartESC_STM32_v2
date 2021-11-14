@@ -32,6 +32,7 @@
 
 extern MCI_Handle_t* pMCI[NBR_OF_MOTORS];
 extern MCT_Handle_t* pMCT[NBR_OF_MOTORS];
+unsigned long getRunTimeCounterValue(void);
 
 void task_init();
 

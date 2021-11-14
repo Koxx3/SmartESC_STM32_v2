@@ -35,10 +35,17 @@
 #define APP_USART_RX_DMA													 hdma_usart1_rx
 
 #define POLE_PAIR_NUM                                                 	 	 (uint8_t)15
-#define USART_IRQHandler 													 USART3_IRQHandler
 #endif
 /****************************************************************************/
 
 #define BATTERY_VOLTAGE_GAIN     											 ((VOLTAGE_DIVIDER_GAIN * ADC_GAIN) * 512.0)
+
+#define DEMCR_TRCENA    0x01000000
+#define DEMCR           (*((volatile uint32_t *)0xE000EDFC))
+#define DWT_CTRL        (*(volatile uint32_t *)0xe0001000)
+#define CYCCNTENA       (1<<0)
+#define DWT_CYCCNT      ((volatile uint32_t *)0xE0001004)
+#define CPU_CYCLES      *DWT_CYCCNT
+#define CPU_CLOCK		64000000
 
 #endif /* APP_PRODUCT_H_ */

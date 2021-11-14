@@ -35,4 +35,6 @@ extern PQD_MotorPowMeas_Handle_t *pMPM[NBR_OF_MOTORS];
 extern SpeednTorqCtrl_Handle_t *pSTC[NBR_OF_MOTORS];
 
 
+
+
 #endif

@@ -53,13 +53,6 @@ const osThreadAttr_t task_cli_attributes = {
 };
 
 
-void _putchar(char character){
-	while(!LL_USART_IsActiveFlag_TXE(VESC_USART)){
-	}
-	LL_USART_TransmitData8(VESC_USART, character);
-
-}
-
 void putbuffer(unsigned char *buf, unsigned int len){
 	HAL_UART_Transmit_DMA(&VESC_USART_DMA, buf, len);
 	while(VESC_USART_TX_DMA.State != HAL_DMA_STATE_READY){
