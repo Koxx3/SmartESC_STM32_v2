@@ -83,13 +83,17 @@ void VescToSTM_set_torque(int32_t current){
 	}else if (q < SpeednTorqCtrlM1.MinNegativeTorque){
 		q = SpeednTorqCtrlM1.MinNegativeTorque;
 	}
-	uint16_t Vin = VBS_GetAvBusVoltage_V(pMCT[M1]->pBusVoltageSensor);
+	volatile float Vin = VescToSTM_get_bus_voltage();
 	if(Vin < mc_conf.l_battery_cut_start){
 		float diff = mc_conf.l_battery_cut_start - mc_conf.l_battery_cut_end;
 		float VinDiff = Vin - mc_conf.l_battery_cut_end;
 		float qRed = (float)q / diff * VinDiff;
 		q = qRed;
 	}
+	if(Vin < mc_conf.l_battery_cut_end){
+		q=0;
+	}
+
 	if(q > 0){
 		pMCI[M1]->pSTC->PISpeed->wUpperIntegralLimit = (uint32_t)q * SP_KDDIV;
 		pMCI[M1]->pSTC->PISpeed->wLowerIntegralLimit = (uint32_t)-q * SP_KDDIV;

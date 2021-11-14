@@ -79,8 +79,7 @@ __weak uint16_t VBS_GetAvBusVoltage_V( BusVoltageSensor_Handle_t * pHandle )
   uint32_t temp;
 
   temp = ( uint32_t )( pHandle->AvBusVoltage_d );
-  temp *= pHandle->ConversionFactor;
-  temp /= 65536u;
+  temp /= pHandle->ConversionFactor;
 
   return ( ( uint16_t )temp );
 }

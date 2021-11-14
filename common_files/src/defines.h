@@ -6,6 +6,7 @@
 #include "parameters_conversion.h"
 #include "mc_config.h"
 #include "mc_tuning.h"
+#include "mc_interface.h"
 
 // Firmware version
 #define FW_VERSION_MAJOR			5
