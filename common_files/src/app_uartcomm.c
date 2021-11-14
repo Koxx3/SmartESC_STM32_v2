@@ -1,113 +1,78 @@
 /*
-	Copyright 2016 - 2019 Benjamin Vedder	benjamin@vedder.se
+ * m365
+ *
+ * Copyright (c) 2021 Jens Kerrinnes
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 
-	This file is part of the VESC firmware.
-
-	The VESC firmware is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    The VESC firmware is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-    */
-
-#include "app.h"
 #include "main.h"
 #include "cmsis_os.h"
-#include "packet.h"
-#include "VescCommand.h"
-
+#include "FreeRTOS.h"
+#include "TTerm.h"
+#include "mc_config.h"
 #include <string.h>
+#include "product.h"
+#include "ninebot.h"
 
-// Settings
-#define BAUDRATE					115200
-#define PACKET_HANDLER				1
-#define PACKET_HANDLER_P			2
+#define CIRC_BUF_SZ       32  /* must be power of two */
+#define DMA_WRITE_PTR ( (CIRC_BUF_SZ - APP_USART_DMA.hdmarx->Instance->CNDTR) & (CIRC_BUF_SZ - 1) )  //huart_cobs->hdmarx->Instance->NDTR.
+uint8_t usart2_rx_dma_buffer[CIRC_BUF_SZ];
 
-osThreadId_t AppUsartHandle;
-const osThreadAttr_t APPUSART_attributes = { .name = "APPUSART", .priority = osPriorityBelowNormal, .stack_size = 128 * 1 };
+uint8_t app_connection_timout = 8;
 
-extern UART_HandleTypeDef APP_USART;
-extern DMA_HandleTypeDef APP_USART_DMA_TX;
+osThreadId_t task_app_handle;
+const osThreadAttr_t task_app_attributes = {
+  .name = "APP-USART",
+  .priority = (osPriority_t) osPriorityBelowNormal,
+  .stack_size = 128 * 2
+};
 
-// Threads
-void task_app_usart(void * argument);
-
-// Variables
-static volatile bool thread_is_running = false;
-static volatile bool uart_is_running = false;
-
-// Private functions
-static void process_packet(unsigned char *data, unsigned int len);
-static void send_packet(unsigned char *data, unsigned int len);
-
-static void process_packet(unsigned char *data, unsigned int len) {
-	commands_process_packet(data, len, app_uartcomm_send_packet);
-}
-
-static void send_packet(unsigned char *data, unsigned int len) {
-	if (uart_is_running) {
-		//Waiting to send status OK
-		while(HAL_DMA_GetState(&APP_USART_DMA_TX) == HAL_DMA_STATE_BUSY) osDelay(1);
-
-		//send data
-		while( HAL_UART_Transmit_DMA(&APP_USART, data, len) != HAL_OK ) osDelay(1);
+void app_uartcomm_dev_write(uint8_t *buffer, uint8_t tx_count)
+{
+	HAL_UART_Transmit_DMA(&APP_USART_DMA, buffer, tx_count);
+	while(APP_USART_TX_DMA.State != HAL_DMA_STATE_READY){
+		APP_USART_DMA.gState = HAL_UART_STATE_READY;
+		vTaskDelay(1);
 	}
 }
 
-void app_uartcomm_start(void) {
-	packet_init(send_packet, process_packet, PACKET_HANDLER);
+void task_app(void * argument)
+{
+	HAL_UART_Receive_DMA(&APP_USART_DMA, usart2_rx_dma_buffer, sizeof(usart2_rx_dma_buffer));
+	CLEAR_BIT(APP_USART_DMA.Instance->CR3, USART_CR3_EIE);
 
-	if (!thread_is_running) {
-		AppUsartHandle = osThreadNew(task_app_usart, NULL, &APPUSART_attributes);
-		thread_is_running = true;
-	}
-}
+	uint32_t rd_ptr=0;
 
-void app_uartcomm_start_permanent(void) {
+  /* Infinite loop */
+	for(;;)
+	{
+		while(rd_ptr != DMA_WRITE_PTR) {
+			ninebot_parse_usart_frame(usart2_rx_dma_buffer[rd_ptr], 1);
 
-}
-
-void app_uartcomm_stop(void) {
-	if (uart_is_running) {
-		HAL_UART_DMAStop(&APP_USART);
-		uart_is_running = false;
-	}
-}
-
-void app_uartcomm_send_packet(unsigned char *data, unsigned int len) {
-	packet_send_packet(data, len, PACKET_HANDLER);
-
-}
-
-void app_uartcomm_configure(uint32_t baudrate, bool permanent_enabled) {
-
-	if (thread_is_running && uart_is_running) {
-		//sdStart(&HW_UART_DEV, &uart_cfg);
-	}
-}
-
-void task_app_usart(void * argument){
-	(void)argument;
-
-	for(;;) {
-		bool rx = true;
-		while (rx) {
-			rx = false;
-			if (uart_is_running) {
-				//msg_t res = sdGetTimeout(&HW_UART_DEV, TIME_IMMEDIATE);
-				//if (res != MSG_TIMEOUT) {
-					//packet_process_byte(res, PACKET_HANDLER);
-					//rx = true;
-				//}
-			}
+			rd_ptr++;
+			rd_ptr &= (CIRC_BUF_SZ - 1);
 		}
-		vTaskDelay(500);
+
+		vTaskDelay(1);
 	}
+}
+
+void task_app_init(){
+	task_app_handle = osThreadNew(task_app, NULL, &task_app_attributes);
 }

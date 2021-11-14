@@ -172,6 +172,16 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Inc/main.h</locationURI>
 		</link>
 		<link>
+			<name>Application/User/ninebot.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/ninebot.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/ninebot.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Inc/ninebot.h</locationURI>
+		</link>
+		<link>
 			<name>Application/User/parameters_conversion.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/parameters_conversion.h</locationURI>
@@ -225,6 +235,16 @@
 			<name>Application/User/task_init.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/task_init.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/temperature.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/temperature.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/temperature.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Inc/temperature.h</locationURI>
 		</link>
 		<link>
 			<name>Drivers/CMSIS/system_stm32f1xx.c</name>

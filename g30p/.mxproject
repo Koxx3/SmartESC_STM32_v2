@@ -7,8 +7,8 @@ HeaderPath=Drivers\STM32F1xx_HAL_Driver\Inc;Drivers\STM32F1xx_HAL_Driver\Inc\Leg
 CDefines=ARM_MATH_CM3;USE_HAL_DRIVER;STM32F103xB;USE_HAL_DRIVER;USE_HAL_DRIVER;
 
 [PreviousGenFiles]
-HeaderPath=C:/Git/M365/Merged/g30p/Inc
+HeaderPath=C:/Users/John/STM32CubeIDE/workspace_1.7.0/SmartESC_STM32_v2-vesc_comp/g30p/Inc
 HeaderFiles=FreeRTOSConfig.h;stm32f1xx_it.h;stm32f1xx_hal_conf.h;main.h;
-SourcePath=C:/Git/M365/Merged/g30p/Src
+SourcePath=C:/Users/John/STM32CubeIDE/workspace_1.7.0/SmartESC_STM32_v2-vesc_comp/g30p/Src
 SourceFiles=freertos.c;stm32f1xx_it.c;stm32f1xx_hal_msp.c;stm32f1xx_hal_timebase_tim.c;main.c;
 
