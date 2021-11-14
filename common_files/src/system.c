@@ -3,7 +3,6 @@
 
 #include <string.h>
 
-
 uint32_t SYS_getCPULoadFine(TaskStatus_t * taskStats, uint32_t taskCount, uint32_t sysTime){
     uint32_t currTask = 0;
     for(;currTask < taskCount; currTask++){

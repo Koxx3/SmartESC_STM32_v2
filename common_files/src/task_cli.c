@@ -49,7 +49,7 @@ extern DMA_HandleTypeDef hdma_usart3_tx;
  */
 
 #define CIRC_BUF_SZ       64  /* must be power of two */
-#define DMA_WRITE_PTR ( (CIRC_BUF_SZ - huart3.hdmarx->Instance->CNDTR) & (CIRC_BUF_SZ - 1) )  //huart_cobs->hdmarx->Instance->NDTR.
+#define DMA_WRITE_PTR ( (CIRC_BUF_SZ - VESC_USART.hdmarx->Instance->CNDTR) & (CIRC_BUF_SZ - 1) )  //huart_cobs->hdmarx->Instance->NDTR.
 uint8_t usart_rx_dma_buffer[CIRC_BUF_SZ];
 
 
@@ -63,17 +63,10 @@ const osThreadAttr_t task_cli_attributes = {
 TERMINAL_HANDLE * cli_handle;
 
 
-void _putchar(char character){
-	while(!LL_USART_IsActiveFlag_TXE(VESC_USART)){
-	}
-	LL_USART_TransmitData8(VESC_USART, character);
-
-}
-
 void putbuffer(unsigned char *buf, unsigned int len){
-	HAL_UART_Transmit_DMA(&huart3, buf, len);
-	while(hdma_usart3_tx.State != HAL_DMA_STATE_READY){
-		huart3.gState = HAL_UART_STATE_READY;
+	HAL_UART_Transmit_DMA(&VESC_USART, buf, len);
+	while(VESC_USART_DMA_TX.State != HAL_DMA_STATE_READY){
+		VESC_USART.gState = HAL_UART_STATE_READY;
 		vTaskDelay(1);
 	}
 }
@@ -90,8 +83,8 @@ void process_packet(unsigned char *data, unsigned int len){
 void task_cli(void * argument)
 {
 
-	HAL_UART_Receive_DMA(&huart3, usart_rx_dma_buffer, sizeof(usart_rx_dma_buffer));
-	CLEAR_BIT(huart3.Instance->CR3, USART_CR3_EIE);
+	HAL_UART_Receive_DMA(&VESC_USART, usart_rx_dma_buffer, sizeof(usart_rx_dma_buffer));
+	CLEAR_BIT(VESC_USART.Instance->CR3, USART_CR3_EIE);
 
 	uint32_t rd_ptr=0;
 	MCI_StartMotor( pMCI[M1] );
@@ -123,7 +116,6 @@ void task_cli(void * argument)
 
 
 void task_cli_init(){
-	HAL_NVIC_SetPriority(VESC_USART_IRQn, 5, 0);
 	cli_handle = NULL;
 	task_cli_handle = osThreadNew(task_cli, cli_handle, &task_cli_attributes);
 }

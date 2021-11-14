@@ -30,6 +30,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "app.h"
+#include "product.h"
 
 mc_configuration mc_conf;
 app_configuration appconf;
@@ -42,6 +43,10 @@ void conf_general_init(void) {
 	conf_general_read_mc_configuration(&mc_conf, 0);
 	conf_general_setup_mc(&mc_conf);
 	
+	//enable cycle counter
+	DEMCR |= DEMCR_TRCENA;
+	DWT_CTRL |= CYCCNTENA;
+
 }
 
 /**
