@@ -25,7 +25,6 @@
 #include "task_cli.h"
 #include "task_init.h"
 #include "task_pwr.h"
-#include "main.h"
 #include "TTerm.h"
 #include "printf.h"
 #include "mc_config.h"
@@ -37,19 +36,12 @@
 
 #define UART_HANDLE 0
 
-extern UART_HandleTypeDef huart1;
-extern UART_HandleTypeDef huart3;
-extern DMA_HandleTypeDef hdma_usart1_tx;
-extern DMA_HandleTypeDef hdma_usart1_rx;
-extern DMA_HandleTypeDef hdma_usart3_rx;
-extern DMA_HandleTypeDef hdma_usart3_tx;
-
 /**
  * \brief           Calculate length of statically allocated array
  */
 
 #define CIRC_BUF_SZ       64  /* must be power of two */
-#define DMA_WRITE_PTR ( (CIRC_BUF_SZ - VESC_USART.hdmarx->Instance->CNDTR) & (CIRC_BUF_SZ - 1) )  //huart_cobs->hdmarx->Instance->NDTR.
+#define DMA_WRITE_PTR ( (CIRC_BUF_SZ - VESC_USART_DMA.hdmarx->Instance->CNDTR) & (CIRC_BUF_SZ - 1) )  //huart_cobs->hdmarx->Instance->NDTR.
 uint8_t usart_rx_dma_buffer[CIRC_BUF_SZ];
 
 
@@ -60,13 +52,11 @@ const osThreadAttr_t task_cli_attributes = {
   .stack_size = 512 * 4
 };
 
-TERMINAL_HANDLE * cli_handle;
-
 
 void putbuffer(unsigned char *buf, unsigned int len){
-	HAL_UART_Transmit_DMA(&VESC_USART, buf, len);
-	while(VESC_USART_DMA_TX.State != HAL_DMA_STATE_READY){
-		VESC_USART.gState = HAL_UART_STATE_READY;
+	HAL_UART_Transmit_DMA(&VESC_USART_DMA, buf, len);
+	while(VESC_USART_TX_DMA.State != HAL_DMA_STATE_READY){
+		VESC_USART_DMA.gState = HAL_UART_STATE_READY;
 		vTaskDelay(1);
 	}
 }
@@ -82,9 +72,8 @@ void process_packet(unsigned char *data, unsigned int len){
 
 void task_cli(void * argument)
 {
-
-	HAL_UART_Receive_DMA(&VESC_USART, usart_rx_dma_buffer, sizeof(usart_rx_dma_buffer));
-	CLEAR_BIT(VESC_USART.Instance->CR3, USART_CR3_EIE);
+	HAL_UART_Receive_DMA(&VESC_USART_DMA, usart_rx_dma_buffer, sizeof(usart_rx_dma_buffer));
+	CLEAR_BIT(VESC_USART_DMA.Instance->CR3, USART_CR3_EIE);
 
 	uint32_t rd_ptr=0;
 	MCI_StartMotor( pMCI[M1] );
@@ -92,15 +81,12 @@ void task_cli(void * argument)
 	vTaskDelay(200);
 	VescToSTM_set_brake(0);
 
-
-
 	packet_init(putbuffer, process_packet, UART_HANDLE);
 
   /* Infinite loop */
 	for(;;)
 	{
 		/* `#START TASK_LOOP_CODE` */
-
 		while(rd_ptr != DMA_WRITE_PTR) {
 			packet_process_byte(usart_rx_dma_buffer[rd_ptr], UART_HANDLE);
 			rd_ptr++;
@@ -113,9 +99,6 @@ void task_cli(void * argument)
 	}
 }
 
-
-
 void task_cli_init(){
-	cli_handle = NULL;
-	task_cli_handle = osThreadNew(task_cli, cli_handle, &task_cli_attributes);
+	task_cli_handle = osThreadNew(task_cli, NULL, &task_cli_attributes);
 }

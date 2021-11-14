@@ -227,6 +227,16 @@
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/task_init.c</locationURI>
 		</link>
 		<link>
+			<name>Application/User/temperature.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/temperature.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/temperature.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Inc/temperature.h</locationURI>
+		</link>
+		<link>
 			<name>Drivers/CMSIS/system_stm32f1xx.c</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/system_stm32f1xx.c</locationURI>

@@ -4,26 +4,37 @@
 #define APP_PRODUCT_H_
 
 #ifdef G30P
+
 #define VBUS_ADC_CHANNEL                                                     MC_ADC_CHANNEL_1
 #define VOLTAGE_DIVIDER_GAIN     											 (float)3363.5
 
-#define VESC_USART                                                 			 huart1
-#define VESC_USART_DMA_TX                                                 	 hdma_usart1_tx
-#define APP_USART														 	 huart2
-#define APP_USART_DMA_TX												     hdma_usart2_tx
+#define VESC_USART                                                 			 USART1
+#define VESC_USART_DMA													     huart1
+#define VESC_USART_TX_DMA													 hdma_usart1_tx
+#define VESC_USART_RX_DMA													 hdma_usart1_rx
+
+#define APP_USART_DMA														 huart2
+#define APP_USART_TX_DMA												     hdma_usart2_tx
+#define APP_USART_TX_DMA													 hdma_usart2_tx
 
 #define POLE_PAIR_NUM                                                 	 	 (uint8_t)14
+#define USART_IRQHandler 												 	 USART1_IRQHandler
 #endif
 
 #ifdef M365
 #define VBUS_ADC_CHANNEL                                                     MC_ADC_CHANNEL_2
 #define VOLTAGE_DIVIDER_GAIN     											 (float)2650.0
-#define VESC_USART                                                 			 huart3
-#define VESC_USART_DMA_TX                                                 	 hdma_usart3_tx
-#define APP_USART														 	 huart1
-#define APP_USART_DMA_TX												   	 hdma_usart1_tx
 
-#define POLE_PAIR_NUM                                                 	 	 (uint8_t)14
+#define VESC_USART                                                 			 USART3
+#define VESC_USART_DMA													     huart3
+#define VESC_USART_TX_DMA													 hdma_usart3_tx
+#define VESC_USART_RX_DMA													 hdma_usart3_rx
+
+#define APP_USART_DMA														 huart1
+#define APP_USART_TX_DMA												     hdma_usart1_tx
+#define APP_USART_RX_DMA													 hdma_usart1_rx
+
+#define POLE_PAIR_NUM                                                 	 	 (uint8_t)15
 #endif
 /****************************************************************************/
 

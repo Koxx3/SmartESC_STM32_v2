@@ -26,11 +26,7 @@ bool app_is_output_disabled(void);
 unsigned app_calc_crc(app_configuration* conf);
 
 // Standard apps
-void app_uartcomm_start(void);
-void app_uartcomm_start_permanent(void);
-void app_uartcomm_stop(void);
-void app_uartcomm_configure(uint32_t baudrate, bool permanent_enabled);
-void app_uartcomm_send_packet(unsigned char *data, unsigned int len);
-void app_uartcomm_send_packet_p(unsigned char *data, unsigned int len);
+void task_app_init(void);
+void app_uartcomm_dev_write(uint8_t *buffer, uint8_t tx_count);
 
 #endif /* APP_H_ */
