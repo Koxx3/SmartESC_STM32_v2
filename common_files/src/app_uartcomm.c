@@ -153,7 +153,7 @@ void task_app(void * argument)
 				ms_without_power = 0;
 			}
 			pulses_without_power_before = ms_without_power;
-			VescToSTM_set_brake(0);
+			//VescToSTM_set_brake(0);
 
 			continue;
 		}
@@ -163,7 +163,7 @@ void task_app(void * argument)
 
 		if (current_mode) {
 			if (current_mode_brake) {
-				VescToSTM_set_brake_current_rel(current_rel);
+				//VescToSTM_set_brake_current_rel(current_rel);
 			} else {
 				float current_out = current_rel;
 				bool is_reverse = false;
@@ -176,7 +176,6 @@ void task_app(void * argument)
 				if (is_reverse) {
 					//VescToSTM_set_current_rel(-current_out);
 				} else {
-					txest(current_out);
 					//VescToSTM_set_current_rel(current_out);
 				}
 			}

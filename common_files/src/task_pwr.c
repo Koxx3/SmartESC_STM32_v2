@@ -24,6 +24,7 @@
 #include "task_pwr.h"
 #include "task_init.h"
 #include "main.h"
+#include "task.h"
 #include "task_cli.h"
 #include <string.h>
 #include "VescCommand.h"
@@ -145,7 +146,7 @@ void power_control(uint8_t pwr)
 		//motors_free(0, NULL);
 		//sleep_x_ticks(2000);
 		//stop_motors();
-		//delay_x_ticks(1);
+		vTaskDelay(1);
 
 		while(HAL_GPIO_ReadPin(PWR_BTN_GPIO_Port, PWR_BTN_Pin));
 		HAL_GPIO_WritePin(TPS_ENA_GPIO_Port, TPS_ENA_Pin, GPIO_PIN_RESET);

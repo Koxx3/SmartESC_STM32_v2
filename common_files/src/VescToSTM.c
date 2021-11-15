@@ -451,7 +451,7 @@ float VescToSTM_get_duty_cycle_now(void) {
  */
 void VescToSTM_set_current_rel(float val) {
 	pMCI[M1]->pSTC->SPD->open_loop = false;
-	uint32_t q;
+	int32_t q;
 	float torque;
 	if(val>0){
 		torque = (float)SpeednTorqCtrlM1.MaxPositiveTorque * val;

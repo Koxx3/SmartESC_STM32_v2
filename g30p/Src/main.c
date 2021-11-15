@@ -148,8 +148,6 @@ int main(void)
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
   MX_MotorControl_Init();
-  HAL_Delay(100);
-
   conf_general_init();
   /* USER CODE END 2 */
 
@@ -158,7 +156,6 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
-  HAL_GPIO_WritePin(TPS_ENA_GPIO_Port, TPS_ENA_Pin, GPIO_PIN_SET);
   /* USER CODE END RTOS_MUTEX */
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
@@ -184,7 +181,6 @@ int main(void)
   /* add threads, ... */
 
   task_init(); //bring up user tasks
-  HAL_GPIO_WritePin(TPS_ENA_GPIO_Port, TPS_ENA_Pin, GPIO_PIN_SET);
 
   /* USER CODE END RTOS_THREADS */
 
