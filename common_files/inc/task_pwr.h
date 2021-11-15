@@ -28,9 +28,24 @@
 
 extern osThreadId_t PwrHandle;
 
+
+#define DEV_PWR_ON                          0x66
+#define DEV_PWR_OFF                         0xDD
+#define DEV_PWR_RESTART                     0xBA
+
+
+typedef enum {
+    NO_PRESS,
+    SINGLE_PRESS,
+    LONG_PRESS,
+    DOUBLE_PRESS,
+	VERY_LONG_PRESS
+} eButtonEvent ;
+
 void task_PWR_init();
 void poweroff(void);
-
+int8_t check_power_button_pressed_state();
+void power_control(uint8_t pwr);
 
 #endif /* TASK_PWR_H_ */
 

@@ -12,6 +12,7 @@
 #include "utils.h"
 #include <string.h>
 #include "product.h"
+#include <math.h>
 
 static float tacho_scale;
 
@@ -109,6 +110,14 @@ void VescToSTM_set_torque(int32_t current){
 		MCI_ExecSpeedRamp(pMCI[M1], mc_conf.l_min_erpm / mc_conf.si_motor_poles , 0);
 	}
 
+}
+
+void VescToSTM_set_brake_current_rel(float val) {
+	if (fabsf(val) > 0.001) {
+		val = 0;
+	}
+
+	VescToSTM_set_brake(val * fabsf(mc_conf.lo_current_motor_min_now));
 }
 
 void VescToSTM_set_brake(int32_t current){

@@ -227,6 +227,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/task_init.c</locationURI>
 		</link>
 		<link>
+			<name>Application/User/task_pwr.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/task_pwr.c</locationURI>
+		</link>
+		<link>
 			<name>Drivers/CMSIS/system_stm32f1xx.c</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/system_stm32f1xx.c</locationURI>

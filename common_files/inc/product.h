@@ -15,7 +15,7 @@
 
 #define APP_USART_DMA														 huart2
 #define APP_USART_TX_DMA												     hdma_usart2_tx
-#define APP_USART_TX_DMA													 hdma_usart2_tx
+#define APP_USART_RX_DMA													 hdma_usart2_rx
 
 #define POLE_PAIR_NUM                                                 	 	 (uint8_t)14
 #define USART_IRQHandler 												 	 USART1_IRQHandler
