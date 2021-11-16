@@ -117,7 +117,7 @@ void VescToSTM_set_torque(int32_t current){
 		q=0;
 	}
 
-	if(q > 0){
+	if(q >= 0){
 		pMCI[M1]->pSTC->PISpeed->wUpperIntegralLimit = q * SP_KDDIV;
 		pMCI[M1]->pSTC->PISpeed->wLowerIntegralLimit = mc_conf.s_pid_allow_braking ? -q : 0;
 		pMCI[M1]->pSTC->PISpeed->hUpperOutputLimit = q;
@@ -172,7 +172,7 @@ void VescToSTM_set_speed(int32_t rpm){
 		if(erpm < mc_conf.l_min_erpm) erpm = mc_conf.l_min_erpm;
 	}
 	pMCI[M1]->pSTC->SPD->open_loop = false;
-	if(rpm>0){
+	if(rpm>=0){
 		pMCI[M1]->pSTC->PISpeed->wUpperIntegralLimit = (int32_t)SpeednTorqCtrlM1.MaxPositiveTorque * SP_KIDIV;
 		pMCI[M1]->pSTC->PISpeed->wLowerIntegralLimit = mc_conf.s_pid_allow_braking ? (int32_t)SpeednTorqCtrlM1.MinNegativeTorque * SP_KIDIV: 0;
 		pMCI[M1]->pSTC->PISpeed->hUpperOutputLimit = SpeednTorqCtrlM1.MaxPositiveTorque;
@@ -496,7 +496,7 @@ void VescToSTM_set_current_rel(float val) {
 	}else if (q < SpeednTorqCtrlM1.MinNegativeTorque){
 		q = SpeednTorqCtrlM1.MinNegativeTorque;
 	}
-	if(q > 0){
+	if(q >= 0){
 		pMCI[M1]->pSTC->PISpeed->wUpperIntegralLimit = (uint32_t)q * SP_KDDIV;
 		pMCI[M1]->pSTC->PISpeed->wLowerIntegralLimit = mc_conf.s_pid_allow_braking ? -q : 0;
 		pMCI[M1]->pSTC->PISpeed->hUpperOutputLimit = q;
