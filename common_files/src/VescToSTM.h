@@ -23,6 +23,10 @@ int32_t VescToSTM_get_erpm();
 int32_t VescToSTM_get_erpm_fast();
 int32_t VescToSTM_get_rpm();
 float VescToSTM_get_pid_pos_now();
+int32_t VescToSTM_rpm_to_speed(int32_t rpm);
+int32_t VescToSTM_erpm_to_speed(int32_t erpm, int32_t pole_pairs);
+int32_t VescToSTM_speed_to_rpm(int32_t speed);
+int32_t VescToSTM_speed_to_erpm(int32_t speed, int32_t pole_pairs);
 
 void VescToSTM_timeout_reset();
 void VescToSTM_handle_timeout();
@@ -44,5 +48,6 @@ uint8_t VescToSTM_get_uid(uint8_t * ptr, uint8_t size);
 void VescToSTM_enable_timeout(bool enbale);
 void VescToSTM_set_open_loop(bool enabled, int16_t init_angle, int16_t erpm);
 void VescToSTM_set_open_loop_rpm(int16_t erpm);
+void VescToSTM_set_brake_current_rel(float val);
 
 #endif /* VESCTOSTM_H_ */

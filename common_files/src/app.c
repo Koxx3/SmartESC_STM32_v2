@@ -21,17 +21,13 @@ const app_configuration* app_get_configuration(void) {
 void app_set_configuration(app_configuration *conf) {
 	appconf = *conf;
 
-	app_uartcomm_stop();
-
 	switch (appconf.app_to_use) {
 		case APP_UART:
-			app_uartcomm_start();
+			task_app_init();
 			break;
 		default:
 			break;
 	}
-
-	app_uartcomm_configure(appconf.app_uart_baudrate, appconf.permanent_uart_enabled);
 }
 
 /**

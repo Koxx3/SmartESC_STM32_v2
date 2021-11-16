@@ -6,6 +6,7 @@
 #include "parameters_conversion.h"
 #include "mc_config.h"
 #include "mc_tuning.h"
+#include "mc_interface.h"
 
 // Firmware version
 #define FW_VERSION_MAJOR			5
@@ -32,6 +33,8 @@ extern MCT_Handle_t* pMCT[NBR_OF_MOTORS];
 extern MCI_Handle_t* pMCI[NBR_OF_MOTORS];
 extern PQD_MotorPowMeas_Handle_t *pMPM[NBR_OF_MOTORS];
 extern SpeednTorqCtrl_Handle_t *pSTC[NBR_OF_MOTORS];
+
+
 
 
 #endif

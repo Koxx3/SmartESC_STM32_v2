@@ -36,12 +36,10 @@ extern mc_configuration mc_conf;
 
 // Functions
 void conf_general_init(void);
-void conf_general_recalc();
 void conf_general_read_app_configuration(app_configuration *conf);
 void conf_general_read_mc_configuration(mc_configuration *conf, bool is_motor_2);
 bool conf_general_store_mc_configuration(mc_configuration *conf, bool is_motor_2);
 void conf_general_setup_mc(mc_configuration *mcconf);
-void conf_general_readback_mc(mc_configuration *mcconf);
 mc_configuration* mc_interface_get_configuration(void);
 
 #endif /* CONF_GENERAL_H_ */

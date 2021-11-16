@@ -47,7 +47,7 @@ static disp_pos_mode display_position_mode;
 
 
 
-#define PRINTF_STACK_SIZE 50u
+#define PRINTF_STACK_SIZE 128u
 void commands_printf(const char* format, ...) {
 
 	va_list arg;

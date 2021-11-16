@@ -10,5 +10,17 @@ m365/m365.settings
 
 m365/STM32CubeIDE/m365 Release.launch
 
+g30p/STM32CubeIDE/Release/
+g30p/STM32CubeIDE/Debug/
+g30p/m365.log
+
+g30p/m365.ioc.bak
+
+g30p/STM32CubeIDE/.settings/language.settings.xml
+
+g30p/m365.settings
+
+g30p/STM32CubeIDE/g30p.launch
+
 *.d
 *.o

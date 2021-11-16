@@ -489,6 +489,7 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 		//mc_interface_set_configuration(mcconf);
 		vTaskDelay(1000);
 		currComp.q = 0;
+		VescToSTM_set_open_loop(false, 0, 0);
 		MCI_SetCurrentReferences(pMCI[M1],currComp);
 		vTaskDelay(10);
 

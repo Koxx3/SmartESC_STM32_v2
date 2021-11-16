@@ -36,6 +36,7 @@
 #include "parameters_conversion.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "product.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -138,7 +139,6 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
   bMCBootCompleted = 0;
   pCLM[M1] = &CircleLimitationM1;
 
-  pMaxTorquePerAmpere[M1] = &MTPARegM1;
   /**********************************************************/
   /*    PWM and current sensing component initialization    */
   /**********************************************************/
@@ -598,6 +598,8 @@ __attribute__((section (".ccmram")))
 __weak uint8_t TSK_HighFrequencyTask(void)
 {
 	/* USER CODE BEGIN HighFrequencyTask 0 */
+	uint32_t cycles = *DWT_CYCCNT;
+    /* Enable CPU cycle counter */
 
 	/* USER CODE END HighFrequencyTask 0 */
 
@@ -656,7 +658,10 @@ __weak uint8_t TSK_HighFrequencyTask(void)
 	/* USER CODE END HighFrequencyTask SINGLEDRIVE_3 */
 	}
 	/* USER CODE BEGIN HighFrequencyTask 1 */
-
+	FOCVars[M1].cycles_last = *DWT_CYCCNT - cycles;
+	if(FOCVars[M1].cycles_last > FOCVars[M1].cycles_max){
+		FOCVars[M1].cycles_max = FOCVars[M1].cycles_last;
+	}
 	/* USER CODE END HighFrequencyTask 1 */
 
 	return bMotorNbr;

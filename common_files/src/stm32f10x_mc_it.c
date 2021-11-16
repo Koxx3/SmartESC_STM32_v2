@@ -58,7 +58,6 @@ void TIMx_UP_M1_IRQHandler(void);
 void DMAx_R1_M1_IRQHandler(void);
 void TIMx_BRK_M1_IRQHandler(void);
 void SPD_TIM_M1_IRQHandler(void);
-void USART_IRQHandler(void);
 void HardFault_Handler(void);
 void SysTick_Handler(void);
 void PFC_TIM_IRQHandler(void);
@@ -170,42 +169,6 @@ void SPD_TIM_M1_IRQHandler(void)
   /* USER CODE END SPD_TIM_M1_IRQn 1 */
 }
 
-/*Start here***********************************************************/
-/*GUI, this section is present only if serial communication is enabled*/
-/**
-  * @brief  This function handles USART interrupt request.
-  * @param  None
-  * @retval None
-  */
-void USART_IRQHandler(void)
-{
-  /* USER CODE BEGIN USART_IRQn 0 */
-
-  /* USER CODE END USART_IRQn 0 */
-  uint16_t hUSART_SR = VESC_USART->SR;
-
-  if (hUSART_SR & USART_SR_ORE) /* Overrun error occurs before SR access */
-  {
-    /* Send Overrun message */
-    LL_USART_ClearFlag_ORE(VESC_USART); /* Clear overrun flag */
-    /* USER CODE BEGIN USART_ORE */
-
-    /* USER CODE END USART_ORE   */
-  }
-  uint8_t c;
-
-  if (hUSART_SR & USART_SR_RXNE) /* Valid data received */
-  {
-
-  /* USER CODE BEGIN USART_RXNE */
-
-  /* USER CODE END USART_RXNE   */
-  }
-
-  /* USER CODE BEGIN USART_IRQn 1 */
-
-  /* USER CODE END USART_IRQn 1 */
-}
 
 /**
   * @brief  This function handles Hard Fault exception.
@@ -222,37 +185,6 @@ void HardFault_Handler(void)
   /* Go to infinite loop when Hard Fault exception occurs */
   while (1)
   {
-    {
-      if (LL_USART_IsActiveFlag_ORE(VESC_USART)) /* Overrun error occurs */
-      {
-        /* Send Overrun message */
-        //UFCP_OVR_IRQ_Handler(&pUSART);
-        LL_USART_ClearFlag_ORE(VESC_USART); /* Clear overrun flag */
-        //UI_SerialCommunicationTimeOutStop();
-      }
-
-      if (LL_USART_IsActiveFlag_TXE(VESC_USART))
-      {
-        //UFCP_TX_IRQ_Handler(&pUSART);
-      }
-
-      if (LL_USART_IsActiveFlag_RXNE(VESC_USART)) /* Valid data have been received */
-      {
-        //uint16_t retVal;
-        //retVal = *(uint16_t*)(UFCP_RX_IRQ_Handler(&pUSART,LL_USART_ReceiveData8(pUSART.USARTx)));
-        //if (retVal == 1)
-        //{
-        //  UI_SerialCommunicationTimeOutStart();
-        //}
-        //if (retVal == 2)
-        //{
-        //  UI_SerialCommunicationTimeOutStop();
-        //
-      }
-      else
-      {
-      }
-    }
   }
  /* USER CODE BEGIN HardFault_IRQn 1 */
 

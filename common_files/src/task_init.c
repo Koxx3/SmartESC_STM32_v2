@@ -25,10 +25,14 @@
 #include "task_LED.h"
 #include "task_pwr.h"
 #include "task_cli.h"
+#include "product.h"
+
+unsigned long getRunTimeCounterValue(void){
+	HAL_GetTick();
+}
 
 void task_init(){
 	task_cli_init();
 	task_LED_init();  //Bring up the blinky
 	task_PWR_init();  //Manage power button
-
 }

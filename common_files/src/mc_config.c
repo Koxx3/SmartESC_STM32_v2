@@ -21,6 +21,8 @@
 #include "parameters_conversion.h"
 #include "mc_parameters.h"
 #include "mc_config.h"
+#include "product.h"
+#include "defines.h"
 
 /* USER CODE BEGIN Additional include */
 
@@ -228,7 +230,7 @@ RDivider_Handle_t RealBusVoltageSensorParamsM1 =
   ._Super                =
   {
     .SensorType          = REAL_SENSOR,
-    .ConversionFactor    = (uint16_t)(ADC_REFERENCE_VOLTAGE / VBUS_PARTITIONING_FACTOR),
+    .ConversionFactor    = (uint16_t)(BATTERY_VOLTAGE_GAIN),
   },
 
   .VbusRegConv =
@@ -238,8 +240,8 @@ RDivider_Handle_t RealBusVoltageSensorParamsM1 =
     .samplingTime = M1_VBUS_SAMPLING_TIME,
   },
   .LowPassFilterBW       =  M1_VBUS_SW_FILTER_BW_FACTOR,
-  .OverVoltageThreshold  = OVERVOLTAGE_THRESHOLD_d,
-  .UnderVoltageThreshold =  UNDERVOLTAGE_THRESHOLD_d,
+  .OverVoltageThreshold  = OV_VOLTAGE_THRESHOLD_V * BATTERY_VOLTAGE_GAIN,
+  .UnderVoltageThreshold =  UD_VOLTAGE_THRESHOLD_V * BATTERY_VOLTAGE_GAIN,
   .aBuffer = RealBusVoltageSensorFilterBufferM1,
 };
 /*
@@ -265,12 +267,6 @@ CircleLimitation_Handle_t CircleLimitationM1 =
   .MaxVd          	  = (uint16_t)(MAX_MODULE * 950 / 1000),
   .Circle_limit_table = MMITABLE,
   .Start_index        = START_INDEX,
-};
-MTPA_Handle_t MTPARegM1 =
-{
-  .SegDiv   = (int16_t)SEGDIV,
-  .AngCoeff = ANGC,
-  .Offset   = OFST,
 };
 
 
