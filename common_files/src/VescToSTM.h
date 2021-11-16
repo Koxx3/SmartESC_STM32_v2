@@ -23,6 +23,10 @@ int32_t VescToSTM_get_erpm();
 int32_t VescToSTM_get_erpm_fast();
 int32_t VescToSTM_get_rpm();
 float VescToSTM_get_pid_pos_now();
+int32_t VescToSTM_rpm_to_speed(int32_t rpm);
+int32_t VescToSTM_erpm_to_speed(int32_t erpm, int32_t pole_pairs);
+int32_t VescToSTM_speed_to_rpm(int32_t speed);
+int32_t VescToSTM_speed_to_erpm(int32_t speed, int32_t pole_pairs);
 
 void VescToSTM_timeout_reset();
 void VescToSTM_handle_timeout();

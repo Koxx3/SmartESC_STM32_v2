@@ -139,7 +139,6 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
   bMCBootCompleted = 0;
   pCLM[M1] = &CircleLimitationM1;
 
-  pMaxTorquePerAmpere[M1] = &MTPARegM1;
   /**********************************************************/
   /*    PWM and current sensing component initialization    */
   /**********************************************************/

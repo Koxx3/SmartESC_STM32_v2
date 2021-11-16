@@ -810,7 +810,7 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 	for(int i=0;i<8;i++){
 		mcconf->foc_hall_table[i] = hall_def[i];
 	}
-	mcconf->foc_hall_interp_erpm = 100;
+	mcconf->foc_hall_interp_erpm = 150;
 //	float foc_sl_erpm;
 //	bool foc_sample_v0_v7;
 //	bool foc_sample_high_current;
@@ -836,8 +836,8 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 //	float gpd_current_ki;
 
 	// Speed PID
-	mcconf->s_pid_kp = 0.25;
-	mcconf->s_pid_ki = 0.0002;
+	mcconf->s_pid_kp = 500;
+	mcconf->s_pid_ki = 300;
 	mcconf->s_pid_kd = 0.0;
 //	float s_pid_kd_filter;
 //	float s_pid_min_erpm;

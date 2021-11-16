@@ -17,6 +17,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
     */
 
+#include <stdlib.h>
 #include "conf_general.h"
 #include "mc_interface.h"
 #include "utils.h"
@@ -197,361 +198,74 @@ bool conf_general_store_mc_configuration(mc_configuration *conf, bool is_motor_2
 	return is_ok;
 }
 
-void conf_general_recalc(){
-	PIDSpeedHandle_M1.wUpperIntegralLimit = (uint32_t)SpeednTorqCtrlM1.MaxPositiveTorque * SP_KDDIV;
-	PIDSpeedHandle_M1.wLowerIntegralLimit = (uint32_t)SpeednTorqCtrlM1.MinNegativeTorque * SP_KDDIV;
-	PIDSpeedHandle_M1.hUpperOutputLimit = SpeednTorqCtrlM1.MaxPositiveTorque;
-	PIDSpeedHandle_M1.hLowerOutputLimit = SpeednTorqCtrlM1.MinNegativeTorque;
-	if(SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit>SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit){
-		HALL_M1._Super.hMaxReliableMecSpeedUnit = (uint16_t)(1.15*SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit);
-	}else{
-		HALL_M1._Super.hMaxReliableMecSpeedUnit = -(uint16_t)(1.15*SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit);
-	}
-	PIDIqHandle_M1.hDefKdGain = PIDIqHandle_M1.hKpGain;
-	PIDIqHandle_M1.hDefKiGain = PIDIqHandle_M1.hKiGain;
-	PIDIdHandle_M1.hDefKdGain = PIDIdHandle_M1.hKpGain;
-	PIDIdHandle_M1.hDefKiGain = PIDIdHandle_M1.hKiGain;
-}
-
 mc_configuration* mc_interface_get_configuration(void){
 	return &mc_conf;
 }
 
+
+
 void conf_general_setup_mc(mc_configuration *mcconf) {
-
-	// Limits
-		SpeednTorqCtrlM1.MaxPositiveTorque = mcconf->l_current_max * CURRENT_FACTOR;
-		SpeednTorqCtrlM1.MinNegativeTorque = mcconf->l_current_min * CURRENT_FACTOR;
-//		float l_in_current_max;
-//		float l_in_current_min;
-		//mcconf->l_abs_current_max = 60;
-		SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit = (mcconf->l_min_erpm * 1.15/ (float)HALL_M1._Super.bElToMecRatio);
-		SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit = (mcconf->l_max_erpm * 1.15/ (float)HALL_M1._Super.bElToMecRatio);
-		HALL_M1._Super.hMinReliableMecSpeedUnit = (mcconf->l_min_erpm * 1.5 / (float)HALL_M1._Super.bElToMecRatio);
-		HALL_M1._Super.hMaxReliableMecSpeedUnit = (mcconf->l_max_erpm * 1.5 / (float)HALL_M1._Super.bElToMecRatio);
-
-//		float l_erpm_start;
-//		float l_max_erpm_fbrake;
-//		float l_max_erpm_fbrake_cc;
-		RealBusVoltageSensorParamsM1.UnderVoltageThreshold = mcconf->l_min_vin * VOLT_SCALING;
-		RealBusVoltageSensorParamsM1.OverVoltageThreshold = mcconf->l_max_vin * VOLT_SCALING;
-//		bool l_slow_abs_current;
-//		float l_temp_fet_start;
-//		float l_temp_fet_end;
-//		float l_temp_motor_start;
-//		float l_temp_motor_end;
-//		float l_temp_accel_dec;
-//		float l_min_duty;
-//		float l_max_duty;
-//		float l_watt_max;
-//		float l_watt_min;
-//		float l_current_max_scale;
-//		float l_current_min_scale;
-//		float l_duty_start;
-//		// Overridden limits (Computed during runtime)
-//		float lo_current_max;
-//		float lo_current_min;
-//		float lo_in_current_max;
-//		float lo_in_current_min;
-//		float lo_current_motor_max_now;
-//		float lo_current_motor_min_now;
+	float current_max = mcconf->l_current_max * CURRENT_FACTOR;
+	float current_min = mcconf->l_current_min * CURRENT_FACTOR;
+	uint16_t max_app_speed;
+	if(mcconf->l_max_erpm > abs(mcconf->l_min_erpm)){
+		max_app_speed = VescToSTM_erpm_to_speed(mcconf->l_min_erpm * 15, mcconf->si_motor_poles);
+	}else{
+		max_app_speed =VescToSTM_erpm_to_speed(abs(mcconf->l_min_erpm * 1.5), mcconf->si_motor_poles);
+	}
 
 
-	// Hall sensor
-	//for(int i=0;i<8;i++){
-	//	mcconf->hall_table[i] = HALL_M1.lut[i];
-	//}
+	PIDSpeedHandle_M1.hKpGain             = mcconf->s_pid_kp * (float)SP_KPDIV;
+	PIDSpeedHandle_M1.hKiGain         	  = mcconf->s_pid_ki * (float)SP_KIDIV / (float)SPEED_LOOP_FREQUENCY_HZ;
+	PIDSpeedHandle_M1.wUpperIntegralLimit = current_max * SP_KIDIV;
+	PIDSpeedHandle_M1.wLowerIntegralLimit = current_min * SP_KIDIV;
+	PIDSpeedHandle_M1.hUpperOutputLimit   = current_max;
+	PIDSpeedHandle_M1.hLowerOutputLimit   = current_min;
+	PIDSpeedHandle_M1.hDefKpGain 		  = PIDSpeedHandle_M1.hKpGain;
+	PIDSpeedHandle_M1.hDefKiGain 		  = PIDSpeedHandle_M1.hKiGain;
+
+	PIDIqHandle_M1.hKpGain          	  = mcconf->foc_current_kp * (float)TF_KPDIV;
+	PIDIqHandle_M1.hKiGain                = mcconf->foc_current_ki * (float)TF_KIDIV / (float)PWM_FREQUENCY;
+	PIDIqHandle_M1.hDefKpGain 			  = PIDIqHandle_M1.hKpGain;
+	PIDIqHandle_M1.hDefKiGain 			  = PIDIqHandle_M1.hKiGain;
+
+	PIDIdHandle_M1.hKpGain             	  = PIDIqHandle_M1.hKpGain; //Torque and flux has the same P gain
+	PIDIdHandle_M1.hKiGain                = PIDIqHandle_M1.hDefKiGain; //Torque and flux has the same I gain
+	PIDIdHandle_M1.hDefKpGain 			  = PIDIdHandle_M1.hKpGain;
+	PIDIdHandle_M1.hDefKiGain 			  = PIDIdHandle_M1.hKiGain;
+
+	SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit = VescToSTM_erpm_to_speed(mcconf->l_max_erpm * 1.15, mcconf->si_motor_poles);
+	SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit = VescToSTM_erpm_to_speed(mcconf->l_min_erpm * 1.15, mcconf->si_motor_poles);
+	SpeednTorqCtrlM1.MaxPositiveTorque			= current_max;
+	SpeednTorqCtrlM1.MinNegativeTorque 			= current_min;
+
+
+	HALL_M1._Super.bElToMecRatio                = mcconf->si_motor_poles;
+	HALL_M1._Super.hMaxReliableMecSpeedUnit     = max_app_speed;
+	HALL_M1._Super.bMaximumSpeedErrorsNumber    = MEAS_ERRORS_BEFORE_FAULTS;
+	HALL_M1.PhaseShift          				= DEG_TO_ANG(mcconf->foc_encoder_offset);
+	for(int i=0;i<8;i++){
+		HALL_M1.lut[i] = mcconf->foc_hall_table[i];
+	}
+	HALL_M1.SwitchSpeed = VescToSTM_erpm_to_speed(mcconf->foc_hall_interp_erpm, mcconf->si_motor_poles);
+
+	TempSensorParamsM1.hOverTempThreshold      = (uint16_t)(OV_TEMPERATURE_THRESHOLD_d);
+	TempSensorParamsM1.hOverTempDeactThreshold = (uint16_t)(OV_TEMPERATURE_THRESHOLD_d - OV_TEMPERATURE_HYSTERESIS_d);
+	TempSensorParamsM1.hSensitivity            = (uint16_t)(ADC_REFERENCE_VOLTAGE/dV_dT);
+	TempSensorParamsM1.wV0                     = (uint16_t)(V0_V *65536/ ADC_REFERENCE_VOLTAGE);
+	TempSensorParamsM1.hT0                     = T0_C;
+
+	RealBusVoltageSensorParamsM1.UnderVoltageThreshold = mcconf->l_min_vin * BATTERY_VOLTAGE_GAIN;
+	RealBusVoltageSensorParamsM1.OverVoltageThreshold = mcconf->l_max_vin * BATTERY_VOLTAGE_GAIN;
+
 
 	// BLDC switching and drive
 	mcconf->motor_type = MOTOR_TYPE_FOC;
 	mcconf->sensor_mode = SENSOR_MODE_SENSORED;
 	mcconf->pwm_mode = PWM_MODE_SYNCHRONOUS;
-
-	// FOC
-	float kp = mcconf->foc_current_kp * (float)TF_KPDIV;
-	float ki = mcconf->foc_current_ki * (float)TF_KIDIV / (float)PWM_FREQUENCY;
-	PIDIqHandle_M1.hKpGain = kp;
-    PIDIqHandle_M1.hKiGain = ki;
-//	float foc_f_sw;
-//	float foc_dt_us;
-    HALL_M1.PhaseShift = DEG_TO_ANG(mcconf->foc_encoder_offset);
-//	float foc_encoder_offset;
-//	bool foc_encoder_inverted;
-//	float foc_encoder_ratio;
-//	float foc_encoder_sin_offset;
-//	float foc_encoder_sin_gain;
-//	float foc_encoder_cos_offset;
-//	float foc_encoder_cos_gain;
-//	float foc_encoder_sincos_filter_constant;
-//	float foc_motor_l;
-//	float foc_motor_ld_lq_diff;
-//	float foc_motor_r;
-//	float foc_motor_flux_linkage;
-//	float foc_observer_gain;
-//	float foc_observer_gain_slow;
-//	float foc_pll_kp;
-//	float foc_pll_ki;
-//	float foc_duty_dowmramp_kp;
-//	float foc_duty_dowmramp_ki;
-//	float foc_openloop_rpm;
-//	float foc_openloop_rpm_low;
-//	float foc_d_gain_scale_start;
-//	float foc_d_gain_scale_max_mod;
-//	float foc_sl_openloop_hyst;
-//	float foc_sl_openloop_time;
-//	float foc_sl_openloop_time_lock;
-//	float foc_sl_openloop_time_ramp;
 	mcconf->foc_sensor_mode = FOC_SENSOR_MODE_HALL;
-	for(int i=0;i<8;i++){
-		 HALL_M1.lut[i] = mcconf->foc_hall_table[i];
-	}
-	HALL_M1.SwitchSpeed = (float)mcconf->foc_hall_interp_erpm / (float)HALL_M1._Super.bElToMecRatio;
-//	float foc_sl_erpm;
-//	bool foc_sample_v0_v7;
-//	bool foc_sample_high_current;
-//	float foc_sat_comp;
-//	bool foc_temp_comp;
-//	float foc_temp_comp_base_temp;
-//	float foc_current_filter_const;
-//	mc_foc_cc_decoupling_mode foc_cc_decoupling;
-//	mc_foc_observer_type foc_observer_type;
-//	float foc_hfi_voltage_start;
-//	float foc_hfi_voltage_run;
-//	float foc_hfi_voltage_max;
-//	float foc_sl_erpm_hfi;
-//	uint16_t foc_hfi_start_samples;
-//	float foc_hfi_obs_ovr_sec;
-//	uint8_t foc_hfi_samples;
 
-	// GPDrive
-//	int gpd_buffer_notify_left;
-//	int gpd_buffer_interpol;
-//	float gpd_current_filter_const;
-//	float gpd_current_kp;
-//	float gpd_current_ki;
-
-	// Speed PID
-	kp = mcconf->s_pid_kp * (float)SP_KPDIV;
-	ki = mcconf->s_pid_ki * (float)SP_KIDIV / (float)SPEED_LOOP_FREQUENCY_HZ;
-	PIDSpeedHandle_M1.hDefKpGain = kp;
-	PIDSpeedHandle_M1.hDefKiGain = ki;
-//	float s_pid_kd;
-//	float s_pid_kd_filter;
-//	float s_pid_min_erpm;
-//	bool s_pid_allow_braking;
-//	float s_pid_ramp_erpms_s;
-
-	// Pos PID
-//	float p_pid_kp;
-//	float p_pid_ki;
-//	float p_pid_kd;
-//	float p_pid_kd_filter;
-//	float p_pid_ang_div;
-
-	// Current controller
-//	float cc_startup_boost_duty;
-//	float cc_min_current;
-//	float cc_gain;
-//	float cc_ramp_step_max;
-
-	// Misc
-//	int32_t m_fault_stop_time_ms;
-//	float m_duty_ramp_step;
-//	float m_current_backoff_gain;
-//	uint32_t m_encoder_counts;
-//	sensor_port_mode m_sensor_port_mode;
-//	bool m_invert_direction;
-//	drv8301_oc_mode m_drv8301_oc_mode;
-//	int m_drv8301_oc_adj;
-//	float m_bldc_f_sw_min;
-//	float m_bldc_f_sw_max;
-//	float m_dc_f_sw;
-//	float m_ntc_motor_beta;
-//	out_aux_mode m_out_aux_mode;
-//	temp_sensor_type m_motor_temp_sens_type;
-//	float m_ptc_motor_coeff;
-//	int m_hall_extra_samples;
-
-	// Setup info
-	HALL_M1._Super.bElToMecRatio = mcconf->si_motor_poles;
-//	float si_gear_ratio;
-//	float si_wheel_diameter;
-	//mcconf->si_battery_type = BATTERY_TYPE_LIION_3_0__4_2;
-	//	int si_battery_cells;
-//	float si_battery_ah;
-
-	// BMS Configuration
-//	bms_config bms;
-
-	conf_general_recalc();
 	HALL_Init(&HALL_M1);
 	VescToSTM_init_odometer(mcconf);
 	mc_conf = *mcconf;
-}
-
-void conf_general_readback_mc(mc_configuration *mcconf) {
-
-	// Limits
-		mcconf->l_current_max = SpeednTorqCtrlM1.MaxPositiveTorque / CURRENT_FACTOR;
-		mcconf->l_current_min  = SpeednTorqCtrlM1.MinNegativeTorque  / CURRENT_FACTOR;
-//		float l_in_current_max;
-//		float l_in_current_min;
-		mcconf->l_abs_current_max = 60;
-		mcconf->l_min_erpm = SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit * HALL_M1._Super.bElToMecRatio;
-		mcconf->l_max_erpm = SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit * HALL_M1._Super.bElToMecRatio;
-//		float l_erpm_start;
-//		float l_max_erpm_fbrake;
-//		float l_max_erpm_fbrake_cc;
-		mcconf->l_min_vin = RealBusVoltageSensorParamsM1.UnderVoltageThreshold / VOLT_SCALING;
-		mcconf->l_max_vin = RealBusVoltageSensorParamsM1.OverVoltageThreshold / VOLT_SCALING;
-		mcconf->l_battery_cut_end = RealBusVoltageSensorParamsM1.UnderVoltageThreshold / VOLT_SCALING;
-		mcconf->l_battery_cut_start = RealBusVoltageSensorParamsM1.OverVoltageThreshold / VOLT_SCALING;
-//		bool l_slow_abs_current;
-//		float l_temp_fet_start;
-//		float l_temp_fet_end;
-//		float l_temp_motor_start;
-//		float l_temp_motor_end;
-//		float l_temp_accel_dec;
-//		float l_min_duty;
-//		float l_max_duty;
-//		float l_watt_max;
-//		float l_watt_min;
-//		float l_current_max_scale;
-//		float l_current_min_scale;
-//		float l_duty_start;
-//		// Overridden limits (Computed during runtime)
-//		float lo_current_max;
-//		float lo_current_min;
-//		float lo_in_current_max;
-//		float lo_in_current_min;
-//		float lo_current_motor_max_now;
-//		float lo_current_motor_min_now;
-
-
-
-
-	// Hall sensor
-//	for(int i=0;i<8;i++){
-//		mcconf->hall_table[i] = HALL_M1.lut[i];
-//	}
-
-	// BLDC switching and drive
-	mcconf->motor_type = MOTOR_TYPE_FOC;
-	mcconf->sensor_mode = SENSOR_MODE_SENSORED;
-	mcconf->pwm_mode = PWM_MODE_SYNCHRONOUS;
-
-	// FOC
-	mcconf->foc_current_kp = PIDIqHandle_M1.hKpGain / (float)TF_KPDIV;
-    mcconf->foc_current_ki = PIDIqHandle_M1.hKiGain / ((float)TF_KIDIV / (float)PWM_FREQUENCY);
-    mcconf->foc_f_sw = PWM_FREQUENCY;
-//	float foc_dt_us;
-    mcconf->foc_encoder_offset = ANG_TO_DEG(HALL_M1.PhaseShift);
-//	bool foc_encoder_inverted;
-//	float foc_encoder_ratio;
-//	float foc_encoder_sin_offset;
-//	float foc_encoder_sin_gain;
-//	float foc_encoder_cos_offset;
-//	float foc_encoder_cos_gain;
-//	float foc_encoder_sincos_filter_constant;
-//	float foc_motor_l;
-//	float foc_motor_ld_lq_diff;
-//	float foc_motor_r;
-//	float foc_motor_flux_linkage;
-//	float foc_observer_gain;
-//	float foc_observer_gain_slow;
-//	float foc_pll_kp;
-//	float foc_pll_ki;
-//	float foc_duty_dowmramp_kp;
-//	float foc_duty_dowmramp_ki;
-//	float foc_openloop_rpm;
-//	float foc_openloop_rpm_low;
-//	float foc_d_gain_scale_start;
-//	float foc_d_gain_scale_max_mod;
-//	float foc_sl_openloop_hyst;
-//	float foc_sl_openloop_time;
-//	float foc_sl_openloop_time_lock;
-//	float foc_sl_openloop_time_ramp;
-	mcconf->foc_sensor_mode = FOC_SENSOR_MODE_HALL;
-
-	for(int i=0;i<8;i++){
-		mcconf->foc_hall_table[i] = HALL_M1.lut[i];
-	}
-	mcconf->foc_hall_interp_erpm = (float)HALL_M1.SwitchSpeed * (float)HALL_M1._Super.bElToMecRatio;
-//	float foc_sl_erpm;
-//	bool foc_sample_v0_v7;
-//	bool foc_sample_high_current;
-//	float foc_sat_comp;
-//	bool foc_temp_comp;
-//	float foc_temp_comp_base_temp;
-//	float foc_current_filter_const;
-//	mc_foc_cc_decoupling_mode foc_cc_decoupling;
-//	mc_foc_observer_type foc_observer_type;
-//	float foc_hfi_voltage_start;
-//	float foc_hfi_voltage_run;
-//	float foc_hfi_voltage_max;
-//	float foc_sl_erpm_hfi;
-//	uint16_t foc_hfi_start_samples;
-//	float foc_hfi_obs_ovr_sec;
-//	uint8_t foc_hfi_samples;
-
-	// GPDrive
-//	int gpd_buffer_notify_left;
-//	int gpd_buffer_interpol;
-//	float gpd_current_filter_const;
-//	float gpd_current_kp;
-//	float gpd_current_ki;
-
-	// Speed PID
-	mcconf->s_pid_kp = PIDSpeedHandle_M1.hDefKpGain / (float)SP_KPDIV;
-	mcconf->s_pid_ki = PIDSpeedHandle_M1.hDefKiGain / ((float)SP_KIDIV / (float)SPEED_LOOP_FREQUENCY_HZ);
-//	float s_pid_kp;
-//	float s_pid_ki;
-//	float s_pid_kd;
-//	float s_pid_kd_filter;
-//	float s_pid_min_erpm;
-//	bool s_pid_allow_braking;
-//	float s_pid_ramp_erpms_s;
-
-	// Pos PID
-//	float p_pid_kp;
-//	float p_pid_ki;
-//	float p_pid_kd;
-//	float p_pid_kd_filter;
-//	float p_pid_ang_div;
-
-	// Current controller
-//	float cc_startup_boost_duty;
-//	float cc_min_current;
-//	float cc_gain;
-//	float cc_ramp_step_max;
-
-	// Misc
-//	int32_t m_fault_stop_time_ms;
-//	float m_duty_ramp_step;
-//	float m_current_backoff_gain;
-//	uint32_t m_encoder_counts;
-//	sensor_port_mode m_sensor_port_mode;
-//	bool m_invert_direction;
-//	drv8301_oc_mode m_drv8301_oc_mode;
-//	int m_drv8301_oc_adj;
-//	float m_bldc_f_sw_min;
-//	float m_bldc_f_sw_max;
-//	float m_dc_f_sw;
-//	float m_ntc_motor_beta;
-//	out_aux_mode m_out_aux_mode;
-//	temp_sensor_type m_motor_temp_sens_type;
-//	float m_ptc_motor_coeff;
-//	int m_hall_extra_samples;
-
-	// Setup info
-	mcconf->si_motor_poles = HALL_M1._Super.bElToMecRatio;
-//	float si_gear_ratio;
-//	float si_wheel_diameter;
-	mcconf->si_battery_type = BATTERY_TYPE_LIION_3_0__4_2;
-	//	int si_battery_cells;
-//	float si_battery_ah;
-
-	// BMS Configuration
-//	bms_config bms;
-
 }
