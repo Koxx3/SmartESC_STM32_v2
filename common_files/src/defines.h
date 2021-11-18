@@ -18,14 +18,10 @@
 #define STM32_UUID					((uint32_t*)0x1FFF7A10)
 #define STM32_UUID_8				((uint8_t*)0x1FFF7A10)
 
+#define MS_TO_TICKS( xTimeInMs ) ( ( TickType_t ) ( ( ( TickType_t ) ( xTimeInMs ) * ( TickType_t ) SYS_TICK_FREQUENCY ) / ( TickType_t ) 1000 ) )
 
-#define VOLT_SCALING (65535/ADC_REFERENCE_VOLTAGE*VBUS_PARTITIONING_FACTOR)
 #define ANG_TO_DEG(x) (x/(65536.0/360.0))
 #define DEG_TO_ANG(x) (x*(65536.0/360.0))
-
-#define CURRENT_FACTOR_A 317.73
-#define CURRENT_FACTOR_mA 0.31773
-#define CURRENT_FACTOR 317.73
 
 #define ADC_GAIN (float)(3.3 / 4095.0)
 

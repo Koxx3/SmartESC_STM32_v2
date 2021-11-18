@@ -28,6 +28,7 @@
 #include "conf_general.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "product.h"
 
 
 osThreadId_t LEDHandle;
@@ -59,16 +60,16 @@ void task_LED(void * argument)
 			last_fault = pMCI[M1]->pSTM->hFaultOccurred;
 			if((xTaskGetTickCount() / 2) > last_fault_time){
 				MCI_FaultAcknowledged(pMCI[M1]);
-				vTaskDelay(100);
+				vTaskDelay(MS_TO_TICKS(100));
 				MCI_StopMotor(pMCI[M1]);
-				vTaskDelay(100);
+				vTaskDelay(MS_TO_TICKS(100));
 				MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
 				MCI_StartMotor(pMCI[M1]);
 				last_fault = 0;
 			}
-			prv_LED_blink(200);
+			prv_LED_blink(MS_TO_TICKS(100));
 		}else{
-			prv_LED_blink(1000);
+			prv_LED_blink(MS_TO_TICKS(500));
 		}
 
 	}

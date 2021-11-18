@@ -78,7 +78,7 @@ void task_cli(void * argument)
 	uint32_t rd_ptr=0;
 	MCI_StartMotor( pMCI[M1] );
 
-	vTaskDelay(200);
+	vTaskDelay(MS_TO_TICKS(100));
 	VescToSTM_set_brake(0);
 
 	packet_init(putbuffer, process_packet, UART_HANDLE);

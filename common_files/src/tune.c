@@ -7,13 +7,13 @@
 #include "drive_parameters.h"
 #include "mc_stm_types.h"
 #include "parameters_conversion.h"
-#include "defines.h"
 #include "FreeRTOS.h"
 #include <string.h>
 #include <stdlib.h>
 #include "utils.h"
 #include "VescToSTM.h"
 #include "conf_general.h"
+#include "product.h"
 
 
 //const uint8_t hall_arr[8] = {0,5,1,3,2,6,4,7};
@@ -55,7 +55,7 @@ bool tune_mcpwm_foc_hall_detect(float current, uint8_t *hall_table) {
 	for (int i = 0;i < 1000;i++) {
 		currComp.q = current_to_torque((float)i * current / 1000.0);
 		MCI_SetCurrentReferences(pMCI[M1],currComp);
-		vTaskDelay(pdMS_TO_TICKS(1));
+		vTaskDelay(MS_TO_TICKS(1));
 	}
 
 	float sin_hall[8];
@@ -70,7 +70,7 @@ bool tune_mcpwm_foc_hall_detect(float current, uint8_t *hall_table) {
 		for (int j = 0;j < 360;j++) {
 			float m_phase_now_override = (float)j * M_PI / 180.0;
 			pMCI[M1]->pSTC->SPD->open_angle = 65536.0 / (2 *M_PI) * m_phase_now_override;
-			vTaskDelay(pdMS_TO_TICKS(5));
+			vTaskDelay(MS_TO_TICKS(5));
 			int hall = HALL_M1.HallState;
 			sin_hall[hall] += sinf(m_phase_now_override);
 			cos_hall[hall] += cosf(m_phase_now_override);
@@ -83,7 +83,7 @@ bool tune_mcpwm_foc_hall_detect(float current, uint8_t *hall_table) {
 		for (int j = 360;j >= 0;j--) {
 			float m_phase_now_override = (float)j * M_PI / 180.0;
 			pMCI[M1]->pSTC->SPD->open_angle =65536.0 / (2 *M_PI) * m_phase_now_override;
-			vTaskDelay(pdMS_TO_TICKS(5));
+			vTaskDelay(MS_TO_TICKS(5));
 			int hall = HALL_M1.HallState;
 			sin_hall[hall] += sinf(m_phase_now_override);
 			cos_hall[hall] += cosf(m_phase_now_override);
@@ -153,11 +153,11 @@ float tune_foc_measure_resistance(float current, int samples) {
 	for (int i = 0;i < 1000;i++) {
 		currComp.q = current_to_torque((float)i * current / 1000.0);
 		MCI_SetCurrentReferences(pMCI[M1],currComp);
-		vTaskDelay(pdMS_TO_TICKS(1));
+		vTaskDelay(MS_TO_TICKS(1));
 	}
 
 	// Wait for the current to rise and the motor to lock.
-	vTaskDelay(pdMS_TO_TICKS(200));
+	vTaskDelay(MS_TO_TICKS(200));
 
 	// Sample
 	pMCI[M1]->pFOCVars->Vq_sum = 0;
@@ -250,7 +250,7 @@ float tune_foc_measure_inductance(float voltage, float * used_current, uint32_t 
 	pPIDIq[M1]->hUpperOutputLimit = 0;
 	pPIDIq[M1]->hLowerOutputLimit = 0;
 
-	vTaskDelay(pdMS_TO_TICKS(50));
+	vTaskDelay(MS_TO_TICKS(50));
 
 	int32_t Iq = 0;
 	int32_t Id = 0;
@@ -264,7 +264,7 @@ float tune_foc_measure_inductance(float voltage, float * used_current, uint32_t 
 		Id += abs(pMCI[M1]->pFOCVars->Iqd.d);
 		pPIDIq[M1]->hUpperOutputLimit = 0;
 		pPIDIq[M1]->hLowerOutputLimit = 0;
-		vTaskDelay(pdMS_TO_TICKS(10));
+		vTaskDelay(MS_TO_TICKS(10));
 	}
 	Iq /= samples;
 	Id /= samples;
@@ -276,7 +276,7 @@ float tune_foc_measure_inductance(float voltage, float * used_current, uint32_t 
 	}
 
 	float inductance = voltage * (0.5e3) / current_avg;
-	vTaskDelay(200);
+	vTaskDelay(MS_TO_TICKS(100));
 
 	// UnLock the motor
 	pPIDIq[M1]->hUpperOutputLimit = IqUpperLim;
@@ -404,7 +404,7 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 	for (int i = 0;i < 1000;i++) {
 		currComp.q = current_to_torque((float)i * current / 1000.0);
 		MCI_SetCurrentReferences(pMCI[M1],currComp);
-		vTaskDelay(2);
+		vTaskDelay(MS_TO_TICKS(1));
 	}
 
 	float duty_still = 0;
@@ -412,7 +412,7 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 	for (int i = 0;i < 1000;i++) {
 		duty_still += fabsf(VescToSTM_get_duty_cycle_now());
 		samples += 1.0;
-		vTaskDelay(2);
+		vTaskDelay(MS_TO_TICKS(1));
 	}
 
 	duty_still /= samples;
@@ -423,7 +423,7 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 		rpm_now += erpm_per_sec / 1000.0;
 		VescToSTM_set_open_loop_rpm(rpm_now);
 
-		vTaskDelay(2);
+		vTaskDelay(MS_TO_TICKS(1));
 		cnt++;
 
 		float duty_now = fabsf(VescToSTM_get_duty_cycle_now());
@@ -487,11 +487,11 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 //		mc_conf.foc_motor_flux_linkage = *linkage;
 //		mc_conf.foc_observer_gain = 0.5e3 / SQ(*linkage);
 		//mc_interface_set_configuration(mcconf);
-		vTaskDelay(1000);
+		vTaskDelay(MS_TO_TICKS(500));
 		currComp.q = 0;
 		VescToSTM_set_open_loop(false, 0, 0);
 		MCI_SetCurrentReferences(pMCI[M1],currComp);
-		vTaskDelay(10);
+		vTaskDelay(MS_TO_TICKS(5));
 
 		float linkage_sum = 0.0;
 		float linkage_samples = 0.0;
@@ -503,7 +503,7 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 
 			linkage_sum += VescToSTM_get_Vq() / SQRT_3 / rad_s_now;
 			linkage_samples += 1.0;
-			vTaskDelay(2);
+			vTaskDelay(MS_TO_TICKS(1));
 		}
 
 		*undriven_samples = linkage_samples;

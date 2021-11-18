@@ -25,7 +25,6 @@
 
 #include "mc_math.h"
 #include "parameters_conversion_f10x.h"
-#include "pmsm_motor_parameters.h"
 #include "drive_parameters.h"
 #include "power_stage_parameters.h"
 

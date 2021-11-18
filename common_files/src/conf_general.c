@@ -205,8 +205,8 @@ mc_configuration* mc_interface_get_configuration(void){
 
 
 void conf_general_setup_mc(mc_configuration *mcconf) {
-	float current_max = mcconf->l_current_max * CURRENT_FACTOR;
-	float current_min = mcconf->l_current_min * CURRENT_FACTOR;
+	float current_max = mcconf->l_current_max * CURRENT_FACTOR_A;
+	float current_min = mcconf->l_current_min * CURRENT_FACTOR_A;
 	uint16_t max_app_speed;
 	if(mcconf->l_max_erpm >= abs(mcconf->l_min_erpm)){
 		max_app_speed = VescToSTM_erpm_to_speed(mcconf->l_max_erpm * 1.5, mcconf->si_motor_poles);

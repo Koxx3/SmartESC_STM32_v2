@@ -38,6 +38,7 @@
 #include "stdarg.h"
 #include <printf.h>
 #include "terminal.h"
+#include "product.h"
 
 
 static void(* volatile send_func)(unsigned char *data, unsigned int len) = 0;
@@ -118,8 +119,8 @@ void send_sample(){
 		uint8_t buffer[40];
 		int32_t index = 0;
 		buffer[index++] = COMM_SAMPLE_PRINT;
-		buffer_append_float32_auto(buffer, (float)samples.m_curr0_samples[samples.index] / CURRENT_FACTOR, &index);
-		buffer_append_float32_auto(buffer, (float)samples.m_curr1_samples[samples.index] / CURRENT_FACTOR, &index);
+		buffer_append_float32_auto(buffer, (float)samples.m_curr0_samples[samples.index] / CURRENT_FACTOR_A, &index);
+		buffer_append_float32_auto(buffer, (float)samples.m_curr1_samples[samples.index] / CURRENT_FACTOR_A, &index);
 		buffer_append_float32_auto(buffer, 0, &index);
 		buffer_append_float32_auto(buffer, 0, &index);
 		buffer_append_float32_auto(buffer, 0, &index);

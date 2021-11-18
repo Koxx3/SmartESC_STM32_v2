@@ -120,7 +120,7 @@ void task_PWR(void *argument) {
 		}
 		main_loop_counter++;
 
-		osDelay(100);
+		vTaskDelay(MS_TO_TICKS(50));
 	}
 }
 

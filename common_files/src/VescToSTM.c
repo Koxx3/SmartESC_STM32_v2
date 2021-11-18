@@ -212,7 +212,7 @@ float VescToSTM_get_phase_current(){
 	wAux1 = MCM_Sqrt(wAux1);
 	wAux1 = wAux1 * SIGN(iq);
 
-	return (float)wAux1 / CURRENT_FACTOR;
+	return (float)wAux1 / CURRENT_FACTOR_A;
 }
 
 float VescToSTM_get_input_current(){
@@ -230,7 +230,7 @@ float VescToSTM_get_id(){
 	int32_t id = pMCI[M1]->pFOCVars->Id_sum / pMCI[M1]->pFOCVars->Id_samples;
 	pMCI[M1]->pFOCVars->Id_sum = 0;
 	pMCI[M1]->pFOCVars->Id_samples = 0;
-	return id / CURRENT_FACTOR;
+	return id / CURRENT_FACTOR_A;
 }
 
 /**
@@ -244,7 +244,7 @@ float VescToSTM_get_iq(){
 	int32_t iq = pMCI[M1]->pFOCVars->Iq_sum / pMCI[M1]->pFOCVars->Iq_samples;
 	pMCI[M1]->pFOCVars->Iq_sum = 0;
 	pMCI[M1]->pFOCVars->Iq_samples = 0;
-	return iq / CURRENT_FACTOR;
+	return iq / CURRENT_FACTOR_A;
 }
 
 /**
