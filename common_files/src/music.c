@@ -1,13 +1,12 @@
 #include "main.h"
 #include"music.h"
-//#include "current_transformation.h"
 
 #define LIMIT(A, MIN, MAX) 						 ((A < MIN) ? (MIN) : ((A > MAX) ? (MAX) : (A)))
 #define MUSIC_SAPMLING_TIME                      (int16_t)((1.0/((float)PWM_FREQUENCY)) * ((float)((int32_t)(INT16_MAX))))
 #define _2_PI_S16                                (uint32_t)(UINT16_MAX)
 #define _2_PI_U8                                 (uint16_t)(U8_MAX)
 
-#define PRODUCT_MUSIC_AMPLITUDE                  (uint8_t)3 /* 0 to 7 levels */
+#define PRODUCT_MUSIC_AMPLITUDE                  (uint8_t)5 /* 0 to 7 levels */
 #define MAX_MUSIC_AMPLITUDE                      10000
 #define MUSIC_BUFF_TERMINATOR_INDEX              (uint8_t)0xFF
 #define MUSIC_INFINITE_PERIODICITY_FLAG          (uint8_t)0xF
@@ -81,11 +80,7 @@ int32_t music_init(MUSIC_PARAM* music_param)
 	music_pattern2[i] = MUSIC_BUFF_TERMINATOR_INDEX;
 	music_pattern3[i] = MUSIC_BUFF_TERMINATOR_INDEX;
 
-#if(MUSIC_OVERRIDING_EFFECT)
 	music_param->overriding_frequency_feature = 1;
-#else
-	music_param->overriding_frequency_feature = 0;
-#endif
 	music_param->overriding_frequency = 500;
 	//SET_BITS(GlobalData.CmdMap.device_state_h, MOTOR_MUSIC_BREAK);
 	music_param->music_pattern = Music_OFF;
