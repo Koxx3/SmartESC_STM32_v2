@@ -182,11 +182,6 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Inc/ninebot.h</locationURI>
 		</link>
 		<link>
-			<name>Application/User/parameters_conversion.h</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/parameters_conversion.h</locationURI>
-		</link>
-		<link>
 			<name>Application/User/printf.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/printf.c</locationURI>
@@ -407,9 +402,19 @@
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Middlewares/Third_Party/FreeRTOS/Source/timers.c</locationURI>
 		</link>
 		<link>
+			<name>Application/User/BLDC/drive_parameters.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/drive_parameters.h</locationURI>
+		</link>
+		<link>
 			<name>Application/User/BLDC/mc_config.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/mc_config.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/BLDC/mc_config.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/mc_config.h</locationURI>
 		</link>
 		<link>
 			<name>Application/User/BLDC/mc_interface.c</name>
@@ -445,6 +450,11 @@
 			<name>Application/User/BLDC/music.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/music.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/BLDC/parameters_conversion.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/parameters_conversion.h</locationURI>
 		</link>
 		<link>
 			<name>Application/User/BLDC/regular_conversion_manager.c</name>
