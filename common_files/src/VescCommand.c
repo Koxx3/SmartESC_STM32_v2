@@ -498,8 +498,27 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				case COMM_FORWARD_CAN:
 					break;
 
-				case COMM_SET_CHUCK_DATA:
-					break;
+				case COMM_SET_CHUCK_DATA:{
+					chuck_data chuck_d_tmp;
+
+					int32_t ind = 0;
+					chuck_d_tmp.js_x = data[ind++];
+					chuck_d_tmp.js_y = data[ind++];
+					chuck_d_tmp.bt_c = data[ind++];
+					chuck_d_tmp.bt_z = data[ind++];
+					chuck_d_tmp.acc_x = buffer_get_int16(data, &ind);
+					chuck_d_tmp.acc_y = buffer_get_int16(data, &ind);
+					chuck_d_tmp.acc_z = buffer_get_int16(data, &ind);
+
+					if (len >= (unsigned int)ind + 2) {
+						chuck_d_tmp.rev_has_state = data[ind++];
+						chuck_d_tmp.is_rev = data[ind++];
+					} else {
+						chuck_d_tmp.rev_has_state = false;
+						chuck_d_tmp.is_rev = false;
+					}
+					VescToStm_nunchuk_update_output(&chuck_d_tmp);
+				} break;
 
 				case COMM_CUSTOM_APP_DATA:
 					break;
@@ -638,10 +657,10 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					mc_configuration *mcconf = &mc_conf;
 
 					int32_t ind = 0;
-					//bool store = data[ind++];
-					//bool forward_can = data[ind++];
+					bool store = data[ind++];
+					bool forward_can = data[ind++];
 					bool ack = data[ind++];
-					//bool divide_by_controllers = data[ind++];
+					bool divide_by_controllers = data[ind++];
 
 					float controller_num = 1.0;
 
@@ -784,7 +803,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					float start = buffer_get_float32(data, 1e3, &ind);
 					float end = buffer_get_float32(data, 1e3, &ind);
 					bool store = data[ind++];
-					//bool fwd_can = data[ind++];
+					bool fwd_can = data[ind++];
 
 					/*if (fwd_can) {
 						comm_can_conf_battery_cut(255, store, start, end);

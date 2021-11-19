@@ -49,6 +49,16 @@ static int16_t erpm_to_int16(int32_t erpm){
 	return out;
 }
 
+
+void VescToStm_nunchuk_update_output(chuck_data * chuck_d){
+	static int throttle;
+	if(chuck_d->js_y != throttle){
+		throttle = chuck_d->js_y;
+		VescToSTM_set_current_rel(utils_map(throttle, 127, 255, 0, 1));
+	}
+}
+
+
 void VescToSTM_init_odometer(mc_configuration* conf){
 	tacho_scale = (conf->si_wheel_diameter * M_PI) / (3.0 * conf->si_motor_poles * conf->si_gear_ratio);
 }
@@ -84,14 +94,14 @@ float VescToSTM_get_pid_pos_now(){
 uint32_t last_reset=0;
 bool timeout_enable = true;
 void VescToSTM_timeout_reset(){
-	last_reset = xTaskGetTickCount();
+	//last_reset = xTaskGetTickCount();
 };
 void VescToSTM_handle_timeout(){
 	if(!timeout_enable) {
 		VescToSTM_timeout_reset();
 	}
 	if((xTaskGetTickCount() - last_reset) > 2000){
-		VescToSTM_set_brake(0);
+		//VescToSTM_set_brake(0);
 	}
 };
 void VescToSTM_enable_timeout(bool enbale){
