@@ -32,7 +32,7 @@
 #include <string.h>
 #include <math.h>
 #include "product.h"
-#include "ninebot.h"
+
 
 
 #define CH_CFG_ST_FREQUENCY             10000
@@ -80,92 +80,92 @@ void task_app(void * argument)
   /* Infinite loop */
 	for(;;)
 	{
-		while(rd2_ptr != DMA_WRITE_PTR(APP_USART_DMA)) {
-			ninebot_parse_usart_frame(usart2_rx_dma_buffer[rd2_ptr], 1);
-			rd2_ptr++;
-			rd2_ptr &= (CIRC_BUF_SZ - 1);
-		}
+//		while(rd2_ptr != DMA_WRITE_PTR(APP_USART_DMA)) {
+//			//ninebot_parse_usart_frame(usart2_rx_dma_buffer[rd2_ptr], 1);
+//			rd2_ptr++;
+//			rd2_ptr &= (CIRC_BUF_SZ - 1);
+//		}
 
-		vTaskDelay(10);
+		vTaskDelay(500);
 
 		// For safe start when fault codes occur
-		if (VescToSTM_get_fault() != FAULT_CODE_NONE) {
-			continue;
-		}
+//		if (VescToSTM_get_fault() != FAULT_CODE_NONE) {
+//			continue;
+//		}
 
-		uint8_t* input = (uint8_t* )ninebot_get_raw_input();
-		float pwr = (float)input[0];
-		float brake = (float)input[1];
+//		uint8_t* input = (uint8_t* )ninebot_get_raw_input();
+//		float pwr = (float)input[0];
+//		float brake = (float)input[1];
+//
+//		if(pwr < 30 || brake < 30){
+//			brake = 41;
+//			//continue;
+//		}
+//
+//		pwr = (float)(pwr - 40) / 100;
+//		pwr = utils_map(pwr, 0.0, 1.54, 0.0, 1.0);
+//
+//		// Truncate the read voltage
+//		utils_truncate_number(&pwr, 0.0, 1.0);
+//		decoded_level = pwr;
+//
+//		// Map and truncate the read voltage
+//		brake = (float)(brake - 40) / 100;
+//		brake = utils_map(brake, 0.0, 1.54, 0.0, 1.0);
+//		utils_truncate_number(&brake, 0.0, 1.0);
+//
+//		// All pins and buttons are still decoded for debugging, even
+//		// when output is disabled.
+//		if (false) {
+//			continue;
+//		}
+//
+//		pwr -= brake;
+//
+//		// Apply deadband
+//		utils_deadband(&pwr, 0.05, 1.0);
+//
+//		// Apply throttle curve
+//		pwr = utils_throttle_curve(pwr, -0.5, 0, 2);
+//
+//		// Apply ramping
+//		static uint16_t last_time = 0;
+//		static float pwr_ramp = 0.0;
+//		float ramp_time = fabsf(pwr) > fabsf(pwr_ramp) ? 0.3 : 0.1;
+//
+//		if (ramp_time > 0.01) {
+//			const float ramp_step = (float)(HAL_GetTick() - last_time) / (ramp_time * 1000.0);
+//			utils_step_towards(&pwr_ramp, pwr, ramp_step);
+//			last_time = HAL_GetTick();
+//			pwr = pwr_ramp;
+//		}
+//
+//		bool current_mode_brake = false;
+//
+//		if (fabsf(pwr) < 0.001) {
+//			ms_without_power += (1000.0 * (float)1) / (float)CH_CFG_ST_FREQUENCY;
+//		}
+//
+//		// Reset timeout
+//		VescToSTM_timeout_reset();
 
-		if(pwr < 30 || brake < 30){
-			brake = 41;
-			//continue;
-		}
-
-		pwr = (float)(pwr - 40) / 100;
-		pwr = utils_map(pwr, 0.0, 1.54, 0.0, 1.0);
-
-		// Truncate the read voltage
-		utils_truncate_number(&pwr, 0.0, 1.0);
-		decoded_level = pwr;
-
-		// Map and truncate the read voltage
-		brake = (float)(brake - 40) / 100;
-		brake = utils_map(brake, 0.0, 1.54, 0.0, 1.0);
-		utils_truncate_number(&brake, 0.0, 1.0);
-
-		// All pins and buttons are still decoded for debugging, even
-		// when output is disabled.
-		if (false) {
-			continue;
-		}
-
-		pwr -= brake;
-
-		// Apply deadband
-		utils_deadband(&pwr, 0.05, 1.0);
-
-		// Apply throttle curve
-		pwr = utils_throttle_curve(pwr, -0.5, 0, 2);
-
-		// Apply ramping
-		static uint16_t last_time = 0;
-		static float pwr_ramp = 0.0;
-		float ramp_time = fabsf(pwr) > fabsf(pwr_ramp) ? 0.3 : 0.1;
-
-		if (ramp_time > 0.01) {
-			const float ramp_step = (float)(HAL_GetTick() - last_time) / (ramp_time * 1000.0);
-			utils_step_towards(&pwr_ramp, pwr, ramp_step);
-			last_time = HAL_GetTick();
-			pwr = pwr_ramp;
-		}
-
-		bool current_mode_brake = false;
-
-		if (fabsf(pwr) < 0.001) {
-			ms_without_power += (1000.0 * (float)1) / (float)CH_CFG_ST_FREQUENCY;
-		}
-
-		// Reset timeout
-		VescToSTM_timeout_reset();
-
-		if (current_mode_brake) {
-			VescToSTM_set_brake_current_rel(pwr);
-		} else {
-			float current_out = pwr;
-			bool is_reverse = false;
-			if (current_out < 0.0) {
-				is_reverse = true;
-				current_out = -current_out;
-				pwr = -pwr;
-			}
-
-			if (is_reverse) {
-				VescToSTM_set_current_rel(-current_out);
-			} else {
-				VescToSTM_set_current_rel(current_out);
-			}
-		}
+//		if (current_mode_brake) {
+//			VescToSTM_set_brake_current_rel(pwr);
+//		} else {
+//			float current_out = pwr;
+//			bool is_reverse = false;
+//			if (current_out < 0.0) {
+//				is_reverse = true;
+//				current_out = -current_out;
+//				pwr = -pwr;
+//			}
+//
+//			if (is_reverse) {
+//				VescToSTM_set_current_rel(-current_out);
+//			} else {
+//				VescToSTM_set_current_rel(current_out);
+//			}
+//		}
 	}
 }
 

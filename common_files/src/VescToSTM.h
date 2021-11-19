@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include "VescDatatypes.h"
 
-
+void VescToStm_nunchuk_update_output(chuck_data * chuck_d);
 void VescToSTM_set_torque(int32_t current);
 void VescToSTM_set_brake(int32_t current);
 void VescToSTM_set_handbrake(float current);
