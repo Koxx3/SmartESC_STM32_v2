@@ -638,10 +638,10 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					mc_configuration *mcconf = &mc_conf;
 
 					int32_t ind = 0;
-					bool store = data[ind++];
-					bool forward_can = data[ind++];
+					//bool store = data[ind++];
+					//bool forward_can = data[ind++];
 					bool ack = data[ind++];
-					bool divide_by_controllers = data[ind++];
+					//bool divide_by_controllers = data[ind++];
 
 					float controller_num = 1.0;
 
@@ -784,7 +784,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					float start = buffer_get_float32(data, 1e3, &ind);
 					float end = buffer_get_float32(data, 1e3, &ind);
 					bool store = data[ind++];
-					bool fwd_can = data[ind++];
+					//bool fwd_can = data[ind++];
 
 					/*if (fwd_can) {
 						comm_can_conf_battery_cut(255, store, start, end);

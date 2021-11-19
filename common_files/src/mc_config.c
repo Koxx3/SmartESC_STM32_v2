@@ -204,7 +204,9 @@ HALL_Handle_t HALL_M1 =
   */
 NTC_Handle_t TempSensorParamsM1 =
 {
-  .bSensorType = REAL_SENSOR,
+  .bSensorType = TEMP_SENSOR_TYPE,
+  .hExpectedTemp_d = ( uint16_t )20,
+  .hExpectedTemp_C = 20,
   .TempRegConv =
   {
     .regADC = ADC1,

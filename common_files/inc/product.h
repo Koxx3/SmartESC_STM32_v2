@@ -30,7 +30,8 @@
 #define HALL_PHASE_SHIFT        											 90
 #define HALL_SENSORS_PLACEMENT  											 DEGREES_120
 #define HALL_FAULT_RESET_CNT												 200
-#define USART_IRQHandler 												 	 USART1_IRQHandler
+
+#define TEMP_SENSOR_TYPE													 VIRTUAL_SENSOR
 #endif
 
 #ifdef M365
@@ -55,6 +56,8 @@
 #define HALL_PHASE_SHIFT        											 90
 #define HALL_SENSORS_PLACEMENT  											 DEGREES_120
 #define HALL_FAULT_RESET_CNT												 200
+
+#define TEMP_SENSOR_TYPE													 REAL_SENSOR
 #endif
 /****************************************************************************/
 

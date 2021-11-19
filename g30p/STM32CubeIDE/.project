@@ -342,9 +342,24 @@
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c</locationURI>
 		</link>
 		<link>
+			<name>Middlewares/FreeRTOS/cmsis_os.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/FreeRTOS/cmsis_os1.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os1.c</locationURI>
+		</link>
+		<link>
 			<name>Middlewares/FreeRTOS/cmsis_os2.c</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/FreeRTOS/cmsis_os2.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/FreeRTOS/croutine.c</name>
@@ -420,6 +435,16 @@
 			<name>Application/User/BLDC/motorcontrol.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/motorcontrol.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/BLDC/music.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/music.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/BLDC/music.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/music.h</locationURI>
 		</link>
 		<link>
 			<name>Application/User/BLDC/regular_conversion_manager.c</name>
