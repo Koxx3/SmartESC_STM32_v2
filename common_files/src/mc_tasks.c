@@ -95,7 +95,7 @@ static volatile uint16_t hStopPermanencyCounterM1 = 0;
 uint8_t bMCBootCompleted = 0;
 
 /* USER CODE BEGIN Private Variables */
-static MUSIC_PARAM bldc_music;
+MUSIC_PARAM bldc_music;
 
 /* USER CODE END Private Variables */
 
@@ -239,7 +239,7 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
   /* USER CODE BEGIN MCboot 2 */
   int32_t status = music_init(&bldc_music);
   if(status){
-  	set_music_command(Music1, &bldc_music);
+  	set_music_command(Music_OFF, &bldc_music);
   }
   /* USER CODE END MCboot 2 */
 

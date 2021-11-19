@@ -24,6 +24,7 @@
 #include "mc_type.h"
 #include "mc_interface.h"
 #include <stdlib.h>
+#include "product.h"
 
 /** @addtogroup MCSDK
   * @{
@@ -54,18 +55,6 @@
 #define LOW_RES_THRESHOLD   ((uint16_t)0x5500u)
 
 #define HALL_COUNTER_RESET  ((uint16_t) 0u)
-
-#define S16_120_PHASE_SHIFT (int16_t)(65536/3)
-#define S16_60_PHASE_SHIFT  (int16_t)(65536/6)
-
-#define STATE_0 (uint8_t)0
-#define STATE_1 (uint8_t)1
-#define STATE_2 (uint8_t)2
-#define STATE_3 (uint8_t)3
-#define STATE_4 (uint8_t)4
-#define STATE_5 (uint8_t)5
-#define STATE_6 (uint8_t)6
-#define STATE_7 (uint8_t)7
 
 #define NEGATIVE          (int8_t)-1
 #define POSITIVE          (int8_t)1
@@ -143,6 +132,7 @@ __weak void HALL_Init( HALL_Handle_t * pHandle )
 
   /* Reset speed reliability */
   pHandle->SensorIsReliable = true;
+  pHandle->speed_fault_reset_cnt = HALL_FAULT_RESET_CNT;
 
   /* Set IC filter for Channel 1 (ICF1) */
   LL_TIM_IC_SetFilter(TIMx, LL_TIM_CHANNEL_CH1, ( uint32_t )(pHandle->ICx_Filter) << 20);
@@ -197,6 +187,7 @@ __weak void HALL_Clear( HALL_Handle_t * pHandle )
 
   /* Reset speed reliability */
   pHandle->SensorIsReliable = true;
+  pHandle->speed_fault_reset_cnt = HALL_FAULT_RESET_CNT;
 
   /* Acceleration measurement not implemented.*/
   pHandle->_Super.hMecAccelUnitP = 0;
@@ -286,7 +277,7 @@ __weak int16_t HALL_CalcElAngle( HALL_Handle_t * pHandle )
 __weak bool HALL_CalcAvrgMecSpeedUnit( HALL_Handle_t * pHandle, int16_t * hMecSpeedUnit )
 {
   TIM_TypeDef * TIMx = pHandle->TIMx;
-  bool bReliability;
+  bool bReliability = true;
 
   if ( pHandle->SensorIsReliable )
   {
@@ -338,8 +329,13 @@ __weak bool HALL_CalcAvrgMecSpeedUnit( HALL_Handle_t * pHandle, int16_t * hMecSp
   }
   else
   {
-    bReliability = false;
-    pHandle->_Super.bSpeedErrorNumber = pHandle->_Super.bMaximumSpeedErrorsNumber;
+    if(pHandle->_Super.bSpeedErrorNumber >= pHandle->_Super.bMaximumSpeedErrorsNumber){
+    	bReliability = false;
+    }
+    if(--pHandle->speed_fault_reset_cnt < 0){
+    	pHandle->speed_fault_reset_cnt = HALL_FAULT_RESET_CNT;
+    	pHandle->SensorIsReliable = true;
+    }
     /* If speed is not reliable the El and Mec speed is set to 0 */
     pHandle->_Super.hElSpeedDpp = 0;
     *hMecSpeedUnit = 0;
@@ -392,26 +388,33 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
                             | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin ) );
     }
 
-    int diff = pHandle->lut[pHandle->HallState] - bPrevHallState;
+    if(pHandle->HallState == 0 || pHandle->HallState == 7){
+    	pHandle->_Super.bSpeedErrorNumber++;
+    	pHandle->SensorIsReliable = false;
 
-    if (diff > 100) {
-		diff -= 255;
-	} else if (diff < -100) {
-		diff += 255;
-	}
-
-    if(diff > 0){
-    	pHandle->Direction = POSITIVE;
-    	pHandle->tachometer++;
     }else{
-    	pHandle->Direction = NEGATIVE;
-    	pHandle->tachometer--;
+    	pHandle->_Super.bSpeedErrorNumber=0;
+		int diff = pHandle->lut[pHandle->HallState] - bPrevHallState;
+
+		if (diff > 100) {
+			diff -= 255;
+		} else if (diff < -100) {
+			diff += 255;
+		}
+
+		if(diff){
+			if(diff > 0){
+				pHandle->Direction = POSITIVE;
+				pHandle->tachometer++;
+			}else if (diff < 0){
+				pHandle->Direction = NEGATIVE;
+				pHandle->tachometer--;
+			}
+			pHandle->tachometer_abs++;
+		}
+
+		pHandle->MeasuredElAngle = pHandle->PhaseShift + (((uint16_t)pHandle->lut[pHandle->HallState])<<8);
     }
-    pHandle->tachometer_abs++;
-
-
-    pHandle->MeasuredElAngle = pHandle->PhaseShift + (((uint16_t)pHandle->lut[pHandle->HallState])<<8);
-
 
     /* We need to check that the direction has not changed.
        If it is the case, the sign of the current speed can be the opposite of the
@@ -621,6 +624,8 @@ __weak void * HALL_TIMx_UP_IRQHandler( void * pHandleVoid )
       pHandle->SpeedFIFOIdx = 0;
       pHandle->ElPeriodSum =pHandle->MaxPeriod * pHandle->SpeedBufferSize;
     }
+  }else{
+	  HALL_Init_Electrical_Angle( pHandle );
   }
   return MC_NULL;
 }
@@ -648,11 +653,16 @@ static void HALL_Init_Electrical_Angle( HALL_Handle_t * pHandle )
                             | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin ) );
     }
 
-    pHandle->_Super.hElAngle = pHandle->PhaseShift + (((uint16_t)pHandle->lut[pHandle->HallState])<<8);
-
-
-  /* Initialize the measured angle */
-  pHandle->MeasuredElAngle = pHandle->_Super.hElAngle;
+    if(pHandle->HallState == 0 || pHandle->HallState == 7){
+    	pHandle->_Super.bSpeedErrorNumber++;
+    	pHandle->SensorIsReliable = false;
+    }else{
+    	pHandle->_Super.bSpeedErrorNumber=0;
+    	pHandle->SensorIsReliable = true;
+    	pHandle->_Super.hElAngle = pHandle->PhaseShift + (((uint16_t)pHandle->lut[pHandle->HallState])<<8);
+    	/* Initialize the measured angle */
+    	pHandle->MeasuredElAngle = pHandle->_Super.hElAngle;
+    }
 
 }
 

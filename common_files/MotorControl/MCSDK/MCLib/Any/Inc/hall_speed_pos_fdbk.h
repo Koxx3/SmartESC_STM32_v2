@@ -211,7 +211,7 @@ typedef struct
 
   int32_t tachometer;
   uint32_t tachometer_abs;
-
+  int16_t speed_fault_reset_cnt;
 
 } HALL_Handle_t;
 /**

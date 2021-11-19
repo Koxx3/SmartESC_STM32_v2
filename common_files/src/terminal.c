@@ -7,6 +7,7 @@
 #include "system.h"
 #include "product.h"
 #include "defines.h"
+#include "music.h"
 
 
 void terminal_top(){
@@ -39,7 +40,7 @@ void terminal_top(){
     }
 }
 
-
+extern MUSIC_PARAM bldc_music;
 
 void terminal_process_string(char *str) {
 	enum { kMaxArgs = 16 };
@@ -61,5 +62,10 @@ void terminal_process_string(char *str) {
 		commands_printf("pong\n");
 	}else if (strcmp(argv[0], "top") == 0){
 		terminal_top();
+	}else if (strcmp(argv[0], "music_on") == 0){
+		set_music_command(Music1, &bldc_music);
+	}else if (strcmp(argv[0], "music_off") == 0){
+		set_music_command(Music_OFF, &bldc_music);
 	}
+
 }

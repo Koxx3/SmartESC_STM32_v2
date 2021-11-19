@@ -34,7 +34,7 @@
 #define MAX_APPLICATION_SPEED_RPM       2500 /*!< rpm, mechanical */
 #define MIN_APPLICATION_SPEED_RPM       0 /*!< rpm, mechanical,
                                                            absolute value */
-#define MEAS_ERRORS_BEFORE_FAULTS       3 /*!< Number of speed
+#define MEAS_ERRORS_BEFORE_FAULTS       20 /*!< Number of speed
                                                              measurement errors before
                                                              main sensor goes in fault */
 /****** Hall sensors ************/

@@ -6,7 +6,7 @@
 #define _2_PI_S16                                (uint32_t)(UINT16_MAX)
 #define _2_PI_U8                                 (uint16_t)(U8_MAX)
 
-#define PRODUCT_MUSIC_AMPLITUDE                  (uint8_t)5 /* 0 to 7 levels */
+#define PRODUCT_MUSIC_AMPLITUDE                  (uint8_t)2 /* 0 to 7 levels */
 #define MAX_MUSIC_AMPLITUDE                      10000
 #define MUSIC_BUFF_TERMINATOR_INDEX              (uint8_t)0xFF
 #define MUSIC_INFINITE_PERIODICITY_FLAG          (uint8_t)0xF
