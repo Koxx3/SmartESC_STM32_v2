@@ -239,7 +239,6 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	SpeednTorqCtrlM1.MaxPositiveTorque			= current_max;
 	SpeednTorqCtrlM1.MinNegativeTorque 			= current_min;
 
-
 	HALL_M1._Super.bElToMecRatio                = mcconf->si_motor_poles;
 	HALL_M1._Super.hMaxReliableMecSpeedUnit     = max_app_speed;
 	HALL_M1._Super.bMaximumSpeedErrorsNumber    = MEAS_ERRORS_BEFORE_FAULTS;

@@ -535,12 +535,12 @@ __weak void FOC_CalcCurrRef(uint8_t bMotor)
     {
      // MTPA_CalcCurrRefFromIq(pMaxTorquePerAmpere[bMotor], &FOCVars[bMotor].Iqdref);
     }*/
-    if (pFW[bMotor])
-    {
-       IqdTmp.q = FOCVars[bMotor].Iqdref.q;
-       IqdTmp.d = FOCVars[bMotor].UserIdref;
-       FOCVars[bMotor].Iqdref = FW_CalcCurrRef(pFW[bMotor],IqdTmp);
-    }
+//    if (pFW[bMotor])
+//    {
+//       IqdTmp.q = FOCVars[bMotor].Iqdref.q;
+//       IqdTmp.d = FOCVars[bMotor].UserIdref;
+//       FOCVars[bMotor].Iqdref = FW_CalcCurrRef(pFW[bMotor],IqdTmp);
+//    }
 
   }
   /* USER CODE BEGIN FOC_CalcCurrRef 1 */

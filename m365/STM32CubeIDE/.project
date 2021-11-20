@@ -157,6 +157,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/defines.h</locationURI>
 		</link>
 		<link>
+			<name>Application/User/flux_weakening_ctrl.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/flux_weakening_ctrl.c</locationURI>
+		</link>
+		<link>
 			<name>Application/User/freertos.c</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/freertos.c</locationURI>

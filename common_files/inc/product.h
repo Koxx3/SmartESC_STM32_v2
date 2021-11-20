@@ -51,7 +51,8 @@
 //Current Measurement
 #define RSHUNT                        										 0.00200
 #define AMPLIFICATION_GAIN            										 8.00
-#define NOMINAL_CURRENT         											 4766
+#define NOMINAL_CURRENT         											 2000
+#define ID_DEMAG														     -2000
 
 #define POLE_PAIR_NUM                                                 	 	 (uint8_t)15
 #define HALL_PHASE_SHIFT        											 90
