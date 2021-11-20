@@ -10,15 +10,9 @@
   * @retval none.
   */
 __weak void FW_Init( FW_Handle_t * pHandle, PID_Handle_t * pPIDSpeed, PID_Handle_t * pPIDFluxWeakeningHandle ){
-	qd_t NULL_qd = {(int16_t)0, (int16_t)0};
-
-	pHandle->AvVolt_qd = NULL_qd;
-	pHandle->AvVoltAmpl = 0;
-	pHandle->hIdRefOffset = 0;
-
-	pHandle->hFW_V_Ref = pHandle->hDefaultFW_V_Ref;
 	pHandle->pFluxWeakeningPID = pPIDFluxWeakeningHandle;
 	pHandle->pSpeedPID = pPIDSpeed;
+	pHandle->hFW_V_Ref = pHandle->hDefaultFW_V_Ref;
 }
 
 /**
@@ -30,16 +24,12 @@ __weak void FW_Init( FW_Handle_t * pHandle, PID_Handle_t * pPIDSpeed, PID_Handle
   */
 __weak void FW_Clear( FW_Handle_t * pHandle )
 {
-	uint16_t aux = 0;
-	uint16_t index;
 	qd_t NULL_qd = {(int16_t)0, (int16_t)0};
 
-	pHandle->AvVoltAmpl = aux;
+	pHandle->AvVoltAmpl = 0;
 	pHandle->AvVolt_qd = NULL_qd;
-	pHandle->hIdRefOffset = 0;
 
 	PID_SetIntegralTerm( pHandle->pFluxWeakeningPID, 0 );
-	PID_SetIntegralTerm( pHandle->pSpeedPID, 0 );
 }
 
 /**
@@ -51,7 +41,11 @@ __weak void FW_Clear( FW_Handle_t * pHandle )
   */
 __weak void FW_DataProcess( FW_Handle_t * pHandle, qd_t Vqd )
 {
+	  int v3 = 0;//(Vqd >> 16) + (pHandle->hVqdLowPassFilterBW - 1) * pHandle->AvVolt_qd.d;
+	  int v4 = 0;//(int16_t)Vqd + (pHandle->hVqdLowPassFilterBW - 1) * pHandle->AvVolt_qd.q;
 
+	  pHandle->AvVolt_qd.q = v4 >> pHandle->hVqdLowPassFilterBWLOG;
+	  pHandle->AvVolt_qd.d = v3 >> pHandle->hVqdLowPassFilterBWLOG;
 }
 
 /**
@@ -68,13 +62,37 @@ __weak void FW_DataProcess( FW_Handle_t * pHandle, qd_t Vqd )
   */
 __weak qd_t FW_CalcCurrRef( FW_Handle_t * pHandle, qd_t Iqdref ){
 
-	int16_t hTorqueReference = 0;
-	int16_t hError;
+	  int v8; // r1@2
+	  pHandle->AvVoltAmpl = MCM_Sqrt(pHandle->AvVolt_qd.d * pHandle->AvVolt_qd.d + pHandle->AvVolt_qd.q * pHandle->AvVolt_qd.q);
 
-    hTorqueReference = PI_Controller( pHandle->pSpeedPID, ( int32_t )hError );
+	  if ( pHandle->AvVoltAmpl > 0x7FFF )
+	    v8 = ((pHandle->hMaxModule * pHandle->hFW_V_Ref) / 0x3E8) - 0x7FFF;
+	  else
+	    v8 = ((pHandle->hMaxModule * pHandle->hFW_V_Ref) / 0x3E8) - pHandle->AvVoltAmpl;
 
-	return Iqdref;
+	  int v9 = PI_Controller(pHandle->pFluxWeakeningPID, v8);
+
+	  if ( v9 < 0 )
+		  pHandle->hIdRefOffset += v9;
+
+	  //if ( pHandle->hDemagCurrent < ((int16_t)Iqdref >> 16))
+		//  pHandle->hDemagCurrent = ((int16_t)Iqdref >> 16);
+
+	  int v12 = MCM_Sqrt(pHandle->wNominalSqCurr - pHandle->hDemagCurrent * pHandle->hDemagCurrent);
+	  int v13 = v12 * PID_GetKIDivisor(pHandle->pSpeedPID);
+
+	  PID_SetLowerIntegralTermLimit(pHandle->pSpeedPID, -v13);
+	  PID_SetUpperIntegralTermLimit(pHandle->pSpeedPID, v13);
+
+	  //if ((int16_t)Iqdref > v12 || (v12 = -v12, (int16_t)Iqdref < v12))
+	  //  LOWORD(v5) = v12;
+
+	  //return (uint16_t)Iqdref | (pHandle->hDemagCurrent << 16);
+
+	  return Iqdref;
 }
+
+
 
 
 /**
@@ -120,6 +138,6 @@ __weak int16_t FW_GetAvVAmplitude( FW_Handle_t * pHandle ){
   *         tenth of percentage points of available voltage.
   */
 __weak uint16_t FW_GetAvVPercentage( FW_Handle_t * pHandle ){
-	return pHandle->AvVoltAmpl / 100;
+	return (uint16_t)(1000 * pHandle->AvVoltAmpl / pHandle->hMaxModule);
 }
 
