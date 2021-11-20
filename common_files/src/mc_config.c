@@ -111,7 +111,7 @@ FW_Handle_t FW_M1 =
 {
   .hMaxModule             = MAX_MODULE,
   .hDefaultFW_V_Ref       = (int16_t)FW_VOLTAGE_REF,
- // .hDemagCurrent          = ID_DEMAG,
+  .hDemagCurrent          = ID_DEMAG,
   .wNominalSqCurr         = ((int32_t)NOMINAL_CURRENT*(int32_t)NOMINAL_CURRENT),
   .hVqdLowPassFilterBW    = M1_VQD_SW_FILTER_BW_FACTOR,
   .hVqdLowPassFilterBWLOG = M1_VQD_SW_FILTER_BW_FACTOR_LOG

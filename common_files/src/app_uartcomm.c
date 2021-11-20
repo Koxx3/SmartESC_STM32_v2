@@ -74,7 +74,7 @@ void task_app(void * argument)
 	HAL_UART_Receive_DMA(&APP_USART_DMA, usart2_rx_dma_buffer, sizeof(usart2_rx_dma_buffer));
 	CLEAR_BIT(APP_USART_DMA.Instance->CR3, USART_CR3_EIE);
 
-	uint32_t rd2_ptr=0;
+	//uint32_t rd2_ptr=0;
 	is_running = true;
 
   /* Infinite loop */

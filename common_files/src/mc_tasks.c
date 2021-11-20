@@ -208,7 +208,7 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
   /*   Flux weakening component initialization           */
   /*******************************************************/
   PID_HandleInit(&PIDFluxWeakeningHandle_M1);
-  //FW_Init(pFW[M1],pPIDSpeed[M1],&PIDFluxWeakeningHandle_M1);
+  FW_Init(pFW[M1],pPIDSpeed[M1],&PIDFluxWeakeningHandle_M1);
 
   FOC_Clear(M1);
   FOCVars[M1].bDriveInput = EXTERNAL;
@@ -493,7 +493,7 @@ __weak void FOC_Clear(uint8_t bMotor)
   /* USER CODE BEGIN FOC_Clear 1 */
   if (pFW[bMotor])
   {
-    //FW_Clear(pFW[bMotor]);
+    FW_Clear(pFW[bMotor]);
   }
   /* USER CODE END FOC_Clear 1 */
 }
@@ -539,7 +539,7 @@ __weak void FOC_CalcCurrRef(uint8_t bMotor)
     {
        IqdTmp.q = FOCVars[bMotor].Iqdref.q;
        IqdTmp.d = FOCVars[bMotor].UserIdref;
-       //FOCVars[bMotor].Iqdref = FW_CalcCurrRef(pFW[bMotor],IqdTmp);
+       FOCVars[bMotor].Iqdref = FW_CalcCurrRef(pFW[bMotor],IqdTmp);
     }
 
   }
@@ -746,7 +746,7 @@ inline uint16_t FOC_CurrControllerM1(void)
   FOCVars[M1].Vd_samples++;
   FOCVars[M1].Valphabeta = Valphabeta;
   FOCVars[M1].hElAngle = hElAngle;
-  //FW_DataProcess(pFW[M1], Vqd);
+  FW_DataProcess(pFW[M1], Vqd);
   return(hCodeError);
 }
 
