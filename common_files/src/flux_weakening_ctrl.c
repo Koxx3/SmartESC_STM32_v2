@@ -41,9 +41,8 @@ __weak void FW_Clear( FW_Handle_t * pHandle )
   */
 __weak void FW_DataProcess( FW_Handle_t * pHandle, qd_t Vqd )
 {
-	  int v3 = 0;//(Vqd >> 16) + (pHandle->hVqdLowPassFilterBW - 1) * pHandle->AvVolt_qd.d;
-	  int v4 = 0;//(int16_t)Vqd + (pHandle->hVqdLowPassFilterBW - 1) * pHandle->AvVolt_qd.q;
-
+	  int16_t v3 = Vqd.d + (pHandle->hVqdLowPassFilterBW - 1) * pHandle->AvVolt_qd.d;
+	  int16_t v4 = Vqd.q + (pHandle->hVqdLowPassFilterBW - 1) * pHandle->AvVolt_qd.q;
 	  pHandle->AvVolt_qd.q = v4 >> pHandle->hVqdLowPassFilterBWLOG;
 	  pHandle->AvVolt_qd.d = v3 >> pHandle->hVqdLowPassFilterBWLOG;
 }
@@ -61,35 +60,45 @@ __weak void FW_DataProcess( FW_Handle_t * pHandle, qd_t Vqd )
   * @retval qd_t Computed Iqdref.
   */
 __weak qd_t FW_CalcCurrRef( FW_Handle_t * pHandle, qd_t Iqdref ){
+	  int16_t AvVoltAmpl = MCM_Sqrt(pHandle->AvVolt_qd.d * pHandle->AvVolt_qd.d + pHandle->AvVolt_qd.q * pHandle->AvVolt_qd.q);
 
-	  int v8; // r1@2
-	  pHandle->AvVoltAmpl = MCM_Sqrt(pHandle->AvVolt_qd.d * pHandle->AvVolt_qd.d + pHandle->AvVolt_qd.q * pHandle->AvVolt_qd.q);
-
-	  if ( pHandle->AvVoltAmpl > 0x7FFF )
-	    v8 = ((pHandle->hMaxModule * pHandle->hFW_V_Ref) / 0x3E8) - 0x7FFF;
+	  int16_t v8;
+	  if (AvVoltAmpl > 0x7FFF )
+		   v8 = ((pHandle->hMaxModule * pHandle->hFW_V_Ref) / 0x3E8) - 0x7FFF;
 	  else
-	    v8 = ((pHandle->hMaxModule * pHandle->hFW_V_Ref) / 0x3E8) - pHandle->AvVoltAmpl;
+	 	   v8 = ((pHandle->hMaxModule * pHandle->hFW_V_Ref) / 0x3E8) - AvVoltAmpl;
 
-	  int v9 = PI_Controller(pHandle->pFluxWeakeningPID, v8);
+	  pHandle->AvVoltAmpl = AvVoltAmpl;
+	  int16_t v9 = PI_Controller(pHandle->pFluxWeakeningPID, v8);
 
-	  if ( v9 < 0 )
-		  pHandle->hIdRefOffset += v9;
+	  if ( v9 < 0 ){
+		  pHandle->AvVolt_qd.d = pHandle->hIdRefOffset;
+	  }
 
-	  //if ( pHandle->hDemagCurrent < ((int16_t)Iqdref >> 16))
-		//  pHandle->hDemagCurrent = ((int16_t)Iqdref >> 16);
+	  if ( v9 >= 0 ){
+		  pHandle->hIdRefOffset = pHandle->AvVolt_qd.d;
+	  } else {
+		  pHandle->AvVolt_qd.d += v9;
+	  }
 
+	  if (pHandle->hDemagCurrent < pHandle->AvVolt_qd.d){
+		  pHandle->hDemagCurrent = pHandle->AvVolt_qd.d;
+	  }
+
+	  uint16_t v11 = pHandle->hDemagCurrent;
 	  int v12 = MCM_Sqrt(pHandle->wNominalSqCurr - pHandle->hDemagCurrent * pHandle->hDemagCurrent);
 	  int v13 = v12 * PID_GetKIDivisor(pHandle->pSpeedPID);
 
 	  PID_SetLowerIntegralTermLimit(pHandle->pSpeedPID, -v13);
 	  PID_SetUpperIntegralTermLimit(pHandle->pSpeedPID, v13);
 
-	  //if ((int16_t)Iqdref > v12 || (v12 = -v12, (int16_t)Iqdref < v12))
-	  //  LOWORD(v5) = v12;
+	  qd_t output = {(int16_t)pHandle->AvVolt_qd.q, (int16_t)(v11 << 16)};
+	  if ( pHandle->AvVolt_qd.q > v12 || (v12 = -v12, pHandle->AvVolt_qd.q < v12) ){
+		  output.q = v12;
+	  }
 
-	  //return (uint16_t)Iqdref | (pHandle->hDemagCurrent << 16);
-
-	  return Iqdref;
+	  //return (unsigned __int16)v5 | (v11 << 16);
+	  return output;
 }
 
 
