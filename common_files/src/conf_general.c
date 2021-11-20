@@ -234,6 +234,13 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	PIDIdHandle_M1.hDefKpGain 			  = PIDIdHandle_M1.hKpGain;
 	PIDIdHandle_M1.hDefKiGain 			  = PIDIdHandle_M1.hKiGain;
 
+	FW_M1.wNominalSqCurr 				  = current_max * current_max;
+	if(mcconf->foc_d_gain_scale_start < 0.5){
+		mcconf->foc_d_gain_scale_start = 0.5;
+	}
+	FW_M1.hFW_V_Ref						  = 1000.0 * mcconf->foc_d_gain_scale_start;
+	FW_M1.hDemagCurrent					  = -(current_max*mcconf->foc_d_gain_scale_max_mod);
+
 	SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit = VescToSTM_erpm_to_speed(mcconf->l_max_erpm * 1.15, mcconf->si_motor_poles);
 	SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit = VescToSTM_erpm_to_speed(mcconf->l_min_erpm * 1.15, mcconf->si_motor_poles);
 	SpeednTorqCtrlM1.MaxPositiveTorque			= current_max;

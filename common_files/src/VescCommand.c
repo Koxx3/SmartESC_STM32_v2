@@ -183,7 +183,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 		ind += VescToSTM_get_uid(send_buffer + ind, 12);
 
-		send_buffer[ind++] = 1;
+		send_buffer[ind++] = appconf.pairing_done;
 		send_buffer[ind++] = FW_TEST_VERSION_NUMBER;
 
 		send_buffer[ind++] = HW_TYPE_VESC;

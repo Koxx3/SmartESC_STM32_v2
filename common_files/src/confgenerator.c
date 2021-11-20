@@ -795,12 +795,12 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 //	float foc_observer_gain_slow;
 //	float foc_pll_kp;
 //	float foc_pll_ki;
-//	float foc_duty_dowmramp_kp;
+//    mcconf->foc_duty_dowmramp_kp;
 //	float foc_duty_dowmramp_ki;
 //	float foc_openloop_rpm;
 //	float foc_openloop_rpm_low;
-//	float foc_d_gain_scale_start;
-//	float foc_d_gain_scale_max_mod;
+	mcconf->foc_d_gain_scale_start = 1;
+	mcconf->foc_d_gain_scale_max_mod = 0;
 //	float foc_sl_openloop_hyst;
 //	float foc_sl_openloop_time;
 //	float foc_sl_openloop_time_lock;

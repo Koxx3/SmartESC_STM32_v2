@@ -128,6 +128,7 @@ void VescToSTM_set_torque(int32_t current){
 	}
 
 	if(q >= 0){
+		FW_M1.hDemagCurrent	= -((float)q*mc_conf.foc_d_gain_scale_max_mod);
 		pMCI[M1]->pSTC->PISpeed->wUpperIntegralLimit = q * SP_KDDIV;
 		pMCI[M1]->pSTC->PISpeed->wLowerIntegralLimit = mc_conf.s_pid_allow_braking ? -q : 0;
 		pMCI[M1]->pSTC->PISpeed->hUpperOutputLimit = q;
@@ -161,12 +162,17 @@ void VescToSTM_set_brake(int32_t current){
 		q = SpeednTorqCtrlM1.MinNegativeTorque;
 	}
 	if(q > 0){
+		FW_M1.hDemagCurrent	= -((float)SpeednTorqCtrlM1.MaxPositiveTorque*mc_conf.foc_d_gain_scale_max_mod);
 		pMCI[M1]->pSTC->PISpeed->hUpperOutputLimit = q;
 		pMCI[M1]->pSTC->PISpeed->hLowerOutputLimit = -q;
+		PIDSpeedHandle_M1.wUpperIntegralLimit = q * SP_KIDIV;
+		PIDSpeedHandle_M1.wLowerIntegralLimit = -q * SP_KIDIV;
 		MCI_ExecSpeedRamp(pMCI[M1], 0 , 0);
 	}else{
 		pMCI[M1]->pSTC->PISpeed->hUpperOutputLimit = -q;
 		pMCI[M1]->pSTC->PISpeed->hLowerOutputLimit = q;
+		PIDSpeedHandle_M1.wUpperIntegralLimit = -q * SP_KIDIV;
+		PIDSpeedHandle_M1.wLowerIntegralLimit = q * SP_KIDIV;
 		MCI_ExecSpeedRamp(pMCI[M1], 0 , 0);
 	}
 }
@@ -183,6 +189,7 @@ void VescToSTM_set_speed(int32_t rpm){
 	}
 	pMCI[M1]->pSTC->SPD->open_loop = false;
 	if(rpm>=0){
+		FW_M1.hDemagCurrent	= -((float)SpeednTorqCtrlM1.MaxPositiveTorque*mc_conf.foc_d_gain_scale_max_mod);
 		pMCI[M1]->pSTC->PISpeed->wUpperIntegralLimit = (int32_t)SpeednTorqCtrlM1.MaxPositiveTorque * SP_KIDIV;
 		pMCI[M1]->pSTC->PISpeed->wLowerIntegralLimit = mc_conf.s_pid_allow_braking ? (int32_t)SpeednTorqCtrlM1.MinNegativeTorque * SP_KIDIV: 0;
 		pMCI[M1]->pSTC->PISpeed->hUpperOutputLimit = SpeednTorqCtrlM1.MaxPositiveTorque;
@@ -406,7 +413,6 @@ int32_t VescToSTM_get_tachometer_abs_value(bool reset) {
  */
 void VescToSTM_set_handbrake(float current) {
 	int32_t q = abs(current_to_torque(current*1000));
-
 	pMCI[M1]->pSTC->SPD->open_loop = true;
 	pMCI[M1]->pSTC->SPD->open_angle = 0;
 
@@ -507,6 +513,7 @@ void VescToSTM_set_current_rel(float val) {
 		q = SpeednTorqCtrlM1.MinNegativeTorque;
 	}
 	if(q >= 0){
+		FW_M1.hDemagCurrent	= -((float)q*mc_conf.foc_d_gain_scale_max_mod);
 		pMCI[M1]->pSTC->PISpeed->wUpperIntegralLimit = (uint32_t)q * SP_KDDIV;
 		pMCI[M1]->pSTC->PISpeed->wLowerIntegralLimit = mc_conf.s_pid_allow_braking ? -q : 0;
 		pMCI[M1]->pSTC->PISpeed->hUpperOutputLimit = q;

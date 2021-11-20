@@ -33,6 +33,7 @@
 
 
 extern mc_configuration mc_conf;
+extern app_configuration appconf;
 
 // Functions
 void conf_general_init(void);

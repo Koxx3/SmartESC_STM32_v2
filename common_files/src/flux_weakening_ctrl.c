@@ -58,56 +58,48 @@ __weak void FW_DataProcess( FW_Handle_t * pHandle, qd_t Vqd )
   * @retval qd_t Computed Iqdref.
   */
 __weak qd_t FW_CalcCurrRef( FW_Handle_t * pHandle, qd_t Iqdref ){
-	  FW_Handle_t *v2;
-	  uint16_t v3;
-	  int16_t v6;
-	  uint16_t v7;
-	  int16_t v8;
-	  int16_t v9;
-	  signed int hDemagCurrent;
-	  int16_t v12;
-	  int16_t v13;
+	  int16_t varError;
 
-	  v2 = pHandle;
-	  v3 = pHandle->hMaxModule * pHandle->hFW_V_Ref;
+	  int16_t AvVoltAmpl = MCM_Sqrt(pHandle->AvVolt_qd.d * pHandle->AvVolt_qd.d + pHandle->AvVolt_qd.q * pHandle->AvVolt_qd.q);
 
-	  signed int D = (int16_t)Iqdref.d;
-	  qd_t Q = Iqdref;
+	  if (AvVoltAmpl > 32767 ){
+		  varError = ((pHandle->hMaxModule * pHandle->hFW_V_Ref) / 1000) - 32767;
+	  } else {
+		  varError = ((pHandle->hMaxModule * pHandle->hFW_V_Ref) / 1000) - AvVoltAmpl;
+	  }
+
+	  pHandle->AvVoltAmpl = AvVoltAmpl;
+	  int16_t pid_output = PI_Controller(pHandle->pFluxWeakeningPID, varError);
+
+	  if (pid_output < 0){
+		  Iqdref.d = pHandle->hIdRefOffset;
+	  }
+
+	  if (pid_output >= 0){
+		  pHandle->hIdRefOffset = Iqdref.d;
+	  } else {
+		  Iqdref.d += pid_output;
+	  }
 
 
-	  v6 = MCM_Sqrt(pHandle->AvVolt_qd.d * pHandle->AvVolt_qd.d + pHandle->AvVolt_qd.q * pHandle->AvVolt_qd.q);
-	  v7 = v3 / 0x3E8;
+	  if ( Iqdref.d < pHandle->hDemagCurrent){
+		  Iqdref.d = pHandle->hDemagCurrent;
+	  }
 
-	  if (v6 > 0x7FFF)
-	    v8 = v7 - 0x7FFF;
-	  else
-	    v8 = v7 - v6;
+	  int sqRoot = MCM_Sqrt(pHandle->wNominalSqCurr - pHandle->hDemagCurrent * pHandle->hDemagCurrent);
+	  int lowerLimit = sqRoot * PID_GetKIDivisor(pHandle->pSpeedPID);
+	  if(Iqdref.d != 0){
+		  PID_SetLowerIntegralTermLimit(pHandle->pSpeedPID, -lowerLimit);
+		  PID_SetUpperIntegralTermLimit(pHandle->pSpeedPID, lowerLimit);
+	  }
+	  if ( Iqdref.q > sqRoot || (sqRoot = -sqRoot, Iqdref.q < sqRoot) ){
+		  Iqdref.q = sqRoot;
+	  }
 
-	  v2->AvVoltAmpl = v6;
-	  v9 = PI_Controller(v2->pFluxWeakeningPID, v8);
-	  if ( v9 < 0 )
-	    D = v2->hIdRefOffset;
-
-	  hDemagCurrent = v2->hDemagCurrent;
-	  if ( v9 >= 0 )
-	    v2->hIdRefOffset = D;
-	  else
-	    D += v9;
-	  if ( hDemagCurrent < D )
-	    hDemagCurrent = D;
-
-	  Q.d = hDemagCurrent;
-
-	  v12 = MCM_Sqrt(v2->wNominalSqCurr - hDemagCurrent * hDemagCurrent);
-	  v13 = v12 * PID_GetKIDivisor(v2->pSpeedPID);
-	  PID_SetLowerIntegralTermLimit(v2->pSpeedPID, -v13);
-	  PID_SetUpperIntegralTermLimit(v2->pSpeedPID, v13);
-
-	  if ( Q.q > v12 || (v12 = -v12, Q.q < v12) )
-		  Q.q = v12;
-
-	  return Q;
+	  return Iqdref;
 }
+
+
 
 
 /**
@@ -155,4 +147,3 @@ __weak int16_t FW_GetAvVAmplitude( FW_Handle_t * pHandle ){
 __weak uint16_t FW_GetAvVPercentage( FW_Handle_t * pHandle ){
 	return (uint16_t)(1000 * pHandle->AvVoltAmpl / pHandle->hMaxModule);
 }
-

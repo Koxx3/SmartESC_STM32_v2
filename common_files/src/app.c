@@ -1,7 +1,7 @@
 #include "app.h"
 #include "crc.h"
 
-static app_configuration appconf;
+extern app_configuration appconf;
 static bool output_vt_init_done = false;
 static volatile bool output_disabled_now = false;
 
