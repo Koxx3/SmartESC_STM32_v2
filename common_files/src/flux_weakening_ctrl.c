@@ -58,9 +58,15 @@ __weak void FW_DataProcess( FW_Handle_t * pHandle, qd_t Vqd )
   * @retval qd_t Computed Iqdref.
   */
 __weak qd_t FW_CalcCurrRef( FW_Handle_t * pHandle, qd_t Iqdref ){
-	  int16_t AvVoltAmpl = MCM_Sqrt(pHandle->AvVolt_qd.d * pHandle->AvVolt_qd.d + pHandle->AvVolt_qd.q * pHandle->AvVolt_qd.q);
-
 	  int16_t varError;
+
+	  int16_t AvVoltAmpl = MCM_Sqrt(pHandle->AvVolt_qd.d * pHandle->AvVolt_qd.d + pHandle->AvVolt_qd.q * pHandle->AvVolt_qd.q);
+	  uint16_t v4 = Iqdref.q;
+	  uint16_t v5 = Iqdref.d;
+
+	  //v4 = a2 >> 16;
+	  //v5 = (signed __int16)a2;
+
 	  if (AvVoltAmpl > 0x7FFF ){
 		  varError = ((pHandle->hMaxModule * pHandle->hFW_V_Ref) / 0x3E8) - 0x7FFF;
 	  } else {
@@ -71,33 +77,32 @@ __weak qd_t FW_CalcCurrRef( FW_Handle_t * pHandle, qd_t Iqdref ){
 	  int16_t pid_output = PI_Controller(pHandle->pFluxWeakeningPID, varError);
 
 	  if (pid_output < 0){
-		  pHandle->AvVolt_qd.d = pHandle->hIdRefOffset;
+		  v4 = pHandle->hIdRefOffset;
 	  }
 
 	  if (pid_output >= 0){
-		  pHandle->hIdRefOffset = pHandle->AvVolt_qd.d;
+		  pHandle->hIdRefOffset = v4;
 	  } else {
-		  pHandle->AvVolt_qd.d += pid_output;
+		  v4 += pid_output;
 	  }
 
-	  if (pHandle->hDemagCurrent < pHandle->AvVolt_qd.d){
-		  pHandle->hDemagCurrent = pHandle->AvVolt_qd.d;
+	  if (pHandle->hDemagCurrent < v4 ){
+		  pHandle->hDemagCurrent = v4;
 	  }
 
-	  uint16_t demCurr = pHandle->hDemagCurrent;
+	  uint16_t v11 = pHandle->hDemagCurrent;
 	  int sqRoot = MCM_Sqrt(pHandle->wNominalSqCurr - pHandle->hDemagCurrent * pHandle->hDemagCurrent);
 	  int lowerLimit = sqRoot * PID_GetKIDivisor(pHandle->pSpeedPID);
 
 	  PID_SetLowerIntegralTermLimit(pHandle->pSpeedPID, -lowerLimit);
 	  PID_SetUpperIntegralTermLimit(pHandle->pSpeedPID, lowerLimit);
 
-	  qd_t output = {(int16_t)pHandle->AvVolt_qd.q, (int16_t)(demCurr << 16)};
-	  if ( pHandle->AvVolt_qd.q > sqRoot || (sqRoot = -sqRoot, pHandle->AvVolt_qd.q < sqRoot) ){
-		  output.q = sqRoot;
+	  if ( v5 > sqRoot || (sqRoot = -sqRoot, v5 < sqRoot) ){
+		 //LOWORD(v5) = sqRoot;
 	  }
 
-	  //return (unsigned __int16)v5 | (v11 << 16);
-	  return output;
+	   //return (qd_t)v5 | (v11 << 16);
+	  return Iqdref;
 }
 
 
