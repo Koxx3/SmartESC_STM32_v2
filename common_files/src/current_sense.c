@@ -46,8 +46,6 @@ __weak uint16_t CURR_CalcMainCurrent( CURR_Handle_t * pHandle )
     hAux = RCM_ExecRegularConv(pHandle->convHandle);
     if ( hAux != 0xFFFFu )
     {
-		commands_printf("SINGLE_PRESS %d", hAux);
-
     	pHandle->aBuffer[pHandle->index] = hAux;
 		wtemp = 0;
 		for ( i = 0; i < 10u; i++ )
