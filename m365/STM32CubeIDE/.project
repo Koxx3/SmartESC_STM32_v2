@@ -152,6 +152,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/virtual_speed_sensor.c</locationURI>
 		</link>
 		<link>
+			<name>Application/User/current_sense.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/current_sense.c</locationURI>
+		</link>
+		<link>
 			<name>Application/User/defines.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/defines.h</locationURI>
