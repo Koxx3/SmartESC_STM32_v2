@@ -38,6 +38,7 @@
 #include "task.h"
 #include "product.h"
 #include "music.h"
+#include "current_sense.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -79,6 +80,8 @@ PID_Handle_t *pPIDId[NBR_OF_MOTORS];
 RDivider_Handle_t *pBusSensorM1;
 
 NTC_Handle_t *pTemperatureSensor[NBR_OF_MOTORS];
+CURR_Handle_t *pMainCurrentSensor;
+
 PWMC_Handle_t * pwmcHandle[NBR_OF_MOTORS];
 DOUT_handle_t *pR_Brake[NBR_OF_MOTORS];
 DOUT_handle_t *pOCPDisabling[NBR_OF_MOTORS];
@@ -200,6 +203,13 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
   /*******************************************************/
   NTC_Init(&TempSensorParamsM1);
   pTemperatureSensor[M1] = &TempSensorParamsM1;
+
+  /*******************************************************/
+  /*   Main current measurement (G30 Only)			     */
+  /*******************************************************/
+  CURR_Init(&CurrentSensorParams);
+  pMainCurrentSensor = &CurrentSensorParams;
+
 
   pREMNG[M1] = &RampExtMngrHFParamsM1;
   REMNG_Init(pREMNG[M1]);
@@ -790,8 +800,9 @@ __weak void TSK_SafetyTask_PWMOFF(uint8_t bMotor)
   uint16_t errMask[NBR_OF_MOTORS] = {VBUS_TEMP_ERR_MASK};
 
   CodeReturn |= errMask[bMotor] & NTC_CalcAvTemp(pTemperatureSensor[bMotor]); /* check for fault if FW protection is activated. It returns MC_OVER_TEMP or MC_NO_ERROR */
-  CodeReturn |= PWMC_CheckOverCurrent(pwmcHandle[bMotor]);                    /* check for fault. It return MC_BREAK_IN or MC_NO_FAULTS
-                                                                                 (for STM32F30x can return MC_OVER_VOLT in case of HW Overvoltage) */
+  CodeReturn |= PWMC_CheckOverCurrent(pwmcHandle[bMotor]);                    /* check for fault. It return MC_BREAK_IN or MC_NO_FAULTS (for STM32F30x can return MC_OVER_VOLT in case of HW Overvoltage) */
+  CodeReturn |= CURR_CalcMainCurrent(pMainCurrentSensor);
+
   if(bMotor == M1)
   {
 	  uint16_t voltage_fault = RVBS_CalcAvVbus(pBusSensorM1);

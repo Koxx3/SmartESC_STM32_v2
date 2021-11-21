@@ -33,6 +33,8 @@
 #define HALL_FAULT_RESET_CNT												 200
 
 #define TEMP_SENSOR_TYPE													 VIRTUAL_SENSOR
+#define CURR_SENSOR_TYPE													 REAL_SENSOR
+
 #endif
 
 #ifdef M365
@@ -60,6 +62,8 @@
 #define HALL_FAULT_RESET_CNT												 200
 
 #define TEMP_SENSOR_TYPE													 REAL_SENSOR
+#define CURR_SENSOR_TYPE													 VIRTUAL_SENSOR
+
 #endif
 /****************************************************************************/
 

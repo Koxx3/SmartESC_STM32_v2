@@ -721,7 +721,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(REAR_LIGHT_GPIO_Port, REAR_LIGHT_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(REAR_LED_GPIO_Port, REAR_LED_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PWR_BTN_Pin */
   GPIO_InitStruct.Pin = PWR_BTN_Pin;
@@ -757,12 +757,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   HAL_GPIO_Init(UNUSED1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : REAR_LIGHT_Pin */
-  GPIO_InitStruct.Pin = REAR_LIGHT_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  /*Configure GPIO pin : REAR_LED_Pin */
+  GPIO_InitStruct.Pin = REAR_LED_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(REAR_LIGHT_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(REAR_LED_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure peripheral I/O remapping */
   __HAL_AFIO_REMAP_PD01_ENABLE();

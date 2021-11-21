@@ -254,6 +254,17 @@ NTC_Handle_t TempSensorParamsM1 =
   .hT0                     = T0_C,
 };
 
+CURR_Handle_t CurrentSensorParams =
+{
+  .bSensorType = CURR_SENSOR_TYPE,
+  .CurrRegConv =
+  {
+    .regADC = ADC1,
+    .channel = MC_ADC_CHANNEL_0,
+    .samplingTime = M1_TEMP_SAMPLING_TIME,
+  }
+};
+
 /* Bus voltage sensor value filter buffer */
 uint16_t RealBusVoltageSensorFilterBufferM1[M1_VBUS_SW_FILTER_BW_FACTOR];
 
