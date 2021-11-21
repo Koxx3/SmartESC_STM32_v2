@@ -407,6 +407,16 @@
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/drive_parameters.h</locationURI>
 		</link>
 		<link>
+			<name>Application/User/BLDC/flux_weakening_ctrl.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/flux_weakening_ctrl.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/BLDC/flux_weakening_ctrl.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Inc/flux_weakening_ctrl.h</locationURI>
+		</link>
+		<link>
 			<name>Application/User/BLDC/mc_config.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/mc_config.c</locationURI>

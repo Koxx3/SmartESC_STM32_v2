@@ -39,6 +39,7 @@
 #include <printf.h>
 #include "terminal.h"
 #include "product.h"
+#include "app.h"
 
 
 static void(* volatile send_func)(unsigned char *data, unsigned int len) = 0;
@@ -754,8 +755,20 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 				case COMM_EXT_NRF_PRESENT:
 				case COMM_EXT_NRF_ESB_RX_DATA:
-				case COMM_APP_DISABLE_OUTPUT:
-					break;
+				case COMM_APP_DISABLE_OUTPUT:{
+					int32_t ind = 0;
+					bool fwd_can = data[ind++];
+					int time = buffer_get_int32(data, &ind);
+					app_disable_output(time);
+
+					if (fwd_can) {
+						data[0] = 0; // Don't continue forwarding
+						uint8_t send_buffer[50];
+						send_buffer[ind++] = packet_id;
+						reply_func(send_buffer, ind);
+						//comm_can_send_buffer(255, data - 1, len + 1, 0);
+					}
+				}break;
 
 				case COMM_TERMINAL_CMD_SYNC:
 					data[len] = '\0';

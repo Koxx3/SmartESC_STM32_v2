@@ -123,7 +123,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     PA4     ------> ADC1_IN4
     PA5     ------> ADC1_IN5
     */
-    GPIO_InitStruct.Pin = M1_TEMPERATURE_Pin|M1_BUS_VOLTAGE_Pin|M1_CURR_AMPL_U_Pin|M1_CURR_AMPL_V_Pin
+    GPIO_InitStruct.Pin = MAIN_CURR_AMPL_Pin|M1_BUS_VOLTAGE_Pin|M1_CURR_AMPL_U_Pin|M1_CURR_AMPL_V_Pin
                           |M1_CURR_AMPL_W_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
@@ -197,7 +197,7 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
     PA4     ------> ADC1_IN4
     PA5     ------> ADC1_IN5
     */
-    HAL_GPIO_DeInit(GPIOA, M1_TEMPERATURE_Pin|M1_BUS_VOLTAGE_Pin|M1_CURR_AMPL_U_Pin|M1_CURR_AMPL_V_Pin
+    HAL_GPIO_DeInit(GPIOA, MAIN_CURR_AMPL_Pin|M1_BUS_VOLTAGE_Pin|M1_CURR_AMPL_U_Pin|M1_CURR_AMPL_V_Pin
                           |M1_CURR_AMPL_W_Pin);
 
     /* ADC1 DMA DeInit */
@@ -263,6 +263,16 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
   /* USER CODE END TIM1_MspInit 0 */
     /* Peripheral clock enable */
     __HAL_RCC_TIM1_CLK_ENABLE();
+
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+    /**TIM1 GPIO Configuration
+    PB12     ------> TIM1_BKIN
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_12;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
   /* USER CODE BEGIN TIM1_MspInit 1 */
 
   /* USER CODE END TIM1_MspInit 1 */
@@ -345,6 +355,19 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
   /* USER CODE END TIM1_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_TIM1_CLK_DISABLE();
+
+    /**TIM1 GPIO Configuration
+    PB12     ------> TIM1_BKIN
+    PB13     ------> TIM1_CH1N
+    PB14     ------> TIM1_CH2N
+    PB15     ------> TIM1_CH3N
+    PA8     ------> TIM1_CH1
+    PA9     ------> TIM1_CH2
+    PA10     ------> TIM1_CH3
+    */
+    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_12|M1_PWM_UL_Pin|M1_PWM_VL_Pin|M1_PWM_WL_Pin);
+
+    HAL_GPIO_DeInit(GPIOA, M1_PWM_UH_Pin|M1_PWM_VH_Pin|M1_PWM_WH_Pin);
 
     /* TIM1 interrupt DeInit */
     HAL_NVIC_DisableIRQ(TIM1_BRK_IRQn);

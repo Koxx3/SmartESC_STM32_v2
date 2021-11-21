@@ -24,8 +24,8 @@
 
 #define RSHUNT                        										 0.00200
 #define AMPLIFICATION_GAIN            										 9.4336
-#define NOMINAL_CURRENT         											 4766
-#define ID_DEMAG															 -4766
+#define NOMINAL_CURRENT         											 2000
+#define ID_DEMAG															 -2000
 
 #define POLE_PAIR_NUM                                                 	 	 (uint8_t)14
 #define HALL_PHASE_SHIFT        											 90
