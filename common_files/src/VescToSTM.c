@@ -12,6 +12,7 @@
 #include "utils.h"
 #include <string.h>
 #include "product.h"
+#include "current_sense.h"
 #include <math.h>
 
 static float tacho_scale;
@@ -233,7 +234,15 @@ float VescToSTM_get_phase_current(){
 }
 
 float VescToSTM_get_input_current(){
+#ifdef M365
 	return (float)pMPM[M1]->_super.hAvrgElMotorPowerW/(float)VBS_GetAvBusVoltage_V(pMCT[M1]->pBusVoltageSensor);
+#endif
+
+#ifdef G30P
+	//return (float)pMPM[M1]->_super.hAvrgElMotorPowerW/(float)VBS_GetAvBusVoltage_V(pMCT[M1]->pBusVoltageSensor);
+
+	return (float)CURR_GetCurrent(pMCT[M1]->pMainCurrentSensor);
+#endif
 }
 
 /**

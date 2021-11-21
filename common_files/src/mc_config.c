@@ -261,7 +261,7 @@ CURR_Handle_t CurrentSensorParams =
   {
     .regADC = ADC1,
     .channel = MC_ADC_CHANNEL_0,
-    .samplingTime = M1_TEMP_SAMPLING_TIME,
+    .samplingTime = 0,
   }
 };
 

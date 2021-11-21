@@ -241,6 +241,7 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
   MCT[M1].pSpeednTorqueCtrl = pSTC[M1];
   MCT[M1].pStateMachine = &STM[M1];
   MCT[M1].pTemperatureSensor = (NTC_Handle_t *) pTemperatureSensor[M1];
+  MCT[M1].pMainCurrentSensor = (CURR_Handle_t *) pMainCurrentSensor;
   MCT[M1].pBusVoltageSensor = &(pBusSensorM1->_Super);
   MCT[M1].pBrakeDigitalOutput = MC_NULL;   /* brake is defined, oBrakeM1*/
   MCT[M1].pNTCRelay = MC_NULL;             /* relay is defined, oRelayM1*/

@@ -17,9 +17,13 @@ typedef struct
 
   int16_t hAvCurrent;
 
-  float test;
-
   uint16_t hFaultState;        /**< Contains latest Fault code.**/
+
+  uint16_t *aBuffer;                /*!< Buffer used to compute average value.*/
+
+  uint8_t elem;                  /*!< Number of stored elements in the average buffer.*/
+
+  uint8_t index;                 /*!< Index of last stored element in the average buffer.*/
 
   uint8_t convHandle;            /*!< handle to the regular conversion */
 
@@ -28,6 +32,7 @@ typedef struct
 __weak void CURR_Init( CURR_Handle_t * pHandle );
 __weak void CURR_Clear( CURR_Handle_t * pHandle );
 __weak uint16_t CURR_CalcMainCurrent( CURR_Handle_t * pHandle );
+__weak float CURR_GetCurrent( CURR_Handle_t * pHandle );
 
 #ifdef __cplusplus
 }

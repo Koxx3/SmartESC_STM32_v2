@@ -1,8 +1,10 @@
 #include "current_sense.h"
 #include "product.h"
+#include "utils.h"
 
 uint16_t offset_curr = 0;
 
+__weak void CURR_Calc_Sample(CURR_Handle_t * pHandle );
 __weak uint16_t CURR_SetFaultState( CURR_Handle_t * pHandle );
 
 
@@ -13,7 +15,7 @@ __weak void CURR_Init( CURR_Handle_t * pHandle )
   {
     /* Need to be register with RegularConvManager */
     pHandle->convHandle = RCM_RegisterRegConv(&pHandle->CurrRegConv);
-    CURR_Calc_Sample(pHandle);
+    //CURR_Calc_Sample(pHandle);
   }
   else  /* case VIRTUAL_SENSOR */
   {
@@ -34,21 +36,35 @@ __weak void CURR_Calc_Sample(CURR_Handle_t * pHandle ){
 
 __weak uint16_t CURR_CalcMainCurrent( CURR_Handle_t * pHandle )
 {
-  uint16_t wtemp;
-  int16_t hAux;
+  uint32_t wtemp;
+  uint16_t hAux;
+  uint8_t i;
+
 
   if ( pHandle->bSensorType == REAL_SENSOR )
   {
     hAux = RCM_ExecRegularConv(pHandle->convHandle);
     if ( hAux != 0xFFFFu )
     {
-      //wtemp =  ( uint32_t )( pHandle->hLowPassFilterBW ) - 1u;
-      //wtemp *= ( uint32_t ) ( pHandle->hAvTemp_d );
-      //wtemp += hAux;
-      //wtemp /= ( uint32_t )( pHandle->hLowPassFilterBW );
-    	pHandle->test = (hAux - offset_curr) / CURRENT_FACTOR_A;
+		commands_printf("SINGLE_PRESS %d", hAux);
 
-      pHandle->hAvCurrent = ( int16_t ) hAux;
+    	pHandle->aBuffer[pHandle->index] = hAux;
+		wtemp = 0;
+		for ( i = 0; i < 10u; i++ )
+		{
+		  wtemp += pHandle->aBuffer[i];
+		}
+		wtemp /= 10u;
+		pHandle->hAvCurrent = ( uint16_t )wtemp;
+
+		if ( pHandle->index < 10u - 1 )
+		{
+		  pHandle->index++;
+		}
+		else
+		{
+		  pHandle->index = 0;
+		}
     }
 
     pHandle->hFaultState = CURR_SetFaultState( pHandle );
@@ -66,6 +82,24 @@ __weak uint16_t CURR_SetFaultState( CURR_Handle_t * pHandle )
   uint16_t hFault;
     hFault = MC_NO_ERROR;
   return hFault;
+}
+
+__weak float CURR_GetCurrent( CURR_Handle_t * pHandle )
+{
+  float temp;
+
+  if ( pHandle->bSensorType == REAL_SENSOR )
+  {
+
+	temp = pHandle->hAvCurrent;
+	temp /= 275275;
+
+	return temp;
+  } else {
+	  temp = 0;
+  }
+
+  return temp;
 }
 
 __weak uint16_t CURR_CheckCurrent( CURR_Handle_t * pHandle )
