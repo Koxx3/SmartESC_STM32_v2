@@ -202,12 +202,46 @@ mc_configuration* mc_interface_get_configuration(void){
 	return &mc_conf;
 }
 
+void conf_general_update_erpm(mc_configuration *mcconf){
+	//Needs Update of Hall params
+//	uint16_t max_app_speed;
+//	if(mcconf->lo_max_erpm >= abs(mcconf->lo_min_erpm)){
+//		max_app_speed = VescToSTM_erpm_to_speed(mcconf->lo_max_erpm * 1.5, mcconf->si_motor_poles);
+//	}else{
+//		max_app_speed = VescToSTM_erpm_to_speed(abs(mcconf->lo_min_erpm * 1.5), mcconf->si_motor_poles);
+//	}
+//	HALL_M1._Super.hMaxReliableMecSpeedUnit     = max_app_speed;
+//	SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit = VescToSTM_erpm_to_speed(mcconf->l_max_erpm * 1.15, mcconf->si_motor_poles);
+//	SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit = VescToSTM_erpm_to_speed(mcconf->l_min_erpm * 1.15, mcconf->si_motor_poles);
+}
+
+void conf_general_update_current(mc_configuration *mcconf){
+	//Also something broken
+//	float current_max = mcconf->lo_current_max * CURRENT_FACTOR_A;
+//	float current_min = mcconf->lo_current_min * CURRENT_FACTOR_A;
+//	PIDSpeedHandle_M1.wUpperIntegralLimit = current_max * SP_KIDIV;
+//	PIDSpeedHandle_M1.wLowerIntegralLimit = current_min * SP_KIDIV;
+//	PIDSpeedHandle_M1.hUpperOutputLimit   = current_max;
+//	PIDSpeedHandle_M1.hLowerOutputLimit   = current_min;
+//	FW_M1.wNominalSqCurr 				  = current_max * current_max;
+//	FW_M1.hDemagCurrent					  = -(current_max*mcconf->foc_d_gain_scale_max_mod);
+//	SpeednTorqCtrlM1.MaxPositiveTorque			= current_max;
+//	SpeednTorqCtrlM1.MinNegativeTorque 			= current_min;
+}
+
 
 
 void conf_general_setup_mc(mc_configuration *mcconf) {
-	float current_max = mcconf->l_current_max * CURRENT_FACTOR_A;
-	float current_min = mcconf->l_current_min * CURRENT_FACTOR_A;
+	float current_max = mcconf->l_current_max * CURRENT_FACTOR_A * mcconf->l_current_min_scale;
+	float current_min = mcconf->l_current_min * CURRENT_FACTOR_A * mcconf->l_current_max_scale;
 	uint16_t max_app_speed;
+
+	mcconf->lo_max_erpm = mcconf->l_max_erpm;
+	mcconf->lo_min_erpm = mcconf->l_min_erpm;
+
+	mcconf->lo_current_min = mcconf->l_current_min;
+	mcconf->lo_current_max = mcconf->l_current_max;
+
 	if(mcconf->l_max_erpm >= abs(mcconf->l_min_erpm)){
 		max_app_speed = VescToSTM_erpm_to_speed(mcconf->l_max_erpm * 1.5, mcconf->si_motor_poles);
 	}else{
@@ -263,6 +297,11 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 
 	//RealBusVoltageSensorParamsM1.UnderVoltageThreshold = mcconf->l_min_vin * BATTERY_VOLTAGE_GAIN;
 	//RealBusVoltageSensorParamsM1.OverVoltageThreshold = mcconf->l_max_vin * BATTERY_VOLTAGE_GAIN;
+
+
+	//save fixed_point vars;
+	mcconf->si_wheel_diameter_s16q16 = float_to_s16q16(mcconf->si_wheel_diameter);
+	mcconf->si_gear_ratio_s16_q16 = float_to_s16q16(mcconf->si_wheel_diameter);
 
 
 	// BLDC switching and drive

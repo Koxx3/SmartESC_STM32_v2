@@ -25,10 +25,16 @@
 
 #define ADC_GAIN (float)(3.3 / 4095.0)
 
+#define float_to_s16q16(x) ( x * 65536.0)
+#define s16q16_to_float(x) ((float)x / 65536.0)
+#define PI_s16q16 (M_PI*65536.0)
+
 extern MCT_Handle_t* pMCT[NBR_OF_MOTORS];
 extern MCI_Handle_t* pMCI[NBR_OF_MOTORS];
 extern PQD_MotorPowMeas_Handle_t *pMPM[NBR_OF_MOTORS];
 extern SpeednTorqCtrl_Handle_t *pSTC[NBR_OF_MOTORS];
+
+
 
 
 
