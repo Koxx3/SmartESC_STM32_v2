@@ -596,7 +596,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						buffer_append_float32(send_buffer, VescToSTM_get_erpm(), 1e0, &ind);
 					}
 					if (mask & ((uint32_t)1 << 6)) {
-						buffer_append_float32(send_buffer, VescToSTM_get_odometer(), 1e3, &ind);
+						buffer_append_float32(send_buffer, VescToSTM_get_speed(), 1e3, &ind);
 					}
 					if (mask & ((uint32_t)1 << 7)) {
 						buffer_append_float16(send_buffer, VescToSTM_get_bus_voltage(), 1e1, &ind);
@@ -665,43 +665,47 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 					float controller_num = 1.0;
 
-					mcconf->l_current_min_scale = buffer_get_float32_auto(data, &ind);
-					mcconf->l_current_max_scale = buffer_get_float32_auto(data, &ind);
+					float l_current_min_scale = buffer_get_float32_auto(data, &ind);
+					float l_current_max_scale = buffer_get_float32_auto(data, &ind);
 
 					if (packet_id == COMM_SET_MCCONF_TEMP_SETUP) {
 						const float fact = ((mcconf->si_motor_poles / 2.0) * 60.0 *
 								mcconf->si_gear_ratio) / (mcconf->si_wheel_diameter * M_PI);
 
-						mcconf->l_min_erpm = buffer_get_float32_auto(data, &ind) * fact;
-						mcconf->l_max_erpm = buffer_get_float32_auto(data, &ind) * fact;
+						mcconf->lo_min_erpm = buffer_get_float32_auto(data, &ind) * fact;
+						mcconf->lo_max_erpm = buffer_get_float32_auto(data, &ind) * fact;
 
 						// Write computed RPM back and change forwarded packet id to
 						// COMM_SET_MCCONF_TEMP. This way only the master has to be
 						// aware of the setup information.
 						ind -= 8;
-						buffer_append_float32_auto(data, mcconf->l_min_erpm, &ind);
-						buffer_append_float32_auto(data, mcconf->l_max_erpm, &ind);
+						buffer_append_float32_auto(data, mcconf->lo_min_erpm, &ind);
+						buffer_append_float32_auto(data, mcconf->lo_max_erpm, &ind);
 					} else {
-						mcconf->l_min_erpm = buffer_get_float32_auto(data, &ind);
-						mcconf->l_max_erpm = buffer_get_float32_auto(data, &ind);
+						mcconf->lo_min_erpm = buffer_get_float32_auto(data, &ind);
+						mcconf->lo_max_erpm = buffer_get_float32_auto(data, &ind);
 					}
 
-					mcconf->l_min_duty = buffer_get_float32_auto(data, &ind);
-					mcconf->l_max_duty = buffer_get_float32_auto(data, &ind);
-					mcconf->l_watt_min = buffer_get_float32_auto(data, &ind) / controller_num;
-					mcconf->l_watt_max = buffer_get_float32_auto(data, &ind) / controller_num;
+					conf_general_update_erpm(mcconf);
+
+					float l_min_duty = buffer_get_float32_auto(data, &ind);
+					float l_max_duty = buffer_get_float32_auto(data, &ind);
+					float l_watt_min = buffer_get_float32_auto(data, &ind) / controller_num;
+					float l_watt_max = buffer_get_float32_auto(data, &ind) / controller_num;
 
 					// Write divided data back to the buffer, as the other controllers have no way to tell
 					// how many controllers are on the bus and thus need pre-divided data.
 					// We set divide by controllers to false before forwarding.
 					ind -= 8;
-					buffer_append_float32_auto(data, mcconf->l_watt_min, &ind);
-					buffer_append_float32_auto(data, mcconf->l_watt_max, &ind);
+					buffer_append_float32_auto(data, l_watt_min, &ind);
+					buffer_append_float32_auto(data, l_watt_max, &ind);
 
+					float l_in_current_min;
+					float l_in_current_max;
 					// Battery limits can be set optionally in a backwards-compatible way.
 					if ((int32_t)len >= (ind + 8)) {
-						mcconf->l_in_current_min = buffer_get_float32_auto(data, &ind);
-						mcconf->l_in_current_max = buffer_get_float32_auto(data, &ind);
+						l_in_current_min = buffer_get_float32_auto(data, &ind);
+						l_in_current_max = buffer_get_float32_auto(data, &ind);
 					}
 
 					mcconf->lo_current_min = mcconf->l_current_min * mcconf->l_current_min_scale;
@@ -713,7 +717,8 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 					//VescToSTM_set_erpm_limits(mcconf);
 
-					//commands_apply_mcconf_hw_limits(mcconf);
+					conf_general_update_erpm(mcconf);
+					conf_general_update_current(mcconf);
 
 					//if (store) {
 					//	conf_general_store_mc_configuration(mcconf, mc_interface_get_motor_thread() == 2);
