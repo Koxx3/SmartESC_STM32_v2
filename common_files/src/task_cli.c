@@ -72,14 +72,10 @@ void process_packet(unsigned char *data, unsigned int len){
 
 void task_cli(void * argument)
 {
+	uint32_t rd_ptr=0;
+
 	HAL_UART_Receive_DMA(&VESC_USART_DMA, usart_rx_dma_buffer, sizeof(usart_rx_dma_buffer));
 	CLEAR_BIT(VESC_USART_DMA.Instance->CR3, USART_CR3_EIE);
-
-	uint32_t rd_ptr=0;
-	MCI_StartMotor( pMCI[M1] );
-
-	vTaskDelay(MS_TO_TICKS(100));
-	VescToSTM_set_brake(0);
 
 	packet_init(putbuffer, process_packet, UART_HANDLE);
 

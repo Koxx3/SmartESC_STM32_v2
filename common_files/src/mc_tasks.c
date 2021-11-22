@@ -789,7 +789,7 @@ __weak void TSK_SafetyTask(void)
   *         \link Motors_reference_number here \endlink
   * @retval None
   */
-uint8_t last_pwm_state=true;
+uint8_t last_pwm_state=false;
 
 __weak void TSK_SafetyTask_PWMOFF(uint8_t bMotor)
 {
@@ -809,11 +809,16 @@ __weak void TSK_SafetyTask_PWMOFF(uint8_t bMotor)
 	  uint16_t voltage_fault = RVBS_CalcAvVbus(pBusSensorM1);
 	  if(voltage_fault==MC_UNDER_VOLT){
 		  CodeReturn |=  errMask[bMotor] & voltage_fault;
+
+		  MCI_StopMotor( &Mci[M1] );
+		  last_pwm_state = false;
 	  }else if (voltage_fault==MC_OVER_VOLT){
+		  CodeReturn |=  errMask[bMotor] & voltage_fault;
+
 		  MCI_StopMotor( &Mci[M1] );
 		  last_pwm_state = false;
 	  }else if (last_pwm_state==false){
-		  if(MCT[M1].pBusVoltageSensor->LatestConv < (pBusSensorM1->OverVoltageThreshold-(1*(65535/ADC_REFERENCE_VOLTAGE*VBUS_PARTITIONING_FACTOR)))){
+		  if(CodeReturn == MC_NO_ERROR){
 			  MCI_StartMotor( &Mci[M1] );
 			  last_pwm_state=true;
 		  }

@@ -7,15 +7,21 @@ uint16_t offset_curr = 0;
 __weak void CURR_Calc_Sample(CURR_Handle_t * pHandle );
 __weak uint16_t CURR_SetFaultState( CURR_Handle_t * pHandle );
 
-
-__weak void CURR_Init( CURR_Handle_t * pHandle )
-{
+__weak void CURR_Init( CURR_Handle_t * pHandle ){
+  uint16_t hAux;
 
   if ( pHandle->bSensorType == REAL_SENSOR )
   {
     /* Need to be register with RegularConvManager */
     pHandle->convHandle = RCM_RegisterRegConv(&pHandle->CurrRegConv);
-    //CURR_Calc_Sample(pHandle);
+
+    for ( pHandle->PolarizationCounter = 0; pHandle->PolarizationCounter < 100u; ) {
+    	  hAux = RCM_ExecRegularConv(pHandle->convHandle);
+    	  if(hAux > 0 && hAux != 0xFFFFu){
+    		  pHandle->CurrentOffset = (hAux + pHandle->CurrentOffset) / 2;
+    		  pHandle->PolarizationCounter++;
+    	  }
+      }
   }
   else  /* case VIRTUAL_SENSOR */
   {
@@ -24,46 +30,22 @@ __weak void CURR_Init( CURR_Handle_t * pHandle )
 
 }
 
-
-__weak void CURR_Calc_Sample(CURR_Handle_t * pHandle ){
-	int i;
-	for (i = 1; i < 1000; ++i) {
-		int16_t hAux = RCM_ExecRegularConv(pHandle->convHandle);
-		offset_curr = (hAux + offset_curr) / 2;
-	}
-}
-
-
-__weak uint16_t CURR_CalcMainCurrent( CURR_Handle_t * pHandle )
-{
-  uint32_t wtemp;
+__weak uint16_t CURR_CalcMainCurrent( CURR_Handle_t * pHandle ){
   uint16_t hAux;
-  uint8_t i;
-
+  int32_t wtemp;
 
   if ( pHandle->bSensorType == REAL_SENSOR )
   {
-    hAux = RCM_ExecRegularConv(pHandle->convHandle);
-    if ( hAux != 0xFFFFu )
-    {
-    	pHandle->aBuffer[pHandle->index] = hAux;
-		wtemp = 0;
-		for ( i = 0; i < 10u; i++ )
-		{
-		  wtemp += pHandle->aBuffer[i];
-		}
-		wtemp /= 10u;
-		pHandle->hAvCurrent = ( uint16_t )wtemp;
+	  hAux = RCM_ExecRegularConv(pHandle->convHandle);
+	  if ( hAux != 0xFFFFu )
+	  {
+		wtemp =  ( uint32_t )( 250u ) - 1u;
+		wtemp *= ( uint32_t ) ( pHandle->hAvCurrent );
+		wtemp += hAux;
+		wtemp /= ( uint32_t )( 250u );
 
-		if ( pHandle->index < 10u - 1 )
-		{
-		  pHandle->index++;
-		}
-		else
-		{
-		  pHandle->index = 0;
-		}
-    }
+		pHandle->hAvCurrent = ( uint16_t ) wtemp;
+	  }
 
     pHandle->hFaultState = CURR_SetFaultState( pHandle );
   }
@@ -75,29 +57,31 @@ __weak uint16_t CURR_CalcMainCurrent( CURR_Handle_t * pHandle )
   return ( pHandle->hFaultState );
 }
 
-__weak uint16_t CURR_SetFaultState( CURR_Handle_t * pHandle )
-{
+__weak uint16_t CURR_SetFaultState( CURR_Handle_t * pHandle ){
   uint16_t hFault;
     hFault = MC_NO_ERROR;
   return hFault;
 }
 
-__weak float CURR_GetCurrent( CURR_Handle_t * pHandle )
-{
-  float temp;
+__weak float CURR_GetCurrent( CURR_Handle_t * pHandle ){
+  float wTemp;
 
   if ( pHandle->bSensorType == REAL_SENSOR )
   {
+	//temp = pHandle->hAvCurrent - (pHandle->CurrentOffset+ 20);
+	//temp /= CURRENT_FACTOR_A;
+	//temp += 0.000000000001;
 
-	temp = pHandle->hAvCurrent;
-	temp /= 275275;
+	  wTemp = ( int32_t )( pHandle->hAvCurrent );
+	  wTemp -= ( int32_t )(uint16_t)(V0_V *65536/ ADC_REFERENCE_VOLTAGE);
+	  wTemp *= (uint16_t)(ADC_REFERENCE_VOLTAGE/0.018);
+	  wTemp = wTemp / 65536 + 4.2;
 
-	return temp;
   } else {
-	  temp = 0;
+	  wTemp = 0;
   }
 
-  return temp;
+  return wTemp;
 }
 
 __weak uint16_t CURR_CheckCurrent( CURR_Handle_t * pHandle )

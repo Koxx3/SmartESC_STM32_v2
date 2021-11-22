@@ -14,6 +14,7 @@
 #define VOLTAGE_DIVIDER_GAIN     											 (float)3363.5
 
 #define VESC_USART                                                 			 USART1
+
 #define VESC_USART_DMA													     huart1
 #define VESC_USART_TX_DMA													 hdma_usart1_tx
 #define VESC_USART_RX_DMA													 hdma_usart1_rx
@@ -21,6 +22,10 @@
 #define APP_USART_DMA														 huart2
 #define APP_USART_TX_DMA												     hdma_usart2_tx
 #define APP_USART_RX_DMA													 hdma_usart2_rx
+
+#define APP2_USART_DMA														 huart3
+#define APP2_USART_TX_DMA												     hdma_usart3_tx
+#define APP2_USART_RX_DMA													 hdma_usart3_rx
 
 #define RSHUNT                        										 0.00200
 #define AMPLIFICATION_GAIN            										 9.4336
@@ -49,6 +54,10 @@
 #define APP_USART_DMA														 huart1
 #define APP_USART_TX_DMA												     hdma_usart1_tx
 #define APP_USART_RX_DMA													 hdma_usart1_rx
+
+#define APP2_USART_DMA														 huart2
+#define APP2_USART_TX_DMA												     hdma_usart2_tx
+#define APP2_USART_RX_DMA													 hdma_usart2_rx
 
 //Current Measurement
 #define RSHUNT                        										 0.00200

@@ -239,9 +239,8 @@ float VescToSTM_get_input_current(){
 #endif
 
 #ifdef G30P
-	//return (float)pMPM[M1]->_super.hAvrgElMotorPowerW/(float)VBS_GetAvBusVoltage_V(pMCT[M1]->pBusVoltageSensor);
-
-	return (float)CURR_GetCurrent(pMCT[M1]->pMainCurrentSensor);
+	return (float)pMPM[M1]->_super.hAvrgElMotorPowerW/(float)VBS_GetAvBusVoltage_V(pMCT[M1]->pBusVoltageSensor);
+	//return (float)CURR_GetCurrent(pMCT[M1]->pMainCurrentSensor);// NOT WORKING :(
 #endif
 }
 

@@ -25,6 +25,10 @@ typedef struct
 
   uint8_t index;                 /*!< Index of last stored element in the average buffer.*/
 
+  uint16_t CurrentOffset;
+
+  uint16_t PolarizationCounter;
+
   uint8_t convHandle;            /*!< handle to the regular conversion */
 
 } CURR_Handle_t;
