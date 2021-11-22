@@ -79,6 +79,8 @@ void task_cli(void * argument)
 
 	packet_init(putbuffer, process_packet, UART_HANDLE);
 
+	VescToSTM_set_brake_rel_int(0);
+
   /* Infinite loop */
 	for(;;)
 	{

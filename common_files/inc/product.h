@@ -55,10 +55,6 @@
 #define APP_USART_TX_DMA												     hdma_usart1_tx
 #define APP_USART_RX_DMA													 hdma_usart1_rx
 
-#define APP2_USART_DMA														 huart2
-#define APP2_USART_TX_DMA												     hdma_usart2_tx
-#define APP2_USART_RX_DMA													 hdma_usart2_rx
-
 //Current Measurement
 #define RSHUNT                        										 0.00200
 #define AMPLIFICATION_GAIN            										 8.00

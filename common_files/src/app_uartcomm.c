@@ -57,6 +57,7 @@ void my_uart_send_data(uint8_t *tdata, uint16_t tnum){
 	}
 }
 
+#ifdef G30P
 void my_uart2_send_data(uint8_t *tdata, uint16_t tnum){
 	//send data
 	while( HAL_UART_Transmit_DMA(&APP2_USART_DMA, tdata, tnum) != HAL_OK ) osDelay(1);
@@ -67,17 +68,22 @@ void my_uart2_send_data(uint8_t *tdata, uint16_t tnum){
 		osDelay(1);
 	}
 }
+#endif
 
 void task_app(void * argument)
 {
 	HAL_UART_Receive_DMA(&APP_USART_DMA, usart_rx_dma_buffer, sizeof(usart_rx_dma_buffer));
 	CLEAR_BIT(APP_USART_DMA.Instance->CR3, USART_CR3_EIE);
 
+#ifdef G30P
 	HAL_UART_Receive_DMA(&APP2_USART_DMA, usart2_rx_dma_buffer, sizeof(usart2_rx_dma_buffer));
 	CLEAR_BIT(APP2_USART_DMA.Instance->CR3, USART_CR3_EIE);
+#endif
 
 	uint32_t rd_ptr=0;
+#ifdef G30P
 	uint32_t rd2_ptr=0;
+#endif
 
   /* Infinite loop */
 	for(;;)
@@ -87,10 +93,12 @@ void task_app(void * argument)
 			rd_ptr &= (CIRC_BUF_SZ - 1);
 		}
 
+#ifdef G30P
 		while(rd2_ptr != DMA_WRITE_PTR(APP2_USART_DMA)) {
 			rd2_ptr++;
 			rd2_ptr &= (CIRC_BUF_SZ - 1);
 		}
+#endif
 
 		osDelay(10);
 	}

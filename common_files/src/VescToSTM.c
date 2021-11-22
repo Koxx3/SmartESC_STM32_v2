@@ -102,7 +102,9 @@ void VescToSTM_handle_timeout(){
 		VescToSTM_timeout_reset();
 	}
 	if((xTaskGetTickCount() - last_reset) > 2000){
-		//VescToSTM_set_brake(0);
+		//float test;
+		//commands_printf("deb: %f", VescToSTM_get_speed());
+		last_reset = xTaskGetTickCount();
 	}
 };
 void VescToSTM_enable_timeout(bool enbale){
@@ -402,8 +404,8 @@ uint32_t VescToSTM_get_odometer(void) {
  * Speed, in m/s
  */
 float VescToSTM_get_speed(void) {
-	int32_t temp = (((MCI_GetAvrgMecSpeedUnit(pMCI[M1])<<16) / 10) * mc_conf.si_wheel_diameter_s16q16 * PI_s16q16) / mc_conf.si_gear_ratio_s16_q16;
-	return s16q16_to_float(temp);
+	float temp = (((float)MCI_GetAvrgMecSpeedUnit(pMCI[M1]) / 10.0) * mc_conf.si_wheel_diameter * M_PI) / mc_conf.si_gear_ratio;
+	return temp;
 }
 
 /**

@@ -27,7 +27,7 @@
 
 #define float_to_s16q16(x) ( x * 65536.0)
 #define s16q16_to_float(x) ((float)x / 65536.0)
-#define PI_s16q16 (M_PI*65536.0)
+#define PI_s16q16 ((int32_t)(M_PI*65536.0))
 
 extern MCT_Handle_t* pMCT[NBR_OF_MOTORS];
 extern MCI_Handle_t* pMCI[NBR_OF_MOTORS];
