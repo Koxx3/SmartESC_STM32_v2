@@ -462,6 +462,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/motorcontrol.c</locationURI>
 		</link>
 		<link>
+			<name>Application/User/BLDC/mtpa.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/mtpa.c</locationURI>
+		</link>
+		<link>
 			<name>Application/User/BLDC/music.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/music.c</locationURI>
