@@ -667,13 +667,19 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 					float l_current_min_scale = buffer_get_float32_auto(data, &ind);
 					float l_current_max_scale = buffer_get_float32_auto(data, &ind);
-
+					float min_erpm;
+					float max_erpm;
+					bool changed=false;
 					if (packet_id == COMM_SET_MCCONF_TEMP_SETUP) {
 						const float fact = ((mcconf->si_motor_poles / 2.0) * 60.0 *
 								mcconf->si_gear_ratio) / (mcconf->si_wheel_diameter * M_PI);
 
-						mcconf->lo_min_erpm = buffer_get_float32_auto(data, &ind) * fact;
-						mcconf->lo_max_erpm = buffer_get_float32_auto(data, &ind) * fact;
+						min_erpm = buffer_get_float32_auto(data, &ind) * fact;
+						max_erpm = buffer_get_float32_auto(data, &ind) * fact;
+						if(min_erpm != mcconf->lo_min_erpm) changed = true;
+						if(max_erpm != mcconf->lo_max_erpm) changed = true;
+						mcconf->lo_min_erpm = min_erpm;
+						mcconf->lo_max_erpm = max_erpm;
 
 						// Write computed RPM back and change forwarded packet id to
 						// COMM_SET_MCCONF_TEMP. This way only the master has to be
@@ -682,11 +688,19 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						buffer_append_float32_auto(data, mcconf->lo_min_erpm, &ind);
 						buffer_append_float32_auto(data, mcconf->lo_max_erpm, &ind);
 					} else {
-						mcconf->lo_min_erpm = buffer_get_float32_auto(data, &ind);
-						mcconf->lo_max_erpm = buffer_get_float32_auto(data, &ind);
+						min_erpm = buffer_get_float32_auto(data, &ind);
+						max_erpm = buffer_get_float32_auto(data, &ind);
+						if(min_erpm != mcconf->lo_min_erpm) changed = true;
+						if(max_erpm != mcconf->lo_max_erpm) changed = true;
+						mcconf->lo_min_erpm = min_erpm;
+						mcconf->lo_max_erpm = max_erpm;
 					}
 
-					conf_general_update_erpm(mcconf);
+					if(mcconf->lo_max_erpm > mcconf->l_max_erpm) mcconf->lo_max_erpm = mcconf->l_max_erpm;
+					if(mcconf->lo_min_erpm < mcconf->l_min_erpm) mcconf->lo_min_erpm = mcconf->l_min_erpm;
+					if(changed==true){
+						VescToStm_nunchuk_update_erpm();
+					}
 
 					float l_min_duty = buffer_get_float32_auto(data, &ind);
 					float l_max_duty = buffer_get_float32_auto(data, &ind);
@@ -717,7 +731,6 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 					//VescToSTM_set_erpm_limits(mcconf);
 
-					conf_general_update_erpm(mcconf);
 					conf_general_update_current(mcconf);
 
 					//if (store) {

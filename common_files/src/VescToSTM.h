@@ -6,7 +6,18 @@
 #include <stdint.h>
 #include "VescDatatypes.h"
 
+typedef enum {
+   STM_STATE_IDLE = 0,
+   STM_STATE_SPEED,
+   STM_STATE_TORQUE,
+   STM_STATE_BRAKE,
+   STM_STATE_HANDBRAKE,
+   STM_STATE_OPENLOOP,
+   STM_STATE_NUNCHUCK
+} stm_state;
+
 void VescToStm_nunchuk_update_output(chuck_data * chuck_d);
+void VescToStm_nunchuk_update_erpm();
 void VescToSTM_set_torque(int32_t current);
 void VescToSTM_set_brake(int32_t current);
 void VescToSTM_set_brake_rel_int(int32_t val);

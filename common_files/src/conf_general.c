@@ -202,18 +202,6 @@ mc_configuration* mc_interface_get_configuration(void){
 	return &mc_conf;
 }
 
-void conf_general_update_erpm(mc_configuration *mcconf){
-	//Needs Update of Hall params
-//	uint16_t max_app_speed;
-//	if(mcconf->lo_max_erpm >= abs(mcconf->lo_min_erpm)){
-//		max_app_speed = VescToSTM_erpm_to_speed(mcconf->lo_max_erpm * 1.5, mcconf->si_motor_poles);
-//	}else{
-//		max_app_speed = VescToSTM_erpm_to_speed(abs(mcconf->lo_min_erpm * 1.5), mcconf->si_motor_poles);
-//	}
-//	HALL_M1._Super.hMaxReliableMecSpeedUnit     = max_app_speed;
-//	SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit = VescToSTM_erpm_to_speed(mcconf->l_max_erpm * 1.15, mcconf->si_motor_poles);
-//	SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit = VescToSTM_erpm_to_speed(mcconf->l_min_erpm * 1.15, mcconf->si_motor_poles);
-}
 
 void conf_general_update_current(mc_configuration *mcconf){
 	//Also something broken
