@@ -429,7 +429,7 @@
 		<link>
 			<name>Application/User/BLDC/max_torque_per_ampere.c</name>
 			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/mtpa.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/max_torque_per_ampere.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/BLDC/max_torque_per_ampere.h</name>
