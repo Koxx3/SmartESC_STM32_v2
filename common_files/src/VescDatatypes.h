@@ -308,6 +308,8 @@ typedef struct {
 	float lo_in_current_min;
 	float lo_current_motor_max_now;
 	float lo_current_motor_min_now;
+	float lo_min_erpm;
+	float lo_max_erpm;
 
 	// BLDC switching and drive
 	mc_pwm_mode pwm_mode;
@@ -427,7 +429,9 @@ typedef struct {
 	// Setup info
 	uint8_t si_motor_poles;
 	float si_gear_ratio;
+	int32_t si_gear_ratio_s16_q16;
 	float si_wheel_diameter;
+	int32_t si_wheel_diameter_s16q16;
 	BATTERY_TYPE si_battery_type;
 	int si_battery_cells;
 	float si_battery_ah;

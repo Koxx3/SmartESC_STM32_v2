@@ -34,7 +34,7 @@
 #define MAX_APPLICATION_SPEED_RPM       2500 /*!< rpm, mechanical */
 #define MIN_APPLICATION_SPEED_RPM       0 /*!< rpm, mechanical,
                                                            absolute value */
-#define MEAS_ERRORS_BEFORE_FAULTS       3 /*!< Number of speed
+#define MEAS_ERRORS_BEFORE_FAULTS       20 /*!< Number of speed
                                                              measurement errors before
                                                              main sensor goes in fault */
 /****** Hall sensors ************/
@@ -147,6 +147,25 @@
 #define ADC_SAMPLING_CYCLES (1 + SAMPLING_CYCLE_CORRECTION)
 
 /******************************   ADDITIONAL FEATURES   **********************/
+#define FW_VOLTAGE_REF                985 /*!<Vs reference, tenth
+                                                        of a percent */
+#define FW_KP_GAIN                    3000 /*!< Default Kp gain */
+#define FW_KI_GAIN                    5000 /*!< Default Ki gain */
+#define FW_KPDIV                      32768
+                                                /*!< Kp gain divisor.If FULL_MISRA_C_COMPLIANCY
+                                                is not defined the divisor is implemented through
+                                                algebrical right shifts to speed up PIs execution.
+                                                Only in this case this parameter specifies the
+                                                number of right shifts to be executed */
+#define FW_KIDIV                      32768
+                                                /*!< Ki gain divisor.If FULL_MISRA_C_COMPLIANCY
+                                                is not defined the divisor is implemented through
+                                                algebrical right shifts to speed up PIs execution.
+                                                Only in this case this parameter specifies the
+                                                number of right shifts to be executed */
+#define FW_KPDIV_LOG                  LOG2(32768)
+#define FW_KIDIV_LOG                  LOG2(32768)
+
 
 /*  Maximum Torque Per Ampere strategy parameters */
 

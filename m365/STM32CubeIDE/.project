@@ -152,9 +152,19 @@
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/virtual_speed_sensor.c</locationURI>
 		</link>
 		<link>
+			<name>Application/User/current_sense.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/current_sense.c</locationURI>
+		</link>
+		<link>
 			<name>Application/User/defines.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/defines.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/flux_weakening_ctrl.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/flux_weakening_ctrl.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/freertos.c</name>
@@ -170,6 +180,16 @@
 			<name>Application/User/main.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Inc/main.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/music.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/music.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/music.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/music.h</locationURI>
 		</link>
 		<link>
 			<name>Application/User/parameters_conversion.h</name>

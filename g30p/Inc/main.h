@@ -71,8 +71,14 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define PWR_BTN_Pin GPIO_PIN_14
 #define PWR_BTN_GPIO_Port GPIOC
-#define M1_TEMPERATURE_Pin GPIO_PIN_0
-#define M1_TEMPERATURE_GPIO_Port GPIOA
+#define UNUSED4_Pin GPIO_PIN_15
+#define UNUSED4_GPIO_Port GPIOC
+#define UNUSED3_Pin GPIO_PIN_0
+#define UNUSED3_GPIO_Port GPIOD
+#define UNUSED2_Pin GPIO_PIN_1
+#define UNUSED2_GPIO_Port GPIOD
+#define MAIN_CURR_AMPL_Pin GPIO_PIN_0
+#define MAIN_CURR_AMPL_GPIO_Port GPIOA
 #define M1_BUS_VOLTAGE_Pin GPIO_PIN_1
 #define M1_BUS_VOLTAGE_GPIO_Port GPIOA
 #define UART2_RXTX_Pin GPIO_PIN_2
@@ -103,6 +109,8 @@ void Error_Handler(void);
 #define M1_PWM_WH_GPIO_Port GPIOA
 #define TPS_ENA_Pin GPIO_PIN_11
 #define TPS_ENA_GPIO_Port GPIOA
+#define UNUSED1_Pin GPIO_PIN_12
+#define UNUSED1_GPIO_Port GPIOA
 #define LED_Pin GPIO_PIN_15
 #define LED_GPIO_Port GPIOA
 #define M1_HALL_H1_Pin GPIO_PIN_4
@@ -113,6 +121,8 @@ void Error_Handler(void);
 #define UART1_TX_GPIO_Port GPIOB
 #define UART1_RX_Pin GPIO_PIN_7
 #define UART1_RX_GPIO_Port GPIOB
+#define REAR_LED_Pin GPIO_PIN_9
+#define REAR_LED_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

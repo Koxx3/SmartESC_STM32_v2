@@ -105,6 +105,39 @@ PID_Handle_t PIDIdHandle_M1 =
 };
 
 /**
+  * @brief  FluxWeakeningCtrl component parameters Motor 1
+  */
+FW_Handle_t FW_M1 =
+{
+  .hMaxModule             = MAX_MODULE,
+  .hDefaultFW_V_Ref       = (int16_t)FW_VOLTAGE_REF,
+  .hDemagCurrent          = ID_DEMAG,
+  .wNominalSqCurr         = ((int32_t)NOMINAL_CURRENT*(int32_t)NOMINAL_CURRENT),
+  .hVqdLowPassFilterBW    = M1_VQD_SW_FILTER_BW_FACTOR,
+  .hVqdLowPassFilterBWLOG = M1_VQD_SW_FILTER_BW_FACTOR_LOG
+};
+
+/**
+  * @brief  PI Flux Weakening control parameters Motor 1
+  */
+PID_Handle_t PIDFluxWeakeningHandle_M1 =
+{
+  .hDefKpGain          = (int16_t)FW_KP_GAIN,
+  .hDefKiGain          = (int16_t)FW_KI_GAIN,
+  .wUpperIntegralLimit = 0,
+  .wLowerIntegralLimit = (int32_t)(-NOMINAL_CURRENT) * (int32_t)FW_KIDIV,
+  .hUpperOutputLimit       = 0,
+  .hLowerOutputLimit       = -INT16_MAX,
+  .hKpDivisor          = (uint16_t)FW_KPDIV,
+  .hKiDivisor          = (uint16_t)FW_KIDIV,
+  .hKpDivisorPOW2      = (uint16_t)FW_KPDIV_LOG,
+  .hKiDivisorPOW2      = (uint16_t)FW_KIDIV_LOG,
+  .hDefKdGain           = 0x0000U,
+  .hKdDivisor           = 0x0000U,
+  .hKdDivisorPOW2       = 0x0000U,
+};
+
+/**
   * @brief  SpeednTorque Controller parameters Motor 1
   */
 SpeednTorqCtrl_Handle_t SpeednTorqCtrlM1 =
@@ -204,7 +237,9 @@ HALL_Handle_t HALL_M1 =
   */
 NTC_Handle_t TempSensorParamsM1 =
 {
-  .bSensorType = REAL_SENSOR,
+  .bSensorType = TEMP_SENSOR_TYPE,
+  .hExpectedTemp_d = 555,
+  .hExpectedTemp_C = M1_VIRTUAL_HEAT_SINK_TEMPERATURE_VALUE,
   .TempRegConv =
   {
     .regADC = ADC1,
@@ -217,6 +252,17 @@ NTC_Handle_t TempSensorParamsM1 =
   .hSensitivity            = (uint16_t)(ADC_REFERENCE_VOLTAGE/dV_dT),
   .wV0                     = (uint16_t)(V0_V *65536/ ADC_REFERENCE_VOLTAGE),
   .hT0                     = T0_C,
+};
+
+CURR_Handle_t CurrentSensorParams =
+{
+  .bSensorType = CURR_SENSOR_TYPE,
+  .CurrRegConv =
+  {
+    .regADC = ADC1,
+    .channel = MC_ADC_CHANNEL_0,
+    .samplingTime = 0,
+  }
 };
 
 /* Bus voltage sensor value filter buffer */
@@ -264,7 +310,7 @@ RampExtMngr_Handle_t RampExtMngrHFParamsM1 =
 CircleLimitation_Handle_t CircleLimitationM1 =
 {
   .MaxModule          = MAX_MODULE,
-  .MaxVd          	  = (uint16_t)(MAX_MODULE * 950 / 1000),
+  .MaxVd          	  = (uint16_t)(MAX_MODULE * FW_VOLTAGE_REF / 1000),
   .Circle_limit_table = MMITABLE,
   .Start_index        = START_INDEX,
 };

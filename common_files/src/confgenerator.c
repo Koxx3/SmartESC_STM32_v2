@@ -137,7 +137,7 @@ int32_t confgenerator_serialize_mcconf(uint8_t *buffer, const mc_configuration *
 	//buffer_append_float32_auto(buffer, conf->foc_hfi_obs_ovr_sec, &ind);
 	buffer_append_float32_auto(buffer, 0, &ind);
 	//buffer[ind++] = conf->foc_hfi_samples;
-	buffer[ind++] = 8;
+	buffer[ind++] = HFI_SAMPLES_8;
 
 //	buffer_append_int16(buffer, conf->gpd_buffer_notify_left, &ind);
 	buffer_append_int16(buffer, 0, &ind);
@@ -757,8 +757,8 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 //		float l_max_duty;
 //		float l_watt_max;
 //		float l_watt_min;
-//		float l_current_max_scale;
-//		float l_current_min_scale;
+		mcconf->l_current_max_scale = 1;
+		mcconf->l_current_min_scale = 1;
 //		float l_duty_start;
 //		// Overridden limits (Computed during runtime)
 //		float lo_current_max;
@@ -795,12 +795,12 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 //	float foc_observer_gain_slow;
 //	float foc_pll_kp;
 //	float foc_pll_ki;
-//	float foc_duty_dowmramp_kp;
+//    mcconf->foc_duty_dowmramp_kp;
 //	float foc_duty_dowmramp_ki;
 //	float foc_openloop_rpm;
 //	float foc_openloop_rpm_low;
-//	float foc_d_gain_scale_start;
-//	float foc_d_gain_scale_max_mod;
+	mcconf->foc_d_gain_scale_start = 1;
+	mcconf->foc_d_gain_scale_max_mod = 0;
 //	float foc_sl_openloop_hyst;
 //	float foc_sl_openloop_time;
 //	float foc_sl_openloop_time_lock;
@@ -836,8 +836,8 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 //	float gpd_current_ki;
 
 	// Speed PID
-	mcconf->s_pid_kp = 500;
-	mcconf->s_pid_ki = 300;
+	mcconf->s_pid_kp = 100;
+	mcconf->s_pid_ki = 50;
 	mcconf->s_pid_kd = 0.0;
 //	float s_pid_kd_filter;
 //	float s_pid_min_erpm;

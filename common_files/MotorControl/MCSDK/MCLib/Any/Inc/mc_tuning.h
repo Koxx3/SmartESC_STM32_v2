@@ -51,6 +51,7 @@ extern "C" {
 #include "state_machine.h"
 #include "mp_self_com_ctrl.h"
 #include "trajectory_ctrl.h"
+#include "current_sense.h"
 
 /**
  * @addtogroup MCSDK
@@ -99,12 +100,11 @@ typedef struct
   MotorPowMeas_Handle_t * pMPM;
   FW_Handle_t  * pFW;
   FF_Handle_t  * pFF;
-  PosCtrl_Handle_t *  pPosCtrl;  
-#ifdef HFINJECTION
-  HFI_FP_Ctrl_Handle_t * pHFI;
-#endif /* HFINJECTION */
+  PosCtrl_Handle_t *  pPosCtrl;
   SCC_Handle_t *  pSCC;
   OTT_Handle_t *  pOTT;
+  CURR_Handle_t * pMainCurrentSensor;
+
 } MCT_Handle_t;
 
 

@@ -28,7 +28,7 @@
 #include "product.h"
 
 unsigned long getRunTimeCounterValue(void){
-	HAL_GetTick();
+	return HAL_GetTick();
 }
 
 void task_init(){

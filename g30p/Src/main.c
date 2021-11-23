@@ -148,6 +148,7 @@ int main(void)
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
   MX_MotorControl_Init();
+  HAL_Delay(100);
   conf_general_init();
   /* USER CODE END 2 */
 
@@ -709,6 +710,7 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
@@ -718,11 +720,30 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(REAR_LED_GPIO_Port, REAR_LED_Pin, GPIO_PIN_RESET);
+
   /*Configure GPIO pin : PWR_BTN_Pin */
   GPIO_InitStruct.Pin = PWR_BTN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(PWR_BTN_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : UNUSED4_Pin */
+  GPIO_InitStruct.Pin = UNUSED4_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  HAL_GPIO_Init(UNUSED4_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : UNUSED3_Pin UNUSED2_Pin */
+  GPIO_InitStruct.Pin = UNUSED3_Pin|UNUSED2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PB2 */
+  GPIO_InitStruct.Pin = GPIO_PIN_2;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : TPS_ENA_Pin LED_Pin */
   GPIO_InitStruct.Pin = TPS_ENA_Pin|LED_Pin;
@@ -730,6 +751,27 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : UNUSED1_Pin */
+  GPIO_InitStruct.Pin = UNUSED1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  HAL_GPIO_Init(UNUSED1_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : REAR_LED_Pin */
+  GPIO_InitStruct.Pin = REAR_LED_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(REAR_LED_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure peripheral I/O remapping */
+  __HAL_AFIO_REMAP_PD01_ENABLE();
+
+  /*Configures the port and pin on which the EVENTOUT Cortex signal will be connected */
+  HAL_GPIOEx_ConfigEventout(AFIO_EVENTOUT_PORT_B, AFIO_EVENTOUT_PIN_2);
+
+  /*Enables the Event Output */
+  HAL_GPIOEx_EnableEventout();
 
 }
 

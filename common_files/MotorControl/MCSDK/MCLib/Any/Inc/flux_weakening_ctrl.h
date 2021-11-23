@@ -45,24 +45,21 @@ typedef struct
 {
   PID_Handle_t        *       pFluxWeakeningPID; /**< PI object used for flux weakening */
   PID_Handle_t        *       pSpeedPID;         /**< PI object used for speed control */
-  uint16_t        hFW_V_Ref;              /**< Voltage reference, tenth of
-                                                 percentage points */
+  uint16_t        hFW_V_Ref;     //(8)         /**< Voltage reference, tenth of percentage points */
+
   qd_t            AvVolt_qd;              /**< Average stator voltage in qd
                                                  reference frame */
-  int16_t         AvVoltAmpl;             /**< Average stator voltage amplitude */
-  int16_t         hIdRefOffset;           /**< Id reference offset */
-  uint16_t        hMaxModule;             /**< Circle limitation maximum allowed module */
+  int16_t         AvVoltAmpl;  //(14)           /**< Average stator voltage amplitude */
+  int16_t         hIdRefOffset;  //(16)         /**< Id reference offset */
+  uint16_t        hMaxModule;    //18         /**< Circle limitation maximum allowed module */
 
-  uint16_t        hDefaultFW_V_Ref;       /**< Default flux weakening voltage reference,
-                                               tenth of percentage points*/
-  int16_t         hDemagCurrent;          /**< Demagnetization current in s16A:
-                                               Current(Amp) = [Current(s16A) * Vdd micro]/
-                                               [65536 * Rshunt * Aop] */
-  int32_t         wNominalSqCurr;         /**< Squared motor nominal current in (s16A)^2
-                                               where:
-                                               Current(Amp) = [Current(s16A) * Vdd micro]/
-                                               [65536 * Rshunt * Aop] */
-  uint16_t        hVqdLowPassFilterBW;    /**< Use this parameter to configure the Vqd
+  uint16_t        hDefaultFW_V_Ref;  //20     /**< Default flux weakening voltage reference, tenth of percentage points*/
+
+  int16_t         hDemagCurrent;   //22       /**< Demagnetization current in s16A: Current(Amp) = [Current(s16A) * Vdd micro]/ [65536 * Rshunt * Aop] */
+
+  int32_t         wNominalSqCurr;   //24      /**< Squared motor nominal current in (s16A)^2  where: Current(Amp) = [Current(s16A) * Vdd micro]/  [65536 * Rshunt * Aop] */
+
+  uint16_t        hVqdLowPassFilterBW;    /** 28 < Use this parameter to configure the Vqd
                                                first order software filter bandwidth.
                                                hVqdLowPassFilterBW = FOC_CurrController
                                                call rate [Hz]/ FilterBandwidth[Hz] in
@@ -71,9 +68,7 @@ typedef struct
                                                is not defined, hVqdLowPassFilterBW is
                                                equal to log with base two of previous
                                                definition */
-  uint16_t        hVqdLowPassFilterBWLOG; /**< hVqdLowPassFilterBW expressed as power of 2.
-                                               E.g. if gain divisor is 512 the value
-                                               must be 9 because 2^9 = 512 */
+  uint16_t        hVqdLowPassFilterBWLOG; //30 /**< hVqdLowPassFilterBW expressed as power of 2. E.g. if gain divisor is 512 the value must be 9 because 2^9 = 512 */
 } FW_Handle_t;
 
 /**

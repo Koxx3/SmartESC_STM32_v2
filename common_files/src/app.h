@@ -27,6 +27,7 @@ unsigned app_calc_crc(app_configuration* conf);
 
 // Standard apps
 void task_app_init(void);
-void app_uartcomm_dev_write(uint8_t *buffer, uint8_t tx_count);
+void my_uart_send_data(uint8_t *tdata, uint16_t tnum);
+void my_uart2_send_data(uint8_t *tdata, uint16_t tnum);
 
 #endif /* APP_H_ */

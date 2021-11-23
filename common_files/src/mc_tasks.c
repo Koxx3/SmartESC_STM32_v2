@@ -37,6 +37,8 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "product.h"
+#include "music.h"
+#include "current_sense.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -78,11 +80,14 @@ PID_Handle_t *pPIDId[NBR_OF_MOTORS];
 RDivider_Handle_t *pBusSensorM1;
 
 NTC_Handle_t *pTemperatureSensor[NBR_OF_MOTORS];
+CURR_Handle_t *pMainCurrentSensor;
+
 PWMC_Handle_t * pwmcHandle[NBR_OF_MOTORS];
 DOUT_handle_t *pR_Brake[NBR_OF_MOTORS];
 DOUT_handle_t *pOCPDisabling[NBR_OF_MOTORS];
 PQD_MotorPowMeas_Handle_t *pMPM[NBR_OF_MOTORS];
 CircleLimitation_Handle_t *pCLM[NBR_OF_MOTORS];
+FW_Handle_t *pFW[NBR_OF_MOTORS];
 MTPA_Handle_t *pMaxTorquePerAmpere[2] = {MC_NULL,MC_NULL};
 RampExtMngr_Handle_t *pREMNG[NBR_OF_MOTORS];   /*!< Ramp manager used to modify the Iq ref
                                                     during the start-up switch over.*/
@@ -94,6 +99,7 @@ static volatile uint16_t hStopPermanencyCounterM1 = 0;
 uint8_t bMCBootCompleted = 0;
 
 /* USER CODE BEGIN Private Variables */
+MUSIC_PARAM bldc_music;
 
 /* USER CODE END Private Variables */
 
@@ -138,6 +144,7 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
 
   bMCBootCompleted = 0;
   pCLM[M1] = &CircleLimitationM1;
+  pFW[M1] = &FW_M1; /* only if M1 has FW */
 
   /**********************************************************/
   /*    PWM and current sensing component initialization    */
@@ -197,8 +204,21 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
   NTC_Init(&TempSensorParamsM1);
   pTemperatureSensor[M1] = &TempSensorParamsM1;
 
+  /*******************************************************/
+  /*   Main current measurement (G30 Only)			     */
+  /*******************************************************/
+  CURR_Init(&CurrentSensorParams);
+  pMainCurrentSensor = &CurrentSensorParams;
+
+
   pREMNG[M1] = &RampExtMngrHFParamsM1;
   REMNG_Init(pREMNG[M1]);
+
+  /*******************************************************/
+  /*   Flux weakening component initialization           */
+  /*******************************************************/
+  PID_HandleInit(&PIDFluxWeakeningHandle_M1);
+  FW_Init(pFW[M1],pPIDSpeed[M1],&PIDFluxWeakeningHandle_M1);
 
   FOC_Clear(M1);
   FOCVars[M1].bDriveInput = EXTERNAL;
@@ -212,7 +232,7 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
   MCT[M1].pPIDSpeed = pPIDSpeed[M1];
   MCT[M1].pPIDIq = pPIDIq[M1];
   MCT[M1].pPIDId = pPIDId[M1];
-  MCT[M1].pPIDFluxWeakening = MC_NULL; /* if M1 doesn't has FW */
+  MCT[M1].pPIDFluxWeakening = &PIDFluxWeakeningHandle_M1; /* only if M1 has FW */
   MCT[M1].pPWMnCurrFdbk = pwmcHandle[M1];
   MCT[M1].pRevupCtrl = MC_NULL;              /* only if M1 is not sensorless*/
   MCT[M1].pSpeedSensorMain = (SpeednPosFdbk_Handle_t *) &HALL_M1;
@@ -221,11 +241,12 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
   MCT[M1].pSpeednTorqueCtrl = pSTC[M1];
   MCT[M1].pStateMachine = &STM[M1];
   MCT[M1].pTemperatureSensor = (NTC_Handle_t *) pTemperatureSensor[M1];
+  MCT[M1].pMainCurrentSensor = (CURR_Handle_t *) pMainCurrentSensor;
   MCT[M1].pBusVoltageSensor = &(pBusSensorM1->_Super);
   MCT[M1].pBrakeDigitalOutput = MC_NULL;   /* brake is defined, oBrakeM1*/
   MCT[M1].pNTCRelay = MC_NULL;             /* relay is defined, oRelayM1*/
   MCT[M1].pMPM =  (MotorPowMeas_Handle_t*)pMPM[M1];
-  MCT[M1].pFW = MC_NULL;
+  MCT[M1].pFW = pFW[M1];
   MCT[M1].pFF = MC_NULL;
 
   MCT[M1].pPosCtrl = MC_NULL;
@@ -235,7 +256,10 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
   pMCTList[M1] = &MCT[M1];
 
   /* USER CODE BEGIN MCboot 2 */
-
+  int32_t status = music_init(&bldc_music);
+  if(status){
+  	set_music_command(Music_OFF, &bldc_music);
+  }
   /* USER CODE END MCboot 2 */
 
   bMCBootCompleted = 1;
@@ -478,7 +502,10 @@ __weak void FOC_Clear(uint8_t bMotor)
   PWMC_SwitchOffPWM(pwmcHandle[bMotor]);
 
   /* USER CODE BEGIN FOC_Clear 1 */
-
+  if (pFW[bMotor])
+  {
+    FW_Clear(pFW[bMotor]);
+  }
   /* USER CODE END FOC_Clear 1 */
 }
 
@@ -507,8 +534,8 @@ __weak void FOC_InitAdditionalMethods(uint8_t bMotor)
   */
 __weak void FOC_CalcCurrRef(uint8_t bMotor)
 {
-
   /* USER CODE BEGIN FOC_CalcCurrRef 0 */
+  qd_t IqdTmp;
 
   /* USER CODE END FOC_CalcCurrRef 0 */
   if(FOCVars[bMotor].bDriveInput == INTERNAL)
@@ -519,6 +546,12 @@ __weak void FOC_CalcCurrRef(uint8_t bMotor)
     {
      // MTPA_CalcCurrRefFromIq(pMaxTorquePerAmpere[bMotor], &FOCVars[bMotor].Iqdref);
     }*/
+    if (pFW[bMotor])
+    {
+       IqdTmp.q = FOCVars[bMotor].Iqdref.q;
+       IqdTmp.d = FOCVars[bMotor].UserIdref;
+       FOCVars[bMotor].Iqdref = FW_CalcCurrRef(pFW[bMotor],IqdTmp);
+    }
 
   }
   /* USER CODE BEGIN FOC_CalcCurrRef 1 */
@@ -683,7 +716,6 @@ __attribute__((section (".ccmram")))
   * @retval int16_t It returns MC_NO_FAULTS if the FOC has been ended before
   *         next PWM Update event, MC_FOC_DURATION otherwise
   */
-
 inline uint16_t FOC_CurrControllerM1(void)
 {
   qd_t Iqd, Vqd;
@@ -695,17 +727,17 @@ inline uint16_t FOC_CurrControllerM1(void)
   uint16_t hCodeError;
   SpeednPosFdbk_Handle_t *speedHandle;
 
+  music_update(&bldc_music);
 
   speedHandle = STC_GetSpeedSensor(pSTC[M1]);
   hElAngle = SPD_GetElAngle(speedHandle);
   PWMC_GetPhaseCurrents(pwmcHandle[M1], &Iab);
   Ialphabeta = MCM_Clarke(Iab);
   Iqd = MCM_Park(Ialphabeta, hElAngle);
-  Vqd.q = PI_Controller(pPIDIq[M1],
-            (int32_t)(FOCVars[M1].Iqdref.q) - Iqd.q);
+  Vqd.q = PI_Controller(pPIDIq[M1], (int32_t)(FOCVars[M1].Iqdref.q) - Iqd.q);
+  Vqd.q += bldc_music.music_signal;
 
-  Vqd.d = PI_Controller(pPIDId[M1],
-            (int32_t)(FOCVars[M1].Iqdref.d) - Iqd.d);
+  Vqd.d = PI_Controller(pPIDId[M1], (int32_t)(FOCVars[M1].Iqdref.d) - Iqd.d);
 
   Vqd = Circle_Limitation(pCLM[M1], Vqd);
   hElAngle += SPD_GetInstElSpeedDpp(speedHandle)*REV_PARK_ANGLE_COMPENSATION_FACTOR;
@@ -725,6 +757,7 @@ inline uint16_t FOC_CurrControllerM1(void)
   FOCVars[M1].Vd_samples++;
   FOCVars[M1].Valphabeta = Valphabeta;
   FOCVars[M1].hElAngle = hElAngle;
+  FW_DataProcess(pFW[M1], Vqd);
   return(hCodeError);
 }
 
@@ -756,7 +789,7 @@ __weak void TSK_SafetyTask(void)
   *         \link Motors_reference_number here \endlink
   * @retval None
   */
-uint8_t last_pwm_state=true;
+uint8_t last_pwm_state=false;
 
 __weak void TSK_SafetyTask_PWMOFF(uint8_t bMotor)
 {
@@ -768,18 +801,24 @@ __weak void TSK_SafetyTask_PWMOFF(uint8_t bMotor)
   uint16_t errMask[NBR_OF_MOTORS] = {VBUS_TEMP_ERR_MASK};
 
   CodeReturn |= errMask[bMotor] & NTC_CalcAvTemp(pTemperatureSensor[bMotor]); /* check for fault if FW protection is activated. It returns MC_OVER_TEMP or MC_NO_ERROR */
-  CodeReturn |= PWMC_CheckOverCurrent(pwmcHandle[bMotor]);                    /* check for fault. It return MC_BREAK_IN or MC_NO_FAULTS
-                                                                                 (for STM32F30x can return MC_OVER_VOLT in case of HW Overvoltage) */
+  CodeReturn |= PWMC_CheckOverCurrent(pwmcHandle[bMotor]);                    /* check for fault. It return MC_BREAK_IN or MC_NO_FAULTS (for STM32F30x can return MC_OVER_VOLT in case of HW Overvoltage) */
+  CodeReturn |= CURR_CalcMainCurrent(pMainCurrentSensor);
+
   if(bMotor == M1)
   {
 	  uint16_t voltage_fault = RVBS_CalcAvVbus(pBusSensorM1);
 	  if(voltage_fault==MC_UNDER_VOLT){
 		  CodeReturn |=  errMask[bMotor] & voltage_fault;
+
+		  MCI_StopMotor( &Mci[M1] );
+		  last_pwm_state = false;
 	  }else if (voltage_fault==MC_OVER_VOLT){
+		  CodeReturn |=  errMask[bMotor] & voltage_fault;
+
 		  MCI_StopMotor( &Mci[M1] );
 		  last_pwm_state = false;
 	  }else if (last_pwm_state==false){
-		  if(MCT[M1].pBusVoltageSensor->LatestConv < (pBusSensorM1->OverVoltageThreshold-(1*(65535/ADC_REFERENCE_VOLTAGE*VBUS_PARTITIONING_FACTOR)))){
+		  if(CodeReturn == MC_NO_ERROR){
 			  MCI_StartMotor( &Mci[M1] );
 			  last_pwm_state=true;
 		  }
@@ -911,11 +950,16 @@ LL_GPIO_LockPin(M1_PWM_VL_GPIO_Port, M1_PWM_VL_Pin);
 LL_GPIO_LockPin(M1_PWM_WH_GPIO_Port, M1_PWM_WH_Pin);
 LL_GPIO_LockPin(M1_PWM_WL_GPIO_Port, M1_PWM_WL_Pin);
 LL_GPIO_LockPin(M1_PWM_UL_GPIO_Port, M1_PWM_UL_Pin);
+#ifdef M365
 LL_GPIO_LockPin(M1_TEMPERATURE_GPIO_Port, M1_TEMPERATURE_Pin);
+#endif
 LL_GPIO_LockPin(M1_CURR_AMPL_W_GPIO_Port, M1_CURR_AMPL_W_Pin);
 LL_GPIO_LockPin(M1_BUS_VOLTAGE_GPIO_Port, M1_BUS_VOLTAGE_Pin);
 LL_GPIO_LockPin(M1_CURR_AMPL_U_GPIO_Port, M1_CURR_AMPL_U_Pin);
 LL_GPIO_LockPin(M1_CURR_AMPL_V_GPIO_Port, M1_CURR_AMPL_V_Pin);
+#ifdef G30P
+LL_GPIO_LockPin(MAIN_CURR_AMPL_GPIO_Port, MAIN_CURR_AMPL_Pin);
+#endif
 }
 
 /* USER CODE BEGIN mc_task 0 */

@@ -12,9 +12,11 @@
 #include "utils.h"
 #include <string.h>
 #include "product.h"
+#include "current_sense.h"
 #include <math.h>
 
 static float tacho_scale;
+stm_state mode;
 
 int32_t current_to_torque(int32_t curr_ma){
 	float ret = curr_ma * CURRENT_FACTOR_mA;
@@ -49,12 +51,34 @@ static int16_t erpm_to_int16(int32_t erpm){
 	return out;
 }
 
-void VescToSTM_init_odometer(mc_configuration* conf){
-	tacho_scale = (conf->si_wheel_diameter * M_PI) / (3.0 * conf->si_motor_poles * conf->si_gear_ratio);
+
+static int last_y;
+void VescToStm_nunchuk_update_erpm(){
+	if(mode == STM_STATE_NUNCHUCK){
+		if(last_y > 126){
+			VescToSTM_set_current_rel_int(utils_map_int(last_y, 127, 255, 0, 32768));
+		}else{
+			VescToSTM_set_brake_rel_int(utils_map(last_y, 0, 126, 32768, 0));
+		}
+	}
 }
+
+void VescToStm_nunchuk_update_output(chuck_data * chuck_d){
+	mode = STM_STATE_NUNCHUCK;
+	if(chuck_d->js_y != last_y){
+		last_y = chuck_d->js_y;
+		if(last_y > 126){
+			VescToSTM_set_current_rel_int(utils_map_int(last_y, 127, 255, 0, 32768));
+		}else{
+			VescToSTM_set_brake_rel_int(utils_map(last_y, 0, 126, 32768, 0));
+		}
+	}
+}
+
 
 void VescToSTM_set_open_loop(bool enabled, int16_t init_angle, int16_t erpm){
 	if(enabled){
+		mode = STM_STATE_OPENLOOP;
 		pMCI[M1]->pSTC->SPD->open_angle = init_angle;
 		pMCI[M1]->pSTC->SPD->open_loop = true;
 		pMCI[M1]->pSTC->SPD->open_speed = erpm_to_int16(erpm);
@@ -84,14 +108,16 @@ float VescToSTM_get_pid_pos_now(){
 uint32_t last_reset=0;
 bool timeout_enable = true;
 void VescToSTM_timeout_reset(){
-	last_reset = xTaskGetTickCount();
+	//last_reset = xTaskGetTickCount();
 };
 void VescToSTM_handle_timeout(){
 	if(!timeout_enable) {
 		VescToSTM_timeout_reset();
 	}
 	if((xTaskGetTickCount() - last_reset) > 2000){
-		VescToSTM_set_brake(0);
+		//float test;
+		//commands_printf("deb: %f", VescToSTM_get_speed());
+		last_reset = xTaskGetTickCount();
 	}
 };
 void VescToSTM_enable_timeout(bool enbale){
@@ -99,13 +125,12 @@ void VescToSTM_enable_timeout(bool enbale){
 }
 
 void VescToSTM_set_torque(int32_t current){
+	mode = STM_STATE_TORQUE;
 	pMCI[M1]->pSTC->SPD->open_loop = false;
-	int32_t q = current_to_torque(current);
-	if(q > SpeednTorqCtrlM1.MaxPositiveTorque){
-		q = SpeednTorqCtrlM1.MaxPositiveTorque;
-	}else if (q < SpeednTorqCtrlM1.MinNegativeTorque){
-		q = SpeednTorqCtrlM1.MinNegativeTorque;
-	}
+
+	int q = current_to_torque(current);
+	utils_truncate_number_int(&q, SpeednTorqCtrlM1.MinNegativeTorque, SpeednTorqCtrlM1.MaxPositiveTorque);
+
 	volatile float Vin = VescToSTM_get_bus_voltage();
 	if(Vin < mc_conf.l_battery_cut_start){
 		float diff = mc_conf.l_battery_cut_start - mc_conf.l_battery_cut_end;
@@ -118,18 +143,19 @@ void VescToSTM_set_torque(int32_t current){
 	}
 
 	if(q >= 0){
+		FW_M1.hDemagCurrent	= -((float)q*mc_conf.foc_d_gain_scale_max_mod);
 		pMCI[M1]->pSTC->PISpeed->wUpperIntegralLimit = q * SP_KDDIV;
 		pMCI[M1]->pSTC->PISpeed->wLowerIntegralLimit = mc_conf.s_pid_allow_braking ? -q : 0;
 		pMCI[M1]->pSTC->PISpeed->hUpperOutputLimit = q;
 		pMCI[M1]->pSTC->PISpeed->hLowerOutputLimit = mc_conf.s_pid_allow_braking ? -q : 0;
-		MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(mc_conf.l_max_erpm, mc_conf.si_motor_poles), 0);
+		MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(mc_conf.lo_max_erpm, mc_conf.si_motor_poles), 0);
 
 	}else{
 		pMCI[M1]->pSTC->PISpeed->wUpperIntegralLimit = mc_conf.s_pid_allow_braking ? -q : 0;
 		pMCI[M1]->pSTC->PISpeed->wLowerIntegralLimit = q * SP_KDDIV;
 		pMCI[M1]->pSTC->PISpeed->hUpperOutputLimit = mc_conf.s_pid_allow_braking ? -q : 0;
 		pMCI[M1]->pSTC->PISpeed->hLowerOutputLimit = q;
-		MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(mc_conf.l_min_erpm, mc_conf.si_motor_poles) , 0);
+		MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(mc_conf.lo_min_erpm, mc_conf.si_motor_poles) , 0);
 	}
 
 }
@@ -142,37 +168,67 @@ void VescToSTM_set_brake_current_rel(float val) {
 	VescToSTM_set_brake(val * fabsf(mc_conf.lo_current_motor_min_now));
 }
 
-void VescToSTM_set_brake(int32_t current){
+void VescToSTM_set_brake_rel_int(int32_t val){
+	mode = STM_STATE_BRAKE;
 	pMCI[M1]->pSTC->SPD->open_loop = false;
-	int32_t q = current_to_torque(current);
-	if(q > SpeednTorqCtrlM1.MaxPositiveTorque){
-		q = SpeednTorqCtrlM1.MaxPositiveTorque;
-	}else if (q < SpeednTorqCtrlM1.MinNegativeTorque){
-		q = SpeednTorqCtrlM1.MinNegativeTorque;
+
+	if(val<0) return;
+
+	int32_t p_q = (int32_t)SpeednTorqCtrlM1.MaxPositiveTorque * val / 32768;
+	int32_t n_q = (int32_t)SpeednTorqCtrlM1.MinNegativeTorque * val / 32768;
+
+	if(p_q > SpeednTorqCtrlM1.MaxPositiveTorque){
+		p_q = SpeednTorqCtrlM1.MaxPositiveTorque;
 	}
+	if(n_q < SpeednTorqCtrlM1.MinNegativeTorque){
+		n_q = SpeednTorqCtrlM1.MinNegativeTorque;
+	}
+
+	FW_M1.hDemagCurrent	= -((float)SpeednTorqCtrlM1.MaxPositiveTorque*mc_conf.foc_d_gain_scale_max_mod);
+	pMCI[M1]->pSTC->PISpeed->hUpperOutputLimit = p_q;
+	pMCI[M1]->pSTC->PISpeed->hLowerOutputLimit = n_q;
+	PIDSpeedHandle_M1.wUpperIntegralLimit = p_q * SP_KIDIV;
+	PIDSpeedHandle_M1.wLowerIntegralLimit = n_q * SP_KIDIV;
+	MCI_ExecSpeedRamp(pMCI[M1], 0 , 0);
+}
+
+void VescToSTM_set_brake(int32_t current){
+	mode = STM_STATE_BRAKE;
+	pMCI[M1]->pSTC->SPD->open_loop = false;
+
+	int q = current_to_torque(current);
+	utils_truncate_number_int(&q, SpeednTorqCtrlM1.MinNegativeTorque, SpeednTorqCtrlM1.MaxPositiveTorque);
+
 	if(q > 0){
+		FW_M1.hDemagCurrent	= -((float)SpeednTorqCtrlM1.MaxPositiveTorque*mc_conf.foc_d_gain_scale_max_mod);
 		pMCI[M1]->pSTC->PISpeed->hUpperOutputLimit = q;
 		pMCI[M1]->pSTC->PISpeed->hLowerOutputLimit = -q;
+		PIDSpeedHandle_M1.wUpperIntegralLimit = q * SP_KIDIV;
+		PIDSpeedHandle_M1.wLowerIntegralLimit = -q * SP_KIDIV;
 		MCI_ExecSpeedRamp(pMCI[M1], 0 , 0);
 	}else{
 		pMCI[M1]->pSTC->PISpeed->hUpperOutputLimit = -q;
 		pMCI[M1]->pSTC->PISpeed->hLowerOutputLimit = q;
+		PIDSpeedHandle_M1.wUpperIntegralLimit = -q * SP_KIDIV;
+		PIDSpeedHandle_M1.wLowerIntegralLimit = q * SP_KIDIV;
 		MCI_ExecSpeedRamp(pMCI[M1], 0 , 0);
 	}
 }
 
 
 void VescToSTM_set_speed(int32_t rpm){
+	mode = STM_STATE_SPEED;
 	int32_t erpm = rpm * mc_conf.si_motor_poles;
 	if(erpm>0){
 		if(erpm < mc_conf.s_pid_min_erpm) erpm = mc_conf.s_pid_min_erpm;
-		if(erpm > mc_conf.l_max_erpm) erpm = mc_conf.l_max_erpm;
+		if(erpm > mc_conf.lo_max_erpm) erpm = mc_conf.lo_max_erpm;
 	}else{
 		if(erpm > -mc_conf.s_pid_min_erpm) erpm = -mc_conf.s_pid_min_erpm;
-		if(erpm < mc_conf.l_min_erpm) erpm = mc_conf.l_min_erpm;
+		if(erpm < mc_conf.lo_min_erpm) erpm = mc_conf.lo_min_erpm;
 	}
 	pMCI[M1]->pSTC->SPD->open_loop = false;
 	if(rpm>=0){
+		FW_M1.hDemagCurrent	= -((float)SpeednTorqCtrlM1.MaxPositiveTorque*mc_conf.foc_d_gain_scale_max_mod);
 		pMCI[M1]->pSTC->PISpeed->wUpperIntegralLimit = (int32_t)SpeednTorqCtrlM1.MaxPositiveTorque * SP_KIDIV;
 		pMCI[M1]->pSTC->PISpeed->wLowerIntegralLimit = mc_conf.s_pid_allow_braking ? (int32_t)SpeednTorqCtrlM1.MinNegativeTorque * SP_KIDIV: 0;
 		pMCI[M1]->pSTC->PISpeed->hUpperOutputLimit = SpeednTorqCtrlM1.MaxPositiveTorque;
@@ -212,11 +268,18 @@ float VescToSTM_get_phase_current(){
 	wAux1 = MCM_Sqrt(wAux1);
 	wAux1 = wAux1 * SIGN(iq);
 
-	return (float)wAux1 / CURRENT_FACTOR;
+	return (float)wAux1 / CURRENT_FACTOR_A;
 }
 
 float VescToSTM_get_input_current(){
+#ifdef M365
 	return (float)pMPM[M1]->_super.hAvrgElMotorPowerW/(float)VBS_GetAvBusVoltage_V(pMCT[M1]->pBusVoltageSensor);
+#endif
+
+#ifdef G30P
+	return (float)pMPM[M1]->_super.hAvrgElMotorPowerW/(float)VBS_GetAvBusVoltage_V(pMCT[M1]->pBusVoltageSensor);
+	//return (float)CURR_GetCurrent(pMCT[M1]->pMainCurrentSensor);// NOT WORKING :(
+#endif
 }
 
 /**
@@ -230,7 +293,7 @@ float VescToSTM_get_id(){
 	int32_t id = pMCI[M1]->pFOCVars->Id_sum / pMCI[M1]->pFOCVars->Id_samples;
 	pMCI[M1]->pFOCVars->Id_sum = 0;
 	pMCI[M1]->pFOCVars->Id_samples = 0;
-	return id / CURRENT_FACTOR;
+	return id / CURRENT_FACTOR_A;
 }
 
 /**
@@ -244,7 +307,7 @@ float VescToSTM_get_iq(){
 	int32_t iq = pMCI[M1]->pFOCVars->Iq_sum / pMCI[M1]->pFOCVars->Iq_samples;
 	pMCI[M1]->pFOCVars->Iq_sum = 0;
 	pMCI[M1]->pFOCVars->Iq_samples = 0;
-	return iq / CURRENT_FACTOR;
+	return iq / CURRENT_FACTOR_A;
 }
 
 /**
@@ -305,6 +368,11 @@ void VescToSTM_start_motor(){
 	MCI_StartMotor( pMCI[M1] );
 }
 
+
+void VescToSTM_init_odometer(mc_configuration* conf){
+	tacho_scale = (conf->si_wheel_diameter * M_PI) / (3.0 * conf->si_motor_poles * conf->si_gear_ratio);
+}
+
 /**
  * Get the distance traveled based on wheel diameter, gearing and motor pole settings.
  *
@@ -344,6 +412,17 @@ void VescToSTM_set_odometer(uint32_t new_odometer_meters) {
  */
 uint32_t VescToSTM_get_odometer(void) {
 	return m_odometer_meters + VescToSTM_get_distance_abs();
+}
+
+/**
+ * Get the speed based on wheel diameter, gearing and motor pole settings.
+ *
+ * @return
+ * Speed, in m/s
+ */
+float VescToSTM_get_speed(void) {
+	float temp = (((float)MCI_GetAvrgMecSpeedUnit(pMCI[M1]) / 10.0) * mc_conf.si_wheel_diameter * M_PI) / mc_conf.si_gear_ratio;
+	return temp;
 }
 
 /**
@@ -395,14 +474,13 @@ int32_t VescToSTM_get_tachometer_abs_value(bool reset) {
  * The brake current to use.
  */
 void VescToSTM_set_handbrake(float current) {
-	int32_t q = abs(current_to_torque(current*1000));
-
+	mode = STM_STATE_HANDBRAKE;
+	int q = abs(current_to_torque(current*1000));
 	pMCI[M1]->pSTC->SPD->open_loop = true;
 	pMCI[M1]->pSTC->SPD->open_angle = 0;
 
-	if(q > SpeednTorqCtrlM1.MaxPositiveTorque){
-		q = SpeednTorqCtrlM1.MaxPositiveTorque;
-	}
+	utils_truncate_number_int(&q, 0, SpeednTorqCtrlM1.MaxPositiveTorque);
+
 	pMCI[M1]->pSTC->PISpeed->hUpperOutputLimit = q;
 	pMCI[M1]->pSTC->PISpeed->hLowerOutputLimit = q;
 	MCI_ExecSpeedRamp(pMCI[M1], 0 , 0);
@@ -479,8 +557,9 @@ float VescToSTM_get_duty_cycle_now(void) {
  * The relative current value, range [-1.0 1.0]
  */
 void VescToSTM_set_current_rel(float val) {
+	mode = STM_STATE_TORQUE;
 	pMCI[M1]->pSTC->SPD->open_loop = false;
-	int32_t q;
+	int q;
 	float torque;
 	if(val>0){
 		torque = (float)SpeednTorqCtrlM1.MaxPositiveTorque * val;
@@ -491,27 +570,61 @@ void VescToSTM_set_current_rel(float val) {
 		q = q *-1;
 	}
 
-	if(q > SpeednTorqCtrlM1.MaxPositiveTorque){
-		q = SpeednTorqCtrlM1.MaxPositiveTorque;
-	}else if (q < SpeednTorqCtrlM1.MinNegativeTorque){
-		q = SpeednTorqCtrlM1.MinNegativeTorque;
-	}
+	utils_truncate_number_int(&q, SpeednTorqCtrlM1.MinNegativeTorque, SpeednTorqCtrlM1.MaxPositiveTorque);
+
 	if(q >= 0){
+		FW_M1.hDemagCurrent	= -((float)q*mc_conf.foc_d_gain_scale_max_mod);
 		pMCI[M1]->pSTC->PISpeed->wUpperIntegralLimit = (uint32_t)q * SP_KDDIV;
 		pMCI[M1]->pSTC->PISpeed->wLowerIntegralLimit = mc_conf.s_pid_allow_braking ? -q : 0;
 		pMCI[M1]->pSTC->PISpeed->hUpperOutputLimit = q;
 		pMCI[M1]->pSTC->PISpeed->hLowerOutputLimit = mc_conf.s_pid_allow_braking ? -q : 0;
-		MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(mc_conf.l_max_erpm, mc_conf.si_motor_poles), 0);
+		MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(mc_conf.lo_max_erpm, mc_conf.si_motor_poles), 0);
 
 	}else{
 		pMCI[M1]->pSTC->PISpeed->wUpperIntegralLimit = mc_conf.s_pid_allow_braking ? -q : 0;
 		pMCI[M1]->pSTC->PISpeed->wLowerIntegralLimit = (uint32_t)q * SP_KDDIV;
 		pMCI[M1]->pSTC->PISpeed->hUpperOutputLimit = mc_conf.s_pid_allow_braking ? -q : 0;
 		pMCI[M1]->pSTC->PISpeed->hLowerOutputLimit = q;
-		MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(mc_conf.l_min_erpm, mc_conf.si_motor_poles), 0);
+		MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(mc_conf.lo_min_erpm, mc_conf.si_motor_poles), 0);
 	}
 }
 
+/**
+ * Set current relative to the minimum and maximum current limits.
+ *
+ * @param current
+ * The relative current value, range [-32768 +32768]
+ */
+void VescToSTM_set_current_rel_int(int32_t val) {
+	mode = STM_STATE_TORQUE;
+	pMCI[M1]->pSTC->SPD->open_loop = false;
+	int q;
+	float torque;
+	if(val>0){
+		q = (int32_t)SpeednTorqCtrlM1.MaxPositiveTorque * val / 32768;
+	}else{
+		q = (int32_t)SpeednTorqCtrlM1.MinNegativeTorque * val / 32768;
+		q = q *-1;
+	}
+
+	utils_truncate_number_int(&q, SpeednTorqCtrlM1.MinNegativeTorque, SpeednTorqCtrlM1.MaxPositiveTorque);
+
+	if(q >= 0){
+		FW_M1.hDemagCurrent	= -((float)q*mc_conf.foc_d_gain_scale_max_mod);
+		pMCI[M1]->pSTC->PISpeed->wUpperIntegralLimit = (uint32_t)q * SP_KDDIV;
+		pMCI[M1]->pSTC->PISpeed->wLowerIntegralLimit = mc_conf.s_pid_allow_braking ? -q : 0;
+		pMCI[M1]->pSTC->PISpeed->hUpperOutputLimit = q;
+		pMCI[M1]->pSTC->PISpeed->hLowerOutputLimit = mc_conf.s_pid_allow_braking ? -q : 0;
+		MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(mc_conf.lo_max_erpm, mc_conf.si_motor_poles), 0);
+
+	}else{
+		pMCI[M1]->pSTC->PISpeed->wUpperIntegralLimit = mc_conf.s_pid_allow_braking ? -q : 0;
+		pMCI[M1]->pSTC->PISpeed->wLowerIntegralLimit = (uint32_t)q * SP_KDDIV;
+		pMCI[M1]->pSTC->PISpeed->hUpperOutputLimit = mc_conf.s_pid_allow_braking ? -q : 0;
+		pMCI[M1]->pSTC->PISpeed->hLowerOutputLimit = q;
+		MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(mc_conf.lo_min_erpm, mc_conf.si_motor_poles), 0);
+	}
+}
 
 mc_fault_code VescToSTM_get_fault(void) {
 	mc_fault_code fault = FAULT_CODE_NONE;

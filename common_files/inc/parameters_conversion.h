@@ -25,7 +25,6 @@
 
 #include "mc_math.h"
 #include "parameters_conversion_f10x.h"
-#include "pmsm_motor_parameters.h"
 #include "drive_parameters.h"
 #include "power_stage_parameters.h"
 
@@ -119,6 +118,10 @@
 
 #define M1_VIRTUAL_HEAT_SINK_TEMPERATURE_VALUE   25u
 #define M1_TEMP_SW_FILTER_BW_FACTOR      250u
+
+/* Flux Weakening - Feed forward */
+#define M1_VQD_SW_FILTER_BW_FACTOR       128u
+#define M1_VQD_SW_FILTER_BW_FACTOR_LOG LOG2(M1_VQD_SW_FILTER_BW_FACTOR)
 
 /* USER CODE END temperature */
 

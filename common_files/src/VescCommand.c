@@ -38,6 +38,8 @@
 #include "stdarg.h"
 #include <printf.h>
 #include "terminal.h"
+#include "product.h"
+#include "app.h"
 
 
 static void(* volatile send_func)(unsigned char *data, unsigned int len) = 0;
@@ -118,8 +120,8 @@ void send_sample(){
 		uint8_t buffer[40];
 		int32_t index = 0;
 		buffer[index++] = COMM_SAMPLE_PRINT;
-		buffer_append_float32_auto(buffer, (float)samples.m_curr0_samples[samples.index] / CURRENT_FACTOR, &index);
-		buffer_append_float32_auto(buffer, (float)samples.m_curr1_samples[samples.index] / CURRENT_FACTOR, &index);
+		buffer_append_float32_auto(buffer, (float)samples.m_curr0_samples[samples.index] / CURRENT_FACTOR_A, &index);
+		buffer_append_float32_auto(buffer, (float)samples.m_curr1_samples[samples.index] / CURRENT_FACTOR_A, &index);
 		buffer_append_float32_auto(buffer, 0, &index);
 		buffer_append_float32_auto(buffer, 0, &index);
 		buffer_append_float32_auto(buffer, 0, &index);
@@ -182,7 +184,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 		ind += VescToSTM_get_uid(send_buffer + ind, 12);
 
-		send_buffer[ind++] = 1;
+		send_buffer[ind++] = appconf.pairing_done;
 		send_buffer[ind++] = FW_TEST_VERSION_NUMBER;
 
 		send_buffer[ind++] = HW_TYPE_VESC;
@@ -497,8 +499,27 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				case COMM_FORWARD_CAN:
 					break;
 
-				case COMM_SET_CHUCK_DATA:
-					break;
+				case COMM_SET_CHUCK_DATA:{
+					chuck_data chuck_d_tmp;
+
+					int32_t ind = 0;
+					chuck_d_tmp.js_x = data[ind++];
+					chuck_d_tmp.js_y = data[ind++];
+					chuck_d_tmp.bt_c = data[ind++];
+					chuck_d_tmp.bt_z = data[ind++];
+					chuck_d_tmp.acc_x = buffer_get_int16(data, &ind);
+					chuck_d_tmp.acc_y = buffer_get_int16(data, &ind);
+					chuck_d_tmp.acc_z = buffer_get_int16(data, &ind);
+
+					if (len >= (unsigned int)ind + 2) {
+						chuck_d_tmp.rev_has_state = data[ind++];
+						chuck_d_tmp.is_rev = data[ind++];
+					} else {
+						chuck_d_tmp.rev_has_state = false;
+						chuck_d_tmp.is_rev = false;
+					}
+					VescToStm_nunchuk_update_output(&chuck_d_tmp);
+				} break;
 
 				case COMM_CUSTOM_APP_DATA:
 					break;
@@ -575,7 +596,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						buffer_append_float32(send_buffer, VescToSTM_get_erpm(), 1e0, &ind);
 					}
 					if (mask & ((uint32_t)1 << 6)) {
-						buffer_append_float32(send_buffer, VescToSTM_get_odometer(), 1e3, &ind);
+						buffer_append_float32(send_buffer, VescToSTM_get_speed(), 1e3, &ind);
 					}
 					if (mask & ((uint32_t)1 << 7)) {
 						buffer_append_float16(send_buffer, VescToSTM_get_bus_voltage(), 1e1, &ind);
@@ -644,43 +665,61 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 					float controller_num = 1.0;
 
-					mcconf->l_current_min_scale = buffer_get_float32_auto(data, &ind);
-					mcconf->l_current_max_scale = buffer_get_float32_auto(data, &ind);
-
+					float l_current_min_scale = buffer_get_float32_auto(data, &ind);
+					float l_current_max_scale = buffer_get_float32_auto(data, &ind);
+					float min_erpm;
+					float max_erpm;
+					bool changed=false;
 					if (packet_id == COMM_SET_MCCONF_TEMP_SETUP) {
 						const float fact = ((mcconf->si_motor_poles / 2.0) * 60.0 *
 								mcconf->si_gear_ratio) / (mcconf->si_wheel_diameter * M_PI);
 
-						mcconf->l_min_erpm = buffer_get_float32_auto(data, &ind) * fact;
-						mcconf->l_max_erpm = buffer_get_float32_auto(data, &ind) * fact;
+						min_erpm = buffer_get_float32_auto(data, &ind) * fact;
+						max_erpm = buffer_get_float32_auto(data, &ind) * fact;
+						if(min_erpm != mcconf->lo_min_erpm) changed = true;
+						if(max_erpm != mcconf->lo_max_erpm) changed = true;
+						mcconf->lo_min_erpm = min_erpm;
+						mcconf->lo_max_erpm = max_erpm;
 
 						// Write computed RPM back and change forwarded packet id to
 						// COMM_SET_MCCONF_TEMP. This way only the master has to be
 						// aware of the setup information.
 						ind -= 8;
-						buffer_append_float32_auto(data, mcconf->l_min_erpm, &ind);
-						buffer_append_float32_auto(data, mcconf->l_max_erpm, &ind);
+						buffer_append_float32_auto(data, mcconf->lo_min_erpm, &ind);
+						buffer_append_float32_auto(data, mcconf->lo_max_erpm, &ind);
 					} else {
-						mcconf->l_min_erpm = buffer_get_float32_auto(data, &ind);
-						mcconf->l_max_erpm = buffer_get_float32_auto(data, &ind);
+						min_erpm = buffer_get_float32_auto(data, &ind);
+						max_erpm = buffer_get_float32_auto(data, &ind);
+						if(min_erpm != mcconf->lo_min_erpm) changed = true;
+						if(max_erpm != mcconf->lo_max_erpm) changed = true;
+						mcconf->lo_min_erpm = min_erpm;
+						mcconf->lo_max_erpm = max_erpm;
 					}
 
-					mcconf->l_min_duty = buffer_get_float32_auto(data, &ind);
-					mcconf->l_max_duty = buffer_get_float32_auto(data, &ind);
-					mcconf->l_watt_min = buffer_get_float32_auto(data, &ind) / controller_num;
-					mcconf->l_watt_max = buffer_get_float32_auto(data, &ind) / controller_num;
+					if(mcconf->lo_max_erpm > mcconf->l_max_erpm) mcconf->lo_max_erpm = mcconf->l_max_erpm;
+					if(mcconf->lo_min_erpm < mcconf->l_min_erpm) mcconf->lo_min_erpm = mcconf->l_min_erpm;
+					if(changed==true){
+						VescToStm_nunchuk_update_erpm();
+					}
+
+					float l_min_duty = buffer_get_float32_auto(data, &ind);
+					float l_max_duty = buffer_get_float32_auto(data, &ind);
+					float l_watt_min = buffer_get_float32_auto(data, &ind) / controller_num;
+					float l_watt_max = buffer_get_float32_auto(data, &ind) / controller_num;
 
 					// Write divided data back to the buffer, as the other controllers have no way to tell
 					// how many controllers are on the bus and thus need pre-divided data.
 					// We set divide by controllers to false before forwarding.
 					ind -= 8;
-					buffer_append_float32_auto(data, mcconf->l_watt_min, &ind);
-					buffer_append_float32_auto(data, mcconf->l_watt_max, &ind);
+					buffer_append_float32_auto(data, l_watt_min, &ind);
+					buffer_append_float32_auto(data, l_watt_max, &ind);
 
+					float l_in_current_min;
+					float l_in_current_max;
 					// Battery limits can be set optionally in a backwards-compatible way.
 					if ((int32_t)len >= (ind + 8)) {
-						mcconf->l_in_current_min = buffer_get_float32_auto(data, &ind);
-						mcconf->l_in_current_max = buffer_get_float32_auto(data, &ind);
+						l_in_current_min = buffer_get_float32_auto(data, &ind);
+						l_in_current_max = buffer_get_float32_auto(data, &ind);
 					}
 
 					mcconf->lo_current_min = mcconf->l_current_min * mcconf->l_current_min_scale;
@@ -692,7 +731,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 					//VescToSTM_set_erpm_limits(mcconf);
 
-					//commands_apply_mcconf_hw_limits(mcconf);
+					conf_general_update_current(mcconf);
 
 					//if (store) {
 					//	conf_general_store_mc_configuration(mcconf, mc_interface_get_motor_thread() == 2);
@@ -734,8 +773,20 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 				case COMM_EXT_NRF_PRESENT:
 				case COMM_EXT_NRF_ESB_RX_DATA:
-				case COMM_APP_DISABLE_OUTPUT:
-					break;
+				case COMM_APP_DISABLE_OUTPUT:{
+					int32_t ind = 0;
+					bool fwd_can = data[ind++];
+					int time = buffer_get_int32(data, &ind);
+					app_disable_output(time);
+
+					if (fwd_can) {
+						data[0] = 0; // Don't continue forwarding
+						uint8_t send_buffer[50];
+						send_buffer[ind++] = packet_id;
+						reply_func(send_buffer, ind);
+						//comm_can_send_buffer(255, data - 1, len + 1, 0);
+					}
+				}break;
 
 				case COMM_TERMINAL_CMD_SYNC:
 					data[len] = '\0';

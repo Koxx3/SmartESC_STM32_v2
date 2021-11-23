@@ -152,6 +152,16 @@
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/virtual_speed_sensor.c</locationURI>
 		</link>
 		<link>
+			<name>Application/User/current_sense.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/current_sense.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/current_sense.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/current_sense.h</locationURI>
+		</link>
+		<link>
 			<name>Application/User/defines.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/defines.h</locationURI>
@@ -180,11 +190,6 @@
 			<name>Application/User/ninebot.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Inc/ninebot.h</locationURI>
-		</link>
-		<link>
-			<name>Application/User/parameters_conversion.h</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/parameters_conversion.h</locationURI>
 		</link>
 		<link>
 			<name>Application/User/printf.c</name>
@@ -342,9 +347,24 @@
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c</locationURI>
 		</link>
 		<link>
+			<name>Middlewares/FreeRTOS/cmsis_os.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/FreeRTOS/cmsis_os1.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os1.c</locationURI>
+		</link>
+		<link>
 			<name>Middlewares/FreeRTOS/cmsis_os2.c</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/FreeRTOS/cmsis_os2.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/FreeRTOS/croutine.c</name>
@@ -392,9 +412,39 @@
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Middlewares/Third_Party/FreeRTOS/Source/timers.c</locationURI>
 		</link>
 		<link>
+			<name>Application/User/BLDC/drive_parameters.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/drive_parameters.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/BLDC/flux_weakening_ctrl.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/flux_weakening_ctrl.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/BLDC/flux_weakening_ctrl.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Inc/flux_weakening_ctrl.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/BLDC/max_torque_per_ampere.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/max_torque_per_ampere.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/BLDC/max_torque_per_ampere.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Inc/max_torque_per_ampere.h</locationURI>
+		</link>
+		<link>
 			<name>Application/User/BLDC/mc_config.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/mc_config.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/BLDC/mc_config.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/mc_config.h</locationURI>
 		</link>
 		<link>
 			<name>Application/User/BLDC/mc_interface.c</name>
@@ -420,6 +470,21 @@
 			<name>Application/User/BLDC/motorcontrol.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/motorcontrol.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/BLDC/music.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/music.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/BLDC/music.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/music.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/BLDC/parameters_conversion.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/parameters_conversion.h</locationURI>
 		</link>
 		<link>
 			<name>Application/User/BLDC/regular_conversion_manager.c</name>

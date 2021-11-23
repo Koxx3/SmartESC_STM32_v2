@@ -6,9 +6,21 @@
 #include <stdint.h>
 #include "VescDatatypes.h"
 
+typedef enum {
+   STM_STATE_IDLE = 0,
+   STM_STATE_SPEED,
+   STM_STATE_TORQUE,
+   STM_STATE_BRAKE,
+   STM_STATE_HANDBRAKE,
+   STM_STATE_OPENLOOP,
+   STM_STATE_NUNCHUCK
+} stm_state;
 
+void VescToStm_nunchuk_update_output(chuck_data * chuck_d);
+void VescToStm_nunchuk_update_erpm();
 void VescToSTM_set_torque(int32_t current);
 void VescToSTM_set_brake(int32_t current);
+void VescToSTM_set_brake_rel_int(int32_t val);
 void VescToSTM_set_handbrake(float current);
 void VescToSTM_set_speed(int32_t rpm);
 float VescToSTM_get_temperature();
@@ -40,8 +52,10 @@ float VescToSTM_get_distance(void);
 float VescToSTM_get_distance_abs(void);
 int32_t VescToSTM_get_tachometer_value(bool reset);
 int32_t VescToSTM_get_tachometer_abs_value(bool reset);
+float VescToSTM_get_speed(void);
 float VescToSTM_get_battery_level(float *wh_left);
 void VescToSTM_set_current_rel(float val);
+void VescToSTM_set_current_rel_int(int32_t val);
 float VescToSTM_get_duty_cycle_now(void);
 mc_fault_code VescToSTM_get_fault(void);
 uint8_t VescToSTM_get_uid(uint8_t * ptr, uint8_t size);

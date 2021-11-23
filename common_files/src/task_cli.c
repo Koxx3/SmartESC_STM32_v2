@@ -40,7 +40,7 @@
  * \brief           Calculate length of statically allocated array
  */
 
-#define CIRC_BUF_SZ       64  /* must be power of two */
+#define CIRC_BUF_SZ       1024  /* must be power of two */
 #define DMA_WRITE_PTR ( (CIRC_BUF_SZ - VESC_USART_DMA.hdmarx->Instance->CNDTR) & (CIRC_BUF_SZ - 1) )  //huart_cobs->hdmarx->Instance->NDTR.
 uint8_t usart_rx_dma_buffer[CIRC_BUF_SZ];
 
@@ -57,7 +57,9 @@ void putbuffer(unsigned char *buf, unsigned int len){
 	HAL_UART_Transmit_DMA(&VESC_USART_DMA, buf, len);
 	while(VESC_USART_TX_DMA.State != HAL_DMA_STATE_READY){
 		VESC_USART_DMA.gState = HAL_UART_STATE_READY;
-		vTaskDelay(1);
+		if(len>10){
+			vTaskDelay(1);
+		}
 	}
 }
 
@@ -72,16 +74,14 @@ void process_packet(unsigned char *data, unsigned int len){
 
 void task_cli(void * argument)
 {
+	uint32_t rd_ptr=0;
+
 	HAL_UART_Receive_DMA(&VESC_USART_DMA, usart_rx_dma_buffer, sizeof(usart_rx_dma_buffer));
 	CLEAR_BIT(VESC_USART_DMA.Instance->CR3, USART_CR3_EIE);
 
-	uint32_t rd_ptr=0;
-	MCI_StartMotor( pMCI[M1] );
-
-	vTaskDelay(200);
-	VescToSTM_set_brake(0);
-
 	packet_init(putbuffer, process_packet, UART_HANDLE);
+
+	VescToSTM_set_brake_rel_int(0);
 
   /* Infinite loop */
 	for(;;)
