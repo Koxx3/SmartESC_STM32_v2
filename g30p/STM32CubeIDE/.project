@@ -427,6 +427,16 @@
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Inc/flux_weakening_ctrl.h</locationURI>
 		</link>
 		<link>
+			<name>Application/User/BLDC/max_torque_per_ampere.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/mtpa.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/BLDC/max_torque_per_ampere.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Inc/max_torque_per_ampere.h</locationURI>
+		</link>
+		<link>
 			<name>Application/User/BLDC/mc_config.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/mc_config.c</locationURI>
@@ -460,11 +470,6 @@
 			<name>Application/User/BLDC/motorcontrol.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/motorcontrol.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/BLDC/mtpa.c</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/mtpa.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/BLDC/music.c</name>

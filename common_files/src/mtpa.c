@@ -1,3 +1,6 @@
+#include "max_torque_per_ampere.h"
+#include "main.h"
+
 __weak void MTPA_CalcCurrRefFromIq( MTPA_Handle_t * pHandle, qd_t *Iqdref )
 {
   if (Iqdref->q < 0){
