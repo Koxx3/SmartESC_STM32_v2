@@ -33,6 +33,7 @@ extern MCT_Handle_t* pMCT[NBR_OF_MOTORS];
 extern MCI_Handle_t* pMCI[NBR_OF_MOTORS];
 extern PQD_MotorPowMeas_Handle_t *pMPM[NBR_OF_MOTORS];
 extern SpeednTorqCtrl_Handle_t *pSTC[NBR_OF_MOTORS];
+extern FOCVars_t FOCVars[NBR_OF_MOTORS];
 
 
 

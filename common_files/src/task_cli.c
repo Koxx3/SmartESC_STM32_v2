@@ -40,7 +40,7 @@
  * \brief           Calculate length of statically allocated array
  */
 
-#define CIRC_BUF_SZ       1024  /* must be power of two */
+#define CIRC_BUF_SZ       512  /* must be power of two */
 #define DMA_WRITE_PTR ( (CIRC_BUF_SZ - VESC_USART_DMA.hdmarx->Instance->CNDTR) & (CIRC_BUF_SZ - 1) )  //huart_cobs->hdmarx->Instance->NDTR.
 uint8_t usart_rx_dma_buffer[CIRC_BUF_SZ];
 
@@ -57,9 +57,7 @@ void putbuffer(unsigned char *buf, unsigned int len){
 	HAL_UART_Transmit_DMA(&VESC_USART_DMA, buf, len);
 	while(VESC_USART_TX_DMA.State != HAL_DMA_STATE_READY){
 		VESC_USART_DMA.gState = HAL_UART_STATE_READY;
-		if(len>10){
-			vTaskDelay(1);
-		}
+		vTaskDelay(1);
 	}
 }
 

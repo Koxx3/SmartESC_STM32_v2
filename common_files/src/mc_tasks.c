@@ -748,13 +748,23 @@ inline uint16_t FOC_CurrControllerM1(void)
   FOCVars[M1].Ialphabeta = Ialphabeta;
   FOCVars[M1].Iqd = Iqd;
   FOCVars[M1].Iq_sum += Iqd.q;
-  FOCVars[M1].Iq_samples++;
   FOCVars[M1].Id_sum += Iqd.d;
-  FOCVars[M1].Id_samples++;
   FOCVars[M1].Vq_sum += Vqd.q;
-  FOCVars[M1].Vq_samples++;
   FOCVars[M1].Vd_sum += Vqd.d;
-  FOCVars[M1].Vd_samples++;
+  if(FOCVars[M1].samples<512){
+	  FOCVars[M1].samples++;
+  }else{
+	  FOCVars[M1].Iq_avg = FOCVars[M1].Iq_sum / 512;
+	  FOCVars[M1].Iq_sum = 0;
+	  FOCVars[M1].Id_avg = FOCVars[M1].Id_sum / 512;
+	  FOCVars[M1].Id_sum = 0;
+	  FOCVars[M1].Vq_avg = FOCVars[M1].Vq_sum / 512;
+	  FOCVars[M1].Vq_sum = 0;
+	  FOCVars[M1].Vd_avg = FOCVars[M1].Vd_sum / 512;
+	  FOCVars[M1].Vd_sum = 0;
+	  FOCVars[M1].samples=0;
+  }
+
   FOCVars[M1].Valphabeta = Valphabeta;
   FOCVars[M1].hElAngle = hElAngle;
   FW_DataProcess(pFW[M1], Vqd);

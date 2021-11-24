@@ -14,6 +14,7 @@
 #include "VescToSTM.h"
 #include "conf_general.h"
 #include "product.h"
+#include "hall_speed_pos_fdbk.h"
 
 
 //const uint8_t hall_arr[8] = {0,5,1,3,2,6,4,7};
@@ -160,28 +161,11 @@ float tune_foc_measure_resistance(float current, int samples) {
 	vTaskDelay(MS_TO_TICKS(200));
 
 	// Sample
-	pMCI[M1]->pFOCVars->Vq_sum = 0;
-	pMCI[M1]->pFOCVars->Vq_samples = 0;
-	pMCI[M1]->pFOCVars->Vd_sum = 0;
-	pMCI[M1]->pFOCVars->Vd_samples = 0;
-	pMCI[M1]->pFOCVars->Iq_sum = 0;
-	pMCI[M1]->pFOCVars->Iq_samples = 0;
-	pMCI[M1]->pFOCVars->Id_sum = 0;
-	pMCI[M1]->pFOCVars->Id_samples = 0;
 
-	int cnt = 0;
-	while (pMCI[M1]->pFOCVars->Vq_samples < samples) {
-		vTaskDelay(1);
-		cnt++;
-		// Timeout
-		if (cnt > 10000) {
-			break;
-		}
-	}
-	int32_t Vq = pMCI[M1]->pFOCVars->Vq_sum / pMCI[M1]->pFOCVars->Vq_samples;
-	int32_t Vd = pMCI[M1]->pFOCVars->Vd_sum / pMCI[M1]->pFOCVars->Vd_samples;
-	int32_t Iq = pMCI[M1]->pFOCVars->Iq_sum / pMCI[M1]->pFOCVars->Iq_samples;
-	int32_t Id = pMCI[M1]->pFOCVars->Id_sum / pMCI[M1]->pFOCVars->Id_samples;
+	int32_t Vq = pMCI[M1]->pFOCVars->Vq_avg;
+	int32_t Vd = pMCI[M1]->pFOCVars->Vd_avg;
+	int32_t Iq = pMCI[M1]->pFOCVars->Iq_avg;
+	int32_t Id = pMCI[M1]->pFOCVars->Id_avg;
 
 	float Vin = VescToSTM_get_bus_voltage();
 	float fVq = Vin / 32768.0 * (float)Vq;
@@ -489,8 +473,11 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 		//mc_interface_set_configuration(mcconf);
 		vTaskDelay(MS_TO_TICKS(500));
 		currComp.q = 0;
+
+		MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
+
+		vTaskDelay(1);
 		VescToSTM_set_open_loop(false, 0, 0);
-		MCI_SetCurrentReferences(pMCI[M1],currComp);
 		vTaskDelay(MS_TO_TICKS(5));
 
 		float linkage_sum = 0.0;
@@ -516,6 +503,7 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 
 		result = true;
 	}
+
 
 	VescToSTM_enable_timeout(true);
 	return result;
