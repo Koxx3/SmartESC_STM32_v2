@@ -20,6 +20,7 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
+#include "stdlib.h"
 #include "main.h"
 #include "mc_type.h"
 #include "mc_math.h"
