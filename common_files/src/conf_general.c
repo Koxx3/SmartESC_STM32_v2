@@ -224,6 +224,9 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	float current_min = mcconf->l_current_min * CURRENT_FACTOR_A * mcconf->l_current_max_scale;
 	uint16_t max_app_speed;
 
+	FOCVars[M1].max_i_batt = mcconf->l_in_current_max * CURRENT_FACTOR_A;
+	FOCVars[M1].min_i_batt = mcconf->l_in_current_min * CURRENT_FACTOR_A;
+
 	mcconf->lo_max_erpm = mcconf->l_max_erpm;
 	mcconf->lo_min_erpm = mcconf->l_min_erpm;
 

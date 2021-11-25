@@ -217,6 +217,8 @@ typedef struct
   uint16_t samples;
   uint32_t cycles_last;
   uint32_t cycles_max;
+  int16_t max_i_batt;
+  int16_t min_i_batt;
 } FOCVars_t, *pFOCVars_t;
 
 /**

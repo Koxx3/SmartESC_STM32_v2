@@ -735,8 +735,8 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 	// Limits
 		mcconf->l_current_max = 10;
 		mcconf->l_current_min  = -10;
-//		float l_in_current_max;
-//		float l_in_current_min;
+		mcconf->l_in_current_max = 10;
+		mcconf->l_in_current_min = -10;
 		mcconf->l_abs_current_max = 60;
 		mcconf->l_min_erpm = -5000;
 		mcconf->l_max_erpm = 5000;

@@ -221,6 +221,8 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
   FW_Init(pFW[M1],pPIDSpeed[M1],&PIDFluxWeakeningHandle_M1);
 
   FOC_Clear(M1);
+  FOCVars[M1].max_i_batt = 100;
+  FOCVars[M1].min_i_batt = -100;
   FOCVars[M1].bDriveInput = EXTERNAL;
   FOCVars[M1].Iqdref = STC_GetDefaultIqdref(pSTC[M1]);
   FOCVars[M1].UserIdref = STC_GetDefaultIqdref(pSTC[M1]).d;
@@ -546,6 +548,34 @@ __weak void FOC_CalcCurrRef(uint8_t bMotor)
     {
      // MTPA_CalcCurrRefFromIq(pMaxTorquePerAmpere[bMotor], &FOCVars[bMotor].Iqdref);
     }*/
+
+    //Battery Curren limit -- START
+    int32_t batt_i = (int32_t)((int32_t)FOCVars[bMotor].Iqdref.q * (int32_t)FOCVars[bMotor].Vq_avg) / 32768;
+    batt_i = abs(batt_i);
+    int16_t q_temp = FOCVars[bMotor].Iqdref.q;
+
+    uint8_t regen = false;
+    if(FOCVars[bMotor].Iqdref.q > 0 && FOCVars[bMotor].Vq_avg <0){
+    	regen = true;
+    }else if(FOCVars[bMotor].Iqdref.q < 0 && FOCVars[bMotor].Vq_avg > 0){
+    	regen = true;
+    }
+    if(regen){
+    	if((-batt_i < FOCVars[bMotor].min_i_batt) ){
+    		q_temp = (int32_t)((int32_t)FOCVars[bMotor].min_i_batt * 32768) / (int32_t)FOCVars[bMotor].Vq_avg;
+    	}
+    }else{
+    	if((batt_i > FOCVars[bMotor].max_i_batt) ){
+    		q_temp = (int32_t)((int32_t)FOCVars[bMotor].max_i_batt * 32768) / (int32_t)FOCVars[bMotor].Vq_avg;
+    	}
+    }
+
+    if(FOCVars[bMotor].Iqdref.q < 0 && q_temp > 0){
+    	q_temp = -q_temp;
+    }
+    FOCVars[bMotor].Iqdref.q = q_temp;
+    //Battery Curren limit -- END
+
     if (pFW[bMotor])
     {
        IqdTmp.q = FOCVars[bMotor].Iqdref.q;
@@ -716,6 +746,8 @@ __attribute__((section (".ccmram")))
   * @retval int16_t It returns MC_NO_FAULTS if the FOC has been ended before
   *         next PWM Update event, MC_FOC_DURATION otherwise
   */
+#define AVG_SAMPLES 512
+
 inline uint16_t FOC_CurrControllerM1(void)
 {
   qd_t Iqd, Vqd;
@@ -754,13 +786,13 @@ inline uint16_t FOC_CurrControllerM1(void)
   if(FOCVars[M1].samples<512){
 	  FOCVars[M1].samples++;
   }else{
-	  FOCVars[M1].Iq_avg = FOCVars[M1].Iq_sum / 512;
+	  FOCVars[M1].Iq_avg = FOCVars[M1].Iq_sum / AVG_SAMPLES;
 	  FOCVars[M1].Iq_sum = 0;
-	  FOCVars[M1].Id_avg = FOCVars[M1].Id_sum / 512;
+	  FOCVars[M1].Id_avg = FOCVars[M1].Id_sum / AVG_SAMPLES;
 	  FOCVars[M1].Id_sum = 0;
-	  FOCVars[M1].Vq_avg = FOCVars[M1].Vq_sum / 512;
+	  FOCVars[M1].Vq_avg = FOCVars[M1].Vq_sum / AVG_SAMPLES;
 	  FOCVars[M1].Vq_sum = 0;
-	  FOCVars[M1].Vd_avg = FOCVars[M1].Vd_sum / 512;
+	  FOCVars[M1].Vd_avg = FOCVars[M1].Vd_sum / AVG_SAMPLES;
 	  FOCVars[M1].Vd_sum = 0;
 	  FOCVars[M1].samples=0;
   }
