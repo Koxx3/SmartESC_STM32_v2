@@ -71,7 +71,7 @@ bool tune_mcpwm_foc_hall_detect(float current, uint8_t *hall_table) {
 		for (int j = 0;j < 360;j++) {
 			float m_phase_now_override = (float)j * M_PI / 180.0;
 			pMCI[M1]->pSTC->SPD->open_angle = 65536.0 / (2 *M_PI) * m_phase_now_override;
-			vTaskDelay(MS_TO_TICKS(5));
+			vTaskDelay(MS_TO_TICKS(2));
 			int hall = HALL_M1.HallState;
 			sin_hall[hall] += sinf(m_phase_now_override);
 			cos_hall[hall] += cosf(m_phase_now_override);
@@ -84,7 +84,7 @@ bool tune_mcpwm_foc_hall_detect(float current, uint8_t *hall_table) {
 		for (int j = 360;j >= 0;j--) {
 			float m_phase_now_override = (float)j * M_PI / 180.0;
 			pMCI[M1]->pSTC->SPD->open_angle =65536.0 / (2 *M_PI) * m_phase_now_override;
-			vTaskDelay(MS_TO_TICKS(5));
+			vTaskDelay(MS_TO_TICKS(2));
 			int hall = HALL_M1.HallState;
 			sin_hall[hall] += sinf(m_phase_now_override);
 			cos_hall[hall] += cosf(m_phase_now_override);

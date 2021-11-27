@@ -168,7 +168,7 @@
 
 /**********  AUXILIARY HALL TIMER MOTOR 1 *************/
 #define M1_HALL_TIM_PERIOD 65535
-#define M1_HALL_IC_FILTER  10
+#define M1_HALL_IC_FILTER  15
 #define SPD_TIM_M1_IRQHandler TIM3_IRQHandler
 
 #define START_INDEX     63

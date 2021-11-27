@@ -39,6 +39,7 @@
 
 #define TEMP_SENSOR_TYPE													 VIRTUAL_SENSOR
 #define CURR_SENSOR_TYPE													 REAL_SENSOR
+#define ERROR_PRINTING														 1
 
 #endif
 
@@ -68,6 +69,7 @@
 
 #define TEMP_SENSOR_TYPE													 REAL_SENSOR
 #define CURR_SENSOR_TYPE													 VIRTUAL_SENSOR
+#define ERROR_PRINTING														 1
 
 #endif
 /****************************************************************************/

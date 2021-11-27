@@ -234,9 +234,9 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	mcconf->lo_current_max = mcconf->l_current_max;
 
 	if(mcconf->l_max_erpm >= abs(mcconf->l_min_erpm)){
-		max_app_speed = VescToSTM_erpm_to_speed(mcconf->l_max_erpm * 1.5, mcconf->si_motor_poles);
+		max_app_speed = VescToSTM_erpm_to_speed(mcconf->l_max_erpm * 2, mcconf->si_motor_poles);
 	}else{
-		max_app_speed = VescToSTM_erpm_to_speed(abs(mcconf->l_min_erpm * 1.5), mcconf->si_motor_poles);
+		max_app_speed = VescToSTM_erpm_to_speed(abs(mcconf->l_min_erpm * 2), mcconf->si_motor_poles);
 	}
 
 

@@ -91,10 +91,11 @@ __weak qd_t FW_CalcCurrRef( FW_Handle_t * pHandle, qd_t Iqdref ){
 	  if(Iqdref.d != 0){
 		  PID_SetLowerIntegralTermLimit(pHandle->pSpeedPID, -lowerLimit);
 		  PID_SetUpperIntegralTermLimit(pHandle->pSpeedPID, lowerLimit);
+		  if ( Iqdref.q > sqRoot || (sqRoot = -sqRoot, Iqdref.q < sqRoot) ){
+		      Iqdref.q = sqRoot;
+		  }
 	  }
-	  if ( Iqdref.q > sqRoot || (sqRoot = -sqRoot, Iqdref.q < sqRoot) ){
-		  Iqdref.q = sqRoot;
-	  }
+
 
 	  return Iqdref;
 }

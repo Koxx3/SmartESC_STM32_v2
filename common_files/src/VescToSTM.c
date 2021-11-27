@@ -125,19 +125,25 @@ void VescToSTM_enable_timeout(bool enbale){
 }
 
 void VescToSTM_update_torque(int32_t q, int32_t min_erpm, int32_t max_erpm){
+
 	if(q >= 0){
+		FW_M1.wNominalSqCurr = q*q;
 		FW_M1.hDemagCurrent	= -((float)q*mc_conf.foc_d_gain_scale_max_mod);
 		SpeednTorqCtrlM1.PISpeed->wUpperIntegralLimit = q * SP_KDDIV;
 		SpeednTorqCtrlM1.PISpeed->wLowerIntegralLimit = mc_conf.s_pid_allow_braking ? -q : 0;
 		SpeednTorqCtrlM1.PISpeed->hUpperOutputLimit = q;
 		SpeednTorqCtrlM1.PISpeed->hLowerOutputLimit = mc_conf.s_pid_allow_braking ? -q : 0;
+		//HALL_M1.q = q;
 		MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(max_erpm, mc_conf.si_motor_poles), 0);
 
 	}else{
+		FW_M1.wNominalSqCurr = q*q;
+		FW_M1.hDemagCurrent	= ((float)q*mc_conf.foc_d_gain_scale_max_mod);
 		SpeednTorqCtrlM1.PISpeed->wUpperIntegralLimit = mc_conf.s_pid_allow_braking ? -q : 0;
 		SpeednTorqCtrlM1.PISpeed->wLowerIntegralLimit = q * SP_KDDIV;
 		SpeednTorqCtrlM1.PISpeed->hUpperOutputLimit = mc_conf.s_pid_allow_braking ? -q : 0;
 		SpeednTorqCtrlM1.PISpeed->hLowerOutputLimit = q;
+		//HALL_M1.q = q;
 		MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(min_erpm, mc_conf.si_motor_poles) , 0);
 	}
 }
@@ -185,8 +191,7 @@ void VescToSTM_set_brake_rel_int(int32_t val){
 	if(n_q < SpeednTorqCtrlM1.MinNegativeTorque){
 		n_q = SpeednTorqCtrlM1.MinNegativeTorque;
 	}
-
-	FW_M1.hDemagCurrent	= -((float)SpeednTorqCtrlM1.MaxPositiveTorque*mc_conf.foc_d_gain_scale_max_mod);
+	FW_M1.hDemagCurrent	= 0;
 	SpeednTorqCtrlM1.PISpeed->hUpperOutputLimit = p_q;
 	SpeednTorqCtrlM1.PISpeed->hLowerOutputLimit = n_q;
 	SpeednTorqCtrlM1.PISpeed->wUpperIntegralLimit = p_q * SP_KIDIV;
@@ -202,6 +207,7 @@ void VescToSTM_set_brake(int32_t current){
 	utils_truncate_number_int(&q, SpeednTorqCtrlM1.MinNegativeTorque, SpeednTorqCtrlM1.MaxPositiveTorque);
 
 	if(q > 0){
+		FW_M1.wNominalSqCurr = q*q;
 		FW_M1.hDemagCurrent	= -((float)SpeednTorqCtrlM1.MaxPositiveTorque*mc_conf.foc_d_gain_scale_max_mod);
 		SpeednTorqCtrlM1.PISpeed->hUpperOutputLimit = q;
 		SpeednTorqCtrlM1.PISpeed->hLowerOutputLimit = -q;
@@ -209,6 +215,8 @@ void VescToSTM_set_brake(int32_t current){
 		SpeednTorqCtrlM1.PISpeed->wLowerIntegralLimit = -q * SP_KIDIV;
 		MCI_ExecSpeedRamp(pMCI[M1], 0 , 0);
 	}else{
+		FW_M1.wNominalSqCurr = q*q;
+		FW_M1.hDemagCurrent = ((float)SpeednTorqCtrlM1.MinNegativeTorque*mc_conf.foc_d_gain_scale_max_mod);
 		SpeednTorqCtrlM1.PISpeed->hUpperOutputLimit = -q;
 		SpeednTorqCtrlM1.PISpeed->hLowerOutputLimit = q;
 		SpeednTorqCtrlM1.PISpeed->wUpperIntegralLimit = -q * SP_KIDIV;
@@ -230,12 +238,15 @@ void VescToSTM_set_speed(int32_t rpm){
 	}
 	VescToSTM_set_open_loop(false, 0, 0);
 	if(rpm>=0){
+		FW_M1.wNominalSqCurr = SpeednTorqCtrlM1.MaxPositiveTorque*SpeednTorqCtrlM1.MaxPositiveTorque;
 		FW_M1.hDemagCurrent	= -((float)SpeednTorqCtrlM1.MaxPositiveTorque*mc_conf.foc_d_gain_scale_max_mod);
 		SpeednTorqCtrlM1.PISpeed->wUpperIntegralLimit = (int32_t)SpeednTorqCtrlM1.MaxPositiveTorque * SP_KIDIV;
 		SpeednTorqCtrlM1.PISpeed->wLowerIntegralLimit = mc_conf.s_pid_allow_braking ? (int32_t)SpeednTorqCtrlM1.MinNegativeTorque * SP_KIDIV: 0;
 		SpeednTorqCtrlM1.PISpeed->hUpperOutputLimit = SpeednTorqCtrlM1.MaxPositiveTorque;
 		SpeednTorqCtrlM1.PISpeed->hLowerOutputLimit = mc_conf.s_pid_allow_braking ? SpeednTorqCtrlM1.MinNegativeTorque : 0;
 	}else{
+		FW_M1.wNominalSqCurr = SpeednTorqCtrlM1.MinNegativeTorque*SpeednTorqCtrlM1.MinNegativeTorque;
+		FW_M1.hDemagCurrent = ((float)SpeednTorqCtrlM1.MinNegativeTorque*mc_conf.foc_d_gain_scale_max_mod);
 		SpeednTorqCtrlM1.PISpeed->wUpperIntegralLimit = mc_conf.s_pid_allow_braking ? (int32_t)SpeednTorqCtrlM1.MaxPositiveTorque * SP_KIDIV: 0;
 		SpeednTorqCtrlM1.PISpeed->wLowerIntegralLimit = (int32_t)SpeednTorqCtrlM1.MinNegativeTorque * SP_KIDIV;
 		SpeednTorqCtrlM1.PISpeed->hUpperOutputLimit = mc_conf.s_pid_allow_braking ? SpeednTorqCtrlM1.MaxPositiveTorque : 0;
@@ -251,6 +262,7 @@ void VescToSTM_set_speed(int32_t rpm){
 
 float VescToSTM_get_temperature(){
 	return NTC_GetAvTemp_C(pMCT[M1]->pTemperatureSensor);
+	//return ANG_TO_DEG(HALL_M1._Super.hElAngle);
 }
 
 
