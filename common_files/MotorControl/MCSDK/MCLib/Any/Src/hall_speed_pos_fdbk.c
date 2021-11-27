@@ -236,10 +236,7 @@ __attribute__( ( section ( ".ccmram" ) ) )
 */
 __weak int16_t HALL_CalcElAngle( HALL_Handle_t * pHandle )
 {
-  if ( pHandle->HallMtpa == true){
-	  return pHandle->_Super.hElAngle;
-  }
-  else if ( pHandle->_Super.hElSpeedDpp != HALL_MAX_PSEUDO_SPEED )
+if ( pHandle->_Super.hElSpeedDpp != HALL_MAX_PSEUDO_SPEED )
   {
     pHandle->MeasuredElAngle += pHandle->_Super.hElSpeedDpp;
     pHandle->_Super.hElAngle += pHandle->_Super.hElSpeedDpp + pHandle->CompSpeed;
@@ -422,15 +419,15 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
        computed speed close to the infinite, and bring instability. */
     if (pHandle->Direction != PrevDirection)
     {
+    	pHandle->BufferFilled = 0;
+    	    	pHandle->SpeedFIFOIdx = 0;
     	cnt=0;
       /* Setting BufferFilled to 0 will prevent to compute the average speed based
        on the SpeedPeriod buffer values */
     }
-    if(cnt<20){
-    	pHandle->BufferFilled = 0;
-    	pHandle->SpeedFIFOIdx = 0;
-    }
-    cnt++;
+
+
+
     if (pHandle->HallMtpa == true)
     {
       pHandle->_Super.hElAngle = pHandle->MeasuredElAngle;
@@ -517,7 +514,7 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
       /* the HALL_MAX_PSEUDO_SPEED is temporary in the buffer, and never included in average computation*/
         if ( wCaptBuf < pHandle->MinPeriod )
         {
-           /* pHandle->AvrElSpeedDpp = HALL_MAX_PSEUDO_SPEED; */
+           pHandle->AvrElSpeedDpp = HALL_MAX_PSEUDO_SPEED;
         }
         else
         {
@@ -552,14 +549,8 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
 
             if((abs(pHandle->AvrElSpeedDpp) < pHandle->SwitchSpeed) ){
             	pHandle->HallMtpa = true;
-            }else{
-            	if(cnt>20){
-            		cnt = 21;
-            		pHandle->HallMtpa = false;
-            	}else{
-            		pHandle->HallMtpa = true;
-            	}
             }
+
           }
           else /* Sensor is not reliable */
           {
