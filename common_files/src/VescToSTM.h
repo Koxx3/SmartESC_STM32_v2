@@ -24,6 +24,7 @@ void VescToSTM_set_brake_rel_int(int32_t val);
 void VescToSTM_set_handbrake(float current);
 void VescToSTM_set_speed(int32_t rpm);
 float VescToSTM_get_temperature();
+float VescToSTM_get_temperature2();
 float VescToSTM_get_phase_current();
 float VescToSTM_get_input_current();
 float VescToSTM_get_id();

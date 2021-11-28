@@ -234,9 +234,9 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	mcconf->lo_current_max = mcconf->l_current_max;
 
 	if(mcconf->l_max_erpm >= abs(mcconf->l_min_erpm)){
-		max_app_speed = VescToSTM_erpm_to_speed(mcconf->l_max_erpm * 2, mcconf->si_motor_poles);
+		max_app_speed = VescToSTM_erpm_to_speed(mcconf->l_max_erpm * 1.15, mcconf->si_motor_poles);
 	}else{
-		max_app_speed = VescToSTM_erpm_to_speed(abs(mcconf->l_min_erpm * 2), mcconf->si_motor_poles);
+		max_app_speed = VescToSTM_erpm_to_speed(abs(mcconf->l_min_erpm * 1.15), mcconf->si_motor_poles);
 	}
 
 
@@ -273,6 +273,7 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 
 	HALL_M1._Super.bElToMecRatio                = mcconf->si_motor_poles;
 	HALL_M1._Super.hMaxReliableMecSpeedUnit     = max_app_speed;
+	HALL_M1._Super.hMinReliableMecSpeedUnit     = -VescToSTM_erpm_to_speed(50, mcconf->si_motor_poles);
 	HALL_M1._Super.bMaximumSpeedErrorsNumber    = MEAS_ERRORS_BEFORE_FAULTS;
 	HALL_M1.PhaseShift          				= DEG_TO_ANG(mcconf->foc_encoder_offset);
 	for(int i=0;i<8;i++){

@@ -237,8 +237,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				buffer_append_float16(send_buffer, VescToSTM_get_temperature() , 1e1, &ind);
 			}
 			if (mask & ((uint32_t)1 << 1)) {
-				//buffer_append_float16(send_buffer, mc_interface_temp_motor_filtered(), 1e1, &ind);
-				buffer_append_float16(send_buffer, 0, 1e1, &ind);
+				buffer_append_float16(send_buffer, VescToSTM_get_temperature2(), 1e1, &ind);
 			}
 			if (mask & ((uint32_t)1 << 2)) {
 				buffer_append_float32(send_buffer, VescToSTM_get_phase_current(), 1e2, &ind);
@@ -580,8 +579,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						buffer_append_float16(send_buffer, VescToSTM_get_temperature(), 1e1, &ind);
 					}
 					if (mask & ((uint32_t)1 << 1)) {
-						//buffer_append_float16(send_buffer, mc_interface_temp_motor_filtered(), 1e1, &ind);
-						buffer_append_float16(send_buffer, 0, 1e1, &ind);
+						buffer_append_float16(send_buffer, VescToSTM_get_temperature2(), 1e1, &ind);
 					}
 					if (mask & ((uint32_t)1 << 2)) {
 						buffer_append_float32(send_buffer, val.current_tot, 1e2, &ind);
