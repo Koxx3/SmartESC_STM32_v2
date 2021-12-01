@@ -36,6 +36,9 @@
 #define PACKET_MAX_PL_LEN		512
 #endif
 
+#define PACKET_SIZE(x) (x+8)
+#define PACKET_HEADER  4
+
 typedef struct {
 	volatile unsigned short rx_timeout;
 	void(*send_func)(unsigned char *data, unsigned int len);
@@ -44,7 +47,6 @@ typedef struct {
 	unsigned int rx_write_ptr;
 	int bytes_left;
 	unsigned char * rx_buffer;
-	unsigned char * tx_buffer;
 } PACKET_STATE_t;
 
 // Functions
@@ -53,6 +55,6 @@ PACKET_STATE_t * packet_init(void (*s_func)(unsigned char *data, unsigned int le
 void packet_reset(PACKET_STATE_t * handle);
 void packet_process_byte(uint8_t rx_data, PACKET_STATE_t * handle);
 void packet_timerfunc(void);
-void packet_send_packet(unsigned char *data, unsigned int len, PACKET_STATE_t * handle);
+void packet_send_packet(unsigned char *send_buffer, unsigned int len, PACKET_STATE_t * handle);
 
 #endif /* PACKET_H_ */

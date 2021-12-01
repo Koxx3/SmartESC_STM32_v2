@@ -698,9 +698,15 @@ __weak uint8_t TSK_HighFrequencyTask(void)
 		samples.dec_state++;
 		if(samples.dec_state == samples.dec){
 			samples.dec_state = 0;
-			samples.m_curr0_samples[samples.index] = FOCVars[M1].Iab.a;
-			samples.m_curr1_samples[samples.index] = FOCVars[M1].Iab.b;
-			samples.m_phase_samples[samples.index] = HALL_M1.MeasuredElAngle / 256;
+			samples.m_curr0_samples[samples.index] = (uint16_t)FOCVars[M1].Iab.a >>4; //Make room for position
+			samples.m_curr1_samples[samples.index] = (uint16_t)FOCVars[M1].Iab.b >>4; //Make room for position
+			samples.m_curr0_samples[samples.index] |= (((uint16_t)HALL_M1._Super.hElAngle<<4) & 0xF000);
+			samples.m_curr1_samples[samples.index] |= (uint16_t)HALL_M1._Super.hElAngle & 0xF000;
+#if SCOPE_UVW == 1
+			samples.m_v0_samples[samples.index] = (uint16_t)PWM_Handle_M1._Super.CntPhA >>3;
+			samples.m_v1_samples[samples.index] = (uint16_t)PWM_Handle_M1._Super.CntPhB >>3;
+			samples.m_v2_samples[samples.index] = (uint16_t)PWM_Handle_M1._Super.CntPhC >>3;
+#endif
 
 			samples.index++;
 			if(samples.index == samples.n_samp){

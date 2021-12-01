@@ -475,9 +475,10 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 		currComp.q = 0;
 
 		MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
-
+		MCI_StopMotor(pMCI[M1]);
 		vTaskDelay(1);
 		VescToSTM_set_open_loop(false, 0, 0);
+
 		vTaskDelay(MS_TO_TICKS(5));
 
 		float linkage_sum = 0.0;
@@ -503,7 +504,9 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 
 		result = true;
 	}
-
+	vTaskDelay(MS_TO_TICKS(500));
+	MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
+	MCI_StartMotor(pMCI[M1]);
 
 	VescToSTM_enable_timeout(true);
 	return result;

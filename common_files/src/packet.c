@@ -40,8 +40,12 @@ PACKET_STATE_t * packet_init(void (*s_func)(unsigned char *data, unsigned int le
 	ret->send_func = s_func;
 	ret->process_func = p_func;
 	ret->rx_buffer = pvPortMalloc(BUFFER_LEN);
-	ret->tx_buffer = pvPortMalloc(BUFFER_LEN);
 	return ret;
+}
+
+void packet_free(PACKET_STATE_t * handle){
+	vPortFree(handle->rx_buffer);
+	vPortFree(handle);
 }
 
 void packet_reset(PACKET_STATE_t * state) {
@@ -50,38 +54,40 @@ void packet_reset(PACKET_STATE_t * state) {
 	state->bytes_left = 0;
 }
 
-void packet_send_packet(unsigned char *data, unsigned int len, PACKET_STATE_t * handle) {
+void packet_send_packet(unsigned char *send_buffer, unsigned int len, PACKET_STATE_t * handle) {
 	if (len == 0 || len > PACKET_MAX_PL_LEN) {
 		return;
 	}
 
+	uint8_t * data = send_buffer + PACKET_HEADER;
 
 	int b_ind = 0;
 
 	if (len <= 255) {
-		handle->tx_buffer[b_ind++] = 2;
-		handle->tx_buffer[b_ind++] = len;
+		send_buffer+=2;
+		send_buffer[b_ind++] = 2;
+		send_buffer[b_ind++] = len;
 	} else if (len <= 65535) {
-		handle->tx_buffer[b_ind++] = 3;
-		handle->tx_buffer[b_ind++] = len >> 8;
-		handle->tx_buffer[b_ind++] = len & 0xFF;
+		send_buffer+=1;
+		send_buffer[b_ind++] = 3;
+		send_buffer[b_ind++] = len >> 8;
+		send_buffer[b_ind++] = len & 0xFF;
 	} else {
-		handle->tx_buffer[b_ind++] = 4;
-		handle->tx_buffer[b_ind++] = len >> 16;
-		handle->tx_buffer[b_ind++] = (len >> 8) & 0x0F;
-		handle->tx_buffer[b_ind++] = len & 0xFF;
+		send_buffer[b_ind++] = 4;
+		send_buffer[b_ind++] = len >> 16;
+		send_buffer[b_ind++] = (len >> 8) & 0x0F;
+		send_buffer[b_ind++] = len & 0xFF;
 	}
 
-	memcpy(handle->tx_buffer + b_ind, data, len);
 	b_ind += len;
 
 	unsigned short crc = crc16(data, len);
-	handle->tx_buffer[b_ind++] = (uint8_t)(crc >> 8);
-	handle->tx_buffer[b_ind++] = (uint8_t)(crc & 0xFF);
-	handle->tx_buffer[b_ind++] = 3;
+	send_buffer[b_ind++] = (uint8_t)(crc >> 8);
+	send_buffer[b_ind++] = (uint8_t)(crc & 0xFF);
+	send_buffer[b_ind++] = 3;
 
 	if (handle->send_func) {
-		handle->send_func(handle->tx_buffer, b_ind);
+		handle->send_func(send_buffer, b_ind);
 	}
 }
 

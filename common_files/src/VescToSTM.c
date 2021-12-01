@@ -70,7 +70,11 @@ void VescToStm_nunchuk_update_output(chuck_data * chuck_d){
 		if(last_y > 126){
 			VescToSTM_set_current_rel_int(utils_map_int(last_y, 127, 255, 0, 32768));
 		}else{
-			VescToSTM_set_brake_rel_int(utils_map(last_y, 0, 126, 32768, 0));
+			if(chuck_d->bt_c){
+				VescToSTM_set_current_rel_int(utils_map_int(last_y, 0, 126, -32768, 0));
+			}else{
+				VescToSTM_set_brake_rel_int(utils_map_int(last_y, 0, 126, 32768, 0));
+			}
 		}
 	}
 }
