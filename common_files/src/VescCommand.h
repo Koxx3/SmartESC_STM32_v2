@@ -46,7 +46,7 @@ typedef enum {
 	SAMP_SENDING
 }SAMP_STATES;
 
-#define ADC_SAMPLE_MAX_LEN 500
+
 
 typedef struct samp_struct samp_str;
 struct samp_struct{
@@ -57,9 +57,9 @@ struct samp_struct{
 	uint16_t n_samp;
 	uint16_t vesc_tool_samples;
 	debug_sampling_mode mode;
-	int16_t m_curr0_samples[ADC_SAMPLE_MAX_LEN];
-	int16_t m_curr1_samples[ADC_SAMPLE_MAX_LEN];
-	int8_t m_phase_samples[ADC_SAMPLE_MAX_LEN];
+	int16_t * m_curr0_samples;
+	int16_t * m_curr1_samples;
+	int8_t  * m_phase_samples;
 };
 
 extern volatile samp_str samples;

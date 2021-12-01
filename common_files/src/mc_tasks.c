@@ -694,7 +694,7 @@ __weak uint8_t TSK_HighFrequencyTask(void)
 		}
 	}
 
-	if(samples.state == SAMP_SAMPLING){
+	if(samples.state == SAMP_SAMPLING && samples.n_samp){
 		samples.dec_state++;
 		if(samples.dec_state == samples.dec){
 			samples.dec_state = 0;
@@ -812,18 +812,18 @@ inline uint16_t FOC_CurrControllerM1(void)
   */
 __weak void TSK_SafetyTask(void)
 {
-  /* USER CODE BEGIN TSK_SafetyTask 0 */
+	/* USER CODE BEGIN TSK_SafetyTask 0 */
 
-  /* USER CODE END TSK_SafetyTask 0 */
-  if (bMCBootCompleted == 1)
-  {
-    TSK_SafetyTask_PWMOFF(M1);
-    /* User conversion execution */
-    RCM_ExecUserConv ();
-  /* USER CODE BEGIN TSK_SafetyTask 1 */
+	/* USER CODE END TSK_SafetyTask 0 */
+	if (bMCBootCompleted == 1)
+	{
+		TSK_SafetyTask_PWMOFF(M1);
+		/* User conversion execution */
+		RCM_ExecUserConv ();
+		/* USER CODE BEGIN TSK_SafetyTask 1 */
 
-  /* USER CODE END TSK_SafetyTask 1 */
-  }
+	/* USER CODE END TSK_SafetyTask 1 */
+	}
 }
 
 /**
@@ -976,6 +976,7 @@ void StartSafetyTask(void const * argument)
     /* delay of 500us */
     vTaskDelay(1);
     TSK_SafetyTask();
+    task_PWR(NULL);
   }
   /* USER CODE END SF task 1 */
 }

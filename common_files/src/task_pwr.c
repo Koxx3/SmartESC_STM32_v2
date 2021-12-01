@@ -28,13 +28,11 @@
 #include "task_cli.h"
 #include <string.h>
 #include "VescCommand.h"
+#include "music.h"
 
-osThreadId_t PwrHandle;
-volatile uint32_t main_loop_counter;
-static uint8_t power_button_state = 0;
+//Not a real Task... it's called from safety task. No delays allowed
 
-const osThreadAttr_t PWR_attributes = { .name = "PWR", .priority =
-		(osPriority_t) osPriorityBelowNormal, .stack_size = 128 * 4 };
+#define EXECUTION_SPEED		40			//every 40 ticks (20ms)
 
 uint8_t buttonState() {
     static const uint32_t DEBOUNCE_MILLIS = 20 ;
@@ -98,40 +96,41 @@ eButtonEvent getButtonEvent()
     return button_event ;
 }
 
+//This is not a FreeRTOS Task... its called from safety task to safe some heap space every 500us
+extern MUSIC_PARAM bldc_music;
 void task_PWR(void *argument) {
-	/* Infinite loop */
-	for (;;) {
-		if(main_loop_counter > 25){
-			switch( getButtonEvent() ){
-				  case NO_PRESS : break ;
-				  case SINGLE_PRESS : {
-					  commands_printf("SINGLE_PRESS");
-				  } break ;
-				  case LONG_PRESS :   {
-					  commands_printf("LONG_PRESS");
-				  } break ;
-				  case VERY_LONG_PRESS :   {
-					  power_control(DEV_PWR_OFF);
-				  } break ;
-				  case DOUBLE_PRESS : {
-					  commands_printf("DOUBLE_PRESS");
-				  } break ;
-			 }
-		}
-		main_loop_counter++;
-
-		vTaskDelay(MS_TO_TICKS(50));
+	static uint8_t main_loop_counter = 0;
+	if(main_loop_counter > 40){
+		main_loop_counter=0;
+		switch( getButtonEvent() ){
+			  case NO_PRESS : break ;
+			  case SINGLE_PRESS : {
+				  commands_printf("SINGLE_PRESS");
+			  } break ;
+			  case LONG_PRESS :   {
+				  commands_printf("LONG_PRESS");
+			  } break ;
+			  case VERY_LONG_PRESS :   {
+				  set_music_command(Music1, &bldc_music);
+				  vTaskDelay(3000);
+				  set_music_command(Music_OFF, &bldc_music);
+				  power_control(DEV_PWR_OFF);
+			  } break ;
+			  case DOUBLE_PRESS : {
+				  commands_printf("DOUBLE_PRESS");
+			  } break ;
+		 }
 	}
+	main_loop_counter++;
 }
 
 void task_PWR_init() {
 	/* Check button pressed state at startup */
-	power_button_state = buttonState();
+	buttonState();
 
     /* Power ON board temporarily, ultimate decision to keep hardware ON or OFF is made later */
 	power_control(DEV_PWR_ON);
 
-	PwrHandle = osThreadNew(task_PWR, NULL, &PWR_attributes);
 }
 
 void power_control(uint8_t pwr)
@@ -143,19 +142,12 @@ void power_control(uint8_t pwr)
 		HAL_GPIO_WritePin(TPS_ENA_GPIO_Port, TPS_ENA_Pin, GPIO_PIN_SET);
 	} else if(pwr == DEV_PWR_OFF) {
 
-		//motors_free(0, NULL);
-		//sleep_x_ticks(2000);
-		//stop_motors();
 		vTaskDelay(1);
 
 		while(HAL_GPIO_ReadPin(PWR_BTN_GPIO_Port, PWR_BTN_Pin));
 		HAL_GPIO_WritePin(TPS_ENA_GPIO_Port, TPS_ENA_Pin, GPIO_PIN_RESET);
 		while(1);
 	} else if(pwr == DEV_PWR_RESTART) {
-
-		//motors_free(0, NULL);
-		//sleep_x_ticks(2000);
-		//stop_motors();
 
 		/* Restart the system */
 		NVIC_SystemReset();

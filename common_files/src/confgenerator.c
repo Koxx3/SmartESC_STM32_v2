@@ -7,6 +7,7 @@
 #include "drive_parameters.h"
 #include "mc_stm_types.h"
 
+
 int32_t confgenerator_serialize_mcconf(uint8_t *buffer, const mc_configuration *conf) {
 	int32_t ind = 0;
 

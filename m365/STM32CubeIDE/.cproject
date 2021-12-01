@@ -138,9 +138,9 @@
 									<listOptionValue builtIn="false" value="../../../common_files/src"/>
 									<listOptionValue builtIn="false" value="../../Drivers/STM32F1xx_HAL_Driver/Inc"/>
 									<listOptionValue builtIn="false" value="../../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy"/>
-									<listOptionValue builtIn="false" value="../../MotorControl/MCSDK/MCLib/Any/Inc"/>
-									<listOptionValue builtIn="false" value="../../MotorControl/MCSDK/MCLib/F1xx/Inc"/>
-									<listOptionValue builtIn="false" value="../../MotorControl/MCSDK/UILibrary/Inc"/>
+									<listOptionValue builtIn="false" value="../../../common_files/MotorControl/MCSDK/MCLib/Any/Inc"/>
+									<listOptionValue builtIn="false" value="../../../common_files/MotorControl/MCSDK/MCLib/F1xx/Inc"/>
+									<listOptionValue builtIn="false" value="../../../common_files/MotorControl/MCSDK/UILibrary/Inc"/>
 									<listOptionValue builtIn="false" value="../../Drivers/CMSIS/Device/ST/STM32F1xx/Include"/>
 									<listOptionValue builtIn="false" value="../../Drivers/CMSIS/Include"/>
 									<listOptionValue builtIn="false" value="../../Drivers/CMSIS/DSP/Include"/>

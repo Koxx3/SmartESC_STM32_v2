@@ -36,12 +36,23 @@
 #define PACKET_MAX_PL_LEN		512
 #endif
 
+typedef struct {
+	volatile unsigned short rx_timeout;
+	void(*send_func)(unsigned char *data, unsigned int len);
+	void(*process_func)(unsigned char *data, unsigned int len);
+	unsigned int rx_read_ptr;
+	unsigned int rx_write_ptr;
+	int bytes_left;
+	unsigned char * rx_buffer;
+	unsigned char * tx_buffer;
+} PACKET_STATE_t;
+
 // Functions
-void packet_init(void (*s_func)(unsigned char *data, unsigned int len),
-		void (*p_func)(unsigned char *data, unsigned int len), int handler_num);
-void packet_reset(int handler_num);
-void packet_process_byte(uint8_t rx_data, int handler_num);
+PACKET_STATE_t * packet_init(void (*s_func)(unsigned char *data, unsigned int len),
+		void (*p_func)(unsigned char *data, unsigned int len));
+void packet_reset(PACKET_STATE_t * handle);
+void packet_process_byte(uint8_t rx_data, PACKET_STATE_t * handle);
 void packet_timerfunc(void);
-void packet_send_packet(unsigned char *data, unsigned int len, int handler_num);
+void packet_send_packet(unsigned char *data, unsigned int len, PACKET_STATE_t * handle);
 
 #endif /* PACKET_H_ */

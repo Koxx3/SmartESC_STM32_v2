@@ -28,14 +28,20 @@
 #include "cmsis_os.h"
 #include "FreeRTOS.h"
 #include "product.h"
+#include "ninebot.h"
+#include "VescCommand.h"
 
+
+NinebotPack frame;
+
+static uint8_t	ui8_tx_buffer[] = {0x55, 0xAA, 0x08, 0x21, 0x64, 0x00, 0x01, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 
 #define CIRC_BUF_SZ       				32  /* must be power of two */
 #define DMA_WRITE_PTR(channel) 			((CIRC_BUF_SZ - channel.hdmarx->Instance->CNDTR) & (CIRC_BUF_SZ - 1) )  //huart_cobs->hdmarx->Instance->NDTR.
 
 uint8_t usart_rx_dma_buffer[CIRC_BUF_SZ];
-uint8_t usart2_rx_dma_buffer[CIRC_BUF_SZ];
+//uint8_t usart2_rx_dma_buffer[CIRC_BUF_SZ];
 
 uint8_t app_connection_timout = 8;
 
@@ -48,6 +54,7 @@ const osThreadAttr_t task_app_attributes = {
 
 void my_uart_send_data(uint8_t *tdata, uint16_t tnum){
 	//send data
+	//HAL_HalfDuplex_EnableTransmitter(&APP_USART_DMA);
 	while( HAL_UART_Transmit_DMA(&APP_USART_DMA, tdata, tnum) != HAL_OK ) osDelay(1);
 
 	//Waiting to send status OK
@@ -55,6 +62,7 @@ void my_uart_send_data(uint8_t *tdata, uint16_t tnum){
 		APP_USART_DMA.gState = HAL_UART_STATE_READY;
 		osDelay(1);
 	}
+	//HAL_HalfDuplex_EnableReceiver(&APP_USART_DMA);
 }
 
 #ifdef G30P
@@ -84,14 +92,24 @@ void task_app(void * argument)
 #ifdef G30P
 	uint32_t rd2_ptr=0;
 #endif
-
+float speed;
   /* Infinite loop */
 	for(;;)
 	{
 		while(rd_ptr != DMA_WRITE_PTR(APP_USART_DMA)) {
+			if(ninebot_parse(usart_rx_dma_buffer[rd_ptr] ,&frame)	==0){
+					//commands_printf("LEN: %d CMD: %x ARG: %x", frame.len, frame.cmd, frame.arg);
+			}
 			rd_ptr++;
 			rd_ptr &= (CIRC_BUF_SZ - 1);
 		}
+		speed += VescToSTM_get_speed()*3.6;
+		speed /=2;
+		ui8_tx_buffer[10]=speed;
+		addCRC((uint8_t*)ui8_tx_buffer, ui8_tx_buffer[2]+6);
+
+
+		my_uart_send_data((uint8_t*)ui8_tx_buffer, sizeof(ui8_tx_buffer));
 
 #ifdef G30P
 		while(rd2_ptr != DMA_WRITE_PTR(APP2_USART_DMA)) {

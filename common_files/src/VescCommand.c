@@ -44,7 +44,6 @@
 
 static void(* volatile send_func)(unsigned char *data, unsigned int len) = 0;
 static volatile int fw_version_sent_cnt = 0;
-static uint8_t send_buffer_global[PACKET_MAX_PL_LEN];
 static disp_pos_mode display_position_mode;
 
 
@@ -100,9 +99,15 @@ void commands_send_packet(unsigned char *data, unsigned int len) {
 }
 
 void commands_send_mcconf(COMM_PACKET_ID packet_id, mc_configuration *mcconf) {
-	send_buffer_global[0] = packet_id;
-	int32_t len = confgenerator_serialize_mcconf(send_buffer_global + 1, mcconf);
-	commands_send_packet(send_buffer_global, len + 1);
+	uint8_t * send_buffer = pvPortMalloc(512);
+	if(send_buffer == NULL){
+		commands_printf("Malloc failed send mcconf)");
+		return;
+	}
+	send_buffer[0] = packet_id;
+	int32_t len = confgenerator_serialize_mcconf(&send_buffer[1], mcconf);
+	commands_send_packet(send_buffer, len + 1);
+	vPortFree(send_buffer);
 }
 
 volatile samp_str samples;
@@ -115,7 +120,7 @@ samples.data[4][samples.index] = PWM_Handle_M1._Super.CntPhC;
 samples.data[5][samples.index] = HALL_M1.MeasuredElAngle;
 */
 void send_sample(){
-	if(samples.state == SAMP_FINISHED){
+	if(samples.state == SAMP_FINISHED && samples.n_samp){
 
 		uint8_t buffer[40];
 		int32_t index = 0;
@@ -134,14 +139,17 @@ void send_sample(){
 
 		samples.index++;
 
-		if(samples.index == samples.n_samp){
+		if(samples.vesc_tool_samples == 1000) commands_send_packet(buffer, index);
+		commands_send_packet(buffer, index);
 
+		if(samples.index == samples.n_samp){
+			vPortFree(samples.m_curr0_samples);
+			vPortFree(samples.m_curr1_samples);
+			vPortFree(samples.m_phase_samples);
+			samples.n_samp = 0;
 			samples.index = 0;
 			samples.state = SAMP_IDLE;
 		}
-
-		if(samples.vesc_tool_samples == 1000) commands_send_packet(buffer, index);
-		commands_send_packet(buffer, index);
 	}
 }
 
@@ -223,7 +231,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 		case COMM_GET_VALUES:
 		case COMM_GET_VALUES_SELECTIVE: {
 			int32_t ind = 0;
-			uint8_t *send_buffer = send_buffer_global;
+			uint8_t send_buffer[80];
 			send_buffer[ind++] = packet_id;
 
 			uint32_t mask = 0xFFFFFFFF;
@@ -406,6 +414,10 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				case COMM_GET_MCCONF:
 				case COMM_GET_MCCONF_DEFAULT: {
 					mc_configuration *mcconf = pvPortMalloc(sizeof(mc_configuration));
+					if(mcconf == NULL){
+						commands_printf("Malloc failed get mcconf");
+						return;
+					}
 
 					if (packet_id == COMM_GET_MCCONF) {
 						*mcconf = *mc_interface_get_configuration();
@@ -435,6 +447,17 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					sample_len = sample_len > ADC_SAMPLE_MAX_LEN ? ADC_SAMPLE_MAX_LEN : sample_len;
 
 					samples.n_samp = sample_len;
+					samples.m_curr0_samples = pvPortMalloc(sample_len * sizeof(int16_t));
+					samples.m_curr1_samples = pvPortMalloc(sample_len * sizeof(int16_t));
+					samples.m_phase_samples = pvPortMalloc(sample_len * sizeof(int8_t));
+
+					if(samples.m_curr0_samples == NULL || samples.m_curr1_samples == NULL || samples.m_phase_samples == NULL){
+						vPortFree(samples.m_curr0_samples);
+						vPortFree(samples.m_curr1_samples);
+						vPortFree(samples.m_phase_samples);
+						samples.n_samp = 0;
+					}
+
 					samples.index = 0;
 					samples.dec_state = 0;
 					samples.state = SAMP_START;
@@ -565,7 +588,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 					int32_t ind = 0;
 					//chMtxLock(&send_buffer_mutex);
-					uint8_t *send_buffer = send_buffer_global;
+					uint8_t send_buffer[80];
 					send_buffer[ind++] = packet_id;
 
 					uint32_t mask = 0xFFFFFFFF;

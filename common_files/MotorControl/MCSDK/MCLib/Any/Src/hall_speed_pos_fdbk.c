@@ -383,18 +383,10 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
     bPrevHallState = pHandle->lut[pHandle->HallState];
     PrevDirection = pHandle->Direction;
 
-    if ( pHandle->SensorPlacement == DEGREES_120 )
-    {
-      pHandle->HallState  = (uint8_t) ((LL_GPIO_IsInputPinSet( pHandle->H3Port, pHandle->H3Pin ) << 2)
-                            | (LL_GPIO_IsInputPinSet( pHandle->H2Port, pHandle->H2Pin ) << 1)
-                            | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin ) );
-    }
-    else
-    {
-      pHandle->HallState  = (uint8_t) ((( LL_GPIO_IsInputPinSet( pHandle->H2Port, pHandle->H2Pin ) ^ 1 ) << 2)
-                            | (LL_GPIO_IsInputPinSet( pHandle->H3Port, pHandle->H3Pin ) << 1)
-                            | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin ) );
-    }
+	pHandle->HallState  = (uint8_t) ((LL_GPIO_IsInputPinSet( pHandle->H3Port, pHandle->H3Pin ) << 2)
+						| (LL_GPIO_IsInputPinSet( pHandle->H2Port, pHandle->H2Pin ) << 1)
+						| LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin ) );
+
 
     if(pHandle->HallState == 0 || pHandle->HallState == 7){
     	pHandle->_Super.bSpeedErrorNumber++;
@@ -666,18 +658,10 @@ static void HALL_Init_Electrical_Angle( HALL_Handle_t * pHandle )
 {
 	uint8_t bPrevHallState;
 	bPrevHallState = pHandle->lut[pHandle->HallState];
-    if ( pHandle->SensorPlacement == DEGREES_120 )
-    {
-      pHandle->HallState  =(uint8_t) ((LL_GPIO_IsInputPinSet( pHandle->H3Port, pHandle->H3Pin ) << 2)
-                            | (LL_GPIO_IsInputPinSet( pHandle->H2Port, pHandle->H2Pin ) << 1)
-                            | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin ) );
-    }
-    else
-    {
-      pHandle->HallState  = (uint8_t) ((( LL_GPIO_IsInputPinSet( pHandle->H2Port, pHandle->H2Pin ) ^ 1 ) << 2)
-                            | (LL_GPIO_IsInputPinSet( pHandle->H3Port, pHandle->H3Pin ) << 1)
-                            | LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin ) );
-    }
+
+	pHandle->HallState  =(uint8_t) ((LL_GPIO_IsInputPinSet( pHandle->H3Port, pHandle->H3Pin ) << 2)
+						| (LL_GPIO_IsInputPinSet( pHandle->H2Port, pHandle->H2Pin ) << 1)
+						| LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin ) );
 
     if(pHandle->HallState == 0 || pHandle->HallState == 7){
     	pHandle->_Super.bSpeedErrorNumber++;

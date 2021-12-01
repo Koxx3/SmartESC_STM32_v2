@@ -34,7 +34,7 @@
 #include "VescToSTM.h"
 #include "product.h"
 
-#define UART_HANDLE 0
+PACKET_STATE_t * phandle;
 
 /**
  * \brief           Calculate length of statically allocated array
@@ -62,7 +62,7 @@ void putbuffer(unsigned char *buf, unsigned int len){
 }
 
 void comm_uart_send_packet(unsigned char *data, unsigned int len) {
-	packet_send_packet(data, len, UART_HANDLE);
+	packet_send_packet(data, len, phandle);
 }
 
 void process_packet(unsigned char *data, unsigned int len){
@@ -77,7 +77,7 @@ void task_cli(void * argument)
 	HAL_UART_Receive_DMA(&VESC_USART_DMA, usart_rx_dma_buffer, sizeof(usart_rx_dma_buffer));
 	CLEAR_BIT(VESC_USART_DMA.Instance->CR3, USART_CR3_EIE);
 
-	packet_init(putbuffer, process_packet, UART_HANDLE);
+	phandle = packet_init(putbuffer, process_packet);
 
 	VescToSTM_set_brake_rel_int(0);
 
@@ -86,7 +86,7 @@ void task_cli(void * argument)
 	{
 		/* `#START TASK_LOOP_CODE` */
 		while(rd_ptr != DMA_WRITE_PTR) {
-			packet_process_byte(usart_rx_dma_buffer[rd_ptr], UART_HANDLE);
+			packet_process_byte(usart_rx_dma_buffer[rd_ptr], phandle);
 			rd_ptr++;
 			rd_ptr &= (CIRC_BUF_SZ - 1);
 		}
@@ -98,5 +98,7 @@ void task_cli(void * argument)
 }
 
 void task_cli_init(){
+#if VESC_TOOL_ENABLE
 	task_cli_handle = osThreadNew(task_cli, NULL, &task_cli_attributes);
+#endif
 }

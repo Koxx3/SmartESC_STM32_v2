@@ -67,9 +67,6 @@ typedef struct
 {
   SpeednPosFdbk_Handle_t _Super;
   /* SW Settings */
-  uint8_t  SensorPlacement; /*!< Define here the mechanical position of the sensors
-                             with reference to an electrical cycle.
-                             Allowed values are: DEGREES_120 or DEGREES_60.*/
 
   int16_t  PhaseShift;  /*!< Define here in s16degree the electrical phase shift
                              between the low to high transition of signal H1 and
