@@ -41,7 +41,9 @@ static uint8_t	ui8_tx_buffer[] = {0x55, 0xAA, 0x08, 0x21, 0x64, 0x00, 0x01, 0xF0
 #define DMA_WRITE_PTR(channel) 			((CIRC_BUF_SZ - channel.hdmarx->Instance->CNDTR) & (CIRC_BUF_SZ - 1) )  //huart_cobs->hdmarx->Instance->NDTR.
 
 uint8_t usart_rx_dma_buffer[CIRC_BUF_SZ];
-//uint8_t usart2_rx_dma_buffer[CIRC_BUF_SZ];
+#ifdef G30P
+uint8_t usart2_rx_dma_buffer[CIRC_BUF_SZ];
+#endif
 
 uint8_t app_connection_timout = 8;
 

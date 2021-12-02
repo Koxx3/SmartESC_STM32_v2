@@ -44,19 +44,8 @@ typedef struct {
     uint8_t CheckSum[2];
 } NinebotPack;
 
-extern uint16_t ninebot_mem_scooter[256];
-extern uint16_t ninebot_mem_batt[256];
 
 void addCRC(uint8_t * message, uint8_t size);
 
-uint8_t clear_ninebot_mem(void);
-uint8_t init_ninebot_scooter_mem(void);
-uint8_t init_ninebot_batt_mem(void);
 
 uint8_t ninebot_parse(uint8_t data, NinebotPack *message);
-uint8_t ninebot_serialyze(NinebotPack *message, uint8_t *dataUART);
-
-//uint8_t *ninebot_slave_answer(NinebotPack *inmessage /*, NinebotPack *outmessage, uint8_t **dataUART*/,uint8_t *outsize);
-uint8_t ninebot_slave_answer(NinebotPack *inmessage, NinebotPack *outmessage);
-uint8_t ninebot_create_pack(uint8_t direction, uint8_t RW,uint8_t command, uint8_t parameter, uint8_t len, uint8_t *payload, NinebotPack *message);
-uint8_t ninebot_create_request(uint8_t direction, uint8_t RW,uint8_t command, uint8_t len, NinebotPack *message);

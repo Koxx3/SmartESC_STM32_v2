@@ -139,13 +139,14 @@ void send_sample(){
 		buffer_append_float32_auto(buffer, (float)temp / VOLTAGE_DIVIDER_GAIN, &index);
 		temp = ((uint16_t)samples.m_v2_samples[samples.index]<<8)-32000;
 		buffer_append_float32_auto(buffer, (float)temp / VOLTAGE_DIVIDER_GAIN, &index);
+		temp = ((((uint16_t)samples.m_v0_samples[samples.index] + (uint16_t)samples.m_v1_samples[samples.index] + (uint16_t)samples.m_v2_samples[samples.index]) / 3)<<8)-32000;
+		buffer_append_float32_auto(buffer, (float)temp / VOLTAGE_DIVIDER_GAIN, &index);
 #else
 		buffer_append_float32_auto(buffer, 0, &index);
 		buffer_append_float32_auto(buffer, 0, &index);
 		buffer_append_float32_auto(buffer, 0, &index);
+		buffer_append_float32_auto(buffer, 0, &index);
 #endif
-		temp = ((((uint16_t)samples.m_v0_samples[samples.index] + (uint16_t)samples.m_v1_samples[samples.index] + (uint16_t)samples.m_v2_samples[samples.index]) / 3)<<8)-32000;
-		buffer_append_float32_auto(buffer, (float)temp / VOLTAGE_DIVIDER_GAIN, &index);
 		buffer_append_float32_auto(buffer, 0, &index);
 		buffer_append_float32_auto(buffer, 16000, &index);
 		buffer[index++] = 1;
