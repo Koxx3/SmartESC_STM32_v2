@@ -421,8 +421,8 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
        computed speed close to the infinite, and bring instability. */
     if (pHandle->Direction != PrevDirection)
     {
-    	//pHandle->BufferFilled = 0;
-    	//pHandle->SpeedFIFOIdx = 0;
+//    	pHandle->BufferFilled = 0;
+//    	pHandle->SpeedFIFOIdx = 0;
 
         /* Set rotor speed to zero */
         pHandle->_Super.hElSpeedDpp = 0;

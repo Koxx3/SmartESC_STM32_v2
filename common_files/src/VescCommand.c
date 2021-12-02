@@ -331,9 +331,9 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 			}
 			if (mask & ((uint32_t)1 << 18)) {
 				//buffer_append_float16(buffer, NTC_TEMP_MOS1(), 1e1, &ind);
-				buffer_append_float16(send_buffer, 0, 1e1, &ind);
+				buffer_append_float16(buffer, 0, 1e1, &ind);
 				//buffer_append_float16(buffer, NTC_TEMP_MOS2(), 1e1, &ind);
-				buffer_append_float16(send_buffer, 0, 1e1, &ind);
+				buffer_append_float16(buffer, 0, 1e1, &ind);
 				//buffer_append_float16(buffer, NTC_TEMP_MOS3(), 1e1, &ind);
 				buffer_append_float16(buffer, 0, 1e1, &ind);
 			}

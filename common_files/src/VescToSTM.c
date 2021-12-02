@@ -265,12 +265,10 @@ void VescToSTM_set_speed(int32_t rpm){
 
 
 float VescToSTM_get_temperature(){
-	//return NTC_GetAvTemp_C(pMCT[M1]->pTemperatureSensor);
-	return ANG_TO_DEG(HALL_M1._Super.hElAngle);
+	return NTC_GetAvTemp_C(pMCT[M1]->pTemperatureSensor);
 }
 float VescToSTM_get_temperature2(){
-	//return NTC_GetAvTemp_C(pMCT[M1]->pTemperatureSensor);
-	return ANG_TO_DEG(HALL_M1.MeasuredElAngle);
+	return 0.0;
 }
 
 
