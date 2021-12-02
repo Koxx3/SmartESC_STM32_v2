@@ -39,8 +39,7 @@ typedef struct {
 	uint8_t addr;
 	uint8_t cmd;
     uint8_t arg;
-    //uint8_t payload[NinebotMaxPayload];
-    uint8_t payload[4];
+    uint8_t payload[NinebotMaxPayload];
     uint8_t CheckSum[2];
 } NinebotPack;
 

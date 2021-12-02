@@ -42,7 +42,7 @@ extern "C" {
  * @{
  */
 
-#define HALL_SPEED_FIFO_SIZE  ((uint8_t)18)
+#define HALL_SPEED_FIFO_SIZE  ((uint8_t)10)
 
 /* HALL SENSORS PLACEMENT ----------------------------------------------------*/
 #define DEGREES_120 0u

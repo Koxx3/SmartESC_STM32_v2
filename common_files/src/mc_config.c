@@ -306,11 +306,13 @@ RampExtMngr_Handle_t RampExtMngrHFParamsM1 =
 /**
   * @brief  CircleLimitation Component parameters Motor 1 - Base Component
   */
+static const uint16_t table[87] = MMITABLE;
+
 CircleLimitation_Handle_t CircleLimitationM1 =
 {
   .MaxModule          = MAX_MODULE,
   .MaxVd          	  = (uint16_t)(MAX_MODULE * FW_VOLTAGE_REF / 1000),
-  .Circle_limit_table = MMITABLE,
+  .Circle_limit_table = (uint16_t*)&table,
   .Start_index        = START_INDEX,
 };
 

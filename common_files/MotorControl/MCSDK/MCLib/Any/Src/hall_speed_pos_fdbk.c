@@ -60,7 +60,6 @@
 #define POSITIVE          (int8_t)1
 
 extern MCI_Handle_t* pMCI[1];
-uint32_t cnt=0;
 
 /* With digit-per-PWM unit (here 2*PI rad = 0xFFFF): */
 #define HALL_MAX_PSEUDO_SPEED        ((int16_t)0x7FFF)
@@ -447,7 +446,6 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
         pHandle->AvrElSpeedDpp = 0;
         pHandle->SpeedFIFOIdx = 0;
         pHandle->ElPeriodSum =pHandle->MaxPeriod * pHandle->SpeedBufferSize;
-    	cnt=0;
       /* Setting BufferFilled to 0 will prevent to compute the average speed based
        on the SpeedPeriod buffer values */
     }

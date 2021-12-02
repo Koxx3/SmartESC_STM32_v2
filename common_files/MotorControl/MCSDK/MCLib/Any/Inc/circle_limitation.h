@@ -47,7 +47,7 @@ typedef struct
                                          module */
   uint16_t MaxVd;                   /**<  Circle limitation maximum allowed
                                          module */
-  uint16_t Circle_limit_table[87];  /**<  Circle limitation table */
+  uint16_t * Circle_limit_table;  /**<  Circle limitation table */
   uint8_t  Start_index;             /**<  Circle limitation table indexing
                                          start */
 } CircleLimitation_Handle_t;
