@@ -98,4 +98,9 @@
 #define CPU_CYCLES      *DWT_CYCCNT
 #define CPU_CLOCK		64000000
 
+
+#define PRIO_BELOW_NORMAL 4
+#define PRIO_NORMAL  5
+#define PRIO_HIGHER  6
+
 #endif /* APP_PRODUCT_H_ */

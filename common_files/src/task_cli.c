@@ -45,12 +45,7 @@ PACKET_STATE_t * phandle;
 uint8_t usart_rx_dma_buffer[CIRC_BUF_SZ];
 
 
-osThreadId_t task_cli_handle;
-const osThreadAttr_t task_cli_attributes = {
-  .name = "CLI",
-  .priority = (osPriority_t) osPriorityBelowNormal,
-  .stack_size = 512 * 4
-};
+TaskHandle_t task_cli_handle;
 
 
 void putbuffer(unsigned char *buf, unsigned int len){
@@ -99,6 +94,6 @@ void task_cli(void * argument)
 
 void task_cli_init(){
 #if VESC_TOOL_ENABLE
-	task_cli_handle = osThreadNew(task_cli, NULL, &task_cli_attributes);
+	xTaskCreate(task_cli, "tskCLI", 256, NULL, PRIO_NORMAL, &task_cli_handle);
 #endif
 }

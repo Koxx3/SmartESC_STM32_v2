@@ -25,11 +25,13 @@
 #include "app.h"
 #include "utils.h"
 #include "VescToSTM.h"
-#include "cmsis_os.h"
 #include "FreeRTOS.h"
+#include "task.h"
 #include "product.h"
 #include "ninebot.h"
 #include "VescCommand.h"
+
+
 
 
 NinebotPack frame;
@@ -47,22 +49,17 @@ uint8_t usart2_rx_dma_buffer[CIRC_BUF_SZ];
 
 uint8_t app_connection_timout = 8;
 
-osThreadId_t task_app_handle;
-const osThreadAttr_t task_app_attributes = {
-  .name = "APP-USART",
-  .priority = (osPriority_t) osPriorityBelowNormal,
-  .stack_size = 128 * 7
-};
+TaskHandle_t task_app_handle;
 
 void my_uart_send_data(uint8_t *tdata, uint16_t tnum){
 	//send data
 	//HAL_HalfDuplex_EnableTransmitter(&APP_USART_DMA);
-	while( HAL_UART_Transmit_DMA(&APP_USART_DMA, tdata, tnum) != HAL_OK ) osDelay(1);
+	while( HAL_UART_Transmit_DMA(&APP_USART_DMA, tdata, tnum) != HAL_OK ) vTaskDelay(1);
 
 	//Waiting to send status OK
 	while(HAL_DMA_GetState(&APP_USART_TX_DMA) != HAL_DMA_STATE_READY){
 		APP_USART_DMA.gState = HAL_UART_STATE_READY;
-		osDelay(1);
+		vTaskDelay(1);
 	}
 	//HAL_HalfDuplex_EnableReceiver(&APP_USART_DMA);
 }
@@ -120,10 +117,10 @@ float speed;
 		}
 #endif
 
-		osDelay(10);
+		vTaskDelay(10);
 	}
 }
 
 void task_app_init(){
-	task_app_handle = osThreadNew(task_app, NULL, &task_app_attributes);
+	xTaskCreate(task_app, "APP-USART", 128, NULL, PRIO_BELOW_NORMAL, &task_app_handle);
 }

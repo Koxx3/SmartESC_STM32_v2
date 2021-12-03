@@ -497,11 +497,13 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 #endif
 
 						samples.n_samp = 0;
-					}
+						commands_printf("Sample malloc failed");
+					}else{
 
-					samples.index = 0;
-					samples.dec_state = 0;
-					samples.state = SAMP_START;
+						samples.index = 0;
+						samples.dec_state = 0;
+						samples.state = SAMP_START;
+					}
 
 				} break;
 

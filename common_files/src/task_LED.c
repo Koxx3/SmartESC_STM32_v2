@@ -32,7 +32,7 @@
 #include "VescCommand.h"
 
 
-osThreadId_t LEDHandle;
+TaskHandle_t LEDHandle;
 const osThreadAttr_t LED_attributes = {
   .name = "LED",
   .priority = (osPriority_t) osPriorityBelowNormal,
@@ -41,9 +41,9 @@ const osThreadAttr_t LED_attributes = {
 
 void prv_LED_blink(uint32_t ticks){
 	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, pdFALSE);
-	osDelay(ticks);
+	vTaskDelay(ticks);
 	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, pdTRUE);
-	osDelay(ticks);
+	vTaskDelay(ticks);
 }
 
 
@@ -93,5 +93,5 @@ void task_LED(void * argument)
 }
 
 void task_LED_init(){
-	LEDHandle = osThreadNew(task_LED, NULL, &LED_attributes);
+	xTaskCreate(task_LED, "tskLED", 128, NULL, PRIO_NORMAL, &LEDHandle);
 }
