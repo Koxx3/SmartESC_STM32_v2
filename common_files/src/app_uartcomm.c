@@ -91,7 +91,7 @@ void task_app(void * argument)
 #ifdef G30P
 	uint32_t rd2_ptr=0;
 #endif
-float speed;
+float speed = 0;
   /* Infinite loop */
 	for(;;)
 	{

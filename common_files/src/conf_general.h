@@ -30,7 +30,7 @@
 
 #define ADDR_FLASH_PAGE_62    ((uint32_t)0x0801F800) /* Base @ of Page 127, 1 Kbytes */
 #define ADDR_FLASH_PAGE_63    ((uint32_t)0x0801FC00) /* Base @ of Page 127, 1 Kbytes */
-
+#define ADDR_FLASH_PAGE_126    ((uint32_t)0x0801F800) /* Base @ of Page 126, 1 Kbytes */
 
 extern mc_configuration mc_conf;
 extern app_configuration appconf;
@@ -43,5 +43,6 @@ bool conf_general_store_mc_configuration(mc_configuration *conf, bool is_motor_2
 void conf_general_setup_mc(mc_configuration *mcconf);
 void conf_general_update_current(mc_configuration *mcconf);
 mc_configuration* mc_interface_get_configuration(void);
+bool conf_general_store_app_configuration(app_configuration *conf);
 
 #endif /* CONF_GENERAL_H_ */

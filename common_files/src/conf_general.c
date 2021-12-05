@@ -80,7 +80,7 @@ uint8_t Flash_ReadByte_MC(uint32_t x){
 
 uint8_t Flash_ReadByte_APP(uint32_t x){
 	uint8_t data[4];
-	*(uint32_t*)data = (*(__IO uint32_t*)(ADDR_FLASH_PAGE_62+((x/4)*4)));
+	*(uint32_t*)data = (*(__IO uint32_t*)(ADDR_FLASH_PAGE_126+((x/4)*4)));
 	return data[x%4];
 }
 
@@ -94,7 +94,7 @@ void conf_general_read_app_configuration(app_configuration *conf) {
 	bool is_ok = true;
 	uint8_t *conf_addr = (uint8_t*)conf;
 
-	for (unsigned int i = 0;i < (sizeof(mc_configuration));i++) {
+	for (unsigned int i = 0;i < (sizeof(app_configuration));i++) {
 		conf_addr[i] = Flash_ReadByte_APP(i);
 	}
 
@@ -143,6 +143,53 @@ void conf_general_read_mc_configuration(mc_configuration *conf, bool is_motor_2)
 		confgenerator_set_defaults_mcconf(conf);
 	}
 
+}
+
+/**
+ * Write app_configuration to EEPROM.
+ *
+ * @param conf
+ * A pointer to the configuration that should be stored.
+ */
+bool conf_general_store_app_configuration(app_configuration *conf) {
+	bool is_ok = true;
+	uint8_t *conf_addr = (uint8_t*)conf;
+
+	uint32_t flash_incr=0;
+	uint8_t byte=0;
+	uint32_t word;
+	uint8_t * word_ptr = (uint8_t*)&word;
+
+	conf->crc = app_calc_crc(conf);
+
+	HAL_FLASH_Unlock();
+
+
+	uint32_t page_error = 0;
+	FLASH_EraseInitTypeDef s_eraseinit;
+	s_eraseinit.TypeErase   = FLASH_TYPEERASE_PAGES;
+	s_eraseinit.PageAddress = ADDR_FLASH_PAGE_126;
+	s_eraseinit.NbPages     = 1;
+	HAL_FLASHEx_Erase(&s_eraseinit, &page_error);
+
+	for (unsigned int i = 0;i < sizeof(app_configuration);i++) {
+
+		word_ptr[byte] = conf_addr[i];
+		byte++;
+		if(byte==4){
+			byte=0;
+			HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, ADDR_FLASH_PAGE_126+(flash_incr*4), *((uint32_t*)word_ptr));
+			word=0;
+			flash_incr++;
+		}
+	}
+	if(byte!=0){
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, ADDR_FLASH_PAGE_126+(flash_incr*4), *((uint32_t*)word_ptr));
+	}
+	HAL_FLASH_Lock();
+	vTaskDelay(500);
+
+	return is_ok;
 }
 
 /**

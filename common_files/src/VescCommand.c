@@ -112,6 +112,19 @@ void commands_send_mcconf(COMM_PACKET_ID packet_id, mc_configuration *mcconf) {
 	vPortFree(send_buffer);
 }
 
+void commands_send_appconf(COMM_PACKET_ID packet_id, app_configuration *appconf) {
+	uint8_t * send_buffer = pvPortMalloc(512 + PACKET_HEADER);
+	if(send_buffer == NULL){
+		commands_printf("Malloc failed send appconf)");
+		return;
+	}
+	uint8_t * buffer = send_buffer + PACKET_HEADER;
+	buffer[0] = packet_id;
+	int32_t len = confgenerator_serialize_appconf(&buffer[1], appconf);
+	commands_send_packet(send_buffer, len + 1);
+	vPortFree(send_buffer);
+}
+
 volatile samp_str samples;
 /*
 samples.data[0][samples.index] = FOCVars[M1].Iab.a;
@@ -458,11 +471,40 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					vPortFree(mcconf);
 				} break;
 
-				case COMM_SET_APPCONF:
+				case COMM_SET_APPCONF:{
+					app_configuration *appconf = app_get_configuration();
+
+					if (confgenerator_deserialize_appconf(data, appconf)) {
+						conf_general_store_app_configuration(appconf);
+						app_set_configuration(appconf);
+						//timeout_configure(appconf->timeout_msec, appconf->timeout_brake_current);
+						vTaskDelay(pdMS_TO_TICKS(200));
+
+						int32_t ind = 0;
+						uint8_t send_buffer[50];
+						send_buffer[ind++] = packet_id;
+						reply_func(send_buffer, ind);
+					} else {
+						commands_printf("Warning: Could not set appconf due to wrong signature");
+					}
+				}
 					break;
 				case COMM_GET_APPCONF:
-				case COMM_GET_APPCONF_DEFAULT:
-					break;
+				case COMM_GET_APPCONF_DEFAULT: {
+
+					app_configuration *appconf = pvPortMalloc(sizeof(app_configuration));
+
+					if (packet_id == COMM_GET_APPCONF) {
+						*appconf = *app_get_configuration();
+					} else {
+						confgenerator_set_defaults_appconf(appconf);
+					}
+
+					commands_send_appconf(packet_id, appconf);
+
+					vPortFree(appconf);
+				}
+				break;
 
 				case COMM_SAMPLE_PRINT: {
 
@@ -736,8 +778,8 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 					float controller_num = 1.0;
 
-					float l_current_min_scale = buffer_get_float32_auto(data, &ind);
-					float l_current_max_scale = buffer_get_float32_auto(data, &ind);
+					mcconf->l_current_min_scale = buffer_get_float32_auto(data, &ind);
+					mcconf->l_current_max_scale = buffer_get_float32_auto(data, &ind);
 					float min_erpm;
 					float max_erpm;
 					bool changed=false;
