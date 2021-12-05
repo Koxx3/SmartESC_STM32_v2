@@ -80,7 +80,7 @@
 #define ERROR_PRINTING														 1
 #endif
 
-#define ADC_SAMPLE_MAX_LEN 													 600
+#define ADC_SAMPLE_MAX_LEN 													 1000
 
 
 #endif

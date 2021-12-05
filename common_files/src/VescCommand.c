@@ -158,7 +158,7 @@ void send_sample(){
 
 		samples.index++;
 
-		if(samples.vesc_tool_samples == 1000) commands_send_packet(send_buffer, index);
+		//if(samples.vesc_tool_samples == 1000) commands_send_packet(send_buffer, index);
 		commands_send_packet(send_buffer, index);
 
 		if(samples.index == samples.n_samp){
