@@ -46,6 +46,7 @@ void task_PWR_init();
 void poweroff(void);
 int8_t check_power_button_pressed_state();
 void power_control(uint8_t pwr);
+void task_PWR(void *argument);
 
 #endif /* TASK_PWR_H_ */
 

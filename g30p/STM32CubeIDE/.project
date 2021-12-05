@@ -197,6 +197,21 @@
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/MotorControl/MCSDK/MCLib/Any/Src/virtual_speed_sensor.c</locationURI>
 		</link>
 		<link>
+			<name>Application/User/FreeRTOSConfig.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/FreeRTOSConfig.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/blowfish.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/blowfish.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/blowfish.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Inc/blowfish.h</locationURI>
+		</link>
+		<link>
 			<name>Application/User/current_sense.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/current_sense.c</locationURI>
@@ -325,6 +340,11 @@
 			<name>Drivers/STM32F1xx_HAL_Driver/stm32f1xx_hal_cortex.c</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c</locationURI>
+		</link>
+		<link>
+			<name>Drivers/STM32F1xx_HAL_Driver/stm32f1xx_hal_crc.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_crc.c</locationURI>
 		</link>
 		<link>
 			<name>Drivers/STM32F1xx_HAL_Driver/stm32f1xx_hal_dma.c</name>

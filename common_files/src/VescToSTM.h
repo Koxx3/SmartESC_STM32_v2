@@ -64,5 +64,5 @@ void VescToSTM_enable_timeout(bool enbale);
 void VescToSTM_set_open_loop(bool enabled, int16_t init_angle, int16_t erpm);
 void VescToSTM_set_open_loop_rpm(int16_t erpm);
 void VescToSTM_set_brake_current_rel(float val);
-
+void VescToSTM_update_torque(int32_t q, int32_t min_erpm, int32_t max_erpm);
 #endif /* VESCTOSTM_H_ */

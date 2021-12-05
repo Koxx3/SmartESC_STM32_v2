@@ -37,6 +37,7 @@
 #include "parameters_conversion.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "task_pwr.h"
 #include "product.h"
 #include "music.h"
 #include "current_sense.h"
