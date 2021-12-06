@@ -74,7 +74,7 @@ unsigned conf_calc_crc(mc_configuration* conf_in) {
 
 uint8_t Flash_ReadByte_MC(uint32_t x){
 	uint8_t data[4];
-	*(uint32_t*)data = (*(__IO uint32_t*)(ADDR_FLASH_PAGE_63+((x/4)*4)));
+	*(uint32_t*)data = (*(__IO uint32_t*)(ADDR_FLASH_PAGE_127+((x/4)*4)));
 	return data[x%4];
 }
 
@@ -145,6 +145,41 @@ void conf_general_read_mc_configuration(mc_configuration *conf, bool is_motor_2)
 
 }
 
+bool conf_general_write_flash(uint8_t page, uint8_t * data, uint16_t size){
+	if(page > 127) return false;
+
+	uint32_t word;
+	uint8_t byte=0;
+	uint8_t * word_ptr = (uint8_t*)&word;
+	uint32_t flash_incr=0;
+
+	HAL_FLASH_Unlock();
+
+	uint32_t page_error = 0;
+	FLASH_EraseInitTypeDef s_eraseinit;
+	s_eraseinit.TypeErase   = FLASH_TYPEERASE_PAGES;
+	s_eraseinit.PageAddress = 0x08000000 + ((uint32_t)page*0x400);
+	s_eraseinit.NbPages     = 1;
+	HAL_FLASHEx_Erase(&s_eraseinit, &page_error);
+
+	for (unsigned int i = 0;i < sizeof(app_configuration);i++) {
+
+		word_ptr[byte] = data[i];
+		byte++;
+		if(byte==4){
+			byte=0;
+			HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s_eraseinit.PageAddress+(flash_incr*4), *((uint32_t*)word_ptr));
+			word=0;
+			flash_incr++;
+		}
+	}
+	if(byte!=0){
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s_eraseinit.PageAddress+(flash_incr*4), *((uint32_t*)word_ptr));
+	}
+	HAL_FLASH_Lock();
+	return true;
+}
+
 /**
  * Write app_configuration to EEPROM.
  *
@@ -153,40 +188,12 @@ void conf_general_read_mc_configuration(mc_configuration *conf, bool is_motor_2)
  */
 bool conf_general_store_app_configuration(app_configuration *conf) {
 	bool is_ok = true;
-	uint8_t *conf_addr = (uint8_t*)conf;
-
-	uint32_t flash_incr=0;
-	uint8_t byte=0;
-	uint32_t word;
-	uint8_t * word_ptr = (uint8_t*)&word;
 
 	conf->crc = app_calc_crc(conf);
 
-	HAL_FLASH_Unlock();
 
+	is_ok = conf_general_write_flash(APP_PAGE, (uint8_t*)conf, sizeof(app_configuration));
 
-	uint32_t page_error = 0;
-	FLASH_EraseInitTypeDef s_eraseinit;
-	s_eraseinit.TypeErase   = FLASH_TYPEERASE_PAGES;
-	s_eraseinit.PageAddress = ADDR_FLASH_PAGE_126;
-	s_eraseinit.NbPages     = 1;
-	HAL_FLASHEx_Erase(&s_eraseinit, &page_error);
-
-	for (unsigned int i = 0;i < sizeof(app_configuration);i++) {
-
-		word_ptr[byte] = conf_addr[i];
-		byte++;
-		if(byte==4){
-			byte=0;
-			HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, ADDR_FLASH_PAGE_126+(flash_incr*4), *((uint32_t*)word_ptr));
-			word=0;
-			flash_incr++;
-		}
-	}
-	if(byte!=0){
-		HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, ADDR_FLASH_PAGE_126+(flash_incr*4), *((uint32_t*)word_ptr));
-	}
-	HAL_FLASH_Lock();
 	vTaskDelay(500);
 
 	return is_ok;
@@ -203,40 +210,13 @@ bool conf_general_store_mc_configuration(mc_configuration *conf, bool is_motor_2
 	vTaskDelay(300);
 
 	bool is_ok = true;
-	uint8_t *conf_addr = (uint8_t*)conf;
-
-	uint32_t flash_incr=0;
-	uint8_t byte=0;
-	uint32_t word;
-	uint8_t * word_ptr = (uint8_t*)&word;
 
 	conf->crc = conf_calc_crc(conf);
 
 	HAL_FLASH_Unlock();
 
+	is_ok = conf_general_write_flash(CONF_PAGE, (uint8_t*)conf, sizeof(mc_configuration));
 
-	uint32_t page_error = 0;
-	FLASH_EraseInitTypeDef s_eraseinit;
-	s_eraseinit.TypeErase   = FLASH_TYPEERASE_PAGES;
-	s_eraseinit.PageAddress = ADDR_FLASH_PAGE_63;
-	s_eraseinit.NbPages     = 1;
-	HAL_FLASHEx_Erase(&s_eraseinit, &page_error);
-
-	for (unsigned int i = 0;i < sizeof(mc_configuration);i++) {
-
-		word_ptr[byte] = conf_addr[i];
-		byte++;
-		if(byte==4){
-			byte=0;
-			HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, ADDR_FLASH_PAGE_63+(flash_incr*4), *((uint32_t*)word_ptr));
-			word=0;
-			flash_incr++;
-		}
-	}
-	if(byte!=0){
-		HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, ADDR_FLASH_PAGE_63+(flash_incr*4), *((uint32_t*)word_ptr));
-	}
-	HAL_FLASH_Lock();
 	vTaskDelay(500);
 	VescToSTM_start_motor();
 	vTaskDelay(100);

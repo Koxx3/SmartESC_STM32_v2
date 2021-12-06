@@ -242,31 +242,31 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 		reply_func(send_buffer, ind);
 		} break;
 
-		case COMM_JUMP_TO_BOOTLOADER_ALL_CAN:
-		case COMM_JUMP_TO_BOOTLOADER:
-			break;
-		case COMM_ERASE_NEW_APP_ALL_CAN:
-		case COMM_ERASE_NEW_APP: {
-			int32_t ind = 0;
-			uint8_t send_buffer[PACKET_SIZE(10)];
-			uint8_t * buffer = send_buffer + PACKET_HEADER;
-			buffer[ind++] = COMM_ERASE_NEW_APP;
-			buffer[ind++] = 1;
-			reply_func(send_buffer, ind);
-		} break;
-		case COMM_WRITE_NEW_APP_DATA_ALL_CAN_LZO:
-		case COMM_WRITE_NEW_APP_DATA_ALL_CAN:
-		case COMM_WRITE_NEW_APP_DATA_LZO:
-		case COMM_WRITE_NEW_APP_DATA: {
-			int32_t ind = 0;
-			uint8_t send_buffer[PACKET_SIZE(16)];
-			uint8_t * buffer = send_buffer + PACKET_HEADER;
-			buffer[ind++] = COMM_WRITE_NEW_APP_DATA;
-			buffer[ind++] = 1;
-			//buffer_append_uint32(send_buffer, new_app_offset, &ind);
-			buffer_append_uint32(buffer, 0, &ind);
-			reply_func(send_buffer, ind);
-		} break;
+//		case COMM_JUMP_TO_BOOTLOADER_ALL_CAN:
+//		case COMM_JUMP_TO_BOOTLOADER:
+//			break;
+//		case COMM_ERASE_NEW_APP_ALL_CAN:
+//		case COMM_ERASE_NEW_APP: {
+//			int32_t ind = 0;
+//			uint8_t send_buffer[PACKET_SIZE(10)];
+//			uint8_t * buffer = send_buffer + PACKET_HEADER;
+//			buffer[ind++] = COMM_ERASE_NEW_APP;
+//			buffer[ind++] = 1;
+//			reply_func(send_buffer, ind);
+//		} break;
+//		case COMM_WRITE_NEW_APP_DATA_ALL_CAN_LZO:
+//		case COMM_WRITE_NEW_APP_DATA_ALL_CAN:
+//		case COMM_WRITE_NEW_APP_DATA_LZO:
+//		case COMM_WRITE_NEW_APP_DATA: {
+//			int32_t ind = 0;
+//			uint8_t send_buffer[PACKET_SIZE(16)];
+//			uint8_t * buffer = send_buffer + PACKET_HEADER;
+//			buffer[ind++] = COMM_WRITE_NEW_APP_DATA;
+//			buffer[ind++] = 1;
+//			//buffer_append_uint32(send_buffer, new_app_offset, &ind);
+//			buffer_append_uint32(buffer, 0, &ind);
+//			reply_func(send_buffer, ind);
+//		} break;
 
 		case COMM_GET_VALUES:
 		case COMM_GET_VALUES_SELECTIVE: {
@@ -338,8 +338,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				buffer_append_float32(buffer, VescToSTM_get_pid_pos_now(), 1e6, &ind);
 			}
 			if (mask & ((uint32_t)1 << 17)) {
-				//uint8_t current_controller_id = app_get_configuration()->controller_id;
-				uint8_t current_controller_id = 1;
+				uint8_t current_controller_id = app_get_configuration()->controller_id;
 				buffer[ind++] = current_controller_id;
 			}
 			if (mask & ((uint32_t)1 << 18)) {
@@ -592,8 +591,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					uint8_t send_buffer[PACKET_SIZE(20)];
 					uint8_t * buffer = send_buffer + PACKET_HEADER;
 					buffer[ind++] = COMM_GET_DECODED_CHUK;
-					//buffer_append_int32(send_buffer, (int32_t)(app_nunchuk_get_decoded_chuk() * 1000000.0), &ind);
-					buffer_append_int32(buffer, 0, &ind);
+					buffer_append_int32(send_buffer, (int32_t)(VescToStm_nunchuk_get_decoded_chuk() * 1000000.0), &ind);
 					reply_func(send_buffer, ind);
 				} break;
 
@@ -636,31 +634,31 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					break;
 
 				case COMM_NRF_START_PAIRING: {
-					int32_t ind = 0;
-					uint8_t send_buffer[PACKET_SIZE(20)];
-					uint8_t * buffer = send_buffer + PACKET_HEADER;
-					buffer[ind++] = packet_id;
-					buffer[ind++] = NRF_PAIR_STARTED;
-					reply_func(send_buffer, ind);
+//					int32_t ind = 0;
+//					uint8_t send_buffer[PACKET_SIZE(20)];
+//					uint8_t * buffer = send_buffer + PACKET_HEADER;
+//					buffer[ind++] = packet_id;
+//					buffer[ind++] = NRF_PAIR_STARTED;
+//					reply_func(send_buffer, ind);
 				} break;
 
-				case COMM_GPD_BUFFER_SIZE_LEFT: {
-					int32_t ind = 0;
-					uint8_t send_buffer[PACKET_SIZE(20)];
-					uint8_t * buffer = send_buffer + PACKET_HEADER;
-					buffer[ind++] = COMM_GPD_BUFFER_SIZE_LEFT;
-					//buffer_append_int32(send_buffer, gpdrive_buffer_size_left(), &ind);
-					buffer_append_int32(buffer, 128, &ind);
-					reply_func(buffer, ind);
-				} break;
-				case COMM_GPD_SET_FSW:
-				case COMM_GPD_FILL_BUFFER:
-				case COMM_GPD_OUTPUT_SAMPLE:
-				case COMM_GPD_SET_MODE:
-				case COMM_GPD_FILL_BUFFER_INT8:
-				case COMM_GPD_FILL_BUFFER_INT16:
-				case COMM_GPD_SET_BUFFER_INT_SCALE:
-				break;
+//				case COMM_GPD_BUFFER_SIZE_LEFT: {
+//					int32_t ind = 0;
+//					uint8_t send_buffer[PACKET_SIZE(20)];
+//					uint8_t * buffer = send_buffer + PACKET_HEADER;
+//					buffer[ind++] = COMM_GPD_BUFFER_SIZE_LEFT;
+//					//buffer_append_int32(send_buffer, gpdrive_buffer_size_left(), &ind);
+//					buffer_append_int32(buffer, 128, &ind);
+//					reply_func(buffer, ind);
+//				} break;
+//				case COMM_GPD_SET_FSW:
+//				case COMM_GPD_FILL_BUFFER:
+//				case COMM_GPD_OUTPUT_SAMPLE:
+//				case COMM_GPD_SET_MODE:
+//				case COMM_GPD_FILL_BUFFER_INT8:
+//				case COMM_GPD_FILL_BUFFER_INT16:
+//				case COMM_GPD_SET_BUFFER_INT_SCALE:
+//				break;
 
 				case COMM_GET_VALUES_SETUP:
 				case COMM_GET_VALUES_SETUP_SELECTIVE: {
@@ -678,7 +676,6 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					float battery_level = VescToSTM_get_battery_level(&wh_batt_left);
 
 					int32_t ind = 0;
-					//chMtxLock(&send_buffer_mutex);
 					uint8_t send_buffer[PACKET_SIZE(80)];
 					uint8_t * buffer = send_buffer + PACKET_HEADER;
 					buffer[ind++] = packet_id;
@@ -742,9 +739,8 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						buffer[ind++] = VescToSTM_get_fault();
 					}
 					if (mask & ((uint32_t)1 << 17)) {
-						//uint8_t current_controller_id = app_get_configuration()->controller_id;
-						//send_buffer[ind++] = current_controller_id;
-						buffer[ind++] = 0;
+						uint8_t current_controller_id = app_get_configuration()->controller_id;
+						send_buffer[ind++] = current_controller_id;
 					}
 					if (mask & ((uint32_t)1 << 18)) {
 						buffer[ind++] = val.num_vescs;
@@ -757,7 +753,6 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					}
 
 					reply_func(send_buffer, ind);
-					//chMtxUnlock(&send_buffer_mutex);
 				    } break;
 
 				case COMM_SET_ODOMETER: {
@@ -886,8 +881,8 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					reply_func(send_buffer, ind);
 				} break;
 
-				case COMM_EXT_NRF_PRESENT:
-				case COMM_EXT_NRF_ESB_RX_DATA:
+//				case COMM_EXT_NRF_PRESENT:
+//				case COMM_EXT_NRF_ESB_RX_DATA:
 				case COMM_APP_DISABLE_OUTPUT:{
 					int32_t ind = 0;
 					bool fwd_can = data[ind++];
@@ -909,35 +904,35 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					terminal_process_string((char*)data);
 					break;
 
-				case COMM_GET_IMU_DATA: {
-					int32_t ind = 0;
-					uint8_t send_buffer[PACKET_SIZE(70)];
-					uint8_t * buffer = send_buffer + PACKET_HEADER;
-					buffer[ind++] = packet_id;
+//				case COMM_GET_IMU_DATA: {
+//					int32_t ind = 0;
+//					uint8_t send_buffer[PACKET_SIZE(70)];
+//					uint8_t * buffer = send_buffer + PACKET_HEADER;
+//					buffer[ind++] = packet_id;
+//
+//					int32_t ind2 = 0;
+//					uint32_t mask = buffer_get_uint16(data, &ind2);
+//
+//					buffer_append_uint16(buffer, mask, &ind);
+//
+//					for(uint8_t i=0;i<16;i++){
+//						if (mask & ((uint32_t)1 << i)) {
+//							buffer_append_float32_auto(buffer, 0, &ind);
+//						}
+//					}
+//
+//					reply_func(send_buffer, ind);
+//				} break;
 
-					int32_t ind2 = 0;
-					uint32_t mask = buffer_get_uint16(data, &ind2);
-
-					buffer_append_uint16(buffer, mask, &ind);
-
-					for(uint8_t i=0;i<16;i++){
-						if (mask & ((uint32_t)1 << i)) {
-							buffer_append_float32_auto(buffer, 0, &ind);
-						}
-					}
-
-					reply_func(send_buffer, ind);
-				} break;
-
-				case COMM_ERASE_BOOTLOADER_ALL_CAN:
-				case COMM_ERASE_BOOTLOADER: {
-					int32_t ind = 0;
-					uint8_t send_buffer[PACKET_SIZE(20)];
-					uint8_t * buffer = send_buffer + PACKET_HEADER;
-					buffer[ind++] = COMM_ERASE_BOOTLOADER;
-					buffer[ind++] = 1;
-					reply_func(send_buffer, ind);
-				} break;
+//				case COMM_ERASE_BOOTLOADER_ALL_CAN:
+//				case COMM_ERASE_BOOTLOADER: {
+//					int32_t ind = 0;
+//					uint8_t send_buffer[PACKET_SIZE(20)];
+//					uint8_t * buffer = send_buffer + PACKET_HEADER;
+//					buffer[ind++] = COMM_ERASE_BOOTLOADER;
+//					buffer[ind++] = 1;
+//					reply_func(send_buffer, ind);
+//				} break;
 
 				case COMM_SET_CURRENT_REL: {
 					int32_t ind = 0;
@@ -993,15 +988,15 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					}
 				} break;
 
-				case COMM_BMS_GET_VALUES:
-				case COMM_BMS_SET_CHARGE_ALLOWED:
-				case COMM_BMS_SET_BALANCE_OVERRIDE:
-				case COMM_BMS_RESET_COUNTERS:
-				case COMM_BMS_FORCE_BALANCE:
-				case COMM_BMS_ZERO_CURRENT_OFFSET: {
-					//bms_process_cmd(data - 1, len + 1, reply_func);
-					break;
-				}
+//				case COMM_BMS_GET_VALUES:
+//				case COMM_BMS_SET_CHARGE_ALLOWED:
+//				case COMM_BMS_SET_BALANCE_OVERRIDE:
+//				case COMM_BMS_RESET_COUNTERS:
+//				case COMM_BMS_FORCE_BALANCE:
+//				case COMM_BMS_ZERO_CURRENT_OFFSET: {
+//					//bms_process_cmd(data - 1, len + 1, reply_func);
+//					break;
+//				}
 
 				// Blocking commands. Only one of them runs at any given time, in their
 				// own thread. If other blocking commands come before the previous one has
@@ -1076,18 +1071,18 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					reply_func(send_buffer, ind);
 				} break;
 
-				case COMM_DETECT_APPLY_ALL_FOC:
-				case COMM_PING_CAN:
-				case COMM_BM_CONNECT:
-				case COMM_BM_ERASE_FLASH_ALL:
-				case COMM_BM_WRITE_FLASH_LZO:
-				case COMM_BM_WRITE_FLASH:
-				case COMM_BM_REBOOT:
-				case COMM_BM_DISCONNECT:
-				case COMM_BM_MAP_PINS_DEFAULT:
-				case COMM_BM_MAP_PINS_NRF5X:
-				case COMM_BM_MEM_READ:
-				case COMM_GET_IMU_CALIBRATION:
+//				case COMM_DETECT_APPLY_ALL_FOC:
+//				case COMM_PING_CAN:
+//				case COMM_BM_CONNECT:
+//				case COMM_BM_ERASE_FLASH_ALL:
+//				case COMM_BM_WRITE_FLASH_LZO:
+//				case COMM_BM_WRITE_FLASH:
+//				case COMM_BM_REBOOT:
+//				case COMM_BM_DISCONNECT:
+//				case COMM_BM_MAP_PINS_DEFAULT:
+//				case COMM_BM_MAP_PINS_NRF5X:
+//				case COMM_BM_MEM_READ:
+//				case COMM_GET_IMU_CALIBRATION:
 					/*
 					if (!is_blocking) {
 						memcpy(blocking_thread_cmd_buffer, data - 1, len + 1);

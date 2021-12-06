@@ -79,6 +79,10 @@ void VescToStm_nunchuk_update_output(chuck_data * chuck_d){
 	}
 }
 
+float VescToStm_nunchuk_get_decoded_chuk(void){
+	return ((float)last_y - 128.0) / 128.0;
+}
+
 
 void VescToSTM_set_open_loop(bool enabled, int16_t init_angle, int16_t erpm){
 	if(enabled){

@@ -18,6 +18,7 @@ typedef enum {
 
 void VescToStm_nunchuk_update_output(chuck_data * chuck_d);
 void VescToStm_nunchuk_update_erpm();
+float VescToStm_nunchuk_get_decoded_chuk(void);
 void VescToSTM_set_torque(int32_t current);
 void VescToSTM_set_brake(int32_t current);
 void VescToSTM_set_brake_rel_int(int32_t val);
