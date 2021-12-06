@@ -162,7 +162,7 @@ bool conf_general_write_flash(uint8_t page, uint8_t * data, uint16_t size){
 	s_eraseinit.NbPages     = 1;
 	HAL_FLASHEx_Erase(&s_eraseinit, &page_error);
 
-	for (unsigned int i = 0;i < sizeof(app_configuration);i++) {
+	for (unsigned int i = 0;i < size;i++) {
 
 		word_ptr[byte] = data[i];
 		byte++;
