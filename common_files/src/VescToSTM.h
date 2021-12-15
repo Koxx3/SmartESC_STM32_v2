@@ -18,12 +18,14 @@ typedef enum {
 
 void VescToStm_nunchuk_update_output(chuck_data * chuck_d);
 void VescToStm_nunchuk_update_erpm();
+float VescToStm_nunchuk_get_decoded_chuk(void);
 void VescToSTM_set_torque(int32_t current);
 void VescToSTM_set_brake(int32_t current);
 void VescToSTM_set_brake_rel_int(int32_t val);
 void VescToSTM_set_handbrake(float current);
 void VescToSTM_set_speed(int32_t rpm);
 float VescToSTM_get_temperature();
+float VescToSTM_get_temperature2();
 float VescToSTM_get_phase_current();
 float VescToSTM_get_input_current();
 float VescToSTM_get_id();
@@ -63,5 +65,5 @@ void VescToSTM_enable_timeout(bool enbale);
 void VescToSTM_set_open_loop(bool enabled, int16_t init_angle, int16_t erpm);
 void VescToSTM_set_open_loop_rpm(int16_t erpm);
 void VescToSTM_set_brake_current_rel(float val);
-
+void VescToSTM_update_torque(int32_t q, int32_t min_erpm, int32_t max_erpm);
 #endif /* VESCTOSTM_H_ */

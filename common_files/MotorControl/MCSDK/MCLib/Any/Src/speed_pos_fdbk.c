@@ -196,12 +196,12 @@ __weak bool SPD_IsMecSpeedReliable( SpeednPosFdbk_Handle_t * pHandle, int16_t * 
 
   if ( hAbsMecSpeedUnit > pHandle->hMaxReliableMecSpeedUnit )
   {
-    SpeedError = true;
+    //SpeedError = true;
   }
 
   if ( hAbsMecSpeedUnit < pHandle->hMinReliableMecSpeedUnit )
   {
-    SpeedError = true;
+    //SpeedError = true;
   }
 
   /* Compute absoulte value of mechanical acceleration */

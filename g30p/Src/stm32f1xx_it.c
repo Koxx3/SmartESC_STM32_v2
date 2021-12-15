@@ -71,6 +71,10 @@ extern TIM_HandleTypeDef htim4;
 /******************************************************************************/
 /*           Cortex-M3 Processor Interruption and Exception Handlers          */
 /******************************************************************************/
+/**
+  * @brief This function handles System service call via SWI instruction.
+  */
+
 
 /******************************************************************************/
 /* STM32F1xx Peripheral Interrupt Handlers                                    */

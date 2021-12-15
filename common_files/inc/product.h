@@ -18,6 +18,7 @@
 #define VESC_USART_DMA													     huart1
 #define VESC_USART_TX_DMA													 hdma_usart1_tx
 #define VESC_USART_RX_DMA													 hdma_usart1_rx
+#define VESC_TOOL_ENABLE													 1
 
 #define APP_USART_DMA														 huart2
 #define APP_USART_TX_DMA												     hdma_usart2_tx
@@ -32,6 +33,8 @@
 #define NOMINAL_CURRENT         											 2000
 #define ID_DEMAG															 -2000
 
+#define SCOPE_UVW															 0
+
 #define POLE_PAIR_NUM                                                 	 	 (uint8_t)14
 #define HALL_PHASE_SHIFT        											 90
 #define HALL_SENSORS_PLACEMENT  											 DEGREES_120
@@ -39,6 +42,9 @@
 
 #define TEMP_SENSOR_TYPE													 VIRTUAL_SENSOR
 #define CURR_SENSOR_TYPE													 REAL_SENSOR
+#define ERROR_PRINTING														 1
+
+#define ADC_SAMPLE_MAX_LEN 													 500
 
 #endif
 
@@ -50,6 +56,7 @@
 #define VESC_USART_DMA													     huart3
 #define VESC_USART_TX_DMA													 hdma_usart3_tx
 #define VESC_USART_RX_DMA													 hdma_usart3_rx
+#define VESC_TOOL_ENABLE													 1
 
 #define APP_USART_DMA														 huart1
 #define APP_USART_TX_DMA												     hdma_usart1_tx
@@ -61,13 +68,20 @@
 #define NOMINAL_CURRENT         											 2000
 #define ID_DEMAG														     -2000
 
+#define SCOPE_UVW															 1
+
 #define POLE_PAIR_NUM                                                 	 	 (uint8_t)15
 #define HALL_PHASE_SHIFT        											 90
-#define HALL_SENSORS_PLACEMENT  											 DEGREES_120
 #define HALL_FAULT_RESET_CNT												 200
 
 #define TEMP_SENSOR_TYPE													 REAL_SENSOR
 #define CURR_SENSOR_TYPE													 VIRTUAL_SENSOR
+#if VESC_TOOL_ENABLE
+#define ERROR_PRINTING														 1
+#endif
+
+#define ADC_SAMPLE_MAX_LEN 													 1000
+
 
 #endif
 /****************************************************************************/
@@ -83,5 +97,20 @@
 #define DWT_CYCCNT      ((volatile uint32_t *)0xE0001004)
 #define CPU_CYCLES      *DWT_CYCCNT
 #define CPU_CLOCK		64000000
+
+
+#define PRIO_BELOW_NORMAL 4
+#define PRIO_NORMAL  5
+#define PRIO_HIGHER  6
+
+// Setting limits
+#define HW_LIM_CURRENT			-120.0, 120.0
+#define HW_LIM_CURRENT_IN		-120.0, 120.0
+#define HW_LIM_CURRENT_ABS		0.0, 160.0
+#define HW_LIM_VIN				6.0, 57.0
+#define HW_LIM_ERPM				-200e3, 200e3
+#define HW_LIM_DUTY_MIN			0.0, 0.1
+#define HW_LIM_DUTY_MAX			0.0, 0.99
+#define HW_LIM_TEMP_FET			-40.0, 110.0
 
 #endif /* APP_PRODUCT_H_ */

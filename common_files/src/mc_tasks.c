@@ -20,6 +20,7 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
+#include "stdlib.h"
 #include "main.h"
 #include "mc_type.h"
 #include "mc_math.h"
@@ -36,6 +37,7 @@
 #include "parameters_conversion.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "task_pwr.h"
 #include "product.h"
 #include "music.h"
 #include "current_sense.h"
@@ -221,6 +223,8 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
   FW_Init(pFW[M1],pPIDSpeed[M1],&PIDFluxWeakeningHandle_M1);
 
   FOC_Clear(M1);
+  FOCVars[M1].max_i_batt = 100;
+  FOCVars[M1].min_i_batt = -100;
   FOCVars[M1].bDriveInput = EXTERNAL;
   FOCVars[M1].Iqdref = STC_GetDefaultIqdref(pSTC[M1]);
   FOCVars[M1].UserIdref = STC_GetDefaultIqdref(pSTC[M1]).d;
@@ -546,6 +550,34 @@ __weak void FOC_CalcCurrRef(uint8_t bMotor)
     {
      // MTPA_CalcCurrRefFromIq(pMaxTorquePerAmpere[bMotor], &FOCVars[bMotor].Iqdref);
     }*/
+
+    //Battery Curren limit -- START
+    int32_t batt_i = (int32_t)((int32_t)FOCVars[bMotor].Iqdref.q * (int32_t)FOCVars[bMotor].Vq_avg) / 32768;
+    batt_i = abs(batt_i);
+    int16_t q_temp = FOCVars[bMotor].Iqdref.q;
+
+    uint8_t regen = false;
+    if(FOCVars[bMotor].Iqdref.q > 0 && FOCVars[bMotor].Vq_avg <0){
+    	regen = true;
+    }else if(FOCVars[bMotor].Iqdref.q < 0 && FOCVars[bMotor].Vq_avg > 0){
+    	regen = true;
+    }
+    if(regen){
+    	if((-batt_i < FOCVars[bMotor].min_i_batt) ){
+    		q_temp = (int32_t)((int32_t)FOCVars[bMotor].min_i_batt * 32768) / (int32_t)FOCVars[bMotor].Vq_avg;
+    	}
+    }else{
+    	if((batt_i > FOCVars[bMotor].max_i_batt) ){
+    		q_temp = (int32_t)((int32_t)FOCVars[bMotor].max_i_batt * 32768) / (int32_t)FOCVars[bMotor].Vq_avg;
+    	}
+    }
+
+    if(FOCVars[bMotor].Iqdref.q < 0 && q_temp > 0){
+    	q_temp = -q_temp;
+    }
+    FOCVars[bMotor].Iqdref.q = q_temp;
+    //Battery Curren limit -- END
+
     if (pFW[bMotor])
     {
        IqdTmp.q = FOCVars[bMotor].Iqdref.q;
@@ -663,13 +695,19 @@ __weak uint8_t TSK_HighFrequencyTask(void)
 		}
 	}
 
-	if(samples.state == SAMP_SAMPLING){
+	if(samples.state == SAMP_SAMPLING && samples.n_samp){
 		samples.dec_state++;
 		if(samples.dec_state == samples.dec){
 			samples.dec_state = 0;
-			samples.m_curr0_samples[samples.index] = FOCVars[M1].Iab.a;
-			samples.m_curr1_samples[samples.index] = FOCVars[M1].Iab.b;
-			samples.m_phase_samples[samples.index] = HALL_M1.MeasuredElAngle / 256;
+			samples.m_curr0_samples[samples.index] = (uint16_t)FOCVars[M1].Iab.a >>4; //Make room for position
+			samples.m_curr1_samples[samples.index] = (uint16_t)FOCVars[M1].Iab.b >>4; //Make room for position
+			samples.m_curr0_samples[samples.index] |= (((uint16_t)HALL_M1._Super.hElAngle<<4) & 0xF000);
+			samples.m_curr1_samples[samples.index] |= (uint16_t)HALL_M1._Super.hElAngle & 0xF000;
+#if SCOPE_UVW == 1
+			samples.m_v0_samples[samples.index] = (uint16_t)PWM_Handle_M1._Super.CntPhA >>3;
+			samples.m_v1_samples[samples.index] = (uint16_t)PWM_Handle_M1._Super.CntPhB >>3;
+			samples.m_v2_samples[samples.index] = (uint16_t)PWM_Handle_M1._Super.CntPhC >>3;
+#endif
 
 			samples.index++;
 			if(samples.index == samples.n_samp){
@@ -716,6 +754,8 @@ __attribute__((section (".ccmram")))
   * @retval int16_t It returns MC_NO_FAULTS if the FOC has been ended before
   *         next PWM Update event, MC_FOC_DURATION otherwise
   */
+#define AVG_SAMPLES 512
+
 inline uint16_t FOC_CurrControllerM1(void)
 {
   qd_t Iqd, Vqd;
@@ -748,13 +788,23 @@ inline uint16_t FOC_CurrControllerM1(void)
   FOCVars[M1].Ialphabeta = Ialphabeta;
   FOCVars[M1].Iqd = Iqd;
   FOCVars[M1].Iq_sum += Iqd.q;
-  FOCVars[M1].Iq_samples++;
   FOCVars[M1].Id_sum += Iqd.d;
-  FOCVars[M1].Id_samples++;
   FOCVars[M1].Vq_sum += Vqd.q;
-  FOCVars[M1].Vq_samples++;
   FOCVars[M1].Vd_sum += Vqd.d;
-  FOCVars[M1].Vd_samples++;
+  if(FOCVars[M1].samples<512){
+	  FOCVars[M1].samples++;
+  }else{
+	  FOCVars[M1].Iq_avg = FOCVars[M1].Iq_sum / AVG_SAMPLES;
+	  FOCVars[M1].Iq_sum = 0;
+	  FOCVars[M1].Id_avg = FOCVars[M1].Id_sum / AVG_SAMPLES;
+	  FOCVars[M1].Id_sum = 0;
+	  FOCVars[M1].Vq_avg = FOCVars[M1].Vq_sum / AVG_SAMPLES;
+	  FOCVars[M1].Vq_sum = 0;
+	  FOCVars[M1].Vd_avg = FOCVars[M1].Vd_sum / AVG_SAMPLES;
+	  FOCVars[M1].Vd_sum = 0;
+	  FOCVars[M1].samples=0;
+  }
+
   FOCVars[M1].Valphabeta = Valphabeta;
   FOCVars[M1].hElAngle = hElAngle;
   FW_DataProcess(pFW[M1], Vqd);
@@ -769,18 +819,18 @@ inline uint16_t FOC_CurrControllerM1(void)
   */
 __weak void TSK_SafetyTask(void)
 {
-  /* USER CODE BEGIN TSK_SafetyTask 0 */
+	/* USER CODE BEGIN TSK_SafetyTask 0 */
 
-  /* USER CODE END TSK_SafetyTask 0 */
-  if (bMCBootCompleted == 1)
-  {
-    TSK_SafetyTask_PWMOFF(M1);
-    /* User conversion execution */
-    RCM_ExecUserConv ();
-  /* USER CODE BEGIN TSK_SafetyTask 1 */
+	/* USER CODE END TSK_SafetyTask 0 */
+	if (bMCBootCompleted == 1)
+	{
+		TSK_SafetyTask_PWMOFF(M1);
+		/* User conversion execution */
+		RCM_ExecUserConv ();
+		/* USER CODE BEGIN TSK_SafetyTask 1 */
 
-  /* USER CODE END TSK_SafetyTask 1 */
-  }
+	/* USER CODE END TSK_SafetyTask 1 */
+	}
 }
 
 /**
@@ -807,6 +857,7 @@ __weak void TSK_SafetyTask_PWMOFF(uint8_t bMotor)
   if(bMotor == M1)
   {
 	  uint16_t voltage_fault = RVBS_CalcAvVbus(pBusSensorM1);
+	  voltage_fault = 0;
 	  if(voltage_fault==MC_UNDER_VOLT){
 		  CodeReturn |=  errMask[bMotor] & voltage_fault;
 
@@ -932,6 +983,7 @@ void StartSafetyTask(void const * argument)
     /* delay of 500us */
     vTaskDelay(1);
     TSK_SafetyTask();
+    task_PWR(NULL);
   }
   /* USER CODE END SF task 1 */
 }

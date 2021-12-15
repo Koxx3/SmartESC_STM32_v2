@@ -19,17 +19,17 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "cmsis_os.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "task_init.h"
 #include "motorcontrol.h"
 #include "conf_general.h"
 #include "app.h"
+#include "product.h"
 
 /* USER CODE END Includes */
 
@@ -62,21 +62,8 @@ DMA_HandleTypeDef hdma_usart1_rx;
 DMA_HandleTypeDef hdma_usart3_rx;
 DMA_HandleTypeDef hdma_usart3_tx;
 
-/* Definitions for mediumFrequency */
-osThreadId_t mediumFrequencyHandle;
-const osThreadAttr_t mediumFrequency_attributes = {
-  .name = "mediumFrequency",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
-};
-/* Definitions for safety */
-osThreadId_t safetyHandle;
-const osThreadAttr_t safety_attributes = {
-  .name = "safety",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityAboveNormal,
-};
 /* USER CODE BEGIN PV */
+/* Definitions for mediumFrequency */
 
 /* USER CODE END PV */
 
@@ -90,11 +77,11 @@ static void MX_TIM1_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USART1_UART_Init(void);
+static void MX_NVIC_Init(void);
+/* USER CODE BEGIN PFP */
 void startMediumFrequencyTask(void *argument);
 extern void StartSafetyTask(void *argument);
 
-static void MX_NVIC_Init(void);
-/* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
@@ -146,10 +133,9 @@ int main(void)
   HAL_Delay(100);
 
   conf_general_init();
-  /* USER CODE END 2 */
 
-  /* Init scheduler */
-  osKernelInitialize();
+
+  //osKernelInitialize();
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -169,14 +155,15 @@ int main(void)
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of mediumFrequency */
-  mediumFrequencyHandle = osThreadNew(startMediumFrequencyTask, NULL, &mediumFrequency_attributes);
-
-  /* creation of safety */
-  safetyHandle = osThreadNew(StartSafetyTask, NULL, &safety_attributes);
-
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
+  TaskHandle_t mediumFrequencyHandle;
+
+  TaskHandle_t safetyHandle;
+
+  xTaskCreate(startMediumFrequencyTask, "medTSK", 128, NULL, PRIO_NORMAL, &mediumFrequencyHandle);
+  xTaskCreate(StartSafetyTask, "safety", 128, NULL, PRIO_HIGHER, &safetyHandle);
+
 
   task_init(); //bring up user tasks
   HAL_GPIO_WritePin(TPS_ENA_GPIO_Port, TPS_ENA_Pin, GPIO_PIN_SET);
@@ -188,9 +175,12 @@ int main(void)
   /* USER CODE END RTOS_EVENTS */
 
   /* Start scheduler */
-  osKernelStart();
+  vTaskStartScheduler();
 
-  /* We should never get here as control is now taken by the scheduler */
+  /* We should never ge*/
+
+  /* USER CODE END 2 */
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   vTaskSwitchContext();
@@ -705,9 +695,6 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
-/* USER CODE END 4 */
-
 /* USER CODE BEGIN Header_startMediumFrequencyTask */
 /**
   * @brief  Function implementing the mediumFrequency thread.
@@ -715,16 +702,9 @@ static void MX_GPIO_Init(void)
   * @retval None
   */
 /* USER CODE END Header_startMediumFrequencyTask */
-__weak void startMediumFrequencyTask(void *argument)
-{
-  /* USER CODE BEGIN 5 */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END 5 */
-}
+
+
+/* USER CODE END 4 */
 
 /**
   * @brief  Period elapsed callback in non blocking mode

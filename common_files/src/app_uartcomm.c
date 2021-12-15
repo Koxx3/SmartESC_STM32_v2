@@ -25,36 +25,45 @@
 #include "app.h"
 #include "utils.h"
 #include "VescToSTM.h"
-#include "cmsis_os.h"
 #include "FreeRTOS.h"
+#include "task.h"
 #include "product.h"
+#include "ninebot.h"
+#include "VescCommand.h"
 
+
+NinebotPack frame;
+
+//static uint8_t	ui8_tx_buffer[] = {0x55, 0xAA, 0x08, 0x21, 0x64, 0x00, 0x01, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+const uint8_t m365_mode[3] = { M365_MODE_SLOW, M365_MODE_DRIVE, M365_MODE_SPORT};
+
+m365Answer m365_to_display = {.start1=NinebotHeader0, .start2=NinebotHeader1, .len=8, .addr=0x21, .cmd=0x64, .arg=0, .mode=1};
 
 
 #define CIRC_BUF_SZ       				32  /* must be power of two */
 #define DMA_WRITE_PTR(channel) 			((CIRC_BUF_SZ - channel.hdmarx->Instance->CNDTR) & (CIRC_BUF_SZ - 1) )  //huart_cobs->hdmarx->Instance->NDTR.
 
 uint8_t usart_rx_dma_buffer[CIRC_BUF_SZ];
+#ifdef G30P
 uint8_t usart2_rx_dma_buffer[CIRC_BUF_SZ];
+#endif
 
 uint8_t app_connection_timout = 8;
 
-osThreadId_t task_app_handle;
-const osThreadAttr_t task_app_attributes = {
-  .name = "APP-USART",
-  .priority = (osPriority_t) osPriorityBelowNormal,
-  .stack_size = 128 * 7
-};
+TaskHandle_t task_app_handle;
 
 void my_uart_send_data(uint8_t *tdata, uint16_t tnum){
 	//send data
-	while( HAL_UART_Transmit_DMA(&APP_USART_DMA, tdata, tnum) != HAL_OK ) osDelay(1);
+	//HAL_HalfDuplex_EnableTransmitter(&APP_USART_DMA);
+	while( HAL_UART_Transmit_DMA(&APP_USART_DMA, tdata, tnum) != HAL_OK ) vTaskDelay(1);
 
 	//Waiting to send status OK
 	while(HAL_DMA_GetState(&APP_USART_TX_DMA) != HAL_DMA_STATE_READY){
 		APP_USART_DMA.gState = HAL_UART_STATE_READY;
-		osDelay(1);
+		vTaskDelay(1);
 	}
+	//HAL_HalfDuplex_EnableReceiver(&APP_USART_DMA);
 }
 
 #ifdef G30P
@@ -84,14 +93,38 @@ void task_app(void * argument)
 #ifdef G30P
 	uint32_t rd2_ptr=0;
 #endif
-
+	uint16_t slow_update_cnt=0;
   /* Infinite loop */
 	for(;;)
 	{
 		while(rd_ptr != DMA_WRITE_PTR(APP_USART_DMA)) {
+			if(ninebot_parse(usart_rx_dma_buffer[rd_ptr] ,&frame)	==0){
+					//commands_printf("LEN: %d CMD: %x ARG: %x", frame.len, frame.cmd, frame.arg);
+				switch(frame.cmd){
+					case 0x64:
+						addCRC((uint8_t*)&m365_to_display, m365_to_display.len+6);
+						my_uart_send_data((uint8_t*)&m365_to_display, sizeof(m365_to_display));
+					break;
+					case 0x65:
+
+
+					break;
+				}
+			}
 			rd_ptr++;
 			rd_ptr &= (CIRC_BUF_SZ - 1);
 		}
+
+		if(slow_update_cnt==0){
+			m365_to_display.speed = VescToSTM_get_speed()*3.6;
+			m365_to_display.battery = utils_map(VescToSTM_get_battery_level(0), 0, 1, 0, 96);
+			m365_to_display.beep=0;
+
+		}else{
+			slow_update_cnt++;
+			if(slow_update_cnt==50) slow_update_cnt=0;
+		}
+
 
 #ifdef G30P
 		while(rd2_ptr != DMA_WRITE_PTR(APP2_USART_DMA)) {
@@ -100,10 +133,10 @@ void task_app(void * argument)
 		}
 #endif
 
-		osDelay(10);
+		vTaskDelay(10);
 	}
 }
 
 void task_app_init(){
-	task_app_handle = osThreadNew(task_app, NULL, &task_app_attributes);
+	xTaskCreate(task_app, "APP-USART", 128, NULL, PRIO_BELOW_NORMAL, &task_app_handle);
 }

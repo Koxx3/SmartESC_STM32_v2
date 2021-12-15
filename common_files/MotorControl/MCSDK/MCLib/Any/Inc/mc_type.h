@@ -207,15 +207,18 @@ typedef struct
   CurrRefSource_t bDriveInput; /**< @brief It specifies whether the current reference source must be
                                  *         #INTERNAL or #EXTERNAL*/
   int32_t Iq_sum;
-  uint16_t Iq_samples;
   int32_t Id_sum;
-  uint16_t Id_samples;
   int32_t Vq_sum;
-  uint16_t Vq_samples;
   int32_t Vd_sum;
-  uint16_t Vd_samples;
+  int16_t Iq_avg;
+  int16_t Id_avg;
+  int16_t Vq_avg;
+  int16_t Vd_avg;
+  uint16_t samples;
   uint32_t cycles_last;
   uint32_t cycles_max;
+  int16_t max_i_batt;
+  int16_t min_i_batt;
 } FOCVars_t, *pFOCVars_t;
 
 /**

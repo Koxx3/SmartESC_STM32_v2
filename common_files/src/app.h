@@ -19,7 +19,7 @@
 #include "conf_general.h"
 
 // Functions
-const app_configuration* app_get_configuration(void);
+app_configuration* app_get_configuration(void);
 void app_set_configuration(app_configuration *conf);
 void app_disable_output(int time_ms);
 bool app_is_output_disabled(void);

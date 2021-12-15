@@ -30,6 +30,7 @@
 #include "mc_interface.h"
 #include "speed_pos_fdbk.h"
 #include "drive_parameters.h"
+#include "product.h"
 
 extern qd_t currComp;
 
@@ -46,7 +47,7 @@ typedef enum {
 	SAMP_SENDING
 }SAMP_STATES;
 
-#define ADC_SAMPLE_MAX_LEN 500
+
 
 typedef struct samp_struct samp_str;
 struct samp_struct{
@@ -57,9 +58,13 @@ struct samp_struct{
 	uint16_t n_samp;
 	uint16_t vesc_tool_samples;
 	debug_sampling_mode mode;
-	int16_t m_curr0_samples[ADC_SAMPLE_MAX_LEN];
-	int16_t m_curr1_samples[ADC_SAMPLE_MAX_LEN];
-	int8_t m_phase_samples[ADC_SAMPLE_MAX_LEN];
+	uint16_t * m_curr0_samples; //4 bits LSB Hall Pos 12bit curr0
+	uint16_t * m_curr1_samples; //4 bits LSB Hall Pos 12bit curr1
+#if SCOPE_UVW == 1
+	uint8_t * m_v0_samples;
+	uint8_t * m_v1_samples;
+	uint8_t * m_v2_samples;
+#endif
 };
 
 extern volatile samp_str samples;

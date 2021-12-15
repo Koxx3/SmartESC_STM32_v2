@@ -126,15 +126,15 @@ PID_Handle_t PIDFluxWeakeningHandle_M1 =
   .hDefKiGain          = (int16_t)FW_KI_GAIN,
   .wUpperIntegralLimit = 0,
   .wLowerIntegralLimit = (int32_t)(-NOMINAL_CURRENT) * (int32_t)FW_KIDIV,
-  .hUpperOutputLimit       = 0,
-  .hLowerOutputLimit       = -INT16_MAX,
+  .hUpperOutputLimit   = 0,
+  .hLowerOutputLimit   = -INT16_MAX,
   .hKpDivisor          = (uint16_t)FW_KPDIV,
   .hKiDivisor          = (uint16_t)FW_KIDIV,
   .hKpDivisorPOW2      = (uint16_t)FW_KPDIV_LOG,
   .hKiDivisorPOW2      = (uint16_t)FW_KIDIV_LOG,
-  .hDefKdGain           = 0x0000U,
-  .hKdDivisor           = 0x0000U,
-  .hKdDivisorPOW2       = 0x0000U,
+  .hDefKdGain          = 0x0000U,
+  .hKdDivisor          = 0x0000U,
+  .hKdDivisorPOW2      = 0x0000U,
 };
 
 /**
@@ -142,17 +142,17 @@ PID_Handle_t PIDFluxWeakeningHandle_M1 =
   */
 SpeednTorqCtrl_Handle_t SpeednTorqCtrlM1 =
 {
-  .STCFrequencyHz =           		MEDIUM_FREQUENCY_TASK_RATE,
+  .STCFrequencyHz 			  =	MEDIUM_FREQUENCY_TASK_RATE,
   .MaxAppPositiveMecSpeedUnit =	(uint16_t)(MAX_APPLICATION_SPEED_UNIT),
   .MinAppPositiveMecSpeedUnit =	(uint16_t)(MIN_APPLICATION_SPEED_UNIT),
   .MaxAppNegativeMecSpeedUnit =	(int16_t)(-MIN_APPLICATION_SPEED_UNIT),
   .MinAppNegativeMecSpeedUnit =	(int16_t)(-MAX_APPLICATION_SPEED_UNIT),
-  .MaxPositiveTorque =				(int16_t)NOMINAL_CURRENT,
-  .MinNegativeTorque =				-(int16_t)NOMINAL_CURRENT,
-  .ModeDefault =					DEFAULT_CONTROL_MODE,
-  .MecSpeedRefUnitDefault =		(int16_t)(DEFAULT_TARGET_SPEED_UNIT),
-  .TorqueRefDefault =				(int16_t)DEFAULT_TORQUE_COMPONENT,
-  .IdrefDefault =					(int16_t)DEFAULT_FLUX_COMPONENT,
+  .MaxPositiveTorque 		  =	(int16_t)NOMINAL_CURRENT,
+  .MinNegativeTorque 		  =	-(int16_t)NOMINAL_CURRENT,
+  .ModeDefault 				  =	DEFAULT_CONTROL_MODE,
+  .MecSpeedRefUnitDefault     = (int16_t)(DEFAULT_TARGET_SPEED_UNIT),
+  .TorqueRefDefault 		  =	(int16_t)DEFAULT_TORQUE_COMPONENT,
+  .IdrefDefault 			  =	(int16_t)DEFAULT_FLUX_COMPONENT,
 };
 PWMC_R3_2_Handle_t PWM_Handle_M1 =
 {
@@ -209,14 +209,13 @@ HALL_Handle_t HALL_M1 =
     .bMaximumSpeedErrorsNumber         =	MEAS_ERRORS_BEFORE_FAULTS,
     .hMaxReliableMecAccelUnitP         =	65535,
     .hMeasurementFrequency             =	TF_REGULATION_RATE_SCALED,
-    .DPPConvFactor                     =  DPP_CONV_FACTOR,
+    .DPPConvFactor                     =    DPP_CONV_FACTOR,
   },
-  .SensorPlacement     = HALL_SENSORS_PLACEMENT,
   .PhaseShift          = (int16_t)(HALL_PHASE_SHIFT * 65536/360),
   .SpeedSamplingFreqHz = MEDIUM_FREQUENCY_TASK_RATE,
   .SpeedBufferSize     = HALL_AVERAGING_FIFO_DEPTH,
- .TIMClockFreq       = HALL_TIM_CLK,
- .TIMx                = TIM3,
+ .TIMClockFreq         = HALL_TIM_CLK,
+ .TIMx                 = TIM3,
 
  .ICx_Filter          = M1_HALL_IC_FILTER,
 
@@ -307,11 +306,13 @@ RampExtMngr_Handle_t RampExtMngrHFParamsM1 =
 /**
   * @brief  CircleLimitation Component parameters Motor 1 - Base Component
   */
+static const uint16_t table[87] = MMITABLE;
+
 CircleLimitation_Handle_t CircleLimitationM1 =
 {
   .MaxModule          = MAX_MODULE,
   .MaxVd          	  = (uint16_t)(MAX_MODULE * FW_VOLTAGE_REF / 1000),
-  .Circle_limit_table = MMITABLE,
+  .Circle_limit_table = (uint16_t*)&table,
   .Start_index        = START_INDEX,
 };
 

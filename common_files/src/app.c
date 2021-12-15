@@ -8,9 +8,11 @@ static volatile bool output_disabled_now = false;
 // Private functions
 static void output_vt_cb(void *arg);
 
-const app_configuration* app_get_configuration(void) {
+app_configuration* app_get_configuration(void) {
 	return &appconf;
 }
+
+
 
 /**
  * Reconfigure and restart all apps. Some apps don't have any configuration options.

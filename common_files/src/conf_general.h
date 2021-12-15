@@ -28,9 +28,12 @@
 
 #include "VescDatatypes.h"
 
-#define ADDR_FLASH_PAGE_62    ((uint32_t)0x0801F800) /* Base @ of Page 127, 1 Kbytes */
-#define ADDR_FLASH_PAGE_63    ((uint32_t)0x0801FC00) /* Base @ of Page 127, 1 Kbytes */
 
+#define APP_PAGE				126
+#define CONF_PAGE				127
+
+#define ADDR_FLASH_PAGE_126    ((uint32_t)0x08000000+(APP_PAGE*0x400)) /* Base @ of Page 126, 1 Kbytes */
+#define ADDR_FLASH_PAGE_127    ((uint32_t)0x08000000+(CONF_PAGE*0x400)) /* Base @ of Page 127, 1 Kbytes */
 
 extern mc_configuration mc_conf;
 extern app_configuration appconf;
@@ -43,5 +46,6 @@ bool conf_general_store_mc_configuration(mc_configuration *conf, bool is_motor_2
 void conf_general_setup_mc(mc_configuration *mcconf);
 void conf_general_update_current(mc_configuration *mcconf);
 mc_configuration* mc_interface_get_configuration(void);
-
+bool conf_general_store_app_configuration(app_configuration *conf);
+int conf_general_detect_apply_all_foc_can(bool detect_can, float max_power_loss, float min_current_in, float max_current_in, float openloop_rpm, float sl_erpm);
 #endif /* CONF_GENERAL_H_ */

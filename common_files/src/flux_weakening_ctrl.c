@@ -58,9 +58,9 @@ __weak void FW_DataProcess( FW_Handle_t * pHandle, qd_t Vqd )
   * @retval qd_t Computed Iqdref.
   */
 __weak qd_t FW_CalcCurrRef( FW_Handle_t * pHandle, qd_t Iqdref ){
-	  int16_t varError;
+	  int32_t varError;
 
-	  int16_t AvVoltAmpl = MCM_Sqrt(pHandle->AvVolt_qd.d * pHandle->AvVolt_qd.d + pHandle->AvVolt_qd.q * pHandle->AvVolt_qd.q);
+	  int32_t AvVoltAmpl = MCM_Sqrt(pHandle->AvVolt_qd.d * pHandle->AvVolt_qd.d + pHandle->AvVolt_qd.q * pHandle->AvVolt_qd.q);
 
 	  if (AvVoltAmpl > 32767 ){
 		  varError = ((pHandle->hMaxModule * pHandle->hFW_V_Ref) / 1000) - 32767;
@@ -91,10 +91,11 @@ __weak qd_t FW_CalcCurrRef( FW_Handle_t * pHandle, qd_t Iqdref ){
 	  if(Iqdref.d != 0){
 		  PID_SetLowerIntegralTermLimit(pHandle->pSpeedPID, -lowerLimit);
 		  PID_SetUpperIntegralTermLimit(pHandle->pSpeedPID, lowerLimit);
+		  if ( Iqdref.q > sqRoot || (sqRoot = -sqRoot, Iqdref.q < sqRoot) ){
+		      Iqdref.q = sqRoot;
+		  }
 	  }
-	  if ( Iqdref.q > sqRoot || (sqRoot = -sqRoot, Iqdref.q < sqRoot) ){
-		  Iqdref.q = sqRoot;
-	  }
+
 
 	  return Iqdref;
 }

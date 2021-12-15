@@ -28,13 +28,17 @@
 #include "task_cli.h"
 #include <string.h>
 #include "VescCommand.h"
+#include "music.h"
+#include "ninebot.h"
+#include "conf_general.h"
+#include "VescToSTM.h"
 
-osThreadId_t PwrHandle;
-volatile uint32_t main_loop_counter;
-static uint8_t power_button_state = 0;
+//Not a real Task... it's called from safety task. No delays allowed
 
-const osThreadAttr_t PWR_attributes = { .name = "PWR", .priority =
-		(osPriority_t) osPriorityBelowNormal, .stack_size = 128 * 4 };
+#define EXECUTION_SPEED		40			//every 40 ticks (20ms)
+
+extern m365Answer m365_to_display;
+extern const uint8_t m365_mode[3];
 
 uint8_t buttonState() {
     static const uint32_t DEBOUNCE_MILLIS = 20 ;
@@ -98,40 +102,54 @@ eButtonEvent getButtonEvent()
     return button_event ;
 }
 
+//This is not a FreeRTOS Task... its called from safety task to safe some heap space every 500us
 void task_PWR(void *argument) {
-	/* Infinite loop */
-	for (;;) {
-		if(main_loop_counter > 25){
-			switch( getButtonEvent() ){
-				  case NO_PRESS : break ;
-				  case SINGLE_PRESS : {
-					  commands_printf("SINGLE_PRESS");
-				  } break ;
-				  case LONG_PRESS :   {
-					  commands_printf("LONG_PRESS");
-				  } break ;
-				  case VERY_LONG_PRESS :   {
-					  power_control(DEV_PWR_OFF);
-				  } break ;
-				  case DOUBLE_PRESS : {
-					  commands_printf("DOUBLE_PRESS");
-				  } break ;
-			 }
-		}
-		main_loop_counter++;
+	static uint8_t main_loop_counter = 0;
+	if(main_loop_counter > 40){
+		main_loop_counter=0;
+		switch( getButtonEvent() ){
+			  case NO_PRESS : break ;
+			  case SINGLE_PRESS : {
+				  m365_to_display.light = !m365_to_display.light;
+			  } break ;
+			  case LONG_PRESS :   {
+				  power_control(DEV_PWR_OFF);
+			  } break ;
+			  case VERY_LONG_PRESS :   {
 
-		vTaskDelay(MS_TO_TICKS(50));
+			  } break ;
+			  case DOUBLE_PRESS : {
+				  float kmh=0;
+				  switch(m365_to_display.mode){
+				  	case M365_MODE_DRIVE:
+				  		  m365_to_display.mode = M365_MODE_SPORT;
+				  		  kmh = 25;
+				  		  break;
+				  	case M365_MODE_SPORT:
+						  m365_to_display.mode = M365_MODE_SLOW;
+						  kmh = 5;
+						  break;
+				  	case M365_MODE_SLOW:
+						  m365_to_display.mode = M365_MODE_DRIVE;
+						  kmh = 10;
+						  break;
+				  }
+				  commands_printf("mode: %d", m365_to_display.mode);
+				  mc_conf.lo_max_erpm = ((kmh * 1000.0 / 60.0)/(mc_conf.si_wheel_diameter*M_PI)) * mc_conf.si_motor_poles * mc_conf.si_gear_ratio;
+				  MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(mc_conf.lo_max_erpm, mc_conf.si_motor_poles), 0);
+			  } break ;
+		 }
 	}
+	main_loop_counter++;
 }
 
 void task_PWR_init() {
 	/* Check button pressed state at startup */
-	power_button_state = buttonState();
+	buttonState();
 
     /* Power ON board temporarily, ultimate decision to keep hardware ON or OFF is made later */
 	power_control(DEV_PWR_ON);
 
-	PwrHandle = osThreadNew(task_PWR, NULL, &PWR_attributes);
 }
 
 void power_control(uint8_t pwr)
@@ -143,19 +161,12 @@ void power_control(uint8_t pwr)
 		HAL_GPIO_WritePin(TPS_ENA_GPIO_Port, TPS_ENA_Pin, GPIO_PIN_SET);
 	} else if(pwr == DEV_PWR_OFF) {
 
-		//motors_free(0, NULL);
-		//sleep_x_ticks(2000);
-		//stop_motors();
 		vTaskDelay(1);
 
 		while(HAL_GPIO_ReadPin(PWR_BTN_GPIO_Port, PWR_BTN_Pin));
 		HAL_GPIO_WritePin(TPS_ENA_GPIO_Port, TPS_ENA_Pin, GPIO_PIN_RESET);
 		while(1);
 	} else if(pwr == DEV_PWR_RESTART) {
-
-		//motors_free(0, NULL);
-		//sleep_x_ticks(2000);
-		//stop_motors();
 
 		/* Restart the system */
 		NVIC_SystemReset();

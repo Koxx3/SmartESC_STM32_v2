@@ -14,6 +14,7 @@
 #include "VescToSTM.h"
 #include "conf_general.h"
 #include "product.h"
+#include "hall_speed_pos_fdbk.h"
 
 
 //const uint8_t hall_arr[8] = {0,5,1,3,2,6,4,7};
@@ -66,11 +67,11 @@ bool tune_mcpwm_foc_hall_detect(float current, uint8_t *hall_table) {
 	memset(hall_iterations, 0, sizeof(hall_iterations));
 
 	// Forwards
-	for (int i = 0;i < 3;i++) {
+	for (int i = 0;i < 6;i++) {
 		for (int j = 0;j < 360;j++) {
 			float m_phase_now_override = (float)j * M_PI / 180.0;
 			pMCI[M1]->pSTC->SPD->open_angle = 65536.0 / (2 *M_PI) * m_phase_now_override;
-			vTaskDelay(MS_TO_TICKS(5));
+			vTaskDelay(1);
 			int hall = HALL_M1.HallState;
 			sin_hall[hall] += sinf(m_phase_now_override);
 			cos_hall[hall] += cosf(m_phase_now_override);
@@ -79,11 +80,11 @@ bool tune_mcpwm_foc_hall_detect(float current, uint8_t *hall_table) {
 	}
 
 	// Reverse
-	for (int i = 0;i < 3;i++) {
+	for (int i = 0;i < 6;i++) {
 		for (int j = 360;j >= 0;j--) {
 			float m_phase_now_override = (float)j * M_PI / 180.0;
 			pMCI[M1]->pSTC->SPD->open_angle =65536.0 / (2 *M_PI) * m_phase_now_override;
-			vTaskDelay(MS_TO_TICKS(5));
+			vTaskDelay(1);
 			int hall = HALL_M1.HallState;
 			sin_hall[hall] += sinf(m_phase_now_override);
 			cos_hall[hall] += cosf(m_phase_now_override);
@@ -160,28 +161,11 @@ float tune_foc_measure_resistance(float current, int samples) {
 	vTaskDelay(MS_TO_TICKS(200));
 
 	// Sample
-	pMCI[M1]->pFOCVars->Vq_sum = 0;
-	pMCI[M1]->pFOCVars->Vq_samples = 0;
-	pMCI[M1]->pFOCVars->Vd_sum = 0;
-	pMCI[M1]->pFOCVars->Vd_samples = 0;
-	pMCI[M1]->pFOCVars->Iq_sum = 0;
-	pMCI[M1]->pFOCVars->Iq_samples = 0;
-	pMCI[M1]->pFOCVars->Id_sum = 0;
-	pMCI[M1]->pFOCVars->Id_samples = 0;
 
-	int cnt = 0;
-	while (pMCI[M1]->pFOCVars->Vq_samples < samples) {
-		vTaskDelay(1);
-		cnt++;
-		// Timeout
-		if (cnt > 10000) {
-			break;
-		}
-	}
-	int32_t Vq = pMCI[M1]->pFOCVars->Vq_sum / pMCI[M1]->pFOCVars->Vq_samples;
-	int32_t Vd = pMCI[M1]->pFOCVars->Vd_sum / pMCI[M1]->pFOCVars->Vd_samples;
-	int32_t Iq = pMCI[M1]->pFOCVars->Iq_sum / pMCI[M1]->pFOCVars->Iq_samples;
-	int32_t Id = pMCI[M1]->pFOCVars->Id_sum / pMCI[M1]->pFOCVars->Id_samples;
+	int32_t Vq = pMCI[M1]->pFOCVars->Vq_avg;
+	int32_t Vd = pMCI[M1]->pFOCVars->Vd_avg;
+	int32_t Iq = pMCI[M1]->pFOCVars->Iq_avg;
+	int32_t Id = pMCI[M1]->pFOCVars->Id_avg;
 
 	float Vin = VescToSTM_get_bus_voltage();
 	float fVq = Vin / 32768.0 * (float)Vq;
@@ -489,8 +473,12 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 		//mc_interface_set_configuration(mcconf);
 		vTaskDelay(MS_TO_TICKS(500));
 		currComp.q = 0;
+
+		MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
+		MCI_StopMotor(pMCI[M1]);
+		vTaskDelay(1);
 		VescToSTM_set_open_loop(false, 0, 0);
-		MCI_SetCurrentReferences(pMCI[M1],currComp);
+
 		vTaskDelay(MS_TO_TICKS(5));
 
 		float linkage_sum = 0.0;
@@ -516,7 +504,41 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 
 		result = true;
 	}
+	vTaskDelay(MS_TO_TICKS(500));
+	MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
+	MCI_StartMotor(pMCI[M1]);
 
 	VescToSTM_enable_timeout(true);
 	return result;
+}
+
+bool tune_foc_measure_r_l_imax(float current_min, float current_max, float max_power_loss, float *r, float *l, float *i_max) {
+	float current_start = current_max / 50;
+	if (current_start < (current_min * 1.1)) {
+		current_start = current_min * 1.1;
+	}
+
+	const float res_old = mc_conf.foc_motor_r;
+
+	float i_last = 0.0;
+	for (float i = current_start;i < current_max;i *= 1.5) {
+		float res_tmp = tune_foc_measure_resistance(i, 5);
+		i_last = i;
+
+		if ((i * i * res_tmp) >= (max_power_loss / 3.0)) {
+			break;
+		}
+	}
+
+	*r = tune_foc_measure_resistance(i_last, 100);
+
+	mc_conf.foc_motor_r = *r;
+
+	*l = tune_foc_measure_inductance_current(i_last, 100) * 1e-6;
+	*i_max = sqrtf(max_power_loss / *r);
+	utils_truncate_number(i_max, HW_LIM_CURRENT);
+
+	mc_conf.foc_motor_r = res_old;
+
+	return true;
 }

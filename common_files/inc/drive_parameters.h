@@ -149,8 +149,8 @@
 /******************************   ADDITIONAL FEATURES   **********************/
 #define FW_VOLTAGE_REF                985 /*!<Vs reference, tenth
                                                         of a percent */
-#define FW_KP_GAIN                    3000 /*!< Default Kp gain */
-#define FW_KI_GAIN                    5000 /*!< Default Ki gain */
+#define FW_KP_GAIN                    6000 /*!< Default Kp gain */
+#define FW_KI_GAIN                    10000 /*!< Default Ki gain */
 #define FW_KPDIV                      32768
                                                 /*!< Kp gain divisor.If FULL_MISRA_C_COMPLIANCY
                                                 is not defined the divisor is implemented through
