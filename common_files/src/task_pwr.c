@@ -29,10 +29,16 @@
 #include <string.h>
 #include "VescCommand.h"
 #include "music.h"
+#include "ninebot.h"
+#include "conf_general.h"
+#include "VescToSTM.h"
 
 //Not a real Task... it's called from safety task. No delays allowed
 
 #define EXECUTION_SPEED		40			//every 40 ticks (20ms)
+
+extern m365Answer m365_to_display;
+extern const uint8_t m365_mode[3];
 
 uint8_t buttonState() {
     static const uint32_t DEBOUNCE_MILLIS = 20 ;
@@ -97,7 +103,6 @@ eButtonEvent getButtonEvent()
 }
 
 //This is not a FreeRTOS Task... its called from safety task to safe some heap space every 500us
-extern MUSIC_PARAM bldc_music;
 void task_PWR(void *argument) {
 	static uint8_t main_loop_counter = 0;
 	if(main_loop_counter > 40){
@@ -105,19 +110,33 @@ void task_PWR(void *argument) {
 		switch( getButtonEvent() ){
 			  case NO_PRESS : break ;
 			  case SINGLE_PRESS : {
-				  commands_printf("SINGLE_PRESS");
+				  m365_to_display.light = !m365_to_display.light;
 			  } break ;
 			  case LONG_PRESS :   {
-				  commands_printf("LONG_PRESS");
-			  } break ;
-			  case VERY_LONG_PRESS :   {
-				  set_music_command(Music1, &bldc_music);
-				  vTaskDelay(3000);
-				  set_music_command(Music_OFF, &bldc_music);
 				  power_control(DEV_PWR_OFF);
 			  } break ;
+			  case VERY_LONG_PRESS :   {
+
+			  } break ;
 			  case DOUBLE_PRESS : {
-				  commands_printf("DOUBLE_PRESS");
+				  float kmh=0;
+				  switch(m365_to_display.mode){
+				  	case M365_MODE_DRIVE:
+				  		  m365_to_display.mode = M365_MODE_SPORT;
+				  		  kmh = 25;
+				  		  break;
+				  	case M365_MODE_SPORT:
+						  m365_to_display.mode = M365_MODE_SLOW;
+						  kmh = 5;
+						  break;
+				  	case M365_MODE_SLOW:
+						  m365_to_display.mode = M365_MODE_DRIVE;
+						  kmh = 10;
+						  break;
+				  }
+				  commands_printf("mode: %d", m365_to_display.mode);
+				  mc_conf.lo_max_erpm = ((kmh * 1000.0 / 60.0)/(mc_conf.si_wheel_diameter*M_PI)) * mc_conf.si_motor_poles * mc_conf.si_gear_ratio;
+				  MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(mc_conf.lo_max_erpm, mc_conf.si_motor_poles), 0);
 			  } break ;
 		 }
 	}

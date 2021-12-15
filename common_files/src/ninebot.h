@@ -25,7 +25,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 //#include "mbed.h"
-#define NinebotHeader0 0x5A//0x55
+#define NinebotHeader0 0x55//0x55
 #define NinebotHeader1 0xAA//0xAA
 #define Ninebotread 0x01
 #define Ninebotwrite 0x03
@@ -42,6 +42,42 @@ typedef struct {
     uint8_t payload[NinebotMaxPayload];
     uint8_t CheckSum[2];
 } NinebotPack;
+                                   //0     1    2     3      4    5     6      7     8    9     10    11    12    13
+//static uint8_t	ui8_tx_buffer[] = {0x55, 0xAA, 0x08, 0x21, 0x64, 0x00, 0x01, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+/*
+ui8_tx_buffer[10]=MS->Speed;
+			ui8_tx_buffer[6]=MS->gear_state;
+			ui8_tx_buffer[7]=map(MS->Voltage,33000,42000,0,96);
+			if(MS->light)ui8_tx_buffer[8]=64;
+			else ui8_tx_buffer[8]=0;
+			addCRC((uint8_t*)ui8_tx_buffer, ui8_tx_buffer[2]+6);
+			HAL_HalfDuplex_EnableTransmitter(&huart1);
+			HAL_UART_Transmit_DMA(&huart1, (uint8_t*)ui8_tx_buffer, sizeof(ui8_tx_buffer));
+			}
+*/
+
+enum m365_display_mode{
+	M365_MODE_SLOW=3,
+	M365_MODE_DRIVE=1,
+	M365_MODE_SPORT=4,
+};
+
+typedef struct {
+	uint8_t start1;  	//0
+	uint8_t start2;  	//1
+	uint8_t len;		//2
+	uint8_t addr;		//3
+	uint8_t cmd;		//4
+    uint8_t arg;		//5
+    uint8_t mode; 		//6
+	uint8_t battery;	//7
+	uint8_t light;		//8
+	uint8_t beep;		//9
+	uint8_t speed;		//10
+	uint8_t data11;		//11
+    uint8_t CheckSum[2];//12-13
+} m365Answer;
 
 
 void addCRC(uint8_t * message, uint8_t size);

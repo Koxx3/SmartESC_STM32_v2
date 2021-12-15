@@ -511,3 +511,34 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 	VescToSTM_enable_timeout(true);
 	return result;
 }
+
+bool tune_foc_measure_r_l_imax(float current_min, float current_max, float max_power_loss, float *r, float *l, float *i_max) {
+	float current_start = current_max / 50;
+	if (current_start < (current_min * 1.1)) {
+		current_start = current_min * 1.1;
+	}
+
+	const float res_old = mc_conf.foc_motor_r;
+
+	float i_last = 0.0;
+	for (float i = current_start;i < current_max;i *= 1.5) {
+		float res_tmp = tune_foc_measure_resistance(i, 5);
+		i_last = i;
+
+		if ((i * i * res_tmp) >= (max_power_loss / 3.0)) {
+			break;
+		}
+	}
+
+	*r = tune_foc_measure_resistance(i_last, 100);
+
+	mc_conf.foc_motor_r = *r;
+
+	*l = tune_foc_measure_inductance_current(i_last, 100) * 1e-6;
+	*i_max = sqrtf(max_power_loss / *r);
+	utils_truncate_number(i_max, HW_LIM_CURRENT);
+
+	mc_conf.foc_motor_r = res_old;
+
+	return true;
+}

@@ -32,11 +32,13 @@
 #include "VescCommand.h"
 
 
-
-
 NinebotPack frame;
 
-static uint8_t	ui8_tx_buffer[] = {0x55, 0xAA, 0x08, 0x21, 0x64, 0x00, 0x01, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+//static uint8_t	ui8_tx_buffer[] = {0x55, 0xAA, 0x08, 0x21, 0x64, 0x00, 0x01, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+const uint8_t m365_mode[3] = { M365_MODE_SLOW, M365_MODE_DRIVE, M365_MODE_SPORT};
+
+m365Answer m365_to_display = {.start1=NinebotHeader0, .start2=NinebotHeader1, .len=8, .addr=0x21, .cmd=0x64, .arg=0, .mode=1};
 
 
 #define CIRC_BUF_SZ       				32  /* must be power of two */
@@ -91,24 +93,38 @@ void task_app(void * argument)
 #ifdef G30P
 	uint32_t rd2_ptr=0;
 #endif
-float speed = 0;
+	uint16_t slow_update_cnt=0;
   /* Infinite loop */
 	for(;;)
 	{
 		while(rd_ptr != DMA_WRITE_PTR(APP_USART_DMA)) {
 			if(ninebot_parse(usart_rx_dma_buffer[rd_ptr] ,&frame)	==0){
 					//commands_printf("LEN: %d CMD: %x ARG: %x", frame.len, frame.cmd, frame.arg);
+				switch(frame.cmd){
+					case 0x64:
+						addCRC((uint8_t*)&m365_to_display, m365_to_display.len+6);
+						my_uart_send_data((uint8_t*)&m365_to_display, sizeof(m365_to_display));
+					break;
+					case 0x65:
+
+
+					break;
+				}
 			}
 			rd_ptr++;
 			rd_ptr &= (CIRC_BUF_SZ - 1);
 		}
-		speed += VescToSTM_get_speed()*3.6;
-		speed /=2;
-		ui8_tx_buffer[10]=speed;
-		addCRC((uint8_t*)ui8_tx_buffer, ui8_tx_buffer[2]+6);
 
+		if(slow_update_cnt==0){
+			m365_to_display.speed = VescToSTM_get_speed()*3.6;
+			m365_to_display.battery = utils_map(VescToSTM_get_battery_level(0), 0, 1, 0, 96);
+			m365_to_display.beep=0;
 
-		my_uart_send_data((uint8_t*)ui8_tx_buffer, sizeof(ui8_tx_buffer));
+		}else{
+			slow_update_cnt++;
+			if(slow_update_cnt==50) slow_update_cnt=0;
+		}
+
 
 #ifdef G30P
 		while(rd2_ptr != DMA_WRITE_PTR(APP2_USART_DMA)) {

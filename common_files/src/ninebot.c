@@ -23,12 +23,6 @@
 #include "ninebot.h"
 #include "m365_register_map.h"
 
-//si size es =20 es posible que el mensaje sea mas largo habria que ver la longitud de las datos declarada en el paquete, mas adelante
-//uint16_t data_index=0;
-//uint16_t checksum=0;
-//uint8_t dataUART_NB_buffer[256];
-//It takes an array that comes from serial and tranforms it into a pack
-
 enum{
 	NIN_IDLE, NIN_HEAD, NIN_LEN, NIN_ADDR, NIN_CMD, NIN_ARG, NIN_DATA, NIN_CRC
 };
@@ -41,11 +35,11 @@ uint8_t ninebot_parse(uint8_t data , NinebotPack *message){
 
 	switch (state){
 	case NIN_IDLE:
-		if(data==0x55) state = NIN_HEAD;
+		if(data==NinebotHeader0) state = NIN_HEAD;
 		cnt =0;
 		break;
 	case NIN_HEAD:
-		if(data==0xAA) state = NIN_LEN;
+		if(data==NinebotHeader1) state = NIN_LEN;
 		break;
 	case NIN_LEN:
 		message->len = data-2;

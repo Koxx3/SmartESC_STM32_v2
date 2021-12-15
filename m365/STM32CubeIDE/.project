@@ -282,6 +282,11 @@
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/stm32f1xx_it.c</locationURI>
 		</link>
 		<link>
+			<name>Application/User/sto_cordic_speed_pos_fdbk.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/sto_cordic_speed_pos_fdbk.c</locationURI>
+		</link>
+		<link>
 			<name>Application/User/system.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/system.c</locationURI>
@@ -465,6 +470,11 @@
 			<name>Application/User/VESC/inc/crc.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/crc.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/VESC/inc/mcconf_default.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/mcconf_default.h</locationURI>
 		</link>
 		<link>
 			<name>Application/User/VESC/inc/packet.h</name>
