@@ -215,7 +215,6 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 		reply_func = commands_send_packet;
 	}
 
-
 	switch (packet_id) {
 	case COMM_FW_VERSION: {
 		int32_t ind = 0;
@@ -360,8 +359,8 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 		} break;
 
 			case COMM_SET_DUTY: {
-				//int32_t ind = 0;
-				//mc_interface_set_duty((float)buffer_get_int32(data, &ind) / 100000.0);
+				int32_t ind = 0;
+				VescToSTM_set_current_rel((float)buffer_get_int32(data, &ind) / 100000.0);
 				VescToSTM_timeout_reset();
 			} break;
 

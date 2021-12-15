@@ -221,12 +221,8 @@ bool conf_general_store_mc_configuration(mc_configuration *conf, bool is_motor_2
 	is_ok = conf_general_write_flash(CONF_PAGE, (uint8_t*)conf, sizeof(mc_configuration));
 
 	vTaskDelay(500);
+	MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
 	VescToSTM_start_motor();
-	PIDIqHandle_M1.wIntegralTerm = 0;
-	PIDIdHandle_M1.wIntegralTerm = 0;
-	PIDSpeedHandle_M1.wIntegralTerm = 0;
-	vTaskDelay(100);
-	VescToSTM_set_torque(0);
 
 	return is_ok;
 }
