@@ -18,6 +18,8 @@
 static float tacho_scale;
 stm_state VescToSTM_mode;
 
+#define DIR_MUL   (mc_conf.m_invert_direction ? -1 : 1)
+
 int32_t current_to_torque(int32_t curr_ma){
 	float ret = curr_ma * CURRENT_FACTOR_mA;
 	return ret;
@@ -133,7 +135,7 @@ void VescToSTM_enable_timeout(bool enbale){
 }
 
 void VescToSTM_update_torque(int32_t q, int32_t min_erpm, int32_t max_erpm){
-
+	q *= DIR_MUL;
 	if(q >= 0){
 		FW_M1.wNominalSqCurr = q*q;
 		FW_M1.hDemagCurrent	= -((float)q*mc_conf.foc_d_gain_scale_max_mod);
@@ -235,6 +237,7 @@ void VescToSTM_set_brake(int32_t current){
 
 
 void VescToSTM_set_speed(int32_t rpm){
+	rpm *= DIR_MUL;
 	VescToSTM_mode = STM_STATE_SPEED;
 	int32_t erpm = rpm * mc_conf.si_motor_poles;
 	if(erpm>0){
@@ -544,6 +547,8 @@ float VescToSTM_get_battery_level(float *wh_left) {
 
 float VescToSTM_get_duty_cycle_now(void) {
 	qd_t Vqd = 	MCI_GetVqd(pMCI[M1]);
+	if(mc_conf.m_invert_direction){
+	}
 	float amplitude = (MCI_GetPhaseVoltageAmplitude(pMCI[M1]) * SIGN(Vqd.q)) / 32768.0;
 	return amplitude;
 }
