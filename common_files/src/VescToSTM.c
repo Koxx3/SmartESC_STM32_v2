@@ -354,7 +354,7 @@ int32_t VescToSTM_get_erpm(){
 
 int32_t VescToSTM_get_erpm_fast(){
 	int32_t speed = ( (  HALL_M1._Super.hElSpeedDpp * ( int32_t )HALL_M1._Super.hMeasurementFrequency * (int32_t) SPEED_UNIT ) / (( int32_t ) HALL_M1._Super.DPPConvFactor));
-	return VescToSTM_speed_to_rpm(speed);
+	return VescToSTM_speed_to_erpm(speed);
 }
 
 int32_t VescToSTM_get_rpm(){
@@ -422,7 +422,7 @@ uint32_t VescToSTM_get_odometer(void) {
  * Speed, in m/s
  */
 float VescToSTM_get_speed(void) {
-	float temp = (((float)MCI_GetAvrgMecSpeedUnit(pMCI[M1]) / 10.0) * mc_conf.si_wheel_diameter * M_PI) / mc_conf.si_gear_ratio;
+	float temp = (((float)MCI_GetAvrgMecSpeedUnit(pMCI[M1]) / 10.0) * mc_conf.si_wheel_diameter * M_PI) / mc_conf.si_gear_ratio / mc_conf.si_motor_poles;
 	return temp;
 }
 

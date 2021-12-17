@@ -249,8 +249,8 @@ void conf_general_update_current(mc_configuration *mcconf){
 
 
 void conf_general_setup_mc(mc_configuration *mcconf) {
-	float current_max = mcconf->l_current_max * CURRENT_FACTOR_A * mcconf->l_current_min_scale;
-	float current_min = mcconf->l_current_min * CURRENT_FACTOR_A * mcconf->l_current_max_scale;
+	float current_max = mcconf->l_current_max * CURRENT_FACTOR_A * mcconf->l_current_max_scale;
+	float current_min = mcconf->l_current_min * CURRENT_FACTOR_A * mcconf->l_current_min_scale;
 	uint16_t max_app_speed;
 
 	FOCVars[M1].max_i_batt = mcconf->l_in_current_max * CURRENT_FACTOR_A;
@@ -302,7 +302,7 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	SpeednTorqCtrlM1.MinNegativeTorque 			= current_min;
 
 	HALL_M1._Super.hMaxReliableMecSpeedUnit     = max_app_speed;
-	HALL_M1._Super.hMinReliableMecSpeedUnit     = VescToSTM_erpm_to_speed(50);
+	HALL_M1._Super.hMinReliableMecSpeedUnit     = VescToSTM_erpm_to_speed(mcconf->foc_hall_interp_erpm);
 	HALL_M1._Super.bMaximumSpeedErrorsNumber    = MEAS_ERRORS_BEFORE_FAULTS;
 	HALL_M1.PhaseShift          				= DEG_TO_ANG(mcconf->foc_encoder_offset);
 	for(int i=0;i<8;i++){
