@@ -49,9 +49,6 @@ typedef struct
 
   uint8_t bSpeedErrorNumber;
 
-  uint8_t bElToMecRatio;  /*!< Coefficient used to transform electrical to
-                               mechanical quantities and viceversa. It usually
-                               coincides with motor pole pairs number*/
   uint8_t SpeedUnit; /*!< The speed unit value is defined into mc_stm_types.h*/
 
   uint8_t bMaximumSpeedErrorsNumber; /*!< Maximum value of not valid measurements

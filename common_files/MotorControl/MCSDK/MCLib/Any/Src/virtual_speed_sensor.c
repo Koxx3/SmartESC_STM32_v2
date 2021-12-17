@@ -131,8 +131,7 @@ __weak int16_t VSS_CalcElAngle( VirtualSpeedSensor_Handle_t * pHandle, void * pI
                                  ( int32_t )pHandle->_Super.hElSpeedDpp,
                                  ( int32_t )pHandle->_Super.bElToMecRatio ) );
 #else
-    pHandle->_Super.hMecAngle += pHandle->_Super.hElSpeedDpp /
-                                 ( int16_t )pHandle->_Super.bElToMecRatio;
+    pHandle->_Super.hMecAngle += pHandle->_Super.hElSpeedDpp;
 #endif
 
     if ( pHandle->bTransitionStarted == true )
@@ -225,7 +224,7 @@ __weak bool VSS_CalcAvrgMecSpeedUnit( VirtualSpeedSensor_Handle_t * pHandle, int
     /* Convert dpp into MecUnit */
     *hMecSpeedUnit = ( int16_t )( ( ( int32_t )pHandle->_Super.hElSpeedDpp *
                                     ( int32_t )pHandle->_Super.hMeasurementFrequency * SPEED_UNIT ) /
-                                  ( ( int32_t )pHandle->_Super.DPPConvFactor * ( int32_t )pHandle->_Super.bElToMecRatio ) );
+                                  ( ( int32_t )pHandle->_Super.DPPConvFactor ) );
 
     pHandle->_Super.hAvrMecSpeedUnit = *hMecSpeedUnit;
 
@@ -241,7 +240,6 @@ __weak bool VSS_CalcAvrgMecSpeedUnit( VirtualSpeedSensor_Handle_t * pHandle, int
                                   ( int32_t ) ( pHandle->_Super.DPPConvFactor) ) /
                                   ( ( int32_t )SPEED_UNIT * ( int32_t )pHandle->_Super.hMeasurementFrequency ) );
 
-    pHandle->_Super.hElSpeedDpp *= ( int16_t )( pHandle->_Super.bElToMecRatio );
 
     pHandle->hRemainingStep = 0u;
   }
@@ -274,7 +272,7 @@ __weak void VSS_SetMecAngle( VirtualSpeedSensor_Handle_t * pHandle, int16_t hMec
 {
 
   pHandle->hElAngleAccu = hMecAngle;
-  pHandle->_Super.hMecAngle = pHandle->hElAngleAccu / ( int16_t )pHandle->_Super.bElToMecRatio;
+  pHandle->_Super.hMecAngle = pHandle->hElAngleAccu;
   pHandle->_Super.hElAngle = hMecAngle;
 }
 
@@ -309,7 +307,6 @@ __weak void  VSS_SetMecAcceleration( VirtualSpeedSensor_Handle_t * pHandle, int1
                                     ( int32_t )( pHandle->_Super.DPPConvFactor) ) /
                                     ( ( int32_t )SPEED_UNIT * ( int32_t )pHandle->_Super.hMeasurementFrequency ) );
 
-      pHandle->_Super.hElSpeedDpp *= ( int16_t )( pHandle->_Super.bElToMecRatio );
 
       pHandle->hRemainingStep = 0u;
 
@@ -325,8 +322,7 @@ __weak void  VSS_SetMecAcceleration( VirtualSpeedSensor_Handle_t * pHandle, int1
 
       pHandle->hRemainingStep = hNbrStep;
 
-      hCurrentMecSpeedDpp = pHandle->_Super.hElSpeedDpp /
-                            ( int16_t )pHandle->_Super.bElToMecRatio;
+      hCurrentMecSpeedDpp = pHandle->_Super.hElSpeedDpp;
 
       hFinalMecSpeedDpp = ( int16_t )( ( ( int32_t )hFinalMecSpeedUnit * ( int32_t )( pHandle->_Super.DPPConvFactor) ) /
                                        ( ( int32_t )SPEED_UNIT * ( int32_t )pHandle->_Super.hMeasurementFrequency ) );
@@ -334,7 +330,7 @@ __weak void  VSS_SetMecAcceleration( VirtualSpeedSensor_Handle_t * pHandle, int1
       wMecAccDppP32 = ( ( ( int32_t )hFinalMecSpeedDpp - ( int32_t )hCurrentMecSpeedDpp ) *
                         ( int32_t )65536 ) / ( int32_t )hNbrStep;
 
-      pHandle->wElAccDppP32 = wMecAccDppP32 * ( int16_t )pHandle->_Super.bElToMecRatio;
+      pHandle->wElAccDppP32 = wMecAccDppP32;
 
       pHandle->hFinalMecSpeedUnit = hFinalMecSpeedUnit;
 

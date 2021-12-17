@@ -263,9 +263,9 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	mcconf->lo_current_max = mcconf->l_current_max;
 
 	if(mcconf->l_max_erpm >= abs(mcconf->l_min_erpm)){
-		max_app_speed = VescToSTM_erpm_to_speed(mcconf->l_max_erpm * 1.15, mcconf->si_motor_poles);
+		max_app_speed = VescToSTM_erpm_to_speed(mcconf->l_max_erpm * 1.15);
 	}else{
-		max_app_speed = VescToSTM_erpm_to_speed(abs(mcconf->l_min_erpm * 1.15), mcconf->si_motor_poles);
+		max_app_speed = VescToSTM_erpm_to_speed(abs(mcconf->l_min_erpm * 1.15));
 	}
 
 
@@ -296,20 +296,19 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	FW_M1.hDemagCurrent					  = -(current_max*mcconf->foc_d_gain_scale_max_mod);
 	PIDFluxWeakeningHandle_M1.wLowerIntegralLimit = (int32_t)(-current_max*mcconf->foc_d_gain_scale_max_mod) * (int32_t)FW_KIDIV,
 
-	SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit = VescToSTM_erpm_to_speed(mcconf->l_max_erpm * 1.15, mcconf->si_motor_poles);
-	SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit = VescToSTM_erpm_to_speed(mcconf->l_min_erpm * 1.15, mcconf->si_motor_poles);
+	SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit = VescToSTM_erpm_to_speed(mcconf->l_max_erpm * 1.15);
+	SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit = VescToSTM_erpm_to_speed(mcconf->l_min_erpm * 1.15);
 	SpeednTorqCtrlM1.MaxPositiveTorque			= current_max;
 	SpeednTorqCtrlM1.MinNegativeTorque 			= current_min;
 
-	HALL_M1._Super.bElToMecRatio                = mcconf->si_motor_poles;
 	HALL_M1._Super.hMaxReliableMecSpeedUnit     = max_app_speed;
-	HALL_M1._Super.hMinReliableMecSpeedUnit     = -VescToSTM_erpm_to_speed(50, mcconf->si_motor_poles);
+	HALL_M1._Super.hMinReliableMecSpeedUnit     = VescToSTM_erpm_to_speed(50);
 	HALL_M1._Super.bMaximumSpeedErrorsNumber    = MEAS_ERRORS_BEFORE_FAULTS;
 	HALL_M1.PhaseShift          				= DEG_TO_ANG(mcconf->foc_encoder_offset);
 	for(int i=0;i<8;i++){
 		HALL_M1.lut[i] = mcconf->foc_hall_table[i];
 	}
-	HALL_M1.SwitchSpeed = VescToSTM_erpm_to_speed(mcconf->foc_hall_interp_erpm, mcconf->si_motor_poles);
+	HALL_M1.SwitchSpeed = VescToSTM_erpm_to_speed(mcconf->foc_hall_interp_erpm);
 
 	TempSensorParamsM1.hOverTempThreshold      = (uint16_t)(OV_TEMPERATURE_THRESHOLD_d);
 	TempSensorParamsM1.hOverTempDeactThreshold = (uint16_t)(OV_TEMPERATURE_THRESHOLD_d - OV_TEMPERATURE_HYSTERESIS_d);
