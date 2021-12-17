@@ -838,7 +838,7 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 
 	// Speed PID
 	mcconf->s_pid_kp = 5;
-	mcconf->s_pid_ki = 5;
+	mcconf->s_pid_ki = 10;
 	mcconf->s_pid_kd = 0.0;
 //	float s_pid_kd_filter;
 //	float s_pid_min_erpm;
