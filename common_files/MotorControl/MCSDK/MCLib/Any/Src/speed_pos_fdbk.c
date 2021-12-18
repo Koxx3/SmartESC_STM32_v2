@@ -264,30 +264,6 @@ __weak int16_t SPD_GetS16Speed( SpeednPosFdbk_Handle_t * pHandle )
   return ( int16_t )wAux;
 }
 
-/**
-  * @brief  This method returns the coefficient used to transform electrical to
-  *         mechanical quantities and viceversa. It usually coincides with motor
-  *         pole pairs number.
-  * @param  pHandle: handler of the current instance of the SpeednPosFdbk component
-  * @retval uint8_t The motor pole pairs number.
-  */
-__weak uint8_t SPD_GetElToMecRatio( SpeednPosFdbk_Handle_t * pHandle )
-{
-  return ( pHandle->bElToMecRatio );
-}
-
-/**
-  * @brief  This method sets the coefficient used to transform electrical to
-  *         mechanical quantities and viceversa. It usually coincides with motor
-  *         pole pairs number.
-  * @param  pHandle: handler of the current instance of the SpeednPosFdbk component
-  * @param  bPP The motor pole pairs number to be set.
-  */
-__weak void SPD_SetElToMecRatio( SpeednPosFdbk_Handle_t * pHandle, uint8_t bPP )
-{
-  pHandle->bElToMecRatio = bPP;
-}
-
 
 /**
   * @}

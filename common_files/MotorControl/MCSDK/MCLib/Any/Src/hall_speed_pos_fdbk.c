@@ -81,10 +81,8 @@ __weak void HALL_Init( HALL_Handle_t * pHandle )
 {
   TIM_TypeDef * TIMx = pHandle->TIMx;
 
-  uint16_t hMinReliableElSpeedUnit = pHandle->_Super.hMinReliableMecSpeedUnit *
-                                     pHandle->_Super.bElToMecRatio;
-  uint16_t hMaxReliableElSpeedUnit = pHandle->_Super.hMaxReliableMecSpeedUnit *
-                                     pHandle->_Super.bElToMecRatio;
+  uint16_t hMinReliableElSpeedUnit = pHandle->_Super.hMinReliableMecSpeedUnit;
+  uint16_t hMaxReliableElSpeedUnit = pHandle->_Super.hMaxReliableMecSpeedUnit;
   uint8_t bSpeedBufferSize;
   uint8_t bIndex;
 
@@ -324,7 +322,7 @@ __weak bool HALL_CalcAvrgMecSpeedUnit( HALL_Handle_t * pHandle, int16_t * hMecSp
           /* Convert el_dpp to MecUnit */
           *hMecSpeedUnit = ( int16_t )( (  pHandle->AvrElSpeedDpp * 
                                         ( int32_t )pHandle->_Super.hMeasurementFrequency * (int32_t) SPEED_UNIT ) /
-                                        (( int32_t ) pHandle->_Super.DPPConvFactor * ( int32_t )pHandle->_Super.bElToMecRatio ) );
+                                        (( int32_t ) pHandle->_Super.DPPConvFactor) );
         }
         else
         {

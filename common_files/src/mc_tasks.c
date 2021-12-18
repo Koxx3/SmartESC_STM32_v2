@@ -857,7 +857,6 @@ __weak void TSK_SafetyTask_PWMOFF(uint8_t bMotor)
   if(bMotor == M1)
   {
 	  uint16_t voltage_fault = RVBS_CalcAvVbus(pBusSensorM1);
-	  voltage_fault = 0;
 	  if(voltage_fault==MC_UNDER_VOLT){
 		  CodeReturn |=  errMask[bMotor] & voltage_fault;
 
