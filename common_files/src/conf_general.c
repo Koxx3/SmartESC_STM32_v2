@@ -35,6 +35,7 @@
 #include <math.h>
 #include "tune.h"
 #include "mcconf_default.h"
+#include <string.h>
 
 mc_configuration mc_conf;
 app_configuration appconf;
