@@ -6,6 +6,7 @@
 #include <string.h>
 #include "drive_parameters.h"
 #include "mc_stm_types.h"
+#include "mcconf_default.h"
 
 
 int32_t confgenerator_serialize_mcconf(uint8_t *buffer, const mc_configuration *conf) {
@@ -729,28 +730,26 @@ bool confgenerator_deserialize_appconf(const uint8_t *buffer, app_configuration 
 	return true;
 }
 
-const uint8_t hall_def[8] = {255, 214, 40, 253, 123, 167, 85, 255};
-
 void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 	memset(mcconf,0,sizeof(mc_configuration));
 	// Limits
-		mcconf->l_current_max = 10;
-		mcconf->l_current_min  = -10;
-		mcconf->l_in_current_max = 10;
-		mcconf->l_in_current_min = -10;
-		mcconf->l_abs_current_max = 60;
-		mcconf->l_min_erpm = -5000;
-		mcconf->l_max_erpm = 5000;
+		mcconf->l_current_max = MCCONF_L_CURRENT_MAX;
+		mcconf->l_current_min  = MCCONF_L_CURRENT_MIN;
+		mcconf->l_in_current_max = MCCONF_L_IN_CURRENT_MAX;
+		mcconf->l_in_current_min = MCCONF_L_IN_CURRENT_MIN;
+		mcconf->l_abs_current_max = MCCONF_L_MAX_ABS_CURRENT;
+		mcconf->l_min_erpm = MCCONF_L_RPM_MIN;
+		mcconf->l_max_erpm = MCCONF_L_RPM_MAX;
 //		float l_erpm_start;
 //		float l_max_erpm_fbrake;
 //		float l_max_erpm_fbrake_cc;
-		mcconf->l_min_vin = 10;
-		mcconf->l_max_vin = 56;
-		mcconf->l_battery_cut_end = 31;
-		mcconf->l_battery_cut_start = 34;
+		mcconf->l_min_vin = MCCONF_L_MIN_VOLTAGE;
+		mcconf->l_max_vin = MCCONF_L_MAX_VOLTAGE;
+		mcconf->l_battery_cut_end = MCCONF_L_BATTERY_CUT_END;
+		mcconf->l_battery_cut_start = MCCONF_L_BATTERY_CUT_START;
 //		bool l_slow_abs_current;
-//		float l_temp_fet_start;
-//		float l_temp_fet_end;
+		mcconf->l_temp_fet_start = MCCONF_L_LIM_TEMP_FET_START;
+		mcconf->l_temp_fet_end = MCCONF_L_LIM_TEMP_FET_END;
 //		float l_temp_motor_start;
 //		float l_temp_motor_end;
 //		float l_temp_accel_dec;
@@ -758,8 +757,8 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 //		float l_max_duty;
 //		float l_watt_max;
 //		float l_watt_min;
-		mcconf->l_current_max_scale = 1;
-		mcconf->l_current_min_scale = 1;
+		mcconf->l_current_max_scale = MCCONF_L_CURRENT_MAX_SCALE;
+		mcconf->l_current_min_scale = MCCONF_L_CURRENT_MIN_SCALE;
 //		float l_duty_start;
 //		// Overridden limits (Computed during runtime)
 //		float lo_current_max;
@@ -776,11 +775,11 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 	mcconf->pwm_mode = PWM_MODE_SYNCHRONOUS;
 
 	// FOC
-	mcconf->foc_current_kp = 0.3;
-    mcconf->foc_current_ki = 152.0;
-    mcconf->foc_f_sw = 16000;
+	mcconf->foc_current_kp = MCCONF_FOC_CURRENT_KP;
+    mcconf->foc_current_ki = MCCONF_FOC_CURRENT_KI;
+    mcconf->foc_f_sw = MCCONF_FOC_F_SW;
 //	float foc_dt_us;
-    mcconf->foc_encoder_offset = 90;
+    mcconf->foc_encoder_offset = MCCONF_FOC_ENCODER_OFFSET;
 //	bool foc_encoder_inverted;
 //	float foc_encoder_ratio;
 //	float foc_encoder_sin_offset;
@@ -807,11 +806,16 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 //	float foc_sl_openloop_time_lock;
 //	float foc_sl_openloop_time_ramp;
 	mcconf->foc_sensor_mode = FOC_SENSOR_MODE_HALL;
+	mcconf->foc_hall_table[0] = MCCONF_FOC_HALL_TAB_0;
+	mcconf->foc_hall_table[1] = MCCONF_FOC_HALL_TAB_1;
+	mcconf->foc_hall_table[2] = MCCONF_FOC_HALL_TAB_2;
+	mcconf->foc_hall_table[3] = MCCONF_FOC_HALL_TAB_3;
+	mcconf->foc_hall_table[4] = MCCONF_FOC_HALL_TAB_4;
+	mcconf->foc_hall_table[5] = MCCONF_FOC_HALL_TAB_5;
+	mcconf->foc_hall_table[6] = MCCONF_FOC_HALL_TAB_6;
+	mcconf->foc_hall_table[7] = MCCONF_FOC_HALL_TAB_7;
 
-	for(int i=0;i<8;i++){
-		mcconf->foc_hall_table[i] = hall_def[i];
-	}
-	mcconf->foc_hall_interp_erpm = 50;
+	mcconf->foc_hall_interp_erpm = MCCONF_FOC_HALL_INTERP_ERPM;
 //	float foc_sl_erpm;
 //	bool foc_sample_v0_v7;
 //	bool foc_sample_high_current;
@@ -837,13 +841,13 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 //	float gpd_current_ki;
 
 	// Speed PID
-	mcconf->s_pid_kp = 5;
-	mcconf->s_pid_ki = 10;
-	mcconf->s_pid_kd = 0.0;
+	mcconf->s_pid_kp = MCCONF_S_PID_KP;
+	mcconf->s_pid_ki = MCCONF_S_PID_KI;
+	mcconf->s_pid_kd = MCCONF_S_PID_KD;
 //	float s_pid_kd_filter;
 //	float s_pid_min_erpm;
-	mcconf->s_pid_allow_braking = false;
-	mcconf->s_pid_ramp_erpms_s = 0;
+	mcconf->s_pid_allow_braking = MCCONF_S_PID_ALLOW_BRAKING;
+	mcconf->s_pid_ramp_erpms_s = MCCONF_S_PID_RAMP_ERPMS_S;
 
 	// Pos PID
 //	float p_pid_kp;
@@ -859,7 +863,7 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 //	float cc_ramp_step_max;
 
 	// Misc
-//	int32_t m_fault_stop_time_ms;
+	mcconf->m_fault_stop_time_ms = MCCONF_M_FAULT_STOP_TIME;
 //	float m_duty_ramp_step;
 //	float m_current_backoff_gain;
 //	uint32_t m_encoder_counts;
@@ -877,13 +881,13 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 //	int m_hall_extra_samples;
 
 	// Setup info
-	mcconf->si_motor_poles = 15;
+	mcconf->si_motor_poles = MCCONF_SI_MOTOR_POLES;
 
-	mcconf->si_gear_ratio = 1;
-	mcconf->si_wheel_diameter = 0.250;
-	mcconf->si_battery_type = BATTERY_TYPE_LIION_3_0__4_2;
-	mcconf->si_battery_cells = 10;
-	mcconf->si_battery_ah = 10;
+	mcconf->si_gear_ratio = MCCONF_SI_GEAR_RATIO;
+	mcconf->si_wheel_diameter = MCCONF_SI_WHEEL_DIAMETER;
+	mcconf->si_battery_type = MCCONF_SI_BATTERY_TYPE;
+	mcconf->si_battery_cells = MCCONF_SI_BATTERY_CELLS;
+	mcconf->si_battery_ah = MCCONF_SI_BATTERY_AH;
 
 	// BMS Configuration
 //	bms_config bms;

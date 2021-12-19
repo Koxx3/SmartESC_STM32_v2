@@ -394,14 +394,6 @@ int conf_general_detect_apply_all_foc(float max_power_loss,	bool store_mcconf_on
 	mcconf->l_min_erpm = MCCONF_L_RPM_MIN;
 	//conf_general_setup_mc(mcconf);
 
-	// Wait maximum 5s for fault code to disappear
-//	if (!wait_fault(5000)) {
-//		mc_interface_set_configuration(mcconf_old);
-//		mempools_free_mcconf(mcconf);
-//		mempools_free_mcconf(mcconf_old);
-//		mc_interface_select_motor_thread(motor_last);
-//		return -1;
-//	}
 
 	// Wait one second for things to get ready after
 	// the fault disappears.
@@ -456,9 +448,10 @@ int conf_general_detect_apply_all_foc(float max_power_loss,	bool store_mcconf_on
 		uint8_t hall_tab[8];
 		bool res = tune_mcpwm_foc_hall_detect((i_max / 3.0)*1000.0, hall_tab);
 		if(res==true){
-			memcpy(mc_conf.foc_hall_table,hall_tab, 8);
-			commands_send_mcconf(COMM_GET_MCCONF, mcconf);
-			conf_general_store_mc_configuration(mcconf, false);
+			memcpy(mcconf_old->foc_hall_table,hall_tab, 8);
+			conf_general_setup_mc(mcconf_old);
+			commands_send_mcconf(COMM_GET_MCCONF, mcconf_old);
+			conf_general_store_mc_configuration(mcconf_old, false);
 			result = 1;
 		}
 

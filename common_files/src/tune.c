@@ -17,8 +17,6 @@
 #include "hall_speed_pos_fdbk.h"
 
 
-//const uint8_t hall_arr[8] = {0,5,1,3,2,6,4,7};
-
 static int16_t current_to_torque(int32_t curr_ma){
 	float ret = curr_ma * CURRENT_FACTOR_mA;
 	return ret;
