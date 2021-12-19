@@ -40,7 +40,7 @@ M365 connections :
 ![image](https://user-images.githubusercontent.com/11454444/146688214-604f43c4-f962-4c4a-937e-974da73d6f42.png)
 
 Use ESP32 prototype board with and ESP32-devkit-c module :
-![image](https://user-images.githubusercontent.com/11454444/146687116-ad32be9d-6a3b-4f04-a995-02352c582d16.png)
+![image](https://user-images.githubusercontent.com/11454444/146688428-d8978339-fab1-4a7b-a88f-305298b6b64f.png)
 
 Use the code provided in the [serial-trottle-brake-esp32](/serial-trottle-brake-esp32) folder with Platform.io
 
