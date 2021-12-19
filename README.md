@@ -31,9 +31,8 @@ Launch VESCTool and connect with COM port.
 ![image](https://user-images.githubusercontent.com/11454444/146687240-e393ea2e-dfd9-4fac-870e-4cf526a61187.png)
 
 Launcher Motor setup wizzard.
-Enable keyboard control in the right toolbar :
-![image](https://user-images.githubusercontent.com/11454444/146688140-10e621de-3ac7-4234-8a69-d7cb0e2779bc.png)
 
+You're ready to control your M365 controller !
 
 # ESP32 test module
 
