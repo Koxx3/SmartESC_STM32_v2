@@ -31,6 +31,9 @@ Launch VESCTool and connect with COM port.
 ![image](https://user-images.githubusercontent.com/11454444/146687240-e393ea2e-dfd9-4fac-870e-4cf526a61187.png)
 
 Launcher Motor setup wizzard.
+![image](https://user-images.githubusercontent.com/11454444/146688494-b4a6c183-a89f-4517-af1f-61b5358aad40.png)
+
+Enter all your settings.
 
 Enable the keyboard control :
 
