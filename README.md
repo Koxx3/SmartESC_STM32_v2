@@ -33,6 +33,7 @@ Launch VESCTool and connect with COM port.
 Launcher Motor setup wizzard.
 
 Enable the keyboard control :
+
 ![image](https://user-images.githubusercontent.com/11454444/146688470-adf8a8f7-e3b4-43f4-9038-479d3d5585c5.png)
 
 You're ready to test your M365 controller with your keyboard !
