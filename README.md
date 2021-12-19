@@ -12,7 +12,7 @@ You need a ST-Link device to reprogram the M365/G3O controller.
 It costs 3/4€ on Aliexpress.
 
 Plug the st-link following this schematic :
-![image](https://user-images.githubusercontent.com/11454444/146687936-fecefada-6a42-4906-8ce2-6a6d8b60b813.png)
+![image](https://user-images.githubusercontent.com/11454444/146688635-b5a1ed07-3482-420f-b324-9e58b0a19dc9.png)
 
 With [STM32 ST-Link Utility](https://www.st.com/en/development-tools/stsw-link004.html), disable Red out protection.
 
@@ -25,7 +25,7 @@ Menu "Target" => "Option bytes"
 Use [VescTool](https://vesc-project.com/vesc_tool) to setup the motor and input properties.
 
 Use a serial USB adapter to connect the Xiaomi controller as an USB VESC :
-![image](https://user-images.githubusercontent.com/11454444/146688078-1a626e9a-ee29-491e-ae80-c56765fcdf11.png)
+![image](https://user-images.githubusercontent.com/11454444/146688647-e3e4d833-7c93-4b4b-a297-cc61ba52071e.png)
 
 Launch VESCTool and connect with COM port.
 ![image](https://user-images.githubusercontent.com/11454444/146687240-e393ea2e-dfd9-4fac-870e-4cf526a61187.png)
@@ -33,7 +33,7 @@ Launch VESCTool and connect with COM port.
 Launcher Motor setup wizzard.
 ![image](https://user-images.githubusercontent.com/11454444/146688494-b4a6c183-a89f-4517-af1f-61b5358aad40.png)
 
-Enter all your settings.
+Enter all your settings in the different windows.
 
 Enable the keyboard control :
 
@@ -45,7 +45,7 @@ You're ready to test your M365 controller with your keyboard !
 # ESP32 test module
 
 M365 connections :
-![image](https://user-images.githubusercontent.com/11454444/146688214-604f43c4-f962-4c4a-937e-974da73d6f42.png)
+![image](https://user-images.githubusercontent.com/11454444/146688619-c3bc8e6d-6884-4b1c-81d6-9ec456d1e41b.png)
 
 Use ESP32 prototype board with and ESP32-devkit-c module :
 ![image](https://user-images.githubusercontent.com/11454444/146688428-d8978339-fab1-4a7b-a88f-305298b6b64f.png)
