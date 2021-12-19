@@ -1,4 +1,4 @@
-This is an alternative firmware for Xiaomi M365 and Ninebot G30 controller
+This is an alternative firmware for Xiaomi M365 and Ninebot G30 controller.
 
 It uses VESC interface to communication throught BMS UART (full duplex UART).
 
@@ -14,7 +14,7 @@ It costs 3/4€ on Aliexpress.
 Plug the st-link following this schematic :
 ![image](https://user-images.githubusercontent.com/11454444/146688635-b5a1ed07-3482-420f-b324-9e58b0a19dc9.png)
 
-With [STM32 ST-Link Utility](https://www.st.com/en/development-tools/stsw-link004.html), disable Red out protection.
+With [STM32 ST-Link Utility](https://www.st.com/en/development-tools/stsw-link004.html), disable Re&d out protection.
 
 Menu "Target" => "Option bytes"
 ![image](https://user-images.githubusercontent.com/11454444/146688019-3e5122c7-f3fb-4964-a44f-684af023746e.png)
