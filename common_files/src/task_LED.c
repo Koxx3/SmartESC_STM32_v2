@@ -81,7 +81,12 @@ void task_LED(void * argument)
 				MCI_StopMotor(pMCI[M1]);
 				vTaskDelay(MS_TO_TICKS(100));
 				MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
-				MCI_StartMotor(pMCI[M1]);
+				if(MCI_GetAvrgMecSpeedUnit(pMCI[M1]) == 0){
+					MCI_StartMotor(pMCI[M1]);
+				}else{
+					pMCI[M1]->pSTM->bState = CLEAR;
+				}
+
 				last_fault = 0;
 			}
 			prv_LED_blink(MS_TO_TICKS(100));
