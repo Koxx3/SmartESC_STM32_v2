@@ -34,6 +34,7 @@
 
 extern qd_t currComp;
 
+void commands_send_mcconf(COMM_PACKET_ID packet_id, mc_configuration *mcconf);
 void commands_process_packet(unsigned char *data, unsigned int len, void(*reply_func)(unsigned char *data, unsigned int len));
 void commands_send_packet(unsigned char *data, unsigned int len);
 void send_sample();

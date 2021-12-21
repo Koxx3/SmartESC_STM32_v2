@@ -202,16 +202,6 @@
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/FreeRTOSConfig.h</locationURI>
 		</link>
 		<link>
-			<name>Application/User/blowfish.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/blowfish.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/blowfish.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Inc/blowfish.h</locationURI>
-		</link>
-		<link>
 			<name>Application/User/current_sense.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/current_sense.c</locationURI>
@@ -239,12 +229,12 @@
 		<link>
 			<name>Application/User/ninebot.c</name>
 			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/ninebot.c</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/ninebot.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/ninebot.h</name>
 			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/ninebot.h</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/Inc/ninebot.h</locationURI>
 		</link>
 		<link>
 			<name>Application/User/printf.c</name>
@@ -527,11 +517,6 @@
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/app.h</locationURI>
 		</link>
 		<link>
-			<name>Application/User/VESC/inc/appconf_default.h</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/appconf_default.h</locationURI>
-		</link>
-		<link>
 			<name>Application/User/VESC/inc/buffer.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/buffer.h</locationURI>
@@ -550,11 +535,6 @@
 			<name>Application/User/VESC/inc/crc.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/crc.h</locationURI>
-		</link>
-		<link>
-			<name>Application/User/VESC/inc/mcconf_default.h</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/mcconf_default.h</locationURI>
 		</link>
 		<link>
 			<name>Application/User/VESC/inc/packet.h</name>

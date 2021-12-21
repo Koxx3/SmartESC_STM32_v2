@@ -74,8 +74,9 @@ void task_LED(void * argument)
 			if((xTaskGetTickCount() / 2) > last_fault_time){
 #if ERROR_PRINTING
 				commands_printf("FAULTS: %x", last_fault);
-
 #endif
+
+#if AUTO_RESET_FAULT
 				MCI_FaultAcknowledged(pMCI[M1]);
 				vTaskDelay(MS_TO_TICKS(100));
 				MCI_StopMotor(pMCI[M1]);
@@ -88,6 +89,7 @@ void task_LED(void * argument)
 				}
 
 				last_fault = 0;
+#endif
 			}
 			prv_LED_blink(MS_TO_TICKS(100));
 		}else{

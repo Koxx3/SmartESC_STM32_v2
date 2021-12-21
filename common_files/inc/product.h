@@ -18,7 +18,6 @@
 #define VESC_USART_DMA													     huart1
 #define VESC_USART_TX_DMA													 hdma_usart1_tx
 #define VESC_USART_RX_DMA													 hdma_usart1_rx
-#define VESC_TOOL_ENABLE													 1
 
 #define APP_USART_DMA														 huart2
 #define APP_USART_TX_DMA												     hdma_usart2_tx
@@ -42,7 +41,6 @@
 
 #define TEMP_SENSOR_TYPE													 VIRTUAL_SENSOR
 #define CURR_SENSOR_TYPE													 REAL_SENSOR
-#define ERROR_PRINTING														 1
 
 #define ADC_SAMPLE_MAX_LEN 													 500
 
@@ -56,7 +54,6 @@
 #define VESC_USART_DMA													     huart3
 #define VESC_USART_TX_DMA													 hdma_usart3_tx
 #define VESC_USART_RX_DMA													 hdma_usart3_rx
-#define VESC_TOOL_ENABLE													 1
 
 #define APP_USART_DMA														 huart1
 #define APP_USART_TX_DMA												     hdma_usart1_tx
@@ -76,15 +73,16 @@
 
 #define TEMP_SENSOR_TYPE													 REAL_SENSOR
 #define CURR_SENSOR_TYPE													 VIRTUAL_SENSOR
-#if VESC_TOOL_ENABLE
-#define ERROR_PRINTING														 1
-#endif
 
 #define ADC_SAMPLE_MAX_LEN 													 1000
 
 
 #endif
 /****************************************************************************/
+#define PRODUCT_FIRMWARE_VERSION                                      		 0x0001
+#define VESC_TOOL_ENABLE													 0
+#define AUTO_RESET_FAULT													 0
+#define ERROR_PRINTING														 0
 
 #define BATTERY_VOLTAGE_GAIN     											 ((VOLTAGE_DIVIDER_GAIN * ADC_GAIN) * 512.0)
 #define CURRENT_FACTOR_A 													 ((32767.0*RSHUNT*AMPLIFICATION_GAIN)/(3.3/2))
