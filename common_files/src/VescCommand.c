@@ -769,7 +769,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					bool forward_can = data[ind++];
 					bool ack = data[ind++];
 					bool divide_by_controllers = data[ind++];
-
+					UNUSED(store);UNUSED(forward_can);UNUSED(divide_by_controllers);
 					float controller_num = 1.0;
 
 					mcconf->l_current_min_scale = buffer_get_float32_auto(data, &ind);
@@ -828,6 +828,9 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						l_in_current_min = buffer_get_float32_auto(data, &ind);
 						l_in_current_max = buffer_get_float32_auto(data, &ind);
 					}
+					UNUSED(l_min_duty);UNUSED(l_max_duty);
+					UNUSED(l_in_current_min);UNUSED(l_in_current_max);
+
 
 					mcconf->lo_current_min = mcconf->l_current_min * mcconf->l_current_min_scale;
 					mcconf->lo_current_max = mcconf->l_current_max * mcconf->l_current_max_scale;
@@ -947,6 +950,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					float end = buffer_get_float32(data, 1e3, &ind);
 					bool store = data[ind++];
 					bool fwd_can = data[ind++];
+					UNUSED(store);UNUSED(fwd_can);
 
 					/*if (fwd_can) {
 						comm_can_conf_battery_cut(255, store, start, end);

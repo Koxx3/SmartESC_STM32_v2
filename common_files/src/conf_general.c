@@ -28,6 +28,7 @@
 #include "drive_parameters.h"
 #include "mc_config.h"
 #include "VescToSTM.h"
+#include "VescCommand.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "app.h"
