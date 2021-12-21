@@ -136,7 +136,7 @@ void task_PWR(void *argument) {
 				  }
 				  commands_printf("mode: %d", m365_to_display.mode);
 				  mc_conf.lo_max_erpm = ((kmh * 1000.0 / 60.0)/(mc_conf.si_wheel_diameter*M_PI)) * mc_conf.si_motor_poles * mc_conf.si_gear_ratio;
-				  MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(mc_conf.lo_max_erpm, mc_conf.si_motor_poles), 0);
+				  MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(mc_conf.lo_max_erpm), 0);
 			  } break ;
 		 }
 	}

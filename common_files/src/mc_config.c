@@ -203,7 +203,6 @@ PWMC_R3_2_Handle_t PWM_Handle_M1 =
 HALL_Handle_t HALL_M1 =
 {
   ._Super = {
-    .bElToMecRatio                     =	POLE_PAIR_NUM,
     .hMaxReliableMecSpeedUnit          =	(uint16_t)(1.15*MAX_APPLICATION_SPEED_UNIT),
     .hMinReliableMecSpeedUnit          =	(uint16_t)(MIN_APPLICATION_SPEED_UNIT),
     .bMaximumSpeedErrorsNumber         =	MEAS_ERRORS_BEFORE_FAULTS,

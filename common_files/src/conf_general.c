@@ -35,6 +35,7 @@
 #include <math.h>
 #include "tune.h"
 #include "mcconf_default.h"
+#include <string.h>
 
 mc_configuration mc_conf;
 app_configuration appconf;
@@ -249,8 +250,8 @@ void conf_general_update_current(mc_configuration *mcconf){
 
 
 void conf_general_setup_mc(mc_configuration *mcconf) {
-	float current_max = mcconf->l_current_max * CURRENT_FACTOR_A * mcconf->l_current_min_scale;
-	float current_min = mcconf->l_current_min * CURRENT_FACTOR_A * mcconf->l_current_max_scale;
+	float current_max = mcconf->l_current_max * CURRENT_FACTOR_A * mcconf->l_current_max_scale;
+	float current_min = mcconf->l_current_min * CURRENT_FACTOR_A * mcconf->l_current_min_scale;
 	uint16_t max_app_speed;
 
 	FOCVars[M1].max_i_batt = mcconf->l_in_current_max * CURRENT_FACTOR_A;
@@ -263,9 +264,9 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	mcconf->lo_current_max = mcconf->l_current_max;
 
 	if(mcconf->l_max_erpm >= abs(mcconf->l_min_erpm)){
-		max_app_speed = VescToSTM_erpm_to_speed(mcconf->l_max_erpm * 1.15, mcconf->si_motor_poles);
+		max_app_speed = VescToSTM_erpm_to_speed(mcconf->l_max_erpm * 1.15);
 	}else{
-		max_app_speed = VescToSTM_erpm_to_speed(abs(mcconf->l_min_erpm * 1.15), mcconf->si_motor_poles);
+		max_app_speed = VescToSTM_erpm_to_speed(abs(mcconf->l_min_erpm * 1.15));
 	}
 
 
@@ -296,29 +297,30 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	FW_M1.hDemagCurrent					  = -(current_max*mcconf->foc_d_gain_scale_max_mod);
 	PIDFluxWeakeningHandle_M1.wLowerIntegralLimit = (int32_t)(-current_max*mcconf->foc_d_gain_scale_max_mod) * (int32_t)FW_KIDIV,
 
-	SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit = VescToSTM_erpm_to_speed(mcconf->l_max_erpm * 1.15, mcconf->si_motor_poles);
-	SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit = VescToSTM_erpm_to_speed(mcconf->l_min_erpm * 1.15, mcconf->si_motor_poles);
+	SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit = VescToSTM_erpm_to_speed(mcconf->l_max_erpm * 1.15);
+	SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit = VescToSTM_erpm_to_speed(mcconf->l_min_erpm * 1.15);
 	SpeednTorqCtrlM1.MaxPositiveTorque			= current_max;
 	SpeednTorqCtrlM1.MinNegativeTorque 			= current_min;
 
-	HALL_M1._Super.bElToMecRatio                = mcconf->si_motor_poles;
 	HALL_M1._Super.hMaxReliableMecSpeedUnit     = max_app_speed;
-	HALL_M1._Super.hMinReliableMecSpeedUnit     = -VescToSTM_erpm_to_speed(50, mcconf->si_motor_poles);
+	HALL_M1._Super.hMinReliableMecSpeedUnit     = VescToSTM_erpm_to_speed(mcconf->foc_hall_interp_erpm);
 	HALL_M1._Super.bMaximumSpeedErrorsNumber    = MEAS_ERRORS_BEFORE_FAULTS;
 	HALL_M1.PhaseShift          				= DEG_TO_ANG(mcconf->foc_encoder_offset);
 	for(int i=0;i<8;i++){
 		HALL_M1.lut[i] = mcconf->foc_hall_table[i];
 	}
-	HALL_M1.SwitchSpeed = VescToSTM_erpm_to_speed(mcconf->foc_hall_interp_erpm, mcconf->si_motor_poles);
+	HALL_M1.SwitchSpeed = VescToSTM_erpm_to_speed(mcconf->foc_hall_interp_erpm);
 
-	TempSensorParamsM1.hOverTempThreshold      = (uint16_t)(OV_TEMPERATURE_THRESHOLD_d);
-	TempSensorParamsM1.hOverTempDeactThreshold = (uint16_t)(OV_TEMPERATURE_THRESHOLD_d - OV_TEMPERATURE_HYSTERESIS_d);
+	if(mcconf->l_temp_fet_end > 75.0) mcconf->l_temp_fet_end = 75.0;  //cannot measure more than 75°C for now (Hardware?)
+	float t_threshold = ((V0_V + (dV_dT * (mcconf->l_temp_fet_end - T0_C)))*INT_SUPPLY_VOLTAGE);
+	TempSensorParamsM1.hOverTempThreshold      = (uint16_t)(t_threshold);
+	TempSensorParamsM1.hOverTempDeactThreshold = (uint16_t)(TempSensorParamsM1.hOverTempThreshold - OV_TEMPERATURE_HYSTERESIS_d);
 	TempSensorParamsM1.hSensitivity            = (uint16_t)(ADC_REFERENCE_VOLTAGE/dV_dT);
 	TempSensorParamsM1.wV0                     = (uint16_t)(V0_V *65536/ ADC_REFERENCE_VOLTAGE);
 	TempSensorParamsM1.hT0                     = T0_C;
 
-	//RealBusVoltageSensorParamsM1.UnderVoltageThreshold = mcconf->l_min_vin * BATTERY_VOLTAGE_GAIN;
-	//RealBusVoltageSensorParamsM1.OverVoltageThreshold = mcconf->l_max_vin * BATTERY_VOLTAGE_GAIN;
+	RealBusVoltageSensorParamsM1.UnderVoltageThreshold = mcconf->l_min_vin * BATTERY_VOLTAGE_GAIN;
+	RealBusVoltageSensorParamsM1.OverVoltageThreshold = mcconf->l_max_vin * BATTERY_VOLTAGE_GAIN;
 
 
 	//save fixed_point vars;
@@ -394,14 +396,6 @@ int conf_general_detect_apply_all_foc(float max_power_loss,	bool store_mcconf_on
 	mcconf->l_min_erpm = MCCONF_L_RPM_MIN;
 	//conf_general_setup_mc(mcconf);
 
-	// Wait maximum 5s for fault code to disappear
-//	if (!wait_fault(5000)) {
-//		mc_interface_set_configuration(mcconf_old);
-//		mempools_free_mcconf(mcconf);
-//		mempools_free_mcconf(mcconf_old);
-//		mc_interface_select_motor_thread(motor_last);
-//		return -1;
-//	}
 
 	// Wait one second for things to get ready after
 	// the fault disappears.
@@ -456,9 +450,10 @@ int conf_general_detect_apply_all_foc(float max_power_loss,	bool store_mcconf_on
 		uint8_t hall_tab[8];
 		bool res = tune_mcpwm_foc_hall_detect((i_max / 3.0)*1000.0, hall_tab);
 		if(res==true){
-			memcpy(mc_conf.foc_hall_table,hall_tab, 8);
-			commands_send_mcconf(COMM_GET_MCCONF, mcconf);
-			conf_general_store_mc_configuration(mcconf, false);
+			memcpy(mcconf_old->foc_hall_table,hall_tab, 8);
+			conf_general_setup_mc(mcconf_old);
+			commands_send_mcconf(COMM_GET_MCCONF, mcconf_old);
+			conf_general_store_mc_configuration(mcconf_old, false);
 			result = 1;
 		}
 

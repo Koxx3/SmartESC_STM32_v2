@@ -141,7 +141,7 @@ __weak int16_t ENC_CalcAngle( ENCODER_Handle_t * pHandle )
   pHandle->_Super.hMecAngle = mecAngle;
   
   /*Computes and stores the rotor electrical angle*/
-  elAngle = mecAngle * pHandle->_Super.bElToMecRatio;
+  elAngle = mecAngle;
 
   pHandle->_Super.hElAngle = elAngle;
   
@@ -257,8 +257,7 @@ __weak bool ENC_CalcAvrgMecSpeedUnit( ENCODER_Handle_t * pHandle, int16_t * pMec
 
   /*Computes & stores the instantaneous electrical speed [dpp], var wtemp1*/
   wtemp1 = pHandle->DeltaCapturesBuffer[pHandle->DeltaCapturesIndex] *
-           ( int32_t )( pHandle->SpeedSamplingFreqHz ) *
-           ( int32_t )pHandle->_Super.bElToMecRatio;
+           ( int32_t )( pHandle->SpeedSamplingFreqHz );
   wtemp1 /= ( int32_t )( pHandle->PulseNumber );
   wtemp1 *= ( int32_t )( pHandle->_Super.DPPConvFactor);
   wtemp1 /= ( int32_t )( pHandle->_Super.hMeasurementFrequency );
@@ -306,7 +305,7 @@ __weak void ENC_SetMecAngle( ENCODER_Handle_t * pHandle, int16_t hMecAngle )
   uint16_t hMecAngleuint;
 
   pHandle->_Super.hMecAngle = hMecAngle;
-  pHandle->_Super.hElAngle = hMecAngle * pHandle->_Super.bElToMecRatio;
+  pHandle->_Super.hElAngle = hMecAngle;
   if ( hMecAngle < 0 )
   {
     hMecAngle *= -1;

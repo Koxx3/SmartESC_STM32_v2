@@ -17,8 +17,6 @@
 #include "hall_speed_pos_fdbk.h"
 
 
-//const uint8_t hall_arr[8] = {0,5,1,3,2,6,4,7};
-
 static int16_t current_to_torque(int32_t curr_ma){
 	float ret = curr_ma * CURRENT_FACTOR_mA;
 	return ret;
@@ -471,6 +469,8 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 //		mc_conf.foc_motor_flux_linkage = *linkage;
 //		mc_conf.foc_observer_gain = 0.5e3 / SQ(*linkage);
 		//mc_interface_set_configuration(mcconf);
+
+		*linkage/=10.0;
 		vTaskDelay(MS_TO_TICKS(500));
 		currComp.q = 0;
 
@@ -481,26 +481,27 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 
 		vTaskDelay(MS_TO_TICKS(5));
 
-		float linkage_sum = 0.0;
-		float linkage_samples = 0.0;
-		for (int i = 0;i < 20000;i++) {
-			float rad_s_now = VescToSTM_get_erpm_fast() * ((2.0 * M_PI) / 60.0); //Faster
-			if (fabsf(VescToSTM_get_duty_cycle_now()) < 0.01) {
-				break;
-			}
-
-			linkage_sum += VescToSTM_get_Vq() / SQRT_3 / rad_s_now;
-			linkage_samples += 1.0;
-			vTaskDelay(MS_TO_TICKS(1));
-		}
-
-		*undriven_samples = linkage_samples;
-
-		if (linkage_samples > 0) {
-			*linkage_undriven = linkage_sum / linkage_samples;
-		} else {
-			*linkage_undriven = 0.0;
-		}
+//		float linkage_sum = 0.0;
+//		float linkage_samples = 0.0;
+//		for (int i = 0;i < 20000;i++) {
+//			float rad_s_now = VescToSTM_get_erpm_fast() * ((2.0 * M_PI) / 60.0); //Faster
+//			if (fabsf(VescToSTM_get_duty_cycle_now()) < 0.01) {
+//				break;
+//			}
+//
+//			linkage_sum += VescToSTM_get_Vq() / SQRT_3 / rad_s_now;
+//			linkage_samples += 1.0;
+//			vTaskDelay(MS_TO_TICKS(1));
+//		}
+//
+//		*undriven_samples = linkage_samples;
+//
+//		if (linkage_samples > 0) {
+//			*linkage_undriven = linkage_sum / linkage_samples;
+//		} else {
+//			*linkage_undriven = 0.0;
+//		}
+		*linkage_undriven = *linkage;
 
 		result = true;
 	}

@@ -27,22 +27,21 @@ int32_t current_to_torque(int32_t curr_ma){
 }
 
 int32_t VescToSTM_rpm_to_speed(int32_t rpm){
-	int32_t speed = ((rpm*SPEED_UNIT)/_RPM);
+	int32_t speed = ((rpm*SPEED_UNIT*mc_conf.si_motor_poles)/_RPM);
 	return speed;
 }
 
 int32_t VescToSTM_speed_to_rpm(int32_t speed){
-	int32_t rpm = speed*60/10;
+	int32_t rpm = (speed*60/10)/mc_conf.si_motor_poles;
 	return rpm;
 }
 
-int32_t VescToSTM_speed_to_erpm(int32_t speed, int32_t pole_pairs){
-	int32_t erpm = speed*60/10*pole_pairs;
+int32_t VescToSTM_speed_to_erpm(int32_t speed){
+	int32_t erpm = speed*60/10;
 	return erpm;
 }
 
-int32_t VescToSTM_erpm_to_speed(int32_t erpm, int32_t pole_pairs){
-	erpm /= pole_pairs;
+int32_t VescToSTM_erpm_to_speed(int32_t erpm){
 	int32_t speed = ((erpm*SPEED_UNIT)/_RPM);
 	return speed;
 }
@@ -118,15 +117,14 @@ float VescToSTM_get_pid_pos_now(){
 uint32_t last_reset=0;
 bool timeout_enable = true;
 void VescToSTM_timeout_reset(){
-	//last_reset = xTaskGetTickCount();
+	last_reset = xTaskGetTickCount();
 };
 void VescToSTM_handle_timeout(){
 	if(!timeout_enable) {
 		VescToSTM_timeout_reset();
 	}
-	if((xTaskGetTickCount() - last_reset) > 2000){
-		//float test;
-		//commands_printf("deb: %f", VescToSTM_get_speed());
+	if((xTaskGetTickCount() - last_reset) > (appconf.timeout_msec*2)){
+		VescToSTM_set_brake(appconf.timeout_brake_current*1000);
 		last_reset = xTaskGetTickCount();
 	}
 };
@@ -144,7 +142,7 @@ void VescToSTM_update_torque(int32_t q, int32_t min_erpm, int32_t max_erpm){
 		SpeednTorqCtrlM1.PISpeed->hUpperOutputLimit = q;
 		SpeednTorqCtrlM1.PISpeed->hLowerOutputLimit = mc_conf.s_pid_allow_braking ? -q : 0;
 		//HALL_M1.q = q;
-		MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(max_erpm, mc_conf.si_motor_poles), 0);
+		MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(max_erpm), 0);
 
 	}else{
 		FW_M1.wNominalSqCurr = q*q;
@@ -154,7 +152,7 @@ void VescToSTM_update_torque(int32_t q, int32_t min_erpm, int32_t max_erpm){
 		SpeednTorqCtrlM1.PISpeed->hUpperOutputLimit = mc_conf.s_pid_allow_braking ? -q : 0;
 		SpeednTorqCtrlM1.PISpeed->hLowerOutputLimit = q;
 		//HALL_M1.q = q;
-		MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(min_erpm, mc_conf.si_motor_poles) , 0);
+		MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(min_erpm) , 0);
 	}
 }
 
@@ -265,7 +263,7 @@ void VescToSTM_set_speed(int32_t rpm){
 	}
 	int32_t ramp_time = 0;
 	if(mc_conf.s_pid_ramp_erpms_s) ramp_time = (float)(erpm * 1000) / mc_conf.s_pid_ramp_erpms_s;
-	MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(erpm, mc_conf.si_motor_poles), ramp_time);
+	MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(erpm), ramp_time);
 }
 
 
@@ -349,13 +347,13 @@ float VescToSTM_get_bus_voltage(){
 }
 
 int32_t VescToSTM_get_erpm(){
-	int32_t erpm = VescToSTM_speed_to_erpm(MCI_GetAvrgMecSpeedUnit( pMCI[M1] ), HALL_M1._Super.bElToMecRatio);
+	int32_t erpm = VescToSTM_speed_to_erpm(MCI_GetAvrgMecSpeedUnit( pMCI[M1] ));
 	return erpm;
 }
 
 int32_t VescToSTM_get_erpm_fast(){
 	int32_t speed = ( (  HALL_M1._Super.hElSpeedDpp * ( int32_t )HALL_M1._Super.hMeasurementFrequency * (int32_t) SPEED_UNIT ) / (( int32_t ) HALL_M1._Super.DPPConvFactor));
-	return VescToSTM_speed_to_rpm(speed);
+	return VescToSTM_speed_to_erpm(speed);
 }
 
 int32_t VescToSTM_get_rpm(){
@@ -423,7 +421,7 @@ uint32_t VescToSTM_get_odometer(void) {
  * Speed, in m/s
  */
 float VescToSTM_get_speed(void) {
-	float temp = (((float)MCI_GetAvrgMecSpeedUnit(pMCI[M1]) / 10.0) * mc_conf.si_wheel_diameter * M_PI) / mc_conf.si_gear_ratio;
+	float temp = (((float)MCI_GetAvrgMecSpeedUnit(pMCI[M1]) / 10.0) * mc_conf.si_wheel_diameter * M_PI) / mc_conf.si_gear_ratio / mc_conf.si_motor_poles;
 	return temp;
 }
 

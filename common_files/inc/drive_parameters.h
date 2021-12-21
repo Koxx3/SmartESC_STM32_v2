@@ -43,7 +43,7 @@
                                                            measurements before main sensor
                                                            goes in fault */
 
-#define HALL_AVERAGING_FIFO_DEPTH        6 /*!< depth of the FIFO used to
+#define HALL_AVERAGING_FIFO_DEPTH        12 /*!< depth of the FIFO used to
                                                            average mechanical speed in
                                                            0.1Hz resolution */
 #define HALL_MTPA  true
@@ -128,7 +128,7 @@
 #define R_BRAKE_SWITCH_OFF_THRES_V      34
 
 #define OV_TEMPERATURE_THRESHOLD_C      70 /*!< Celsius degrees */
-#define OV_TEMPERATURE_HYSTERESIS_C     10 /*!< Celsius degrees */
+#define OV_TEMPERATURE_HYSTERESIS_C     5 /*!< Celsius degrees */
 
 #define HW_OV_CURRENT_PROT_BYPASS       DISABLE /*!< In case ON_OVER_VOLTAGE
                                                           is set to TURN_ON_LOW_SIDES
