@@ -58,7 +58,7 @@ void commands_printf(const char* format, ...) {
 	uint8_t * print_buffer = send_buffer + PACKET_HEADER;
 
 	print_buffer[0] = COMM_PRINT;
-	len = vsnprintf(print_buffer + 1, PRINTF_STACK_SIZE - 1, format, arg);
+	len = vsnprintf((char*)print_buffer + 1, PRINTF_STACK_SIZE - 1, format, arg);
 	va_end (arg);
 
 	if(len > 0) {
