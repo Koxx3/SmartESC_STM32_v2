@@ -117,15 +117,14 @@ float VescToSTM_get_pid_pos_now(){
 uint32_t last_reset=0;
 bool timeout_enable = true;
 void VescToSTM_timeout_reset(){
-	//last_reset = xTaskGetTickCount();
+	last_reset = xTaskGetTickCount();
 };
 void VescToSTM_handle_timeout(){
 	if(!timeout_enable) {
 		VescToSTM_timeout_reset();
 	}
-	if((xTaskGetTickCount() - last_reset) > 2000){
-		//float test;
-		//commands_printf("deb: %f", VescToSTM_get_speed());
+	if((xTaskGetTickCount() - last_reset) > (appconf.timeout_msec*2)){
+		VescToSTM_set_brake(appconf.timeout_brake_current*1000);
 		last_reset = xTaskGetTickCount();
 	}
 };

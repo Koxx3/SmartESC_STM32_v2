@@ -897,8 +897,8 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 void confgenerator_set_defaults_appconf(app_configuration *conf) {
 	memset(conf,0,sizeof(app_configuration));
 	conf->controller_id = 167;
-	//conf->timeout_msec = APPCONF_TIMEOUT_MSEC;
-	//conf->timeout_brake_current = APPCONF_TIMEOUT_BRAKE_CURRENT;
+	conf->timeout_msec = APPCONF_TIMEOUT_MSEC;
+	conf->timeout_brake_current = APPCONF_TIMEOUT_BRAKE_CURRENT;
 	//conf->send_can_status = APPCONF_SEND_CAN_STATUS;
 	//conf->send_can_status_rate_hz = APPCONF_SEND_CAN_STATUS_RATE_HZ;
 	//conf->can_baud_rate = CAN_BAUD;

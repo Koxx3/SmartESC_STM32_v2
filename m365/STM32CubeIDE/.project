@@ -447,6 +447,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/app.h</locationURI>
 		</link>
 		<link>
+			<name>Application/User/VESC/inc/appconf_default.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/appconf_default.h</locationURI>
+		</link>
+		<link>
 			<name>Application/User/VESC/inc/buffer.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/buffer.h</locationURI>
