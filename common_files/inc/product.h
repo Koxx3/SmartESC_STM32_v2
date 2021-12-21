@@ -50,7 +50,7 @@
 
 #ifdef M365
 #define VBUS_ADC_CHANNEL                                                     MC_ADC_CHANNEL_2
-#define VOLTAGE_DIVIDER_GAIN     											 (float)2650.0
+#define VOLTAGE_DIVIDER_GAIN     											 (float)1480.0
 
 #define VESC_USART                                                 			 USART3
 #define VESC_USART_DMA													     huart3
