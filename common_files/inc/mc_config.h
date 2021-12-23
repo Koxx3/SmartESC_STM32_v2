@@ -38,6 +38,7 @@
 #include "ramp_ext_mngr.h"
 #include "circle_limitation.h"
 #include "current_sense.h"
+#include "sto_cordic_speed_pos_fdbk.h"
 
 /* USER CODE BEGIN Additional include */
 
@@ -58,6 +59,7 @@ extern RDivider_Handle_t RealBusVoltageSensorParamsM1;
 extern CircleLimitation_Handle_t CircleLimitationM1;
 extern RampExtMngr_Handle_t RampExtMngrHFParamsM1;
 extern MTPA_Handle_t MTPARegM1;
+extern STO_CR_Handle_t STO_CR_M1;
 
 /* USER CODE BEGIN Additional extern */
 

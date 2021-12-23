@@ -40,7 +40,7 @@ PACKET_STATE_t * phandle;
  * \brief           Calculate length of statically allocated array
  */
 
-#define CIRC_BUF_SZ       1024  /* must be power of two */
+#define CIRC_BUF_SZ       512  /* must be power of two */
 #define DMA_WRITE_PTR ( (CIRC_BUF_SZ - VESC_USART_DMA.hdmarx->Instance->CNDTR) & (CIRC_BUF_SZ - 1) )  //huart_cobs->hdmarx->Instance->NDTR.
 uint8_t usart_rx_dma_buffer[CIRC_BUF_SZ];
 
