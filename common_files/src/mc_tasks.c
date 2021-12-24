@@ -714,8 +714,11 @@ __weak uint8_t TSK_HighFrequencyTask(void)
 			samples.m_curr0_samples[samples.index] |= (((uint16_t)STO_CR_M1._Super.hElAngle<<4) & 0xF000);
 			samples.m_curr1_samples[samples.index] |= (uint16_t)STO_CR_M1._Super.hElAngle & 0xF000;
 #if SCOPE_UVW == 1
-			samples.m_v0_samples[samples.index] = (uint16_t)PWM_Handle_M1._Super.CntPhA >>3;
-			samples.m_v1_samples[samples.index] = (uint16_t)PWM_Handle_M1._Super.CntPhB >>3;
+//			samples.m_v0_samples[samples.index] = (uint16_t)PWM_Handle_M1._Super.CntPhA >>3;
+//			samples.m_v1_samples[samples.index] = (uint16_t)PWM_Handle_M1._Super.CntPhB >>3;
+//			samples.m_v2_samples[samples.index] = (uint16_t)PWM_Handle_M1._Super.CntPhC >>3;
+			samples.m_v0_samples[samples.index] = (uint16_t)STO_CR_M1._Super.hElAngle >>8;
+			samples.m_v1_samples[samples.index] = (uint16_t)HALL_M1._Super.hElAngle >>8;
 			samples.m_v2_samples[samples.index] = (uint16_t)PWM_Handle_M1._Super.CntPhC >>3;
 #endif
 
@@ -740,6 +743,11 @@ __weak uint8_t TSK_HighFrequencyTask(void)
 	STO_CR_CalcElAngle (&STO_CR_M1, &STO_aux_Inputs);
 	STO_CR_CalcAvrgElSpeedDpp (&STO_CR_M1);
 	/* USER CODE END HighFrequencyTask SINGLEDRIVE_3 */
+		if(abs(pSTC[M1]->SPD->hAvrMecSpeedUnit) > 200 && STO_CR_M1.IsAlgorithmConverged){
+			pSTC[M1]->SPD = (SpeednPosFdbk_Handle_t *) &STO_CR_M1;
+		}else{
+			pSTC[M1]->SPD = (SpeednPosFdbk_Handle_t *) &HALL_M1;
+		}
 	}
 	/* USER CODE BEGIN HighFrequencyTask 1 */
 	FOCVars[M1].cycles_last = *DWT_CYCCNT - cycles;

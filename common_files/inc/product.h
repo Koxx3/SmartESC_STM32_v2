@@ -31,8 +31,8 @@
 #define AMPLIFICATION_GAIN            										 9.4336
 #define NOMINAL_CURRENT         											 2000
 #define MOTOR_VOLTAGE_CONSTANT  2.5 /*!< Volts RMS ph-ph /kRPM */
-#define RS                     0.11 /* Stator resistance , ohm*/
-#define LS                     0.000018 /* Stator inductance, H*/
+#define RS                     0.124 /* Stator resistance , ohm*/
+#define LS                     0.000009 /* Stator inductance, H*/
 #define ID_DEMAG															 -2000
 
 #define SCOPE_UVW															 0
