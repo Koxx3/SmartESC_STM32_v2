@@ -741,7 +741,7 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 		mcconf->l_abs_current_max = MCCONF_L_MAX_ABS_CURRENT;
 		mcconf->l_min_erpm = MCCONF_L_RPM_MIN;
 		mcconf->l_max_erpm = MCCONF_L_RPM_MAX;
-//		float l_erpm_start;
+		mcconf->l_erpm_start = MCCONF_L_RPM_START;
 //		float l_max_erpm_fbrake;
 //		float l_max_erpm_fbrake_cc;
 		mcconf->l_min_vin = MCCONF_L_MIN_VOLTAGE;
