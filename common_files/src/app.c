@@ -1,5 +1,6 @@
 #include "app.h"
 #include "crc.h"
+#include "product.h"
 
 extern app_configuration appconf;
 static bool output_vt_init_done = false;
@@ -18,6 +19,9 @@ app_configuration* app_get_configuration(void) {
  */
 void app_set_configuration(app_configuration *conf) {
 	appconf = *conf;
+
+	VESC_USART_DMA.Init.BaudRate = appconf.app_uart_baudrate;
+	HAL_UART_Init(&VESC_USART_DMA);
 
 	switch (appconf.app_to_use) {
 		case APP_UART:

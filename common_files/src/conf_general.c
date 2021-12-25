@@ -334,6 +334,7 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	mcconf->foc_sensor_mode = FOC_SENSOR_MODE_HALL;
 
 	HALL_Init(&HALL_M1);
+
 	VescToSTM_init_odometer(mcconf);
 	mc_conf = *mcconf;
 }

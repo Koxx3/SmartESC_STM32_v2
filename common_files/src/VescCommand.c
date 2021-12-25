@@ -190,6 +190,34 @@ void send_sample(){
 	}
 }
 
+void commands_send_rotor_pos(int16_t angle) {
+	uint8_t send_buffer[PACKET_SIZE(10)];
+	uint8_t * buffer = send_buffer + PACKET_HEADER;
+	int32_t index = 0;
+	buffer[index++] = COMM_ROTOR_POSITION;
+	int32_t pos = utils_map_int(angle, INT16_MIN, INT16_MAX, 0, 3590);
+	buffer_append_int32(buffer, pos * 10000, &index);
+	commands_send_packet(send_buffer, index);
+}
+
+void send_position(){
+	switch (display_position_mode) {
+	case DISP_POS_MODE_ENCODER:
+		commands_send_rotor_pos(SpeednTorqCtrlM1.SPD->hElAngle);
+		break;
+	case DISP_POS_MODE_PID_POS:
+		//commands_send_rotor_pos(SpeednTorqCtrlM1.SPD->hElAngle);
+		break;
+
+	case DISP_POS_MODE_PID_POS_ERROR:
+		//commands_send_rotor_pos(utils_angle_difference(mc_interface_get_pid_pos_set(), mc_interface_get_pid_pos_now()));
+		break;
+
+	default:
+		break;
+	}
+}
+
 
 
 
