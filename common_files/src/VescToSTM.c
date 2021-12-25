@@ -23,8 +23,21 @@ stm_state VescToSTM_mode;
 int32_t current_to_torque(int32_t curr_ma){
 	float ret = curr_ma * CURRENT_FACTOR_mA;
 	return ret;
-
 }
+
+int16_t VescToSTM_Iq_lim_hook(int16_t iq){
+
+	int32_t temp_fet_start = mc_conf.l_temp_fet_start;
+	int32_t temp = VescToSTM_get_temperature();
+	if(temp > temp_fet_start){
+		if(temp > temp_fet_start){
+			iq = utils_map_int(temp, temp_fet_start, mc_conf.l_temp_fet_end, iq, 0);
+		}
+	}
+
+	return iq;
+}
+
 
 int32_t VescToSTM_rpm_to_speed(int32_t rpm){
 	int32_t speed = ((rpm*SPEED_UNIT*mc_conf.si_motor_poles)/_RPM);

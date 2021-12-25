@@ -41,6 +41,7 @@ int32_t VescToSTM_rpm_to_speed(int32_t rpm);
 int32_t VescToSTM_erpm_to_speed(int32_t erpm);
 int32_t VescToSTM_speed_to_rpm(int32_t speed);
 int32_t VescToSTM_speed_to_erpm(int32_t speed);
+int16_t VescToSTM_Iq_lim_hook(int16_t iq);
 
 void VescToSTM_timeout_reset();
 void VescToSTM_handle_timeout();

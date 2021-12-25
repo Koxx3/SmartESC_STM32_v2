@@ -258,8 +258,8 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	FOCVars[M1].max_i_batt = mcconf->l_in_current_max * CURRENT_FACTOR_A;
 	FOCVars[M1].min_i_batt = mcconf->l_in_current_min * CURRENT_FACTOR_A;
 
-	mcconf->lo_max_erpm = mcconf->l_max_erpm;
-	mcconf->lo_min_erpm = mcconf->l_min_erpm;
+	mcconf->lo_max_erpm = mcconf->l_max_erpm * mcconf->l_erpm_start;
+	mcconf->lo_min_erpm = mcconf->l_min_erpm * mcconf->l_erpm_start;
 
 	mcconf->lo_current_min = mcconf->l_current_min;
 	mcconf->lo_current_max = mcconf->l_current_max;
@@ -269,7 +269,6 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	}else{
 		max_app_speed = VescToSTM_erpm_to_speed(abs(mcconf->l_min_erpm * 1.15));
 	}
-
 
 	PIDSpeedHandle_M1.hKpGain             = mcconf->s_pid_kp * (float)SP_KPDIV;
 	PIDSpeedHandle_M1.hKiGain         	  = mcconf->s_pid_ki * (float)SP_KIDIV / (float)SPEED_LOOP_FREQUENCY_HZ;
@@ -322,7 +321,6 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 
 	RealBusVoltageSensorParamsM1.UnderVoltageThreshold = mcconf->l_min_vin * BATTERY_VOLTAGE_GAIN;
 	RealBusVoltageSensorParamsM1.OverVoltageThreshold = mcconf->l_max_vin * BATTERY_VOLTAGE_GAIN;
-
 
 	//save fixed_point vars;
 	mcconf->si_wheel_diameter_s16q16 = float_to_s16q16(mcconf->si_wheel_diameter);
