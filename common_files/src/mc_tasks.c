@@ -41,6 +41,7 @@
 #include "product.h"
 #include "music.h"
 #include "current_sense.h"
+#include "VescToSTM.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -575,7 +576,9 @@ __weak void FOC_CalcCurrRef(uint8_t bMotor)
     if(FOCVars[bMotor].Iqdref.q < 0 && q_temp > 0){
     	q_temp = -q_temp;
     }
-    FOCVars[bMotor].Iqdref.q = q_temp;
+
+    FOCVars[bMotor].Iqdref.q = VescToSTM_Iq_lim_hook(q_temp);
+
     //Battery Curren limit -- END
 
     if (pFW[bMotor])

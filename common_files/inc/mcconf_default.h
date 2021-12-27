@@ -69,7 +69,7 @@
 #define MCCONF_L_RPM_MIN				-60000.0	// The motor speed limit (Lower)
 #endif
 #ifndef MCCONF_L_RPM_START
-#define MCCONF_L_RPM_START				0.8		// Fraction of full speed where RPM current limiting starts
+#define MCCONF_L_RPM_START				1.0		// Fraction of full speed where RPM current limiting starts
 #endif
 #ifndef MCCONF_L_SLOW_ABS_OVERCURRENT
 #define MCCONF_L_SLOW_ABS_OVERCURRENT	true	// Use the filtered (and hence slower) current for the overcurrent fault detection

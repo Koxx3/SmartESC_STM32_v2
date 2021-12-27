@@ -87,6 +87,7 @@ void task_cli(void * argument)
 		}
 
 		send_sample();
+		send_position();
 		VescToSTM_handle_timeout();
 		vTaskDelay(1);
 	}
