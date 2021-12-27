@@ -79,6 +79,7 @@ void VescToStm_nunchuk_update_erpm(){
 
 void VescToStm_nunchuk_update_output(chuck_data * chuck_d){
 	VescToSTM_mode = STM_STATE_NUNCHUCK;
+	VescToSTM_timeout_reset();
 	if(chuck_d->js_y != last_y){
 		last_y = chuck_d->js_y;
 		if(last_y > 126){
