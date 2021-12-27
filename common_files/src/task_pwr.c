@@ -39,6 +39,7 @@
 
 extern m365Answer m365_to_display;
 extern const uint8_t m365_mode[3];
+uint32_t shutdown_limit = 0;
 
 uint8_t buttonState() {
     static const uint32_t DEBOUNCE_MILLIS = 20 ;
@@ -102,9 +103,28 @@ eButtonEvent getButtonEvent()
     return button_event ;
 }
 
+void PWR_set_shutdown_time(uint32_t seconds){
+
+	shutdown_limit = seconds * 2000;
+
+}
+
 //This is not a FreeRTOS Task... its called from safety task to safe some heap space every 500us
 void task_PWR(void *argument) {
 	static uint8_t main_loop_counter = 0;
+	static uint32_t shutdown_timer = 0;
+
+
+	if(SpeednTorqCtrlM1.SPD->hAvrMecSpeedUnit){
+		shutdown_timer = 0;
+	}else if (shutdown_limit > 0){
+		shutdown_timer++;
+		if(shutdown_timer>shutdown_limit){
+			shutdown_timer=0;
+			power_control(DEV_PWR_OFF);
+		}
+	}
+
 	if(main_loop_counter > 40){
 		main_loop_counter=0;
 		switch( getButtonEvent() ){

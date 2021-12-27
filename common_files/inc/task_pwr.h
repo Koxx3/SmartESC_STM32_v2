@@ -47,6 +47,7 @@ void poweroff(void);
 int8_t check_power_button_pressed_state();
 void power_control(uint8_t pwr);
 void task_PWR(void *argument);
+void PWR_set_shutdown_time(uint32_t seconds);
 
 #endif /* TASK_PWR_H_ */
 
