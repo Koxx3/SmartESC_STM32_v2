@@ -79,6 +79,7 @@ void VescToStm_nunchuk_update_erpm(){
 
 void VescToStm_nunchuk_update_output(chuck_data * chuck_d){
 	VescToSTM_mode = STM_STATE_NUNCHUCK;
+	VescToSTM_timeout_reset();
 	if(chuck_d->js_y != last_y){
 		last_y = chuck_d->js_y;
 		if(last_y > 126){
@@ -110,6 +111,19 @@ void VescToSTM_set_open_loop(bool enabled, int16_t init_angle, int16_t erpm){
 	}
 }
 
+void VescToSTM_ramp_current(float current){ //in Amps
+	current*=1000;
+	qd_t currComp;
+	currComp.q = 0;
+	currComp.d = 0;
+	for (int i = 0;i < 1000;i++) {
+		currComp.q = current_to_torque((float)i * current / 1000.0);
+		MCI_SetCurrentReferences(pMCI[M1],currComp);
+		vTaskDelay(MS_TO_TICKS(1));
+		VescToSTM_timeout_reset();
+	}
+}
+
 void VescToSTM_set_open_loop_rpm(int16_t erpm){
 	SpeednTorqCtrlM1.SPD->open_speed = erpm_to_int16(erpm);
 }
@@ -136,9 +150,11 @@ void VescToSTM_handle_timeout(){
 	if(!timeout_enable) {
 		VescToSTM_timeout_reset();
 	}
-	if((xTaskGetTickCount() - last_reset) > (appconf.timeout_msec*2)){
-		VescToSTM_set_brake(appconf.timeout_brake_current*1000);
-		last_reset = xTaskGetTickCount();
+	if(appconf.timeout_msec){
+		if((xTaskGetTickCount() - last_reset) > (appconf.timeout_msec*2)){
+			VescToSTM_set_brake(appconf.timeout_brake_current*1000);
+			last_reset = xTaskGetTickCount();
+		}
 	}
 };
 void VescToSTM_enable_timeout(bool enbale){

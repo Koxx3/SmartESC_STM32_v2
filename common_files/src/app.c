@@ -1,6 +1,7 @@
 #include "app.h"
 #include "crc.h"
 #include "product.h"
+#include "task_pwr.h"
 
 extern app_configuration appconf;
 static bool output_vt_init_done = false;
@@ -21,7 +22,38 @@ void app_set_configuration(app_configuration *conf) {
 	appconf = *conf;
 
 	VESC_USART_DMA.Init.BaudRate = appconf.app_uart_baudrate;
+
 	HAL_UART_Init(&VESC_USART_DMA);
+
+	switch(conf->shutdown_mode){
+	case SHUTDOWN_MODE_OFF_AFTER_10S:
+		PWR_set_shutdown_time(10);
+		break;
+	case SHUTDOWN_MODE_OFF_AFTER_1M:
+		PWR_set_shutdown_time(60);
+		break;
+	case SHUTDOWN_MODE_OFF_AFTER_5M:
+		PWR_set_shutdown_time(300);
+		break;
+	case SHUTDOWN_MODE_OFF_AFTER_10M:
+		PWR_set_shutdown_time(600);
+		break;
+	case SHUTDOWN_MODE_OFF_AFTER_30M:
+		PWR_set_shutdown_time(1800);
+		break;
+	case SHUTDOWN_MODE_OFF_AFTER_1H:
+		PWR_set_shutdown_time(3600);
+		break;
+	case SHUTDOWN_MODE_OFF_AFTER_5H:
+		PWR_set_shutdown_time(18000);
+		break;
+	default:
+		PWR_set_shutdown_time(0);  // 0 = disable timer
+		break;
+	}
+
+
+
 
 	switch (appconf.app_to_use) {
 		case APP_UART:

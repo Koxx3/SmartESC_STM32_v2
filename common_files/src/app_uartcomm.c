@@ -138,5 +138,7 @@ void task_app(void * argument)
 }
 
 void task_app_init(){
-	xTaskCreate(task_app, "APP-USART", 128, NULL, PRIO_BELOW_NORMAL, &task_app_handle);
+	if(task_app_handle == NULL){
+		xTaskCreate(task_app, "APP-USART", 128, NULL, PRIO_BELOW_NORMAL, &task_app_handle);
+	}
 }
