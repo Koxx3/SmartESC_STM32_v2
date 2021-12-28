@@ -8,7 +8,8 @@
 #include "product.h"
 #include "defines.h"
 #include "music.h"
-
+#include "stdlib.h"
+#include "VescToSTM.h"
 
 void terminal_top(){
     TaskStatus_t * taskStats;
@@ -66,6 +67,29 @@ void terminal_process_string(char *str) {
 		set_music_command(Music1, &bldc_music);
 	}else if (strcmp(argv[0], "music_off") == 0){
 		set_music_command(Music_OFF, &bldc_music);
+	} else if (strcmp(argv[0], "foc_openloop") == 0) {
+		if (argc == 3) {
+			uint32_t erpm_target = 0;
+			uint32_t current = atoi(argv[1]);
+			erpm_target = atoi(argv[2]);
+
+			if (current >= 0 && erpm_target >= 0) {
+				VescToSTM_set_open_loop(true, SpeednTorqCtrlM1.SPD->hElAngle, 0);
+				VescToSTM_ramp_current(current);
+				uint32_t erpm=0;
+				while(erpm < erpm_target){
+					VescToSTM_set_open_loop_rpm(erpm);
+					erpm += 1;
+					vTaskDelay(MS_TO_TICKS(1));
+					VescToSTM_timeout_reset();
+				}
+
+			} else {
+				commands_printf("Invalid argument(s).\n");
+			}
+		} else {
+			commands_printf("This command requires two arguments.\n");
+		}
 	}
 
 }
