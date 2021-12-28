@@ -236,7 +236,7 @@ HALL_Handle_t HALL_M1 =
 NTC_Handle_t TempSensorParamsM1 =
 {
   .bSensorType = TEMP_SENSOR_TYPE,
-  .hExpectedTemp_d = 555,
+  .hExpectedTemp_d = 32767,
   .hExpectedTemp_C = M1_VIRTUAL_HEAT_SINK_TEMPERATURE_VALUE,
   .TempRegConv =
   {
@@ -246,7 +246,7 @@ NTC_Handle_t TempSensorParamsM1 =
   },
   .hLowPassFilterBW        = M1_TEMP_SW_FILTER_BW_FACTOR,
   .hOverTempThreshold      = (uint16_t)(OV_TEMPERATURE_THRESHOLD_d),
-  .hOverTempDeactThreshold = (uint16_t)(OV_TEMPERATURE_THRESHOLD_d - OV_TEMPERATURE_HYSTERESIS_d),
+  .hOverTempDeactThreshold = (uint16_t)(OV_TEMPERATURE_DEACT_d),
   .hSensitivity            = (uint16_t)(ADC_REFERENCE_VOLTAGE/dV_dT),
   .wV0                     = (uint16_t)(V0_V *65536/ ADC_REFERENCE_VOLTAGE),
   .hT0                     = T0_C,

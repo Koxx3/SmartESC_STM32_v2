@@ -66,11 +66,11 @@ __weak uint16_t NTC_SetFaultState( NTC_Handle_t * pHandle )
 {
   uint16_t hFault;
 
-  if ( pHandle->hAvTemp_d > pHandle->hOverTempThreshold )
+  if ( pHandle->hAvTemp_d < pHandle->hOverTempThreshold )
   {
     hFault = MC_OVER_TEMP;
   }
-  else if ( pHandle->hAvTemp_d < pHandle->hOverTempDeactThreshold )
+  else if ( pHandle->hAvTemp_d > pHandle->hOverTempDeactThreshold )
   {
     hFault = MC_NO_ERROR;
   }
@@ -114,7 +114,7 @@ __weak void NTC_Init( NTC_Handle_t * pHandle )
  */
 __weak void NTC_Clear( NTC_Handle_t * pHandle )
 {
-  pHandle->hAvTemp_d = 0u;
+  pHandle->hAvTemp_d = pHandle->hExpectedTemp_d;
 }
 
 /**
@@ -178,10 +178,10 @@ __weak int16_t NTC_GetAvTemp_C( NTC_Handle_t * pHandle )
 
   if ( pHandle->bSensorType == REAL_SENSOR )
   {
-    wTemp = ( int32_t )( pHandle->hAvTemp_d );
-    wTemp -= ( int32_t )( pHandle->wV0 );
-    wTemp *= pHandle->hSensitivity;
-    wTemp = wTemp / 65536 + ( int32_t )( pHandle->hT0 );
+		wTemp = ( int32_t )( pHandle->hAvTemp_d );
+		wTemp -= ( int32_t )( pHandle->wV0 );
+		wTemp *= pHandle->hSensitivity;
+		wTemp = ( int32_t )( pHandle->hT0) - wTemp / 65536;
   }
   else
   {
