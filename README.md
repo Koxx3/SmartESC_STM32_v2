@@ -52,9 +52,9 @@ Use ESP32 prototype board with and ESP32-devkit-c module :
 
 Use the code provided in the [serial-trottle-brake-esp32](/serial-trottle-brake-esp32) folder with Platform.io
 
-# Error Code SESC (Smart ESC) in VESC Tool
+# Error Code SESC (Smart ESC) in VESC Tool 
 
-
+Can read it in "VESC Terminal" (or others Serial Terminal)
 
 0 = MC_NO_ERROR     (No error)
 0= MC_NO_FAULTS     (No error)
