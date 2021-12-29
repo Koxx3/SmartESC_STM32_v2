@@ -52,17 +52,21 @@ Use ESP32 prototype board with and ESP32-devkit-c module :
 
 Use the code provided in the [serial-trottle-brake-esp32](/serial-trottle-brake-esp32) folder with Platform.io
 
-# Error Code SESC (Smart ESC) in VESC Tool 
+# Error Code SESC (Smart ESC) in VESC Tool
 
 Can read it in "VESC Terminal" (or others Serial Terminal)
 
-0 = MC_NO_ERROR     (No error)
-0= MC_NO_FAULTS     (No error)
-1 = MC_FOC_DURATION (FOC rate to high)
-2 = MC_OVER_VOLT    (Software over voltage)
-4 = MC_UNDER_VOLT   (Software under voltage)
-8 = MC_OVER_TEMP    (Software over temperature)
-10 = MC_START_UP    (Startup failed)
-20 = MC_SPEED_FDBK  (Speed feedback)
-40 = MC_BREAK_IN    (Emergency input (Over current))
-80 = MC_SW_ERROR  
+- 0 = MC_NO_ERROR     (No error)
+- 0= MC_NO_FAULTS     (No error)
+- 1 = MC_FOC_DURATION (FOC rate to high)
+- 2 = MC_OVER_VOLT    (Software over voltage)
+- 4 = MC_UNDER_VOLT   (Software under voltage)
+- 8 = MC_OVER_TEMP    (Software over temperature)
+- 10 = MC_START_UP    (Startup failed)
+- 20 = MC_SPEED_FDBK  (Speed feedback)
+- 40 = MC_BREAK_IN    (Emergency input (Over current))
+- 80 = MC_SW_ERROR
+
+# Command available in Terminal :
+
+- foc_openloop [current] [erpm]  (Exemple : foc_openloop 10 500)
