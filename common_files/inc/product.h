@@ -50,7 +50,6 @@
 #define VBUS_ADC_CHANNEL                                                     MC_ADC_CHANNEL_2
 #define VOLTAGE_DIVIDER_GAIN     											 (float)2650.0
 
-#define VESC_USART                                                 			 USART3
 #define VESC_USART_DMA													     huart3
 #define VESC_USART_TX_DMA													 hdma_usart3_tx
 #define VESC_USART_RX_DMA													 hdma_usart3_rx

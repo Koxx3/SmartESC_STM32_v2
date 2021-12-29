@@ -297,6 +297,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/task_cli.c</locationURI>
 		</link>
 		<link>
+			<name>Application/User/task_cli.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/task_cli.h</locationURI>
+		</link>
+		<link>
 			<name>Application/User/task_init.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/task_init.c</locationURI>

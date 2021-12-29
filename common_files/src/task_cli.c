@@ -34,45 +34,47 @@
 #include "VescToSTM.h"
 #include "product.h"
 
-PACKET_STATE_t * phandle;
+
 
 /**
  * \brief           Calculate length of statically allocated array
  */
 
-#define CIRC_BUF_SZ       1024  /* must be power of two */
 #define DMA_WRITE_PTR ( (CIRC_BUF_SZ - VESC_USART_DMA.hdmarx->Instance->CNDTR) & (CIRC_BUF_SZ - 1) )  //huart_cobs->hdmarx->Instance->NDTR.
-uint8_t usart_rx_dma_buffer[CIRC_BUF_SZ];
-
 
 TaskHandle_t task_cli_handle;
 
 
-void putbuffer(unsigned char *buf, unsigned int len){
-	HAL_UART_Transmit_DMA(&VESC_USART_DMA, buf, len);
-	while(VESC_USART_TX_DMA.State != HAL_DMA_STATE_READY){
-		VESC_USART_DMA.gState = HAL_UART_STATE_READY;
+void putbuffer(unsigned char *buf, unsigned int len, port_str * port){
+	HAL_UART_Transmit_DMA(port->uart, buf, len);
+	while(port->uart->hdmatx->State != HAL_DMA_STATE_READY){
+		port->uart->gState = HAL_UART_STATE_READY;
 		vTaskDelay(1);
 	}
 }
 
-void comm_uart_send_packet(unsigned char *data, unsigned int len) {
+void comm_uart_send_packet(unsigned char *data, unsigned int len, PACKET_STATE_t * phandle) {
 	packet_send_packet(data, len, phandle);
 }
 
-void process_packet(unsigned char *data, unsigned int len){
-	commands_process_packet(data, len, &comm_uart_send_packet);
+void process_packet(unsigned char *data, unsigned int len, PACKET_STATE_t * phandle){
+	commands_process_packet(data, len, &comm_uart_send_packet, phandle);
 }
 
+uint32_t uart_get_write_pos(port_str * port){
+	return ( ((uint32_t)port->rx_buffer_size - port->uart->hdmarx->Instance->CNDTR) & ((uint32_t)port->rx_buffer_size -1));
+}
 
 void task_cli(void * argument)
 {
 	uint32_t rd_ptr=0;
+	port_str * port = (port_str*) argument;
+	uint8_t * usart_rx_dma_buffer = pvPortMalloc(port->rx_buffer_size);
 
-	HAL_UART_Receive_DMA(&VESC_USART_DMA, usart_rx_dma_buffer, sizeof(usart_rx_dma_buffer));
-	CLEAR_BIT(VESC_USART_DMA.Instance->CR3, USART_CR3_EIE);
+	HAL_UART_Receive_DMA(port->uart, usart_rx_dma_buffer, port->rx_buffer_size);
+	CLEAR_BIT(port->uart->Instance->CR3, USART_CR3_EIE);
 
-	phandle = packet_init(putbuffer, process_packet);
+	port->phandle = packet_init(putbuffer, process_packet, port);
 
 	VescToSTM_set_brake_rel_int(0);
 
@@ -80,21 +82,21 @@ void task_cli(void * argument)
 	for(;;)
 	{
 		/* `#START TASK_LOOP_CODE` */
-		while(rd_ptr != DMA_WRITE_PTR) {
-			packet_process_byte(usart_rx_dma_buffer[rd_ptr], phandle);
+		while(rd_ptr != uart_get_write_pos(port)) {
+			packet_process_byte(usart_rx_dma_buffer[rd_ptr], port->phandle);
 			rd_ptr++;
-			rd_ptr &= (CIRC_BUF_SZ - 1);
+			rd_ptr &= ((uint32_t)port->rx_buffer_size - 1);
 		}
 
-		send_sample();
-		send_position();
+		send_sample(port->phandle);
+		send_position(port->phandle);
 		VescToSTM_handle_timeout();
 		vTaskDelay(1);
 	}
 }
 
-void task_cli_init(){
+void task_cli_init(port_str * port){
 #if VESC_TOOL_ENABLE
-	xTaskCreate(task_cli, "tskCLI", 256, NULL, PRIO_NORMAL, &task_cli_handle);
+	xTaskCreate(task_cli, "tskCLI", 256, (void*)port, PRIO_NORMAL, &task_cli_handle);
 #endif
 }

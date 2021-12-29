@@ -22,6 +22,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "task_cli.h"
 
 // Settings
 #ifndef PACKET_RX_TIMEOUT
@@ -39,19 +40,22 @@
 #define PACKET_SIZE(x) (x+8)
 #define PACKET_HEADER  4
 
-typedef struct {
+typedef struct __PACKET_STATE_t__ PACKET_STATE_t;
+
+struct __PACKET_STATE_t__{
 	volatile unsigned short rx_timeout;
-	void(*send_func)(unsigned char *data, unsigned int len);
-	void(*process_func)(unsigned char *data, unsigned int len);
+	void(*send_func)(unsigned char *data, unsigned int len, port_str* port);
+	void(*process_func)(unsigned char *data, unsigned int len, PACKET_STATE_t * phandle);
 	unsigned int rx_read_ptr;
 	unsigned int rx_write_ptr;
 	int bytes_left;
 	unsigned char * rx_buffer;
-} PACKET_STATE_t;
+	port_str * port;
+};
 
 // Functions
-PACKET_STATE_t * packet_init(void (*s_func)(unsigned char *data, unsigned int len),
-		void (*p_func)(unsigned char *data, unsigned int len));
+PACKET_STATE_t * packet_init(void (*s_func)(unsigned char *data, unsigned int len, port_str * port),
+		void (*p_func)(unsigned char *data, unsigned int len, PACKET_STATE_t * phandle), port_str * port);
 void packet_reset(PACKET_STATE_t * handle);
 void packet_process_byte(uint8_t rx_data, PACKET_STATE_t * handle);
 void packet_timerfunc(void);

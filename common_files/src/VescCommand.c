@@ -42,15 +42,15 @@
 #include "app.h"
 
 
-static void(* volatile send_func)(unsigned char *data, unsigned int len) = 0;
+static void(* volatile send_func)(unsigned char *data, unsigned int len, PACKET_STATE_t * phandle) = 0;
 static volatile int fw_version_sent_cnt = 0;
 static disp_pos_mode display_position_mode;
 
 
 
 #define PRINTF_STACK_SIZE 128u
-void commands_printf(const char* format, ...) {
-
+void commands_printf(PACKET_STATE_t * phandle, const char* format, ...) {
+	if(phandle==NULL) return;
 	va_list arg;
 	va_start (arg, format);
 	int len;
@@ -63,7 +63,7 @@ void commands_printf(const char* format, ...) {
 
 	if(len > 0) {
 		commands_send_packet((unsigned char*)send_buffer,
-				(len < 254) ? len + 1 : 255);
+				(len < 254) ? len + 1 : 255, phandle);
 	}
 
 }
@@ -93,35 +93,35 @@ void commands_printf(const char* format, ...) {
  * @param len
  * The data length.
  */
-void commands_send_packet(unsigned char *data, unsigned int len) {
+void commands_send_packet(unsigned char *data, unsigned int len, PACKET_STATE_t * phandle) {
 	if (send_func) {
-		send_func(data, len);
+		send_func(data, len, phandle);
 	}
 }
 
-void commands_send_mcconf(COMM_PACKET_ID packet_id, mc_configuration *mcconf) {
+void commands_send_mcconf(COMM_PACKET_ID packet_id, mc_configuration *mcconf, PACKET_STATE_t * phandle) {
 	uint8_t * send_buffer = pvPortMalloc(512 + PACKET_HEADER);
 	if(send_buffer == NULL){
-		commands_printf("Malloc failed send mcconf)");
+		commands_printf(phandle, "Malloc failed send mcconf)");
 		return;
 	}
 	uint8_t * buffer = send_buffer + PACKET_HEADER;
 	buffer[0] = packet_id;
 	int32_t len = confgenerator_serialize_mcconf(&buffer[1], mcconf);
-	commands_send_packet(send_buffer, len + 1);
+	commands_send_packet(send_buffer, len + 1, phandle);
 	vPortFree(send_buffer);
 }
 
-void commands_send_appconf(COMM_PACKET_ID packet_id, app_configuration *appconf) {
+void commands_send_appconf(COMM_PACKET_ID packet_id, app_configuration *appconf, PACKET_STATE_t * phandle) {
 	uint8_t * send_buffer = pvPortMalloc(512 + PACKET_HEADER);
 	if(send_buffer == NULL){
-		commands_printf("Malloc failed send appconf)");
+		commands_printf(phandle, "Malloc failed send appconf)");
 		return;
 	}
 	uint8_t * buffer = send_buffer + PACKET_HEADER;
 	buffer[0] = packet_id;
 	int32_t len = confgenerator_serialize_appconf(&buffer[1], appconf);
-	commands_send_packet(send_buffer, len + 1);
+	commands_send_packet(send_buffer, len + 1, phandle);
 	vPortFree(send_buffer);
 }
 
@@ -134,7 +134,7 @@ samples.data[3][samples.index] = PWM_Handle_M1._Super.CntPhB;
 samples.data[4][samples.index] = PWM_Handle_M1._Super.CntPhC;
 samples.data[5][samples.index] = HALL_M1.MeasuredElAngle;
 */
-void send_sample(){
+void send_sample(PACKET_STATE_t * phandle){
 	if(samples.state == SAMP_FINISHED && samples.n_samp){
 
 		uint8_t send_buffer[PACKET_SIZE(50)];
@@ -172,7 +172,7 @@ void send_sample(){
 		samples.index++;
 
 		//if(samples.vesc_tool_samples == 1000) commands_send_packet(send_buffer, index);
-		commands_send_packet(send_buffer, index);
+		commands_send_packet(send_buffer, index, phandle);
 
 		if(samples.index == samples.n_samp){
 			vPortFree(samples.m_curr0_samples);
@@ -190,20 +190,20 @@ void send_sample(){
 	}
 }
 
-void commands_send_rotor_pos(int16_t angle) {
+void commands_send_rotor_pos(PACKET_STATE_t * phandle, int16_t angle) {
 	uint8_t send_buffer[PACKET_SIZE(10)];
 	uint8_t * buffer = send_buffer + PACKET_HEADER;
 	int32_t index = 0;
 	buffer[index++] = COMM_ROTOR_POSITION;
 	int32_t pos = utils_map_int(angle, INT16_MIN, INT16_MAX, 0, 3590);
 	buffer_append_int32(buffer, pos * 10000, &index);
-	commands_send_packet(send_buffer, index);
+	commands_send_packet(send_buffer, index, phandle);
 }
 
-void send_position(){
+void send_position(PACKET_STATE_t * phandle){
 	switch (display_position_mode) {
 	case DISP_POS_MODE_ENCODER:
-		commands_send_rotor_pos(SpeednTorqCtrlM1.SPD->hElAngle);
+		commands_send_rotor_pos(phandle, SpeednTorqCtrlM1.SPD->hElAngle);
 		break;
 	case DISP_POS_MODE_PID_POS:
 		//commands_send_rotor_pos(SpeednTorqCtrlM1.SPD->hElAngle);
@@ -222,7 +222,7 @@ void send_position(){
 
 
 void commands_process_packet(unsigned char *data, unsigned int len,
-		void(*reply_func)(unsigned char *data, unsigned int len)) {
+		void(*reply_func)(unsigned char *data, unsigned int len, PACKET_STATE_t * phandle), PACKET_STATE_t * phandle) {
 
 	if (!len) {
 		return;
@@ -266,7 +266,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 		fw_version_sent_cnt++;
 
-		reply_func(send_buffer, ind);
+		reply_func(send_buffer, ind, phandle);
 		} break;
 
 		case COMM_JUMP_TO_BOOTLOADER_ALL_CAN:
@@ -279,7 +279,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 			uint8_t * buffer = send_buffer + PACKET_HEADER;
 			buffer[ind++] = COMM_ERASE_NEW_APP;
 			buffer[ind++] = 1;
-			reply_func(send_buffer, ind);
+			reply_func(send_buffer, ind, phandle);
 		} break;
 		case COMM_WRITE_NEW_APP_DATA_ALL_CAN_LZO:
 		case COMM_WRITE_NEW_APP_DATA_ALL_CAN:
@@ -292,7 +292,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 			buffer[ind++] = 1;
 			//buffer_append_uint32(send_buffer, new_app_offset, &ind);
 			buffer_append_uint32(buffer, 0, &ind);
-			reply_func(send_buffer, ind);
+			reply_func(send_buffer, ind, phandle);
 		} break;
 
 		case COMM_GET_VALUES:
@@ -383,7 +383,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				buffer_append_float32(buffer, VescToSTM_get_Vq(), 1e3, &ind);
 			}
 
-			reply_func(send_buffer, ind);
+			reply_func(send_buffer, ind, phandle);
 		} break;
 
 			case COMM_SET_DUTY: {
@@ -466,7 +466,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					uint8_t send_buffer[PACKET_SIZE(10)];
 					uint8_t * buffer = send_buffer + PACKET_HEADER;
 					buffer[ind++] = packet_id;
-					reply_func(send_buffer, ind);
+					reply_func(send_buffer, ind, phandle);
 				} else {
 					//commands_printf("Warning: Could not set mcconf due to wrong signature");
 				}
@@ -475,7 +475,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				uint8_t send_buffer[PACKET_SIZE(10)];
 				uint8_t * buffer = send_buffer + PACKET_HEADER;
 				buffer[ind++] = packet_id;
-				reply_func(send_buffer, ind);
+				reply_func(send_buffer, ind, phandle);
 
 				vPortFree(mcconf);
 				} break;
@@ -484,7 +484,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				case COMM_GET_MCCONF_DEFAULT: {
 					mc_configuration *mcconf = pvPortMalloc(sizeof(mc_configuration));
 					if(mcconf == NULL){
-						commands_printf("Malloc failed get mcconf");
+						commands_printf(phandle, "Malloc failed get mcconf");
 						return;
 					}
 
@@ -493,7 +493,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					} else {
 						confgenerator_set_defaults_mcconf(mcconf);
 					}
-					commands_send_mcconf(packet_id, mcconf);
+					commands_send_mcconf(packet_id, mcconf, phandle);
 					vPortFree(mcconf);
 				} break;
 
@@ -509,9 +509,9 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						int32_t ind = 0;
 						uint8_t send_buffer[50];
 						send_buffer[ind++] = packet_id;
-						reply_func(send_buffer, ind);
+						reply_func(send_buffer, ind, phandle);
 					} else {
-						commands_printf("Warning: Could not set appconf due to wrong signature");
+						commands_printf(phandle, "Warning: Could not set appconf due to wrong signature");
 					}
 				}
 					break;
@@ -526,7 +526,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						confgenerator_set_defaults_appconf(appconf);
 					}
 
-					commands_send_appconf(packet_id, appconf);
+					commands_send_appconf(packet_id, appconf, phandle);
 
 					vPortFree(appconf);
 				}
@@ -565,7 +565,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 #endif
 
 						samples.n_samp = 0;
-						commands_printf("Sample malloc failed");
+						commands_printf(phandle, "Sample malloc failed");
 					}else{
 
 						samples.index = 0;
@@ -593,7 +593,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					buffer_append_int32(buffer, 0, &ind);
 					//buffer_append_int32(send_buffer, (int32_t)(servodec_get_last_pulse_len(0) * 1000000.0), &ind);
 					buffer_append_int32(buffer, 0, &ind);
-					reply_func(send_buffer, ind);
+					reply_func(send_buffer, ind, phandle);
 
 				} break;
 
@@ -610,7 +610,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					buffer_append_int32(buffer, 0, &ind);
 					//buffer_append_int32(send_buffer, (int32_t)(app_adc_get_voltage2() * 1000000.0), &ind);
 					buffer_append_int32(buffer, 0, &ind);
-					reply_func(send_buffer, ind);
+					reply_func(send_buffer, ind, phandle);
 				} break;
 
 				case COMM_GET_DECODED_CHUK: {
@@ -619,7 +619,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					uint8_t * buffer = send_buffer + PACKET_HEADER;
 					buffer[ind++] = COMM_GET_DECODED_CHUK;
 					buffer_append_int32(send_buffer, (int32_t)(VescToStm_nunchuk_get_decoded_chuk() * 1000000.0), &ind);
-					reply_func(send_buffer, ind);
+					reply_func(send_buffer, ind, phandle);
 				} break;
 
 				case COMM_GET_DECODED_BALANCE: {
@@ -629,7 +629,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					buffer[ind++] = COMM_GET_DECODED_BALANCE;
 					memset(buffer,0,36);
 					ind+=36;
-					reply_func(send_buffer, ind);
+					reply_func(send_buffer, ind, phandle);
 				} break;
 
 				case COMM_FORWARD_CAN:
@@ -666,7 +666,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					uint8_t * buffer = send_buffer + PACKET_HEADER;
 					buffer[ind++] = packet_id;
 					buffer[ind++] = NRF_PAIR_STARTED;
-					reply_func(send_buffer, ind);
+					reply_func(send_buffer, ind, phandle);
 				} break;
 
 				case COMM_GPD_BUFFER_SIZE_LEFT: {
@@ -676,7 +676,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					buffer[ind++] = COMM_GPD_BUFFER_SIZE_LEFT;
 					//buffer_append_int32(send_buffer, gpdrive_buffer_size_left(), &ind);
 					buffer_append_int32(buffer, 128, &ind);
-					reply_func(buffer, ind);
+					reply_func(buffer, ind, phandle);
 				} break;
 				case COMM_GPD_SET_FSW:
 				case COMM_GPD_FILL_BUFFER:
@@ -779,7 +779,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						buffer_append_uint32(buffer, VescToSTM_get_odometer(), &ind);
 					}
 
-					reply_func(send_buffer, ind);
+					reply_func(send_buffer, ind, phandle);
 				    } break;
 
 				case COMM_SET_ODOMETER: {
@@ -881,7 +881,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						uint8_t send_buffer[PACKET_SIZE(20)];
 						uint8_t * buffer = send_buffer + PACKET_HEADER;
 						buffer[ind++] = packet_id;
-						reply_func(send_buffer, ind);
+						reply_func(send_buffer, ind, phandle);
 					}
 
 				} break;
@@ -908,7 +908,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					buffer_append_float32_auto(buffer, mcconf->si_gear_ratio, &ind);
 					buffer_append_float32_auto(buffer, mcconf->si_wheel_diameter, &ind);
 
-					reply_func(send_buffer, ind);
+					reply_func(send_buffer, ind, phandle);
 				} break;
 
 				case COMM_EXT_NRF_PRESENT:
@@ -924,14 +924,14 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						uint8_t send_buffer[PACKET_SIZE(20)];
 						uint8_t * buffer = send_buffer + PACKET_HEADER;
 						buffer[ind++] = packet_id;
-						reply_func(send_buffer, ind);
+						reply_func(send_buffer, ind, phandle);
 						//comm_can_send_buffer(255, data - 1, len + 1, 0);
 					}
 				}break;
 
 				case COMM_TERMINAL_CMD_SYNC:
 					data[len] = '\0';
-					terminal_process_string((char*)data);
+					terminal_process_string((char*)data, phandle);
 					break;
 
 				case COMM_GET_IMU_DATA: {
@@ -951,7 +951,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						}
 					}
 
-					reply_func(send_buffer, ind);
+					reply_func(send_buffer, ind, phandle);
 				} break;
 
 				case COMM_ERASE_BOOTLOADER_ALL_CAN:
@@ -961,7 +961,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					uint8_t * buffer = send_buffer + PACKET_HEADER;
 					buffer[ind++] = COMM_ERASE_BOOTLOADER;
 					buffer[ind++] = 1;
-					reply_func(send_buffer, ind);
+					reply_func(send_buffer, ind, phandle);
 				} break;
 
 				case COMM_SET_CURRENT_REL: {
@@ -1004,7 +1004,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					uint8_t send_buffer[PACKET_SIZE(20)];
 					uint8_t * buffer = send_buffer + PACKET_HEADER;
 					buffer[ind++] = packet_id;
-					reply_func(send_buffer, ind);
+					reply_func(send_buffer, ind, phandle);
 				} break;
 
 				case COMM_SET_CAN_MODE: {
@@ -1015,7 +1015,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						uint8_t send_buffer[PACKET_SIZE(20)];
 						uint8_t * buffer = send_buffer + PACKET_HEADER;
 						buffer[ind++] = packet_id;
-						reply_func(send_buffer, ind);
+						reply_func(send_buffer, ind, phandle);
 					}
 				} break;
 
@@ -1034,7 +1034,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				// finished, they are discarded.
 				case COMM_TERMINAL_CMD:
 					data[len] = '\0';
-					terminal_process_string((char*)data);
+					terminal_process_string((char*)data, phandle);
 					break;
 				case COMM_DETECT_MOTOR_PARAM:
 				case COMM_DETECT_MOTOR_R_L:{
@@ -1049,7 +1049,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					buffer[ind++] = COMM_DETECT_MOTOR_R_L;
 					buffer_append_float32(buffer, r, 1e6, &ind);
 					buffer_append_float32(buffer, l, 1e3, &ind);
-					reply_func(send_buffer, ind);
+					reply_func(send_buffer, ind, phandle);
 				}
 					break;
 				case COMM_DETECT_MOTOR_FLUX_LINKAGE:
@@ -1066,7 +1066,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					memcpy(buffer + ind, hall_tab, 8);
 					ind += 8;
 					buffer[ind++] = res ? 0 : 1;
-					reply_func(send_buffer, ind);
+					reply_func(send_buffer, ind, phandle);
 
 				} break;
 				case COMM_DETECT_MOTOR_FLUX_LINKAGE_OPENLOOP: {
@@ -1099,7 +1099,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					ind = 0;
 					buffer[ind++] = COMM_DETECT_MOTOR_FLUX_LINKAGE_OPENLOOP;
 					buffer_append_float32(buffer, linkage, 1e7, &ind);
-					reply_func(send_buffer, ind);
+					reply_func(send_buffer, ind, phandle);
 				} break;
 				case COMM_PING_CAN:{
 					int32_t ind = 0;
@@ -1107,7 +1107,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					uint8_t * buffer = send_buffer + PACKET_HEADER;
 					buffer[ind++] = COMM_PING_CAN;
 					//buffer[ind++] = 0; Add one byte for each detected
-					reply_func(send_buffer, ind);
+					reply_func(send_buffer, ind, phandle);
 				} break;
 				case COMM_DETECT_APPLY_ALL_FOC: {
 					int32_t ind = 0;
@@ -1121,12 +1121,12 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					float sl_erpm = buffer_get_float32(data, 1e3, &ind);
 
 					int res = conf_general_detect_apply_all_foc_can(detect_can, max_power_loss,
-							min_current_in, max_current_in, openloop_rpm, sl_erpm);
+							min_current_in, max_current_in, openloop_rpm, sl_erpm, phandle);
 
 					ind = 0;
 					buffer[ind++] = COMM_DETECT_APPLY_ALL_FOC;
 					buffer_append_int16(buffer, res, &ind);
-					reply_func(send_buffer, ind);
+					reply_func(send_buffer, ind, phandle);
 				} break;
 				case COMM_BM_CONNECT:
 				case COMM_BM_ERASE_FLASH_ALL:

@@ -31,8 +31,13 @@ unsigned long getRunTimeCounterValue(void){
 	return HAL_GetTick();
 }
 
+port_str main_uart = {	.uart = &VESC_USART_DMA,
+					    .rx_buffer_size = 512,
+						.phandle = NULL
+};
+
 void task_init(){
-	task_cli_init();
-	task_LED_init();  //Bring up the blinky
-	task_PWR_init();  //Manage power button
+	task_cli_init(&main_uart);
+	task_LED_init(&main_uart);  //Bring up the blinky
+	task_PWR_init(&main_uart);  //Manage power button
 }

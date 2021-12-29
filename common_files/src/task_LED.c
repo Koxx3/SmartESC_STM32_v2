@@ -58,7 +58,6 @@ void prv_LED_blink(uint32_t ticks){
 //#define  MC_BREAK_IN  (uint16_t)(0x0040u)      /**< @brief Error: Emergency input (Over current).*/
 //#define  MC_SW_ERROR  (uint16_t)(0x0080u)      /**< @brief Software Error.*/
 
-
 void task_LED(void * argument)
 {
 	volatile uint32_t last_fault_time=0;
@@ -73,7 +72,7 @@ void task_LED(void * argument)
 			last_fault = pMCI[M1]->pSTM->hFaultOccurred;
 			if((xTaskGetTickCount() / 2) > last_fault_time){
 #if ERROR_PRINTING
-				commands_printf("FAULTS: %x", last_fault);
+				commands_printf(((port_str*)argument)->phandle, "FAULTS: %x", last_fault);
 #endif
 
 #if AUTO_RESET_FAULT
@@ -99,6 +98,6 @@ void task_LED(void * argument)
 	}
 }
 
-void task_LED_init(){
-	xTaskCreate(task_LED, "tskLED", 128, NULL, PRIO_NORMAL, &LEDHandle);
+void task_LED_init(port_str * port){
+	xTaskCreate(task_LED, "tskLED", 128, (void*)port, PRIO_NORMAL, &LEDHandle);
 }

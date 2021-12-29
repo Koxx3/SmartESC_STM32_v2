@@ -374,7 +374,7 @@ void conf_general_calc_apply_foc_cc_kp_ki_gain(mc_configuration *mcconf, float t
  * -10: Flux linkage detection failed
  *  -x: see conf_general_autodetect_apply_sensors_foc faults
  */
-int conf_general_detect_apply_all_foc(float max_power_loss,	bool store_mcconf_on_success, bool send_mcconf_on_success) {
+int conf_general_detect_apply_all_foc(float max_power_loss,	bool store_mcconf_on_success, bool send_mcconf_on_success, PACKET_STATE_t * phandle) {
 	int result = -1;
 
 	mc_configuration *mcconf = &mc_conf;
@@ -453,7 +453,7 @@ int conf_general_detect_apply_all_foc(float max_power_loss,	bool store_mcconf_on
 		if(res==true){
 			memcpy(mcconf_old->foc_hall_table,hall_tab, 8);
 			conf_general_setup_mc(mcconf_old);
-			commands_send_mcconf(COMM_GET_MCCONF, mcconf_old);
+			commands_send_mcconf(COMM_GET_MCCONF, mcconf_old, phandle);
 			conf_general_store_mc_configuration(mcconf_old, false);
 			result = 1;
 		}
@@ -503,10 +503,10 @@ int conf_general_detect_apply_all_foc(float max_power_loss,	bool store_mcconf_on
  * -51: CAN detection failed
  */
 int conf_general_detect_apply_all_foc_can(bool detect_can, float max_power_loss,
-		float min_current_in, float max_current_in, float openloop_rpm, float sl_erpm) {
+		float min_current_in, float max_current_in, float openloop_rpm, float sl_erpm, PACKET_STATE_t * phandle) {
 
 
-	int res = conf_general_detect_apply_all_foc(max_power_loss, false, false);
+	int res = conf_general_detect_apply_all_foc(max_power_loss, false, false, phandle);
 
 	return res;
 }
