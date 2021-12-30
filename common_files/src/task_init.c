@@ -24,7 +24,6 @@
 #include "task_init.h"
 #include "task_LED.h"
 #include "task_pwr.h"
-#include "task_cli.h"
 #include "product.h"
 
 unsigned long getRunTimeCounterValue(void){
@@ -33,7 +32,15 @@ unsigned long getRunTimeCounterValue(void){
 
 port_str main_uart = {	.uart = &VESC_USART_DMA,
 					    .rx_buffer_size = 512,
-						.phandle = NULL
+						.phandle = NULL,
+						.half_duplex = false,
+						.task_handle = NULL
+};
+port_str aux_uart = {	.uart = &APP_USART_DMA,
+					    .rx_buffer_size = 512,
+						.phandle = NULL,
+						.half_duplex = true,
+						.task_handle = NULL
 };
 
 void task_init(){

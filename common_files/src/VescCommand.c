@@ -135,6 +135,7 @@ samples.data[4][samples.index] = PWM_Handle_M1._Super.CntPhC;
 samples.data[5][samples.index] = HALL_M1.MeasuredElAngle;
 */
 void send_sample(PACKET_STATE_t * phandle){
+	if(phandle != samples.phandle) return;
 	if(samples.state == SAMP_FINISHED && samples.n_samp){
 
 		uint8_t send_buffer[PACKET_SIZE(50)];
@@ -175,6 +176,10 @@ void send_sample(PACKET_STATE_t * phandle){
 		commands_send_packet(send_buffer, index, phandle);
 
 		if(samples.index == samples.n_samp){
+			for(int i=0;i<4;i++){ //send some extra frames
+				commands_send_packet(send_buffer, index, phandle);
+			}
+
 			vPortFree(samples.m_curr0_samples);
 			vPortFree(samples.m_curr1_samples);
 #if SCOPE_UVW == 1
@@ -183,6 +188,7 @@ void send_sample(PACKET_STATE_t * phandle){
 			vPortFree(samples.m_v2_samples);
 
 #endif
+			samples.phandle = NULL;
 			samples.n_samp = 0;
 			samples.index = 0;
 			samples.state = SAMP_IDLE;
@@ -203,7 +209,9 @@ void commands_send_rotor_pos(PACKET_STATE_t * phandle, int16_t angle) {
 void send_position(PACKET_STATE_t * phandle){
 	switch (display_position_mode) {
 	case DISP_POS_MODE_ENCODER:
+		if(phandle->port->half_duplex==true && (xTaskGetTickCount() % 100)) break;
 		commands_send_rotor_pos(phandle, SpeednTorqCtrlM1.SPD->hElAngle);
+
 		break;
 	case DISP_POS_MODE_PID_POS:
 		//commands_send_rotor_pos(SpeednTorqCtrlM1.SPD->hElAngle);
@@ -567,7 +575,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						samples.n_samp = 0;
 						commands_printf(phandle, "Sample malloc failed");
 					}else{
-
+						samples.phandle = phandle;
 						samples.index = 0;
 						samples.dec_state = 0;
 						samples.state = SAMP_START;

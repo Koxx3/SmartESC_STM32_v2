@@ -52,6 +52,7 @@ uint8_t usart2_rx_dma_buffer[CIRC_BUF_SZ];
 uint8_t app_connection_timout = 8;
 
 TaskHandle_t task_app_handle;
+bool kill;
 
 void my_uart_send_data(uint8_t *tdata, uint16_t tnum){
 	//send data
@@ -134,11 +135,24 @@ void task_app(void * argument)
 #endif
 
 		vTaskDelay(10);
+		if(kill){
+			kill = false;
+			task_app_handle = NULL;
+			vTaskDelete(xTaskGetCurrentTaskHandle());
+
+		}
+
 	}
 }
 
 void task_app_init(){
 	if(task_app_handle == NULL){
+		kill=false;
 		xTaskCreate(task_app, "APP-USART", 128, NULL, PRIO_BELOW_NORMAL, &task_app_handle);
 	}
+}
+
+void task_app_kill(){
+	kill = true;
+	//vTaskDelay(50);
 }

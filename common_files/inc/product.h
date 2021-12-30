@@ -1,9 +1,9 @@
 #include "main.h"
 #include "defines.h"
 
+
 #ifndef APP_PRODUCT_H_
 #define APP_PRODUCT_H_
-
  /*  Phase current (int16_t 0-to-peak) = (Phase current (A 0-to-peak)* 32767 * Rshunt *
                                    *Amplifying network gain)/(MCU supply voltage/2)
 */
@@ -101,6 +101,7 @@
 #define PRIO_BELOW_NORMAL 4
 #define PRIO_NORMAL  5
 #define PRIO_HIGHER  6
+
 
 // Setting limits
 #define HW_LIM_CURRENT			-120.0, 120.0

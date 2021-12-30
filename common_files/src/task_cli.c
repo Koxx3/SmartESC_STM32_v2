@@ -40,17 +40,19 @@
  * \brief           Calculate length of statically allocated array
  */
 
-#define DMA_WRITE_PTR ( (CIRC_BUF_SZ - VESC_USART_DMA.hdmarx->Instance->CNDTR) & (CIRC_BUF_SZ - 1) )  //huart_cobs->hdmarx->Instance->NDTR.
-
-TaskHandle_t task_cli_handle;
-
 
 void putbuffer(unsigned char *buf, unsigned int len, port_str * port){
+	if(port->half_duplex){
+		port->uart->Instance->CR1 &= ~USART_CR1_RE;
+		vTaskDelay(1);
+	}
+	//HAL_UART_Transmit(port->uart, buf, len, 500);
 	HAL_UART_Transmit_DMA(port->uart, buf, len);
 	while(port->uart->hdmatx->State != HAL_DMA_STATE_READY){
 		port->uart->gState = HAL_UART_STATE_READY;
 		vTaskDelay(1);
 	}
+	if(port->half_duplex) port->uart->Instance->CR1 |= USART_CR1_RE;
 }
 
 void comm_uart_send_packet(unsigned char *data, unsigned int len, PACKET_STATE_t * phandle) {
@@ -70,7 +72,9 @@ void task_cli(void * argument)
 	uint32_t rd_ptr=0;
 	port_str * port = (port_str*) argument;
 	uint8_t * usart_rx_dma_buffer = pvPortMalloc(port->rx_buffer_size);
-
+	if(port->half_duplex){
+		HAL_HalfDuplex_Init(port->uart);
+	}
 	HAL_UART_Receive_DMA(port->uart, usart_rx_dma_buffer, port->rx_buffer_size);
 	CLEAR_BIT(port->uart->Instance->CR3, USART_CR3_EIE);
 
@@ -92,11 +96,28 @@ void task_cli(void * argument)
 		send_position(port->phandle);
 		VescToSTM_handle_timeout();
 		vTaskDelay(1);
+
+		if(port->kill){
+			port->kill=false;
+			port->task_handle = NULL;
+			packet_free(port->phandle);
+			vPortFree(usart_rx_dma_buffer);
+			vTaskDelete(xTaskGetCurrentTaskHandle());
+		}
+
 	}
 }
 
 void task_cli_init(port_str * port){
 #if VESC_TOOL_ENABLE
-	xTaskCreate(task_cli, "tskCLI", 256, (void*)port, PRIO_NORMAL, &task_cli_handle);
+	if(port->task_handle == NULL){
+		port->kill = false;
+		xTaskCreate(task_cli, "tskCLI", 256, (void*)port, PRIO_NORMAL, port->task_handle);
+	}
 #endif
+}
+
+void task_cli_kill(port_str * port){
+	port->kill = true;
+	//vTaskDelay(50);
 }

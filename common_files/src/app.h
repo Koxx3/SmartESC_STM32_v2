@@ -27,6 +27,7 @@ unsigned app_calc_crc(app_configuration* conf);
 
 // Standard apps
 void task_app_init(void);
+void task_app_kill();
 void my_uart_send_data(uint8_t *tdata, uint16_t tnum);
 void my_uart2_send_data(uint8_t *tdata, uint16_t tnum);
 

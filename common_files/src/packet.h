@@ -60,5 +60,6 @@ void packet_reset(PACKET_STATE_t * handle);
 void packet_process_byte(uint8_t rx_data, PACKET_STATE_t * handle);
 void packet_timerfunc(void);
 void packet_send_packet(unsigned char *send_buffer, unsigned int len, PACKET_STATE_t * handle);
+void packet_free(PACKET_STATE_t * handle);
 
 #endif /* PACKET_H_ */
