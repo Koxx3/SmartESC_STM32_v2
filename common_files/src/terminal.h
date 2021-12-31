@@ -5,8 +5,9 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "packet.h"
 
-void terminal_process_string(char *str);
+void terminal_process_string(char *str, PACKET_STATE_t * phandle);
 
 
 #endif /* TUNE_H_ */

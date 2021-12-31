@@ -27,6 +27,7 @@
 #define FW_TEST_VERSION_NUMBER		0
 
 #include "VescDatatypes.h"
+#include "packet.h"
 
 
 #define APP_PAGE				126
@@ -47,5 +48,5 @@ void conf_general_setup_mc(mc_configuration *mcconf);
 void conf_general_update_current(mc_configuration *mcconf);
 mc_configuration* mc_interface_get_configuration(void);
 bool conf_general_store_app_configuration(app_configuration *conf);
-int conf_general_detect_apply_all_foc_can(bool detect_can, float max_power_loss, float min_current_in, float max_current_in, float openloop_rpm, float sl_erpm);
+int conf_general_detect_apply_all_foc_can(bool detect_can, float max_power_loss, float min_current_in, float max_current_in, float openloop_rpm, float sl_erpm, PACKET_STATE_t * phandle);
 #endif /* CONF_GENERAL_H_ */

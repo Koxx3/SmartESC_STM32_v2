@@ -503,9 +503,12 @@ int32_t VescToSTM_get_tachometer_abs_value(bool reset) {
  * The brake current to use.
  */
 void VescToSTM_set_handbrake(float current) {
-	VescToSTM_mode = STM_STATE_HANDBRAKE;
+
 	int q = abs(current_to_torque(current*1000));
-	VescToSTM_set_open_loop(true, 0, 0);
+	if(VescToSTM_mode != STM_STATE_HANDBRAKE){
+		VescToSTM_set_open_loop(true, SpeednTorqCtrlM1.SPD->hElAngle, 0);
+	}
+	VescToSTM_mode = STM_STATE_HANDBRAKE;
 
 	utils_truncate_number_int(&q, 0, SpeednTorqCtrlM1.MaxPositiveTorque);
 

@@ -32,13 +32,14 @@
 
 // Private functions
 static int try_decode_packet(unsigned char *buffer, unsigned int in_len,
-		void(*process_func)(unsigned char *data, unsigned int len), int *bytes_left);
+		void(*process_func)(unsigned char *data, unsigned int len, PACKET_STATE_t * phandle), int *bytes_left, PACKET_STATE_t * phandle);
 
-PACKET_STATE_t * packet_init(void (*s_func)(unsigned char *data, unsigned int len), void (*p_func)(unsigned char *data, unsigned int len)) {
+PACKET_STATE_t * packet_init(void (*s_func)(unsigned char *data, unsigned int len, port_str * port), void (*p_func)(unsigned char *data, unsigned int len, PACKET_STATE_t *phandle), port_str * port) {
 	PACKET_STATE_t * ret = pvPortMalloc(sizeof(PACKET_STATE_t));
 	memset(ret, 0, sizeof(PACKET_STATE_t));
 	ret->send_func = s_func;
 	ret->process_func = p_func;
+	ret->port = port;
 	ret->rx_buffer = pvPortMalloc(BUFFER_LEN);
 	return ret;
 }
@@ -87,7 +88,7 @@ void packet_send_packet(unsigned char *send_buffer, unsigned int len, PACKET_STA
 	send_buffer[b_ind++] = 3;
 
 	if (handle->send_func) {
-		handle->send_func(send_buffer, b_ind);
+		handle->send_func(send_buffer, b_ind, handle->port);
 	}
 }
 
@@ -143,7 +144,7 @@ void packet_process_byte(uint8_t rx_data, PACKET_STATE_t * handle) {
 	// until we run out of data.
 	for (;;) {
 		int res = try_decode_packet(handle->rx_buffer + handle->rx_read_ptr,
-				data_len, handle->process_func, &handle->bytes_left);
+				data_len, handle->process_func, &handle->bytes_left, handle);
 
 		// More data is needed
 		if (res == -2) {
@@ -189,7 +190,7 @@ void packet_process_byte(uint8_t rx_data, PACKET_STATE_t * handle) {
  * -2: OK so far, but not enough data
  */
 static int try_decode_packet(unsigned char *buffer, unsigned int in_len,
-		void(*process_func)(unsigned char *data, unsigned int len), int *bytes_left) {
+		void(*process_func)(unsigned char *data, unsigned int len, PACKET_STATE_t * phandle), int *bytes_left, PACKET_STATE_t * phandle) {
 	*bytes_left = 0;
 
 	if (in_len == 0) {
@@ -272,7 +273,7 @@ static int try_decode_packet(unsigned char *buffer, unsigned int in_len,
 
 	if (crc_calc == crc_rx) {
 		if (process_func) {
-			process_func(buffer + data_start, len);
+			process_func(buffer + data_start, len, phandle);
 		}
 
 		return len + data_start + 3;

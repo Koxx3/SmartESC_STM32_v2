@@ -31,15 +31,16 @@
 #include "speed_pos_fdbk.h"
 #include "drive_parameters.h"
 #include "product.h"
+#include "packet.h"
 
 extern qd_t currComp;
 
-void commands_send_mcconf(COMM_PACKET_ID packet_id, mc_configuration *mcconf);
-void commands_process_packet(unsigned char *data, unsigned int len, void(*reply_func)(unsigned char *data, unsigned int len));
-void commands_send_packet(unsigned char *data, unsigned int len);
+void commands_send_mcconf(COMM_PACKET_ID packet_id, mc_configuration *mcconf, PACKET_STATE_t * phandle);
+void commands_process_packet(unsigned char *data, unsigned int len, void(*reply_func)(unsigned char *data, unsigned int len, PACKET_STATE_t * phandle), PACKET_STATE_t * phandle);
+void commands_send_packet(unsigned char *data, unsigned int len, PACKET_STATE_t * phandle);
 void send_sample();
-void send_position();
-void commands_printf(const char* format, ...);
+void send_position(PACKET_STATE_t * phandle);
+void commands_printf(PACKET_STATE_t * phandle, const char* format, ...);
 
 typedef enum {
 	SAMP_IDLE,

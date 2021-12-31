@@ -27,20 +27,22 @@
 #include "cmsis_os.h"
 #include "FreeRTOS.h"
 #include "stream_buffer.h"
+#include "main.h"
 
 extern osThreadId_t task_cli_handle;
 
 void cli_start_console();
 
-enum uart_mode{
-	UART_MODE_ST,
-	UART_MODE_CLI
-};
+typedef struct __PACKET_STATE_t__ PACKET_STATE_t;
+
+typedef struct{
+	UART_HandleTypeDef * uart;
+	uint16_t rx_buffer_size;  //power of 2
+	PACKET_STATE_t * phandle;
+} port_str;
 
 
-extern StreamBufferHandle_t UART_RX;
-
-void task_cli_init();
+void task_cli_init(port_str * port);
 
 
 #endif /* TASK_LED_H_ */
