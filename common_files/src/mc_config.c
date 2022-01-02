@@ -210,7 +210,6 @@ HALL_Handle_t HALL_M1 =
     .hMeasurementFrequency             =	TF_REGULATION_RATE_SCALED,
     .DPPConvFactor                     =    DPP_CONV_FACTOR,
   },
-  .PhaseShift          = (int16_t)(HALL_PHASE_SHIFT * 65536/360),
   .SpeedSamplingFreqHz = MEDIUM_FREQUENCY_TASK_RATE,
   .SpeedBufferSize     = HALL_AVERAGING_FIFO_DEPTH,
  .TIMClockFreq         = HALL_TIM_CLK,

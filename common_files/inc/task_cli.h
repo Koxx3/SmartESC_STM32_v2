@@ -28,6 +28,7 @@
 #include "FreeRTOS.h"
 #include "stream_buffer.h"
 #include "main.h"
+#include "task.h"
 
 extern osThreadId_t task_cli_handle;
 
@@ -39,11 +40,13 @@ typedef struct{
 	UART_HandleTypeDef * uart;
 	uint16_t rx_buffer_size;  //power of 2
 	PACKET_STATE_t * phandle;
+	bool half_duplex;
+	TaskHandle_t task_handle;
 } port_str;
 
 
 void task_cli_init(port_str * port);
-
+void task_cli_kill(port_str * port);
 
 #endif /* TASK_LED_H_ */
 
