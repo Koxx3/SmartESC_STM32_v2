@@ -37,7 +37,7 @@ port_str main_uart = {	.uart = &VESC_USART_DMA,
 						.task_handle = NULL
 };
 port_str aux_uart = {	.uart = &APP_USART_DMA,
-					    .rx_buffer_size = 512,
+					    .rx_buffer_size = 128,
 						.phandle = NULL,
 						.half_duplex = true,
 						.task_handle = NULL

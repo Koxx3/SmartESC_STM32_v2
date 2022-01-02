@@ -63,7 +63,7 @@ void process_packet(unsigned char *data, unsigned int len, PACKET_STATE_t * phan
 	commands_process_packet(data, len, &comm_uart_send_packet, phandle);
 }
 
-uint32_t uart_get_write_pos(port_str * port){
+static uint32_t uart_get_write_pos(port_str * port){
 	return ( ((uint32_t)port->rx_buffer_size - port->uart->hdmarx->Instance->CNDTR) & ((uint32_t)port->rx_buffer_size -1));
 }
 
@@ -72,6 +72,7 @@ void task_cli(void * argument)
 	uint32_t rd_ptr=0;
 	port_str * port = (port_str*) argument;
 	uint8_t * usart_rx_dma_buffer = pvPortMalloc(port->rx_buffer_size);
+	HAL_UART_MspInit(port->uart);
 	if(port->half_duplex){
 		HAL_HalfDuplex_Init(port->uart);
 	}
@@ -95,14 +96,15 @@ void task_cli(void * argument)
 		send_sample(port->phandle);
 		send_position(port->phandle);
 		VescToSTM_handle_timeout();
-		vTaskDelay(1);
+		//vTaskDelay(1);
 
-		if(port->kill){
-			port->kill=false;
+		if(ulTaskNotifyTake(pdTRUE, 1)){
+			HAL_UART_MspDeInit(port->uart);
 			port->task_handle = NULL;
 			packet_free(port->phandle);
 			vPortFree(usart_rx_dma_buffer);
-			vTaskDelete(xTaskGetCurrentTaskHandle());
+			vTaskDelete(NULL);
+			vTaskDelay(portMAX_DELAY);
 		}
 
 	}
@@ -111,13 +113,14 @@ void task_cli(void * argument)
 void task_cli_init(port_str * port){
 #if VESC_TOOL_ENABLE
 	if(port->task_handle == NULL){
-		port->kill = false;
-		xTaskCreate(task_cli, "tskCLI", 256, (void*)port, PRIO_NORMAL, port->task_handle);
+		xTaskCreate(task_cli, "tskCLI", 256, (void*)port, PRIO_NORMAL, &port->task_handle);
 	}
 #endif
 }
 
 void task_cli_kill(port_str * port){
-	port->kill = true;
-	//vTaskDelay(50);
+	if(port->task_handle){
+		xTaskNotify(port->task_handle, 0, eIncrement);
+		vTaskDelay(200);
+	}
 }

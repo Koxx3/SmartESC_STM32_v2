@@ -58,12 +58,16 @@ void app_set_configuration(app_configuration *conf) {
 
 	switch (appconf.app_to_use) {
 		case APP_UART:
-			task_app_kill();
+			if( xTaskGetSchedulerState() == taskSCHEDULER_RUNNING){
+				task_app_kill(&aux_uart);
+			}
 			task_cli_init(&aux_uart);
 			break;
 		case APP_CUSTOM:
-			task_cli_kill(&aux_uart);
-			task_app_init();
+			if( xTaskGetSchedulerState() == taskSCHEDULER_RUNNING){
+				task_cli_kill(&aux_uart);
+			}
+			task_app_init(&aux_uart);
 			break;
 		default:
 			break;

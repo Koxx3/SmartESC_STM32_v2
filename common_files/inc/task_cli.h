@@ -41,8 +41,7 @@ typedef struct{
 	uint16_t rx_buffer_size;  //power of 2
 	PACKET_STATE_t * phandle;
 	bool half_duplex;
-	TaskHandle_t * task_handle;
-	bool kill;
+	TaskHandle_t task_handle;
 } port_str;
 
 

@@ -410,7 +410,7 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
 			pHandle->tachometer_abs++;
 		}
 
-		pHandle->MeasuredElAngle = pHandle->PhaseShift + (((uint16_t)pHandle->lut[pHandle->HallState]-(diff/2))<<8);
+		pHandle->MeasuredElAngle = (((uint16_t)pHandle->lut[pHandle->HallState]-(diff/2))<<8);
     }
 
     /* We need to check that the direction has not changed.
@@ -686,7 +686,7 @@ static void HALL_Init_Electrical_Angle( HALL_Handle_t * pHandle )
 			pHandle->tachometer_abs++;
 		}
 
-		pHandle->MeasuredElAngle = pHandle->PhaseShift + (((uint16_t)pHandle->lut[pHandle->HallState]-(diff/2))<<8);
+		pHandle->MeasuredElAngle = (((uint16_t)pHandle->lut[pHandle->HallState]-(diff/2))<<8);
 
     	//pHandle->_Super.hElAngle = pHandle->PhaseShift + (((uint16_t)pHandle->lut[pHandle->HallState])<<8);
     	/* Initialize the measured angle */

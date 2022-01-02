@@ -47,12 +47,12 @@ bool tune_mcpwm_foc_hall_detect(float current, uint8_t *hall_table) {
 
 	// Lock the motor
 	VescToSTM_set_open_loop(true, 0, 0);
-	int old_phase_shift = HALL_M1.PhaseShift;
-	HALL_M1.PhaseShift = 0;
+	//int old_phase_shift = HALL_M1.PhaseShift;
+	//HALL_M1.PhaseShift = 0;
 
 
 	for (int i = 0;i < 1000;i++) {
-		currComp.q = current_to_torque((float)i * current / 1000.0);
+		currComp.d = current_to_torque((float)i * current / 1000.0);
 		MCI_SetCurrentReferences(pMCI[M1],currComp);
 		vTaskDelay(MS_TO_TICKS(1));
 	}
@@ -91,7 +91,7 @@ bool tune_mcpwm_foc_hall_detect(float current, uint8_t *hall_table) {
 	}
 
 
-	currComp.q = 0;
+	currComp.d = 0;
 	MCI_SetCurrentReferences(pMCI[M1],currComp);
 	VescToSTM_set_open_loop(false, 0, 0);
 
@@ -106,7 +106,7 @@ bool tune_mcpwm_foc_hall_detect(float current, uint8_t *hall_table) {
 			fails++;
 		}
 	}
-	HALL_M1.PhaseShift = old_phase_shift;
+	//HALL_M1.PhaseShift = old_phase_shift;
 	VescToSTM_enable_timeout(true);
 	return fails == 2;
 }
@@ -145,9 +145,6 @@ float tune_foc_measure_resistance(float current, int samples) {
 
 	// Lock the motor
 	VescToSTM_set_open_loop(true, 0, 0);
-	int old_phase_shift = HALL_M1.PhaseShift;
-	HALL_M1.PhaseShift = 0;
-
 
 	for (int i = 0;i < 1000;i++) {
 		currComp.q = current_to_torque((float)i * current / 1000.0);
@@ -176,7 +173,6 @@ float tune_foc_measure_resistance(float current, int samples) {
 
 	// UnLock the motor
 	VescToSTM_set_open_loop(false, 0, 0);
-	HALL_M1.PhaseShift = old_phase_shift;
 
 	// Enable timeout
 	VescToSTM_enable_timeout(true);
@@ -220,9 +216,6 @@ float tune_foc_measure_inductance(float voltage, float * used_current, uint32_t 
 	// Lock the motor
 	pMCI[M1]->pSTC->SPD->open_loop = true;
 	pMCI[M1]->pSTC->SPD->open_angle =0;
-	int old_phase_shift = HALL_M1.PhaseShift;
-	HALL_M1.PhaseShift = 0;
-
 
 	int16_t IqUpperLim = pPIDIq[M1]->hUpperOutputLimit;
 	int16_t IqLowerLim = pPIDIq[M1]->hLowerOutputLimit;
@@ -271,7 +264,6 @@ float tune_foc_measure_inductance(float voltage, float * used_current, uint32_t 
 	pPIDId[M1]->wPrevProcessVarError = 0;
 	pMCI[M1]->pSTC->SPD->open_loop = false;
 	pMCI[M1]->pSTC->SPD->open_angle =0;
-	HALL_M1.PhaseShift = old_phase_shift;
 
 	// Enable timeout
 	VescToSTM_enable_timeout(true);
