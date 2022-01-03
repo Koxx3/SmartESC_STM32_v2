@@ -41,7 +41,9 @@ void terminal_top(PACKET_STATE_t * phandle){
     }
 }
 
+#if MUSIC_ENABLE
 extern MUSIC_PARAM bldc_music;
+#endif
 
 void terminal_process_string(char *str, PACKET_STATE_t * phandle) {
 	enum { kMaxArgs = 16 };
@@ -63,11 +65,15 @@ void terminal_process_string(char *str, PACKET_STATE_t * phandle) {
 		commands_printf(phandle, "pong\n");
 	}else if (strcmp(argv[0], "top") == 0){
 		terminal_top(phandle);
-	}else if (strcmp(argv[0], "music_on") == 0){
+	}
+#if MUSIC_ENABLE
+	else if (strcmp(argv[0], "music_on") == 0){
 		set_music_command(Music1, &bldc_music);
 	}else if (strcmp(argv[0], "music_off") == 0){
 		set_music_command(Music_OFF, &bldc_music);
-	} else if (strcmp(argv[0], "foc_openloop") == 0) {
+	}
+#endif
+	else if (strcmp(argv[0], "foc_openloop") == 0) {
 		if (argc == 3) {
 			uint32_t erpm_target = 0;
 			uint32_t current = atoi(argv[1]);
