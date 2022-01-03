@@ -71,7 +71,7 @@ void task_LED(void * argument)
 			}
 			last_fault = pMCI[M1]->pSTM->hFaultOccurred;
 			if((xTaskGetTickCount() / 2) > last_fault_time){
-#if ERROR_PRINTING
+#if ERROR_PRINTING && VESC_TOOL_ENABLE
 				commands_printf(((port_str*)argument)->phandle, "FAULTS: %x", last_fault);
 #endif
 
