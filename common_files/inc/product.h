@@ -84,6 +84,10 @@
 #define VESC_TOOL_ENABLE													 1
 #define AUTO_RESET_FAULT													 1
 #define ERROR_PRINTING														 1
+#define MUSIC_ENABLE														 1
+#define BATTERY_SUPPORT_LIION												 1
+#define BATTERY_SUPPORT_LIFEPO												 1
+#define BATTERY_SUPPORT_LEAD												 1
 
 #define BATTERY_VOLTAGE_GAIN     											 ((VOLTAGE_DIVIDER_GAIN * ADC_GAIN) * 512.0)
 #define CURRENT_FACTOR_A 													 ((32767.0*RSHUNT*AMPLIFICATION_GAIN)/(3.3/2))

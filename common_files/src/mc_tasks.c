@@ -102,7 +102,9 @@ static volatile uint16_t hStopPermanencyCounterM1 = 0;
 uint8_t bMCBootCompleted = 0;
 
 /* USER CODE BEGIN Private Variables */
+#if MUSIC_ENABLE
 MUSIC_PARAM bldc_music;
+#endif
 
 /* USER CODE END Private Variables */
 
@@ -261,10 +263,12 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
   pMCTList[M1] = &MCT[M1];
 
   /* USER CODE BEGIN MCboot 2 */
+#if MUSIC_ENABLE
   int32_t status = music_init(&bldc_music);
   if(status){
   	set_music_command(Music_OFF, &bldc_music);
   }
+#endif
   /* USER CODE END MCboot 2 */
 
   bMCBootCompleted = 1;
@@ -770,7 +774,9 @@ inline uint16_t FOC_CurrControllerM1(void)
   uint16_t hCodeError;
   SpeednPosFdbk_Handle_t *speedHandle;
 
+#if MUSIC_ENABLE
   music_update(&bldc_music);
+#endif
 
   speedHandle = STC_GetSpeedSensor(pSTC[M1]);
   hElAngle = SPD_GetElAngle(speedHandle);
@@ -778,7 +784,9 @@ inline uint16_t FOC_CurrControllerM1(void)
   Ialphabeta = MCM_Clarke(Iab);
   Iqd = MCM_Park(Ialphabeta, hElAngle);
   Vqd.q = PI_Controller(pPIDIq[M1], (int32_t)(FOCVars[M1].Iqdref.q) - Iqd.q);
+#if MUSIC_ENABLE
   Vqd.q += bldc_music.music_signal;
+#endif
 
   Vqd.d = PI_Controller(pPIDId[M1], (int32_t)(FOCVars[M1].Iqdref.d) - Iqd.d);
 
