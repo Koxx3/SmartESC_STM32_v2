@@ -2,6 +2,7 @@
 #include "crc.h"
 #include "product.h"
 #include "task_pwr.h"
+#include "task_init.h"
 
 extern app_configuration appconf;
 static bool output_vt_init_done = false;
@@ -57,7 +58,16 @@ void app_set_configuration(app_configuration *conf) {
 
 	switch (appconf.app_to_use) {
 		case APP_UART:
-			task_app_init();
+			if( xTaskGetSchedulerState() == taskSCHEDULER_RUNNING){
+				task_app_kill(&aux_uart);
+			}
+			task_cli_init(&aux_uart);
+			break;
+		case APP_CUSTOM:
+			if( xTaskGetSchedulerState() == taskSCHEDULER_RUNNING){
+				task_cli_kill(&aux_uart);
+			}
+			task_app_init(&aux_uart);
 			break;
 		default:
 			break;

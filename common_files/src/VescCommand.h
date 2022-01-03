@@ -54,6 +54,7 @@ typedef enum {
 
 typedef struct samp_struct samp_str;
 struct samp_struct{
+	PACKET_STATE_t * phandle;
 	SAMP_STATES state;
 	uint8_t dec;
 	uint8_t dec_state;

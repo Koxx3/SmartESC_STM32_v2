@@ -29,11 +29,15 @@
 #include "mc_interface.h"
 #include "mc_tuning.h"
 #include "FreeRTOS.h"
+#include "task_cli.h"
 
 extern MCI_Handle_t* pMCI[NBR_OF_MOTORS];
 extern MCT_Handle_t* pMCT[NBR_OF_MOTORS];
 unsigned long getRunTimeCounterValue(void);
 
 void task_init();
+
+extern port_str main_uart;
+extern port_str aux_uart;
 
 #endif /* TASK_INIT_H_ */

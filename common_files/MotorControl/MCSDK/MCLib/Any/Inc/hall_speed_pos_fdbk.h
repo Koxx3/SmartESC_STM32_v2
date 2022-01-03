@@ -68,10 +68,6 @@ typedef struct
   SpeednPosFdbk_Handle_t _Super;
   /* SW Settings */
 
-  int16_t  PhaseShift;  /*!< Define here in s16degree the electrical phase shift
-                             between the low to high transition of signal H1 and
-                             the maximum of the Bemf induced on phase A.*/
-
   uint16_t SpeedSamplingFreqHz; /*!< Frequency (Hz) at which motor speed is to
                              be computed. It must be equal to the frequency
                              at which function SPD_CalcAvrgMecSpeedUnit

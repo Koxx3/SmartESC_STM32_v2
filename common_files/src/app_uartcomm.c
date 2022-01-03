@@ -41,69 +41,52 @@ const uint8_t m365_mode[3] = { M365_MODE_SLOW, M365_MODE_DRIVE, M365_MODE_SPORT}
 m365Answer m365_to_display = {.start1=NinebotHeader0, .start2=NinebotHeader1, .len=8, .addr=0x21, .cmd=0x64, .arg=0, .mode=1};
 
 
-#define CIRC_BUF_SZ       				32  /* must be power of two */
-#define DMA_WRITE_PTR(channel) 			((CIRC_BUF_SZ - channel.hdmarx->Instance->CNDTR) & (CIRC_BUF_SZ - 1) )  //huart_cobs->hdmarx->Instance->NDTR.
-
-uint8_t usart_rx_dma_buffer[CIRC_BUF_SZ];
-#ifdef G30P
-uint8_t usart2_rx_dma_buffer[CIRC_BUF_SZ];
-#endif
-
 uint8_t app_connection_timout = 8;
 
 TaskHandle_t task_app_handle;
+bool kill;
 
-void my_uart_send_data(uint8_t *tdata, uint16_t tnum){
-	//send data
-	//HAL_HalfDuplex_EnableTransmitter(&APP_USART_DMA);
-	while( HAL_UART_Transmit_DMA(&APP_USART_DMA, tdata, tnum) != HAL_OK ) vTaskDelay(1);
-
-	//Waiting to send status OK
-	while(HAL_DMA_GetState(&APP_USART_TX_DMA) != HAL_DMA_STATE_READY){
-		APP_USART_DMA.gState = HAL_UART_STATE_READY;
+void my_uart_send_data(unsigned char *buf, unsigned int len, port_str * port){
+	if(port->half_duplex){
+		port->uart->Instance->CR1 &= ~USART_CR1_RE;
 		vTaskDelay(1);
 	}
-	//HAL_HalfDuplex_EnableReceiver(&APP_USART_DMA);
-}
-
-#ifdef G30P
-void my_uart2_send_data(uint8_t *tdata, uint16_t tnum){
-	//send data
-	while( HAL_UART_Transmit_DMA(&APP2_USART_DMA, tdata, tnum) != HAL_OK ) osDelay(1);
-
-	//Waiting to send status OK
-	while(HAL_DMA_GetState(&APP2_USART_TX_DMA) != HAL_DMA_STATE_READY){
-		APP2_USART_DMA.gState = HAL_UART_STATE_READY;
-		osDelay(1);
+	//HAL_UART_Transmit(port->uart, buf, len, 500);
+	HAL_UART_Transmit_DMA(port->uart, buf, len);
+	while(port->uart->hdmatx->State != HAL_DMA_STATE_READY){
+		port->uart->gState = HAL_UART_STATE_READY;
+		vTaskDelay(1);
 	}
+	if(port->half_duplex) port->uart->Instance->CR1 |= USART_CR1_RE;
 }
-#endif
+
+static uint32_t uart_get_write_pos(port_str * port){
+	return ( ((uint32_t)port->rx_buffer_size - port->uart->hdmarx->Instance->CNDTR) & ((uint32_t)port->rx_buffer_size -1));
+}
 
 void task_app(void * argument)
 {
-	HAL_UART_Receive_DMA(&APP_USART_DMA, usart_rx_dma_buffer, sizeof(usart_rx_dma_buffer));
-	CLEAR_BIT(APP_USART_DMA.Instance->CR3, USART_CR3_EIE);
-
-#ifdef G30P
-	HAL_UART_Receive_DMA(&APP2_USART_DMA, usart2_rx_dma_buffer, sizeof(usart2_rx_dma_buffer));
-	CLEAR_BIT(APP2_USART_DMA.Instance->CR3, USART_CR3_EIE);
-#endif
-
 	uint32_t rd_ptr=0;
-#ifdef G30P
-	uint32_t rd2_ptr=0;
-#endif
+	port_str * port = (port_str*) argument;
+	uint8_t * usart_rx_dma_buffer = pvPortMalloc(port->rx_buffer_size);
+	HAL_UART_MspInit(port->uart);
+	if(port->half_duplex){
+		HAL_HalfDuplex_Init(port->uart);
+	}
+	HAL_UART_Receive_DMA(port->uart, usart_rx_dma_buffer, port->rx_buffer_size);
+	CLEAR_BIT(port->uart->Instance->CR3, USART_CR3_EIE);
+
 	uint16_t slow_update_cnt=0;
   /* Infinite loop */
 	for(;;)
 	{
-		while(rd_ptr != DMA_WRITE_PTR(APP_USART_DMA)) {
+		while(rd_ptr != uart_get_write_pos(port)) {
 			if(ninebot_parse(usart_rx_dma_buffer[rd_ptr] ,&frame)	==0){
 					//commands_printf("LEN: %d CMD: %x ARG: %x", frame.len, frame.cmd, frame.arg);
 				switch(frame.cmd){
 					case 0x64:
 						addCRC((uint8_t*)&m365_to_display, m365_to_display.len+6);
-						my_uart_send_data((uint8_t*)&m365_to_display, sizeof(m365_to_display));
+						my_uart_send_data((uint8_t*)&m365_to_display, sizeof(m365_to_display), port);
 					break;
 					case 0x65:
 
@@ -112,7 +95,7 @@ void task_app(void * argument)
 				}
 			}
 			rd_ptr++;
-			rd_ptr &= (CIRC_BUF_SZ - 1);
+			rd_ptr &= ((uint32_t)port->rx_buffer_size - 1);
 		}
 
 		if(slow_update_cnt==0){
@@ -126,19 +109,27 @@ void task_app(void * argument)
 		}
 
 
-#ifdef G30P
-		while(rd2_ptr != DMA_WRITE_PTR(APP2_USART_DMA)) {
-			rd2_ptr++;
-			rd2_ptr &= (CIRC_BUF_SZ - 1);
-		}
-#endif
-
 		vTaskDelay(10);
+		if(ulTaskNotifyTake(pdTRUE, 10)){
+			HAL_UART_MspDeInit(port->uart);
+			port->task_handle = NULL;
+			vPortFree(usart_rx_dma_buffer);
+			vTaskDelete(NULL);
+			vTaskDelay(portMAX_DELAY);
+		}
+
 	}
 }
 
-void task_app_init(){
-	if(task_app_handle == NULL){
-		xTaskCreate(task_app, "APP-USART", 128, NULL, PRIO_BELOW_NORMAL, &task_app_handle);
+void task_app_init(port_str * port){
+	if(port->task_handle == NULL){
+		xTaskCreate(task_app, "APP-USART", 128, (void*)port, PRIO_BELOW_NORMAL, &port->task_handle);
+	}
+}
+
+void task_app_kill(port_str * port){
+	if(port->task_handle){
+		xTaskNotify(port->task_handle, 0, eIncrement);
+		vTaskDelay(200);
 	}
 }
