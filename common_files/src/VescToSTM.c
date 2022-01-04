@@ -82,13 +82,17 @@ void VescToStm_nunchuk_update_output(chuck_data * chuck_d){
 	VescToSTM_timeout_reset();
 	if(chuck_d->js_y != last_y){
 		last_y = chuck_d->js_y;
-		if(last_y > 126){
-			VescToSTM_set_current_rel_int(utils_map_int(last_y, 127, 255, 0, 32768));
+		if(appconf.app_chuk_conf.ctrl_type == CHUK_CTRL_TYPE_NONE) return;
+		float out_val = (chuck_d->js_y - 128.0) / 128.0;
+		utils_deadband(&out_val, appconf.app_chuk_conf.hyst, 1.0);
+		out_val = utils_throttle_curve(out_val, appconf.app_chuk_conf.throttle_exp, appconf.app_chuk_conf.throttle_exp_brake, appconf.app_chuk_conf.throttle_exp_mode);
+		if(out_val > 0.0){
+			VescToSTM_set_current_rel(out_val);
 		}else{
-			if(chuck_d->bt_c){
-				VescToSTM_set_current_rel_int(utils_map_int(last_y, 0, 126, -32768, 0));
+			if((chuck_d->bt_c && appconf.app_chuk_conf.ctrl_type == CHUK_CTRL_TYPE_CURRENT) || appconf.app_chuk_conf.ctrl_type == CHUK_CTRL_TYPE_CURRENT_BIDIRECTIONAL){
+				VescToSTM_set_current_rel(out_val);
 			}else{
-				VescToSTM_set_brake_rel_int(utils_map_int(last_y, 0, 126, 32768, 0));
+				VescToSTM_set_brake_current_rel(out_val);
 			}
 		}
 	}
@@ -206,11 +210,7 @@ void VescToSTM_set_torque(int32_t current){
 }
 
 void VescToSTM_set_brake_current_rel(float val) {
-	if (fabsf(val) > 0.001) {
-		val = 0;
-	}
-
-	VescToSTM_set_brake(val * fabsf(mc_conf.lo_current_min));
+	VescToSTM_set_brake(val * fabsf(mc_conf.lo_current_min)*1000);
 }
 
 void VescToSTM_set_brake_rel_int(int32_t val){

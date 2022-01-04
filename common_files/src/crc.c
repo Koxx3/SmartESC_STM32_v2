@@ -60,6 +60,39 @@ unsigned short crc16(unsigned char *buf, unsigned int len) {
 	return cksum;
 }
 
+
+/*uint8_t make8(uint32_t dat, uint8_t offset){
+	switch(offset){
+	case 1:
+		dat = dat >> 8;
+		break;
+	case 2:
+		dat = dat >> 16;
+		break;
+	case 3:
+		dat = dat >> 24;
+		break;
+	default:
+		break;
+	}
+	return dat;
+}
+
+unsigned short  crc16(unsigned char *Buffer, unsigned int Len)
+{
+   int16_t x;
+   int16_t crc = 0x0000;
+
+   while(Len--)
+   {
+      x = make8(crc,1) ^ *Buffer++;
+      x ^= x>>4;
+
+      crc = (crc << 8) ^ (x << 12) ^ (x <<5) ^ x;
+   }
+   return crc;
+}
+*/
 /**
   * @brief  Computes the 32-bit CRC of a given buffer of data word(32-bit) using
   * Hardware Acceleration.
