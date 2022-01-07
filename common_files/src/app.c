@@ -53,8 +53,8 @@ void app_set_configuration(app_configuration *conf) {
 		break;
 	}
 
-
-
+	if(appconf.app_adc_conf.update_rate_hz < 1) appconf.app_adc_conf.update_rate_hz = 1;
+	if(appconf.app_adc_conf.update_rate_hz > 200) appconf.app_adc_conf.update_rate_hz = 200;
 
 	switch (appconf.app_to_use) {
 		case APP_UART:
@@ -63,7 +63,7 @@ void app_set_configuration(app_configuration *conf) {
 			}
 			task_cli_init(&aux_uart);
 			break;
-		case APP_CUSTOM:
+		case APP_ADC:
 			if( xTaskGetSchedulerState() == taskSCHEDULER_RUNNING){
 				task_cli_kill(&aux_uart);
 			}

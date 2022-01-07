@@ -611,13 +611,13 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					uint8_t send_buffer[PACKET_SIZE(20)];
 					uint8_t * buffer = send_buffer + PACKET_HEADER;
 					buffer[ind++] = COMM_GET_DECODED_ADC;
-					buffer_append_int32(buffer, 0, &ind);
+					buffer_append_int32(buffer, app_adc_get_decoded_level() * 1000000.0, &ind);
 					//buffer_append_int32(send_buffer, (int32_t)(app_adc_get_voltage() * 1000000.0), &ind);
-					buffer_append_int32(buffer, 0, &ind);
+					buffer_append_int32(buffer, VescToSTM_get_ADC1() * 1000000.0, &ind);
 					//buffer_append_int32(send_buffer, (int32_t)(app_adc_get_decoded_level2() * 1000000.0), &ind);
-					buffer_append_int32(buffer, 0, &ind);
+					buffer_append_int32(buffer, app_adc_get_decoded_level2() * 1000000.0, &ind);
 					//buffer_append_int32(send_buffer, (int32_t)(app_adc_get_voltage2() * 1000000.0), &ind);
-					buffer_append_int32(buffer, 0, &ind);
+					buffer_append_int32(buffer, VescToSTM_get_ADC2() * 1000000.0, &ind);
 					reply_func(send_buffer, ind, phandle);
 				} break;
 

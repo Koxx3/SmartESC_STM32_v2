@@ -227,25 +227,31 @@ int32_t confgenerator_serialize_appconf(uint8_t *buffer, const app_configuration
 	buffer[ind++] = (uint8_t)conf->uavcan_esc_index;
 	buffer[ind++] = conf->uavcan_raw_mode;
 	buffer[ind++] = conf->app_to_use;
-	buffer[ind++] = conf->app_ppm_conf.ctrl_type;
-	buffer_append_float32_auto(buffer, conf->app_ppm_conf.pid_max_erpm, &ind);
-	buffer_append_float32_auto(buffer, conf->app_ppm_conf.hyst, &ind);
-	buffer_append_float32_auto(buffer, conf->app_ppm_conf.pulse_start, &ind);
-	buffer_append_float32_auto(buffer, conf->app_ppm_conf.pulse_end, &ind);
-	buffer_append_float32_auto(buffer, conf->app_ppm_conf.pulse_center, &ind);
-	buffer[ind++] = conf->app_ppm_conf.median_filter;
-	buffer[ind++] = conf->app_ppm_conf.safe_start;
-	buffer_append_float32_auto(buffer, conf->app_ppm_conf.throttle_exp, &ind);
-	buffer_append_float32_auto(buffer, conf->app_ppm_conf.throttle_exp_brake, &ind);
-	buffer[ind++] = conf->app_ppm_conf.throttle_exp_mode;
-	buffer_append_float32_auto(buffer, conf->app_ppm_conf.ramp_time_pos, &ind);
-	buffer_append_float32_auto(buffer, conf->app_ppm_conf.ramp_time_neg, &ind);
-	buffer[ind++] = conf->app_ppm_conf.multi_esc;
-	buffer[ind++] = conf->app_ppm_conf.tc;
-	buffer_append_float32_auto(buffer, conf->app_ppm_conf.tc_max_diff, &ind);
-	buffer_append_float32_auto(buffer, conf->app_ppm_conf.max_erpm_for_dir, &ind);
-	buffer_append_float32_auto(buffer, conf->app_ppm_conf.smart_rev_max_duty, &ind);
-	buffer_append_float32_auto(buffer, conf->app_ppm_conf.smart_rev_ramp_time, &ind);
+
+//	buffer[ind++] = conf->app_ppm_conf.ctrl_type;
+//	buffer_append_float32_auto(buffer, conf->app_ppm_conf.pid_max_erpm, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_ppm_conf.hyst, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_ppm_conf.pulse_start, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_ppm_conf.pulse_end, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_ppm_conf.pulse_center, &ind);
+//	buffer[ind++] = conf->app_ppm_conf.median_filter;
+//	buffer[ind++] = conf->app_ppm_conf.safe_start;
+//	buffer_append_float32_auto(buffer, conf->app_ppm_conf.throttle_exp, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_ppm_conf.throttle_exp_brake, &ind);
+//	buffer[ind++] = conf->app_ppm_conf.throttle_exp_mode;
+//	buffer_append_float32_auto(buffer, conf->app_ppm_conf.ramp_time_pos, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_ppm_conf.ramp_time_neg, &ind);
+//	buffer[ind++] = conf->app_ppm_conf.multi_esc;
+//	buffer[ind++] = conf->app_ppm_conf.tc;
+//	buffer_append_float32_auto(buffer, conf->app_ppm_conf.tc_max_diff, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_ppm_conf.max_erpm_for_dir, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_ppm_conf.smart_rev_max_duty, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_ppm_conf.smart_rev_ramp_time, &ind);
+
+
+	memset(&buffer[ind],0,58);
+	ind+=58;
+
 	buffer[ind++] = conf->app_adc_conf.ctrl_type;
 	buffer_append_float32_auto(buffer, conf->app_adc_conf.hyst, &ind);
 	buffer_append_float32_auto(buffer, conf->app_adc_conf.voltage_start, &ind);
@@ -283,86 +289,90 @@ int32_t confgenerator_serialize_appconf(uint8_t *buffer, const app_configuration
 	buffer[ind++] = conf->app_chuk_conf.use_smart_rev;
 	buffer_append_float32_auto(buffer, conf->app_chuk_conf.smart_rev_max_duty, &ind);
 	buffer_append_float32_auto(buffer, conf->app_chuk_conf.smart_rev_ramp_time, &ind);
-	buffer[ind++] = conf->app_nrf_conf.speed;
-	buffer[ind++] = conf->app_nrf_conf.power;
-	buffer[ind++] = conf->app_nrf_conf.crc_type;
-	buffer[ind++] = conf->app_nrf_conf.retry_delay;
-	buffer[ind++] = (uint8_t)conf->app_nrf_conf.retries;
-	buffer[ind++] = (uint8_t)conf->app_nrf_conf.channel;
-	buffer[ind++] = (uint8_t)conf->app_nrf_conf.address[0];
-	buffer[ind++] = (uint8_t)conf->app_nrf_conf.address[1];
-	buffer[ind++] = (uint8_t)conf->app_nrf_conf.address[2];
-	buffer[ind++] = conf->app_nrf_conf.send_crc_ack;
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.kp, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.ki, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.kd, &ind);
-	buffer_append_uint16(buffer, conf->app_balance_conf.hertz, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.fault_pitch, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.fault_roll, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.fault_duty, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.fault_adc1, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.fault_adc2, &ind);
-	buffer_append_uint16(buffer, conf->app_balance_conf.fault_delay_pitch, &ind);
-	buffer_append_uint16(buffer, conf->app_balance_conf.fault_delay_roll, &ind);
-	buffer_append_uint16(buffer, conf->app_balance_conf.fault_delay_duty, &ind);
-	buffer_append_uint16(buffer, conf->app_balance_conf.fault_delay_switch_half, &ind);
-	buffer_append_uint16(buffer, conf->app_balance_conf.fault_delay_switch_full, &ind);
-	buffer_append_uint16(buffer, conf->app_balance_conf.fault_adc_half_erpm, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.tiltback_angle, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.tiltback_speed, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.tiltback_duty, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.tiltback_high_voltage, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.tiltback_low_voltage, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.tiltback_constant, &ind);
-	buffer_append_uint16(buffer, conf->app_balance_conf.tiltback_constant_erpm, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.startup_pitch_tolerance, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.startup_roll_tolerance, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.startup_speed, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.deadzone, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.current_boost, &ind);
-	buffer[ind++] = conf->app_balance_conf.multi_esc;
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.yaw_kp, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.yaw_ki, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.yaw_kd, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.roll_steer_kp, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.roll_steer_erpm_kp, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.brake_current, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.yaw_current_clamp, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.setpoint_pitch_filter, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.setpoint_target_filter, &ind);
-	buffer_append_float32_auto(buffer, conf->app_balance_conf.setpoint_filter_clamp, &ind);
-	buffer_append_uint16(buffer, conf->app_balance_conf.kd_pt1_frequency, &ind);
-	buffer[ind++] = conf->app_pas_conf.ctrl_type;
-	buffer[ind++] = conf->app_pas_conf.sensor_type;
-	buffer_append_float16(buffer, conf->app_pas_conf.current_scaling, 1000, &ind);
-	buffer_append_float16(buffer, conf->app_pas_conf.pedal_rpm_start, 10, &ind);
-	buffer_append_float16(buffer, conf->app_pas_conf.pedal_rpm_end, 10, &ind);
-	buffer[ind++] = conf->app_pas_conf.invert_pedal_direction;
-	buffer_append_uint16(buffer, conf->app_pas_conf.magnets, &ind);
-	buffer[ind++] = conf->app_pas_conf.use_filter;
-	buffer_append_float16(buffer, conf->app_pas_conf.ramp_time_pos, 100, &ind);
-	buffer_append_float16(buffer, conf->app_pas_conf.ramp_time_neg, 100, &ind);
-	buffer_append_uint16(buffer, conf->app_pas_conf.update_rate_hz, &ind);
-	buffer[ind++] = conf->imu_conf.type;
-	buffer[ind++] = conf->imu_conf.mode;
-	buffer_append_uint16(buffer, conf->imu_conf.sample_rate_hz, &ind);
-	buffer_append_float32_auto(buffer, conf->imu_conf.accel_confidence_decay, &ind);
-	buffer_append_float32_auto(buffer, conf->imu_conf.mahony_kp, &ind);
-	buffer_append_float32_auto(buffer, conf->imu_conf.mahony_ki, &ind);
-	buffer_append_float32_auto(buffer, conf->imu_conf.madgwick_beta, &ind);
-	buffer_append_float32_auto(buffer, conf->imu_conf.rot_roll, &ind);
-	buffer_append_float32_auto(buffer, conf->imu_conf.rot_pitch, &ind);
-	buffer_append_float32_auto(buffer, conf->imu_conf.rot_yaw, &ind);
-	buffer_append_float32_auto(buffer, conf->imu_conf.accel_offsets[0], &ind);
-	buffer_append_float32_auto(buffer, conf->imu_conf.accel_offsets[1], &ind);
-	buffer_append_float32_auto(buffer, conf->imu_conf.accel_offsets[2], &ind);
-	buffer_append_float32_auto(buffer, conf->imu_conf.gyro_offsets[0], &ind);
-	buffer_append_float32_auto(buffer, conf->imu_conf.gyro_offsets[1], &ind);
-	buffer_append_float32_auto(buffer, conf->imu_conf.gyro_offsets[2], &ind);
-	buffer_append_float32_auto(buffer, conf->imu_conf.gyro_offset_comp_fact[0], &ind);
-	buffer_append_float32_auto(buffer, conf->imu_conf.gyro_offset_comp_fact[1], &ind);
-	buffer_append_float32_auto(buffer, conf->imu_conf.gyro_offset_comp_fact[2], &ind);
-	buffer_append_float32_auto(buffer, conf->imu_conf.gyro_offset_comp_clamp, &ind);
+
+	memset(&buffer[ind],0,225);
+	ind+=225;
+
+//	buffer[ind++] = conf->app_nrf_conf.speed;
+//	buffer[ind++] = conf->app_nrf_conf.power;
+//	buffer[ind++] = conf->app_nrf_conf.crc_type;
+//	buffer[ind++] = conf->app_nrf_conf.retry_delay;
+//	buffer[ind++] = (uint8_t)conf->app_nrf_conf.retries;
+//	buffer[ind++] = (uint8_t)conf->app_nrf_conf.channel;
+//	buffer[ind++] = (uint8_t)conf->app_nrf_conf.address[0];
+//	buffer[ind++] = (uint8_t)conf->app_nrf_conf.address[1];
+//	buffer[ind++] = (uint8_t)conf->app_nrf_conf.address[2];
+//	buffer[ind++] = conf->app_nrf_conf.send_crc_ack;
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.kp, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.ki, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.kd, &ind);  12
+//	buffer_append_uint16(buffer, conf->app_balance_conf.hertz, &ind); 14
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.fault_pitch, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.fault_roll, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.fault_duty, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.fault_adc1, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.fault_adc2, &ind); 34
+//	buffer_append_uint16(buffer, conf->app_balance_conf.fault_delay_pitch, &ind); 36
+//	buffer_append_uint16(buffer, conf->app_balance_conf.fault_delay_roll, &ind);
+//	buffer_append_uint16(buffer, conf->app_balance_conf.fault_delay_duty, &ind); 40
+//	buffer_append_uint16(buffer, conf->app_balance_conf.fault_delay_switch_half, &ind);
+//	buffer_append_uint16(buffer, conf->app_balance_conf.fault_delay_switch_full, &ind);
+//	buffer_append_uint16(buffer, conf->app_balance_conf.fault_adc_half_erpm, &ind); 46
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.tiltback_angle, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.tiltback_speed, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.tiltback_duty, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.tiltback_high_voltage, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.tiltback_low_voltage, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.tiltback_constant, &ind); 70
+//	buffer_append_uint16(buffer, conf->app_balance_conf.tiltback_constant_erpm, &ind); 72
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.startup_pitch_tolerance, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.startup_roll_tolerance, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.startup_speed, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.deadzone, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.current_boost, &ind); 92
+//	buffer[ind++] = conf->app_balance_conf.multi_esc; 93
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.yaw_kp, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.yaw_ki, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.yaw_kd, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.roll_steer_kp, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.roll_steer_erpm_kp, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.brake_current, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.yaw_current_clamp, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.setpoint_pitch_filter, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.setpoint_target_filter, &ind);
+//	buffer_append_float32_auto(buffer, conf->app_balance_conf.setpoint_filter_clamp, &ind); 133
+//	buffer_append_uint16(buffer, conf->app_balance_conf.kd_pt1_frequency, &ind); 135
+//	buffer[ind++] = conf->app_pas_conf.ctrl_type;
+//	buffer[ind++] = conf->app_pas_conf.sensor_type; 137
+//	buffer_append_float16(buffer, conf->app_pas_conf.current_scaling, 1000, &ind); 139
+//	buffer_append_float16(buffer, conf->app_pas_conf.pedal_rpm_start, 10, &ind);
+//	buffer_append_float16(buffer, conf->app_pas_conf.pedal_rpm_end, 10, &ind); 143
+//	buffer[ind++] = conf->app_pas_conf.invert_pedal_direction; 144
+//	buffer_append_uint16(buffer, conf->app_pas_conf.magnets, &ind); 146
+//	buffer[ind++] = conf->app_pas_conf.use_filter; 147
+//	buffer_append_float16(buffer, conf->app_pas_conf.ramp_time_pos, 100, &ind); 149
+//	buffer_append_float16(buffer, conf->app_pas_conf.ramp_time_neg, 100, &ind); 151
+//	buffer_append_uint16(buffer, conf->app_pas_conf.update_rate_hz, &ind); 153
+//	buffer[ind++] = conf->imu_conf.type; 154
+//	buffer[ind++] = conf->imu_conf.mode; 155
+//	buffer_append_uint16(buffer, conf->imu_conf.sample_rate_hz, &ind); 157
+//	buffer_append_float32_auto(buffer, conf->imu_conf.accel_confidence_decay, &ind);
+//	buffer_append_float32_auto(buffer, conf->imu_conf.mahony_kp, &ind);
+//	buffer_append_float32_auto(buffer, conf->imu_conf.mahony_ki, &ind);
+//	buffer_append_float32_auto(buffer, conf->imu_conf.madgwick_beta, &ind);
+//	buffer_append_float32_auto(buffer, conf->imu_conf.rot_roll, &ind);
+//	buffer_append_float32_auto(buffer, conf->imu_conf.rot_pitch, &ind);
+//	buffer_append_float32_auto(buffer, conf->imu_conf.rot_yaw, &ind);
+//	buffer_append_float32_auto(buffer, conf->imu_conf.accel_offsets[0], &ind);
+//	buffer_append_float32_auto(buffer, conf->imu_conf.accel_offsets[1], &ind);
+//	buffer_append_float32_auto(buffer, conf->imu_conf.accel_offsets[2], &ind);
+//	buffer_append_float32_auto(buffer, conf->imu_conf.gyro_offsets[0], &ind);
+//	buffer_append_float32_auto(buffer, conf->imu_conf.gyro_offsets[1], &ind);
+//	buffer_append_float32_auto(buffer, conf->imu_conf.gyro_offsets[2], &ind);
+//	buffer_append_float32_auto(buffer, conf->imu_conf.gyro_offset_comp_fact[0], &ind);
+//	buffer_append_float32_auto(buffer, conf->imu_conf.gyro_offset_comp_fact[1], &ind);
+//	buffer_append_float32_auto(buffer, conf->imu_conf.gyro_offset_comp_fact[2], &ind);
+//	buffer_append_float32_auto(buffer, conf->imu_conf.gyro_offset_comp_clamp, &ind); 225
 
 	return ind;
 }
@@ -591,25 +601,26 @@ bool confgenerator_deserialize_appconf(const uint8_t *buffer, app_configuration 
 	conf->uavcan_esc_index = buffer[ind++];
 	conf->uavcan_raw_mode = buffer[ind++];
 	conf->app_to_use = buffer[ind++];
-	conf->app_ppm_conf.ctrl_type = buffer[ind++];
-	conf->app_ppm_conf.pid_max_erpm = buffer_get_float32_auto(buffer, &ind);
-	conf->app_ppm_conf.hyst = buffer_get_float32_auto(buffer, &ind);
-	conf->app_ppm_conf.pulse_start = buffer_get_float32_auto(buffer, &ind);
-	conf->app_ppm_conf.pulse_end = buffer_get_float32_auto(buffer, &ind);
-	conf->app_ppm_conf.pulse_center = buffer_get_float32_auto(buffer, &ind);
-	conf->app_ppm_conf.median_filter = buffer[ind++];
-	conf->app_ppm_conf.safe_start = buffer[ind++];
-	conf->app_ppm_conf.throttle_exp = buffer_get_float32_auto(buffer, &ind);
-	conf->app_ppm_conf.throttle_exp_brake = buffer_get_float32_auto(buffer, &ind);
-	conf->app_ppm_conf.throttle_exp_mode = buffer[ind++];
-	conf->app_ppm_conf.ramp_time_pos = buffer_get_float32_auto(buffer, &ind);
-	conf->app_ppm_conf.ramp_time_neg = buffer_get_float32_auto(buffer, &ind);
-	conf->app_ppm_conf.multi_esc = buffer[ind++];
-	conf->app_ppm_conf.tc = buffer[ind++];
-	conf->app_ppm_conf.tc_max_diff = buffer_get_float32_auto(buffer, &ind);
-	conf->app_ppm_conf.max_erpm_for_dir = buffer_get_float32_auto(buffer, &ind);
-	conf->app_ppm_conf.smart_rev_max_duty = buffer_get_float32_auto(buffer, &ind);
-	conf->app_ppm_conf.smart_rev_ramp_time = buffer_get_float32_auto(buffer, &ind);
+	ind+=58;
+//	conf->app_ppm_conf.ctrl_type = buffer[ind++];
+//	conf->app_ppm_conf.pid_max_erpm = buffer_get_float32_auto(buffer, &ind);
+//	conf->app_ppm_conf.hyst = buffer_get_float32_auto(buffer, &ind);
+//	conf->app_ppm_conf.pulse_start = buffer_get_float32_auto(buffer, &ind);
+//	conf->app_ppm_conf.pulse_end = buffer_get_float32_auto(buffer, &ind);
+//	conf->app_ppm_conf.pulse_center = buffer_get_float32_auto(buffer, &ind);
+//	conf->app_ppm_conf.median_filter = buffer[ind++];
+//	conf->app_ppm_conf.safe_start = buffer[ind++];
+//	conf->app_ppm_conf.throttle_exp = buffer_get_float32_auto(buffer, &ind);
+//	conf->app_ppm_conf.throttle_exp_brake = buffer_get_float32_auto(buffer, &ind);
+//	conf->app_ppm_conf.throttle_exp_mode = buffer[ind++];
+//	conf->app_ppm_conf.ramp_time_pos = buffer_get_float32_auto(buffer, &ind);
+//	conf->app_ppm_conf.ramp_time_neg = buffer_get_float32_auto(buffer, &ind);
+//	conf->app_ppm_conf.multi_esc = buffer[ind++];
+//	conf->app_ppm_conf.tc = buffer[ind++];
+//	conf->app_ppm_conf.tc_max_diff = buffer_get_float32_auto(buffer, &ind);
+//	conf->app_ppm_conf.max_erpm_for_dir = buffer_get_float32_auto(buffer, &ind);
+//	conf->app_ppm_conf.smart_rev_max_duty = buffer_get_float32_auto(buffer, &ind);
+//	conf->app_ppm_conf.smart_rev_ramp_time = buffer_get_float32_auto(buffer, &ind);
 	conf->app_adc_conf.ctrl_type = buffer[ind++];
 	conf->app_adc_conf.hyst = buffer_get_float32_auto(buffer, &ind);
 	conf->app_adc_conf.voltage_start = buffer_get_float32_auto(buffer, &ind);
@@ -647,6 +658,9 @@ bool confgenerator_deserialize_appconf(const uint8_t *buffer, app_configuration 
 	conf->app_chuk_conf.use_smart_rev = buffer[ind++];
 	conf->app_chuk_conf.smart_rev_max_duty = buffer_get_float32_auto(buffer, &ind);
 	conf->app_chuk_conf.smart_rev_ramp_time = buffer_get_float32_auto(buffer, &ind);
+
+	ind+=225;
+	/*
 	conf->app_nrf_conf.speed = buffer[ind++];
 	conf->app_nrf_conf.power = buffer[ind++];
 	conf->app_nrf_conf.crc_type = buffer[ind++];
@@ -726,7 +740,7 @@ bool confgenerator_deserialize_appconf(const uint8_t *buffer, app_configuration 
 	conf->imu_conf.gyro_offset_comp_fact[0] = buffer_get_float32_auto(buffer, &ind);
 	conf->imu_conf.gyro_offset_comp_fact[1] = buffer_get_float32_auto(buffer, &ind);
 	conf->imu_conf.gyro_offset_comp_fact[2] = buffer_get_float32_auto(buffer, &ind);
-	conf->imu_conf.gyro_offset_comp_clamp = buffer_get_float32_auto(buffer, &ind);
+	conf->imu_conf.gyro_offset_comp_clamp = buffer_get_float32_auto(buffer, &ind);*/
 
 	return true;
 }
@@ -909,7 +923,7 @@ void confgenerator_set_defaults_appconf(app_configuration *conf) {
 	//conf->can_mode = APPCONF_CAN_MODE;
 	//conf->uavcan_esc_index = APPCONF_UAVCAN_ESC_INDEX;
 	//conf->uavcan_raw_mode = APPCONF_UAVCAN_RAW_MODE;
-	conf->app_to_use = APP_UART;
+	conf->app_to_use = APP_ADC;
 	//conf->app_ppm_conf.ctrl_type = APPCONF_PPM_CTRL_TYPE;
 	//conf->app_ppm_conf.pid_max_erpm = APPCONF_PPM_PID_MAX_ERPM;
 	//conf->app_ppm_conf.hyst = APPCONF_PPM_HYST;
@@ -929,37 +943,37 @@ void confgenerator_set_defaults_appconf(app_configuration *conf) {
 	//conf->app_ppm_conf.max_erpm_for_dir = APPCONF_PPM_MAX_ERPM_FOR_DIR;
 	//conf->app_ppm_conf.smart_rev_max_duty = APPCONF_PPM_SMART_REV_MAX_DUTY;
 	//conf->app_ppm_conf.smart_rev_ramp_time = APPCONF_PPM_SMART_REV_RAMP_TIME;
-	//conf->app_adc_conf.ctrl_type = APPCONF_ADC_CTRL_TYPE;
-	//conf->app_adc_conf.hyst = APPCONF_ADC_HYST;
-	//conf->app_adc_conf.voltage_start = APPCONF_ADC_VOLTAGE_START;
-	//conf->app_adc_conf.voltage_end = APPCONF_ADC_VOLTAGE_END;
-	//conf->app_adc_conf.voltage_center = APPCONF_ADC_VOLTAGE_CENTER;
-	//conf->app_adc_conf.voltage2_start = APPCONF_ADC_VOLTAGE2_START;
-	//conf->app_adc_conf.voltage2_end = APPCONF_ADC_VOLTAGE2_END;
-	//conf->app_adc_conf.use_filter = APPCONF_ADC_USE_FILTER;
-	//conf->app_adc_conf.safe_start = APPCONF_ADC_SAFE_START;
+	conf->app_adc_conf.ctrl_type = APPCONF_ADC_CTRL_TYPE;
+	conf->app_adc_conf.hyst = APPCONF_ADC_HYST;
+	conf->app_adc_conf.voltage_start = APPCONF_ADC_VOLTAGE_START;
+	conf->app_adc_conf.voltage_end = APPCONF_ADC_VOLTAGE_END;
+	conf->app_adc_conf.voltage_center = APPCONF_ADC_VOLTAGE_CENTER;
+	conf->app_adc_conf.voltage2_start = APPCONF_ADC_VOLTAGE2_START;
+	conf->app_adc_conf.voltage2_end = APPCONF_ADC_VOLTAGE2_END;
+	conf->app_adc_conf.use_filter = APPCONF_ADC_USE_FILTER;
+	conf->app_adc_conf.safe_start = APPCONF_ADC_SAFE_START;
 	//conf->app_adc_conf.cc_button_inverted = APPCONF_ADC_CC_BUTTON_INVERTED;
 	//conf->app_adc_conf.rev_button_inverted = APPCONF_ADC_REV_BUTTON_INVERTED;
 	//conf->app_adc_conf.voltage_inverted = APPCONF_ADC_VOLTAGE_INVERTED;
 	//conf->app_adc_conf.voltage2_inverted = APPCONF_ADC_VOLTAGE2_INVERTED;
-	//conf->app_adc_conf.throttle_exp = APPCONF_ADC_THROTTLE_EXP;
-	//conf->app_adc_conf.throttle_exp_brake = APPCONF_ADC_THROTTLE_EXP_BRAKE;
-	//conf->app_adc_conf.throttle_exp_mode = APPCONF_ADC_THROTTLE_EXP_MODE;
-	//conf->app_adc_conf.ramp_time_pos = APPCONF_ADC_RAMP_TIME_POS;
-	//conf->app_adc_conf.ramp_time_neg = APPCONF_ADC_RAMP_TIME_NEG;
+	conf->app_adc_conf.throttle_exp = APPCONF_ADC_THROTTLE_EXP;
+	conf->app_adc_conf.throttle_exp_brake = APPCONF_ADC_THROTTLE_EXP_BRAKE;
+	conf->app_adc_conf.throttle_exp_mode = APPCONF_ADC_THROTTLE_EXP_MODE;
+	conf->app_adc_conf.ramp_time_pos = APPCONF_ADC_RAMP_TIME_POS;
+	conf->app_adc_conf.ramp_time_neg = APPCONF_ADC_RAMP_TIME_NEG;
 	//conf->app_adc_conf.multi_esc = APPCONF_ADC_MULTI_ESC;
 	//conf->app_adc_conf.tc = APPCONF_ADC_TC;
 	//conf->app_adc_conf.tc_max_diff = APPCONF_ADC_TC_MAX_DIFF;
-	//conf->app_adc_conf.update_rate_hz = APPCONF_ADC_UPDATE_RATE_HZ;
+	conf->app_adc_conf.update_rate_hz = APPCONF_ADC_UPDATE_RATE_HZ;
 	conf->app_uart_baudrate = 115200;
-	//conf->app_chuk_conf.ctrl_type = APPCONF_CHUK_CTRL_TYPE;
-	//conf->app_chuk_conf.hyst = APPCONF_CHUK_HYST;
+	conf->app_chuk_conf.ctrl_type = APPCONF_CHUK_CTRL_TYPE;
+	conf->app_chuk_conf.hyst = APPCONF_CHUK_HYST;
 	//conf->app_chuk_conf.ramp_time_pos = APPCONF_CHUK_RAMP_TIME_POS;
 	//conf->app_chuk_conf.ramp_time_neg = APPCONF_CHUK_RAMP_TIME_NEG;
 	//conf->app_chuk_conf.stick_erpm_per_s_in_cc = APPCONF_STICK_ERPM_PER_S_IN_CC;
-	//conf->app_chuk_conf.throttle_exp = APPCONF_CHUK_THROTTLE_EXP;
-	//conf->app_chuk_conf.throttle_exp_brake = APPCONF_CHUK_THROTTLE_EXP_BRAKE;
-	//conf->app_chuk_conf.throttle_exp_mode = APPCONF_CHUK_THROTTLE_EXP_MODE;
+	conf->app_chuk_conf.throttle_exp = APPCONF_CHUK_THROTTLE_EXP;
+	conf->app_chuk_conf.throttle_exp_brake = APPCONF_CHUK_THROTTLE_EXP_BRAKE;
+	conf->app_chuk_conf.throttle_exp_mode = APPCONF_CHUK_THROTTLE_EXP_MODE;
 	//conf->app_chuk_conf.multi_esc = APPCONF_CHUK_MULTI_ESC;
 	//conf->app_chuk_conf.tc = APPCONF_CHUK_TC;
 	//conf->app_chuk_conf.tc_max_diff = APPCONF_CHUK_TC_MAX_DIFF;

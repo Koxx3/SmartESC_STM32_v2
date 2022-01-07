@@ -18,6 +18,9 @@
 static float tacho_scale;
 stm_state VescToSTM_mode;
 
+float adc_1;
+float adc_2;
+
 #define DIR_MUL   (mc_conf.m_invert_direction ? -1 : 1)
 
 int32_t current_to_torque(int32_t curr_ma){
@@ -140,6 +143,18 @@ uint8_t VescToSTM_get_uid(uint8_t * ptr, uint8_t size){
 	return size;
 }
 
+float VescToSTM_get_ADC1(){
+	return adc_1;
+}
+void VescToSTM_set_ADC1(float val){
+	adc_1 = val;
+}
+float VescToSTM_get_ADC2(){
+	return adc_2;
+}
+void VescToSTM_set_ADC2(float val){
+	adc_2 = val;
+}
 
 float VescToSTM_get_pid_pos_now(){
 	return 360.0 / 65536.0 * (float)SpeednTorqCtrlM1.SPD->hElAngle;
@@ -263,10 +278,9 @@ void VescToSTM_set_brake(int32_t current){
 }
 
 
-void VescToSTM_set_speed(int32_t rpm){
-	rpm *= DIR_MUL;
+void VescToSTM_set_speed(int32_t erpm){
+	erpm *= DIR_MUL;
 	VescToSTM_mode = STM_STATE_SPEED;
-	int32_t erpm = rpm * mc_conf.si_motor_poles;
 	if(erpm>0){
 		if(erpm < mc_conf.s_pid_min_erpm) erpm = mc_conf.s_pid_min_erpm;
 		if(erpm > mc_conf.lo_max_erpm) erpm = mc_conf.lo_max_erpm;
@@ -275,7 +289,7 @@ void VescToSTM_set_speed(int32_t rpm){
 		if(erpm < mc_conf.lo_min_erpm) erpm = mc_conf.lo_min_erpm;
 	}
 	VescToSTM_set_open_loop(false, 0, 0);
-	if(rpm>=0){
+	if(erpm>=0){
 		FW_M1.wNominalSqCurr = SpeednTorqCtrlM1.MaxPositiveTorque*SpeednTorqCtrlM1.MaxPositiveTorque;
 		FW_M1.hDemagCurrent	= -((float)SpeednTorqCtrlM1.MaxPositiveTorque*mc_conf.foc_d_gain_scale_max_mod);
 		SpeednTorqCtrlM1.PISpeed->wUpperIntegralLimit = (int32_t)SpeednTorqCtrlM1.MaxPositiveTorque * SP_KIDIV;
@@ -636,5 +650,8 @@ void VescToSTM_set_current_rel_int(int32_t val) {
 
 mc_fault_code VescToSTM_get_fault(void) {
 	mc_fault_code fault = FAULT_CODE_NONE;
+
+
+
 	return fault;
 }

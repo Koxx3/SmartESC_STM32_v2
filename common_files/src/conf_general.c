@@ -193,6 +193,8 @@ bool conf_general_write_flash(uint8_t page, uint8_t * data, uint16_t size){
  */
 bool conf_general_store_app_configuration(app_configuration *conf) {
 	bool is_ok = true;
+	VescToSTM_stop_motor();
+	vTaskDelay(300);
 
 	conf->crc = app_calc_crc(conf);
 
@@ -200,6 +202,8 @@ bool conf_general_store_app_configuration(app_configuration *conf) {
 	is_ok = conf_general_write_flash(APP_PAGE, (uint8_t*)conf, sizeof(app_configuration));
 
 	vTaskDelay(500);
+	MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
+	VescToSTM_start_motor();
 
 	return is_ok;
 }

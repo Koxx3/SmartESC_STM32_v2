@@ -139,7 +139,7 @@ void task_PWR(void *argument) {
 
 			  } break ;
 			  case DOUBLE_PRESS : {
-				  float kmh=0;
+				  uint32_t kmh=0;
 				  switch(m365_to_display.mode){
 				  	case M365_MODE_DRIVE:
 				  		  m365_to_display.mode = M365_MODE_SPORT;
@@ -147,14 +147,18 @@ void task_PWR(void *argument) {
 				  		  break;
 				  	case M365_MODE_SPORT:
 						  m365_to_display.mode = M365_MODE_SLOW;
-						  kmh = 5;
+						  kmh = 1337;
 						  break;
 				  	case M365_MODE_SLOW:
 						  m365_to_display.mode = M365_MODE_DRIVE;
 						  kmh = 10;
 						  break;
 				  }
-				  mc_conf.lo_max_erpm = ((kmh * 1000.0 / 60.0)/(mc_conf.si_wheel_diameter*M_PI)) * mc_conf.si_motor_poles * mc_conf.si_gear_ratio;
+				  if(kmh==1337){
+					  mc_conf.lo_max_erpm = mc_conf.l_max_erpm;
+				  }else{
+					  mc_conf.lo_max_erpm = (((float)kmh * 1000.0 / 60.0)/(mc_conf.si_wheel_diameter*M_PI)) * mc_conf.si_motor_poles * mc_conf.si_gear_ratio;
+				  }
 				  MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(mc_conf.lo_max_erpm), 0);
 			  } break ;
 		 }

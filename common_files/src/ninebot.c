@@ -53,7 +53,7 @@ uint8_t ninebot_parse(uint8_t data , NinebotPack *message){
 		message->addr = data;
 		break;
 	case NIN_CMD:
-		cnt++;
+		cnt=0;
 		state = NIN_ARG;
 		checksum=checksum + data;
 		message->cmd = data;
@@ -67,6 +67,7 @@ uint8_t ninebot_parse(uint8_t data , NinebotPack *message){
 	case NIN_DATA:
 		cnt++;
 		checksum=checksum + data;
+		message->payload[cnt-2] = data;
 		if(cnt == (message->len)){
 			state = NIN_CRC;
 			cnt=0;

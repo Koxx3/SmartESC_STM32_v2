@@ -782,7 +782,7 @@ typedef struct {
 	app_use app_to_use;
 
 	// PPM application settings
-	ppm_config app_ppm_conf;
+	//ppm_config app_ppm_conf;
 
 	// ADC application settings
 	adc_config app_adc_conf;
@@ -794,16 +794,16 @@ typedef struct {
 	chuk_config app_chuk_conf;
 
 	// NRF application settings
-	nrf_config app_nrf_conf;
+	//nrf_config app_nrf_conf;
 
 	// Balance application settings
-	balance_config app_balance_conf;
+	//balance_config app_balance_conf;
 
 	// Pedal Assist application settings
-	pas_config app_pas_conf;
+	//pas_config app_pas_conf;
 
 	// IMU Settings
-	imu_config imu_conf;
+	//imu_config imu_conf;
 
 	// Protect from flash corruption
 	uint16_t crc;
