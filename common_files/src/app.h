@@ -31,4 +31,5 @@ void task_app_kill();
 void my_uart_send_data(unsigned char *buf, unsigned int len, port_str * port);
 float app_adc_get_decoded_level(void);
 float app_adc_get_decoded_level2(void);
+void app_adc_stop_output(void);
 #endif /* APP_H_ */

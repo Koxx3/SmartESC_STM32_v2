@@ -228,6 +228,14 @@ float app_adc_get_decoded_level2(void) {
 }
 
 TimerHandle_t xTimer;
+
+void app_adc_stop_output(void) {
+	if(xTimer!=NULL){
+		xTimerStop(xTimer, 2000);
+	}
+}
+
+
 void task_app(void * argument)
 {
 	uint32_t rd_ptr=0;
@@ -243,7 +251,7 @@ void task_app(void * argument)
 	if(xTimer==NULL){
 		xTimer = xTimerCreate("ADC_UP",MS_TO_TICKS(20) , pdTRUE, ( void * ) 0,vTimerCallback );
 	}
-	xTimerStart(xTimer, 0);
+	xTimerStart(xTimer, 100);
 
 	uint16_t slow_update_cnt=0;
   /* Infinite loop */
@@ -260,6 +268,10 @@ void task_app(void * argument)
 					case 0x65:
 						adc1 = frame.payload[1];
 						adc2 = frame.payload[2];
+						VescToSTM_timeout_reset();
+						if(xTimerIsTimerActive(xTimer)==pdFALSE){
+							xTimerStart(xTimer, 100);
+						}
 						//commands_printf(main_uart.phandle, "LEN: %d CMD: %x ARG: %x PAY: %02x %02x %02x %02x", frame.len, frame.cmd, frame.arg, frame.payload[0], frame.payload[1], frame.payload[2], frame.payload[3]);
 						//commands_printf(main_uart.phandle, "Cycles: %d", cyg);
 					break;

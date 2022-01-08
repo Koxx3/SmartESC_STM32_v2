@@ -14,6 +14,7 @@
 #include "product.h"
 #include "current_sense.h"
 #include <math.h>
+#include "app.h"
 
 static float tacho_scale;
 stm_state VescToSTM_mode;
@@ -172,6 +173,7 @@ void VescToSTM_handle_timeout(){
 	if(appconf.timeout_msec){
 		if((xTaskGetTickCount() - last_reset) > (appconf.timeout_msec*2)){
 			VescToSTM_set_brake(appconf.timeout_brake_current*1000);
+			app_adc_stop_output();
 			last_reset = xTaskGetTickCount();
 		}
 	}
