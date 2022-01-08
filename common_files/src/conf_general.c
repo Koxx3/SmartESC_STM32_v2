@@ -325,7 +325,17 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	TempSensorParamsM1.hT0                     = T0_C;
 
 	RealBusVoltageSensorParamsM1.UnderVoltageThreshold = mcconf->l_min_vin * BATTERY_VOLTAGE_GAIN;
+	if(mcconf->l_min_vin == 0.0){
+		RealBusVoltageSensorParamsM1.DisableUnderVoltage = 1;
+	}else{
+		RealBusVoltageSensorParamsM1.DisableUnderVoltage = 0;
+	}
 	RealBusVoltageSensorParamsM1.OverVoltageThreshold = mcconf->l_max_vin * BATTERY_VOLTAGE_GAIN;
+	if(mcconf->l_max_vin == 0.0){
+		RealBusVoltageSensorParamsM1.DisableOverVoltage = 1;
+	}else{
+		RealBusVoltageSensorParamsM1.DisableOverVoltage = 0;
+	}
 
 	//save fixed_point vars;
 	mcconf->si_wheel_diameter_s16q16 = float_to_s16q16(mcconf->si_wheel_diameter);

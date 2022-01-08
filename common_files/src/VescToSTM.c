@@ -651,9 +651,21 @@ void VescToSTM_set_current_rel_int(int32_t val) {
 }
 
 mc_fault_code VescToSTM_get_fault(void) {
-	mc_fault_code fault = FAULT_CODE_NONE;
+	switch(pMCI[M1]->pSTM->hFaultOccurred){
+	case MC_NO_ERROR:
+		return FAULT_CODE_NONE;
+		break;
+	case MC_OVER_TEMP:
+		return FAULT_CODE_OVER_TEMP_FET;
+		break;
+	case MC_OVER_VOLT:
+		return FAULT_CODE_OVER_VOLTAGE;
+		break;
+	case MC_UNDER_VOLT:
+		return FAULT_CODE_UNDER_VOLTAGE;
+		break;
+	default:
+		return FAULT_CODE_NONE;
+	}
 
-
-
-	return fault;
 }
