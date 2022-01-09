@@ -2,11 +2,22 @@ This is an alternative firmware for Xiaomi M365 and Ninebot G30 controller.
 
 ![image](https://user-images.githubusercontent.com/11454444/148704200-e28ee13e-c91b-4aac-8dbf-6021095749a5.png)
 
+Avantage over other Xiaomi custom firmwares :
+- you can put any motor since it can detect all motor parameters and optimize them
+- you can use any battery, even 20s (with hardware modifications), change the voltage divider and set the new value in the controller
+- you can change the shunts values and set the new value in the controller
+- you can setup the controller very easily with VESCTool and make a lot of performance/stability tests
+- you can use the controller with any other device, event without any display
+- soon, we hope to support multiple linked controller
+
+Cons :
+- you loose the ability to monitor M365 BMS for now (work in progress), but don't worry, you still have the voltage ;)
+
 It can interface :
 - the stock M365/G30 display
 - VESCTool through VESC interface on the BMS UART (full duplex UART).
 
-Nota : this firmware is in beta. You'll loose the ability to monitor M365 BMS.
+Nota : this firmware is in beta. 
 
 You'll be able to setup and control the controller/motor from VESCTool interface with a simple USB/Serial adapter.
 With any small arduino, use analog acceleration/brake throttles to control any electic moving device like escooter, gokart, electric skateboard without using the stock display.
