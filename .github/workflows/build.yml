@@ -34,7 +34,7 @@ jobs:
       uses: docker://wsbu/stm32cubeide:latest
       with:
         entrypoint: /opt/stm32cubeide/stm32cubeide
-        args: --launcher.suppressErrors -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild -build all -importAll /github/workspace/
+        args: --launcher.suppressErrors -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild -build m365/Debug -importAll /github/workspace/
     
     - name: 'Upload Artifact M365'
       uses: actions/upload-artifact@v2
