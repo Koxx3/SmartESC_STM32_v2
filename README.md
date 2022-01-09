@@ -16,9 +16,9 @@ For an easier build, you need `git` and `docker`.
 ## Build on Linux
 Launch from terminal:
 
-`bash -c "./docker_build_m365.sh"`
+`chmod +x docker_build*; ./docker_build_m365.sh`
 
-`bash -c "./docker_build_g30.sh"`
+`chmod +x docker_build*; ./docker_build_g30.sh`
 
 ## Build on Windows
 Double click :
