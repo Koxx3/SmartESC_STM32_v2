@@ -14,14 +14,18 @@ For an easier build, you need `git` and `docker`.
 `git clone https://github.com/Koxx3/SmartESC_STM32_v2.git`
 
 ## Build on Linux
-`./docker_build_m365.sh`
+Launch from terminal:
 
-`./docker_build_g30.sh`
+`bash -c "./docker_build_m365.sh"`
+
+`bash -c "./docker_build_g30.sh"`
 
 ## Build on Windows
-`docker_build_m365.bat`
+Double click :
 
-`docker_build_g30.bat`
+`docker_build_m365.sh`
+
+`docker_build_g30.sh`
 
 
 # Programming
