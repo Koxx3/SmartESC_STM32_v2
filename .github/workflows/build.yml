@@ -36,22 +36,29 @@ jobs:
         entrypoint: /opt/stm32cubeide/stm32cubeide
         args: --launcher.suppressErrors -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild -build m365/Debug -importAll /github/workspace/
     
-    - name: 'Upload Artifact M365'
+    - name: 'Upload Artifact M365 - with build number'
       uses: actions/upload-artifact@v2
       with:
         path: ${{ github.workspace }}/m365/STM32CubeIDE/Debug/m365.bin
         name: ${{ github.run_number }}
         retention-days: 5
 
-    - name: 'Build G30'
-      uses: docker://wsbu/stm32cubeide:latest
-      with:
-        entrypoint: /opt/stm32cubeide/stm32cubeide
-        args: --launcher.suppressErrors -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild -build g30/Debug -importAll /github/workspace/
-
-    - name: 'Upload Artifact G30'
+    - name: 'Upload Artifact M365 - as latest'
       uses: actions/upload-artifact@v2
       with:
-        path: ${{ github.workspace }}/g30/STM32CubeIDE/Debug/g30.bin
-        name: ${{ github.run_number }}
-        retention-days: 5
+        path: ${{ github.workspace }}/m365/STM32CubeIDE/Debug/m365.bin
+        name: latest
+        retention-days: 365
+
+#    - name: 'Build G30'
+#      uses: docker://wsbu/stm32cubeide:latest
+#      with:
+#        entrypoint: /opt/stm32cubeide/stm32cubeide
+#        args: --launcher.suppressErrors -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild -build g30/Debug -importAll /github/workspace/
+#
+#    - name: 'Upload Artifact G30'
+#      uses: actions/upload-artifact@v2
+#      with:
+#        path: ${{ github.workspace }}/g30/STM32CubeIDE/Debug/g30.bin
+#        name: ${{ github.run_number }}
+#        retention-days: 5
