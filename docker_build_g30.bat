@@ -1,0 +1,1 @@
+docker run -v %cd%:/project wsbu/stm32cubeide /opt/stm32cubeide/stm32cubeide --launcher.suppressErrors -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild -build g30/Debug -importAll /project/
