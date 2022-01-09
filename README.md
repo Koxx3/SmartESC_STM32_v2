@@ -13,7 +13,6 @@ Last build status : [![Release on tag](https://github.com/Koxx3/SmartESC_STM32_v
 Download the latest build for M365 : [![Package Control total downloads](https://img.shields.io/github/downloads/Koxx3/SmartESC_STM32_v2/total.svg)](https://github.com/Koxx3/SmartESC_STM32_v2/releases/latest/download/m365.bin)
 
 
-
 If you want to build it manually, for an easier build, you need `git` and `docker`.
 
 ## Clone the project
