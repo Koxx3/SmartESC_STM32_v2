@@ -1,10 +1,16 @@
 This is an alternative firmware for Xiaomi M365 and Ninebot G30 controller.
 
-It uses VESC interface to communication throught BMS UART (full duplex UART).
+![image](https://user-images.githubusercontent.com/11454444/148704200-e28ee13e-c91b-4aac-8dbf-6021095749a5.png)
 
-Nota : this firmware is in beta. It's not meant to be used with native M365 display for now, and you'll loose the ability to monitor M365 BMS.
+It can interface :
+- the stock M365/G30 display
+- VESCTool through VESC interface on the BMS UART (full duplex UART).
 
-You'll be able to setup and control the controller/motor from VESCTool interface with a simple USB/Serial adapter and, with any small arduino, use analog acceleration/brake throttles to control a moving device like escooter, gokart, electric skateboard.
+Nota : this firmware is in beta. You'll loose the ability to monitor M365 BMS.
+
+You'll be able to setup and control the controller/motor from VESCTool interface with a simple USB/Serial adapter.
+With any small arduino, use analog acceleration/brake throttles to control any electic moving device like escooter, gokart, electric skateboard without using the stock display.
+
 
 # Download 
 
