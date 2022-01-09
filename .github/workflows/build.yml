@@ -33,9 +33,10 @@ jobs:
     - name: build
       uses: docker://wsbu/stm32cubeide:latest
       with:
-        entrypoint: /opt/stm32cubeide/stm32cubeide --launcher.suppressErrors -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild -build m365/Debug -importAll /github/workspace/
+        entrypoint: /opt/stm32cubeide/stm32cubeide
         args: version    
-      
+# --launcher.suppressErrors -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild -build m365/Debug -importAll /github/workspace/
+
     - uses: actions/setup-python@v2
       with:
         python-version: '3.x' # Version range or exact version of a Python version to use, using SemVer's version range syntax
