@@ -12,6 +12,7 @@ Avantage over other Xiaomi custom firmwares :
 
 Cons :
 - you loose the ability to monitor M365 BMS for now (work in progress), but don't worry, you still have the voltage ;)
+- you loose the ability to update firmwares through bluetooth
 
 It can interface :
 - the stock M365/G30 display
