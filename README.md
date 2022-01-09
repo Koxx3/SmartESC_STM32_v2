@@ -6,12 +6,14 @@ Nota : this firmware is in beta. It's not meant to be used with native M365 disp
 
 You'll be able to setup and control the controller/motor from VESCTool interface with a simple USB/Serial adapter and, with any small arduino, use analog acceleration/brake throttles to control a moving device like escooter, gokart, electric skateboard.
 
-# Build
-
-Last automatic build status : [![Build on commit](https://github.com/Koxx3/SmartESC_STM32_v2/actions/workflows/build_on_commit.yml/badge.svg)](https://github.com/Koxx3/SmartESC_STM32_v2/actions/workflows/build_on_commit.yml)
+# Download 
 
 Download the latest build for M365 : [![Package Control total downloads](https://img.shields.io/github/downloads/Koxx3/SmartESC_STM32_v2/total.svg)](https://github.com/Koxx3/SmartESC_STM32_v2/releases/latest/download/m365.bin)
 
+
+# Build
+
+Last automatic build status : [![Build on commit](https://github.com/Koxx3/SmartESC_STM32_v2/actions/workflows/build_on_commit.yml/badge.svg)](https://github.com/Koxx3/SmartESC_STM32_v2/actions/workflows/build_on_commit.yml)
 
 If you want to build it manually, for an easier build, you need `git` and `docker`.
 
