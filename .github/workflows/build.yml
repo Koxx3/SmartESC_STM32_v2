@@ -34,18 +34,18 @@ jobs:
       uses: docker://wsbu/stm32cubeide:latest
       with:
         entrypoint: /opt/stm32cubeide/stm32cubeide
-        args: --launcher.suppressErrors -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild -build m365/Debug -importAll /github/workspace/
-
-    - uses: actions/setup-python@v2
-      with:
-        python-version: '3.x' # Version range or exact version of a Python version to use, using SemVer's version range syntax
-        architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
-        
-    - run: python tools/xiaotea/Scripts/prepareZip_online.py      
+        args: --launcher.suppressErrors -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild -build all -importAll /github/workspace/
     
-    - name: 'Upload Artifact'
+    - name: 'Upload Artifact M365'
       uses: actions/upload-artifact@v2
       with:
-        path: ${{ github.workspace }}/tools/zip_output
+        path: ${{ github.workspace }}/m365/STM32CubeIDE/Debug/m365.bin
+        name: ${{ github.run_number }}
+        retention-days: 5
+
+    - name: 'Upload Artifact G30'
+      uses: actions/upload-artifact@v2
+      with:
+        path: ${{ github.workspace }}/g30/STM32CubeIDE/Debug/g30.bin
         name: ${{ github.run_number }}
         retention-days: 5
