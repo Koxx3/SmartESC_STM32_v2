@@ -8,6 +8,8 @@ You'll be able to setup and control the controller/motor from VESCTool interface
 
 # Build
 
+[![CI](https://github.com/Koxx3/SmartESC_STM32_v2/actions/workflows/build.yml/badge.svg)](https://github.com/Koxx3/SmartESC_STM32_v2/actions/workflows/build.yml)
+
 For an easier build, you need `git` and `docker`.
 
 ## Clone the project
