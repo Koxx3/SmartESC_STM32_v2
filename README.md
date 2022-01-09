@@ -1,6 +1,10 @@
-This is an alternative firmware for Xiaomi M365 and Ninebot G30 controller.
+# SmartESC
+
+SmartESC (aka SESC) is an alternative firmware for Xiaomi M365 and Ninebot G30 controller.
 
 ![image](https://user-images.githubusercontent.com/11454444/148704200-e28ee13e-c91b-4aac-8dbf-6021095749a5.png)
+
+# Overview
 
 Avantage over other Xiaomi custom firmwares :
 - you can put any motor since it can detect all motor parameters and optimize them
