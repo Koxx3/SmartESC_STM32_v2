@@ -6,6 +6,22 @@ Nota : this firmware is in beta. It's not meant to be used with native M365 disp
 
 You'll be able to setup and control the controller/motor from VESCTool interface with a simple USB/Serial adapter and, with any small arduino, use analog acceleration/brake throttles to control a moving device like escooter, gokart, electric skateboard.
 
+# Build
+
+For an easier build, you need `git` and `docker`.
+
+## Clone the project
+`git clone https://github.com/Koxx3/SmartESC_STM32_v2.git`
+
+## Build on Linux
+`docker_build_m365.sh`
+`docker_build_g30.sh`
+
+## Build on Windows
+`docker_build_m365.bat`
+`docker_build_g30.bat`
+
+
 # Programming
 
 You need a ST-Link device to reprogram the M365/G3O controller.
