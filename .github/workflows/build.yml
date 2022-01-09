@@ -20,29 +20,29 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    
     - name: log untrusted output
       run: |
-
         # disable command workflow processing
         echo "::stop-commands::`echo -n ${{ github.token }} | sha256sum | head -c 64`"
-
         # log untrusted output
         echo "untrusted output"
-
         # enable workflow command processing
         echo "::`echo -n ${{ github.token }} | sha256sum | head -c 64`::"
-    - name: arm-none-eabi-gcc
-      uses: fiam/arm-none-eabi-gcc@v1.0.2
+        
+    - name: build
+      uses: docker://wsbu/stm32cubeide:latest
       with:
-        release: '9-2020-q2'
-    - name: make
-      run: make
+        entrypoint: /opt/stm32cubeide/stm32cubeide --launcher.suppressErrors -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild -build m365/Debug -importAll /github/workspace/
+        args: version    
       
     - uses: actions/setup-python@v2
       with:
         python-version: '3.x' # Version range or exact version of a Python version to use, using SemVer's version range syntax
         architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
+        
     - run: python tools/xiaotea/Scripts/prepareZip_online.py      
+    
     - name: 'Upload Artifact'
       uses: actions/upload-artifact@v2
       with:
