@@ -41,14 +41,7 @@ jobs:
       with:
         path: ${{ github.workspace }}/m365/STM32CubeIDE/Debug/m365.bin
         name: ${{ github.run_number }}
-        retention-days: 5
-
-    - name: 'Upload Artifact M365 - as latest'
-      uses: actions/upload-artifact@v2
-      with:
-        path: ${{ github.workspace }}/m365/STM32CubeIDE/Debug/m365.bin
-        name: latest
-        retention-days: 365
+        retention-days: 90
 
 #    - name: 'Build G30'
 #      uses: docker://wsbu/stm32cubeide:latest
