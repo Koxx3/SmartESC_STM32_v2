@@ -118,6 +118,8 @@ Can read it in "VESC Terminal" (or others Serial Terminal)
 - 40 = MC_BREAK_IN    (Emergency input (Over current))
 - 80 = MC_SW_ERROR
 
-# Command available in Terminal :
+# Command available in VESCTool terminal
 
+- help (see all available commands)
 - foc_openloop [current] [erpm]  (Exemple : foc_openloop 10 500)
+- ... (lot of other commands)
