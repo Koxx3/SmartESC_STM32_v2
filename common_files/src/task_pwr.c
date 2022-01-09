@@ -143,15 +143,15 @@ void task_PWR(void *argument) {
 				  switch(m365_to_display.mode){
 				  	case M365_MODE_DRIVE:
 				  		  m365_to_display.mode = M365_MODE_SPORT;
-				  		  kmh = 25;
+				  		  kmh = 1337;
 				  		  break;
 				  	case M365_MODE_SPORT:
 						  m365_to_display.mode = M365_MODE_SLOW;
-						  kmh = 1337;
+						  kmh = 5;
 						  break;
 				  	case M365_MODE_SLOW:
 						  m365_to_display.mode = M365_MODE_DRIVE;
-						  kmh = 10;
+						  kmh = 25;
 						  break;
 				  }
 				  if(kmh==1337){

@@ -84,7 +84,7 @@
 #define VESC_TOOL_ENABLE													 1
 #define AUTO_RESET_FAULT													 1
 #define ERROR_PRINTING														 0
-#define MUSIC_ENABLE														 1
+#define MUSIC_ENABLE														 0
 #define BATTERY_SUPPORT_LIION												 1
 #define BATTERY_SUPPORT_LIFEPO												 1
 #define BATTERY_SUPPORT_LEAD												 1

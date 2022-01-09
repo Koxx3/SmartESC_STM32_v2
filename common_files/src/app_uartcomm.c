@@ -80,6 +80,7 @@ static float decoded_level2 = 0.0;
 volatile uint32_t cyg;
 
 void vTimerCallback( TimerHandle_t xTimer ){
+	if(SpeednTorqCtrlM1.SPD->open_loop==true) return;
 	uint32_t temp1 = frame.payload[1];
 	uint32_t temp2 = frame.payload[2];
 	temp1 <<= 4;
@@ -188,7 +189,7 @@ void vTimerCallback( TimerHandle_t xTimer ){
 		break;
 
 	case ADC_CTRL_TYPE_CURRENT_NOREV_BRAKE_CENTER:
-		if(pwr>0){
+		if(pwr>=0){
 			VescToSTM_set_current_rel(pwr);
 		}else{
 			VescToSTM_set_brake_current_rel(pwr);
@@ -197,7 +198,7 @@ void vTimerCallback( TimerHandle_t xTimer ){
 	case ADC_CTRL_TYPE_CURRENT_NOREV_BRAKE_ADC:
 		if(brake>0){
 			VescToSTM_set_brake_current_rel(brake);
-		}else if(pwr>0){
+		}else if(pwr>=0){
 			VescToSTM_set_current_rel(pwr);
 		}
 
