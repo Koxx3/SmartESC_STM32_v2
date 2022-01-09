@@ -132,6 +132,15 @@ void VescToSTM_ramp_current(float current){ //in Amps
 	}
 }
 
+void VescToSTM_set_current(float current){ //in Amps
+	current*=1000;
+	qd_t currComp;
+	currComp.q = 0;
+	currComp.d = 0;
+	currComp.q = current_to_torque(current);
+	MCI_SetCurrentReferences(pMCI[M1],currComp);
+}
+
 void VescToSTM_set_open_loop_rpm(int16_t erpm){
 	SpeednTorqCtrlM1.SPD->open_speed = erpm_to_int16(erpm);
 }

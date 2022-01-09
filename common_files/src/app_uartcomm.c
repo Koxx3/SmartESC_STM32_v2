@@ -36,7 +36,6 @@
 
 NinebotPack frame;
 
-//static uint8_t	ui8_tx_buffer[] = {0x55, 0xAA, 0x08, 0x21, 0x64, 0x00, 0x01, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 const uint8_t m365_mode[3] = { M365_MODE_SLOW, M365_MODE_DRIVE, M365_MODE_SPORT};
 
@@ -46,7 +45,6 @@ m365Answer m365_to_display = {.start1=NinebotHeader0, .start2=NinebotHeader1, .l
 uint8_t app_connection_timout = 8;
 
 TaskHandle_t task_app_handle;
-bool kill;
 
 void my_uart_send_data(unsigned char *buf, unsigned int len, port_str * port){
 	if(port->half_duplex){

@@ -1068,7 +1068,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					uint8_t hall_tab[8];
 					uint8_t send_buffer[PACKET_SIZE(50)];
 					uint8_t * buffer = send_buffer + PACKET_HEADER;
-					bool res = tune_mcpwm_foc_hall_detect(buffer_get_int32(data, &ind), hall_tab);
+					bool res = tune_mcpwm_foc_hall_detect((float)buffer_get_int32(data, &ind)/1000.0, hall_tab);
 					ind=0;
 					buffer[ind++] = COMM_DETECT_HALL_FOC;
 					memcpy(buffer + ind, hall_tab, 8);
