@@ -8,7 +8,7 @@ You'll be able to setup and control the controller/motor from VESCTool interface
 
 # Build
 
-Last build status : [![Release on tag](https://github.com/Koxx3/SmartESC_STM32_v2/actions/workflows/release_on_tag.yml/badge.svg)](https://github.com/Koxx3/SmartESC_STM32_v2/actions/workflows/release_on_tag.yml)
+Last automatic build status : [![Build on commit](https://github.com/Koxx3/SmartESC_STM32_v2/actions/workflows/build_on_commit.yml/badge.svg)](https://github.com/Koxx3/SmartESC_STM32_v2/actions/workflows/build_on_commit.yml)
 
 Download the latest build for M365 : [![Package Control total downloads](https://img.shields.io/github/downloads/Koxx3/SmartESC_STM32_v2/total.svg)](https://github.com/Koxx3/SmartESC_STM32_v2/releases/latest/download/m365.bin)
 
