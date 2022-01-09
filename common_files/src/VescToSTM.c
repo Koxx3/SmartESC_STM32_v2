@@ -64,7 +64,7 @@ int32_t VescToSTM_erpm_to_speed(int32_t erpm){
 }
 
 static int16_t erpm_to_int16(int32_t erpm){
-	int32_t speed = VescToSTM_rpm_to_speed(erpm);
+	int32_t speed = VescToSTM_erpm_to_speed(erpm);
 	int32_t out = ((int32_t)HALL_M1._Super.DPPConvFactor * speed) / ((int32_t) SPEED_UNIT * (int32_t)HALL_M1._Super.hMeasurementFrequency);
 	return out;
 }
