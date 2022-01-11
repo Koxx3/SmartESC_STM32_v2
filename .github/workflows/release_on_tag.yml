@@ -60,7 +60,7 @@ jobs:
     - name: Send telegram message on push
       uses: appleboy/telegram-action@master
       with:
-        to: '-612989906'
+        to: '-782703197'
         token: '5007329855:AAHiUVukDA9tSdbxDbaQtvxP6oYFuRNf5os'
         message: |
           New release available : ${{ github.ref }}
