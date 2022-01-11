@@ -28,11 +28,10 @@ enum{
 };
 
 
-uint8_t ninebot_parse(uint8_t data , NinebotPack *message){
+uint16_t ninebot_parse(uint8_t data , NinebotPack *message){
 	static uint8_t state = NIN_IDLE;
 	static uint8_t cnt = 0;
 	static uint16_t checksum=0;
-
 	switch (state){
 	case NIN_IDLE:
 		if(data==NinebotHeader0) state = NIN_HEAD;
@@ -42,7 +41,8 @@ uint8_t ninebot_parse(uint8_t data , NinebotPack *message){
 		if(data==NinebotHeader1) state = NIN_LEN;
 		break;
 	case NIN_LEN:
-		message->len = data-2;
+		message->len = data-1;
+		checksum=0;
 		checksum=checksum + data;
 		state = NIN_ADDR;
 		break;
@@ -67,18 +67,21 @@ uint8_t ninebot_parse(uint8_t data , NinebotPack *message){
 	case NIN_DATA:
 		cnt++;
 		checksum=checksum + data;
-		message->payload[cnt-2] = data;
+		if((cnt-2) < NinebotMaxPayload){
+			message->payload[cnt-2] = data;
+		}
 		if(cnt == (message->len)){
 			state = NIN_CRC;
 			cnt=0;
 		}
 		break;
 	case NIN_CRC:
-		checksum=checksum + data;
+		//checksum=checksum + data;
 		message->CheckSum[cnt] = data;
 		if(cnt==1){
+			checksum ^= 0xFFFF;
 			state = NIN_IDLE;
-			return 0;
+			return checksum - ((message->CheckSum[1]<<8) + message->CheckSum[0]);
 		}
 		cnt++;
 		break;

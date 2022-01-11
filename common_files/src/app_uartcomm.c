@@ -77,10 +77,11 @@ static float decoded_level2 = 0.0;
 
 volatile uint32_t cyg;
 
+
 void vTimerCallback( TimerHandle_t xTimer ){
 	if(SpeednTorqCtrlM1.SPD->open_loop==true) return;
-	uint32_t temp1 = frame.payload[1];
-	uint32_t temp2 = frame.payload[2];
+	uint32_t temp1 = adc1;
+	uint32_t temp2 = adc2;
 	temp1 <<= 4;
 	temp2 <<= 4;
 	static uint16_t aver1=0;
@@ -258,7 +259,7 @@ void task_app(void * argument)
 	{
 		while(rd_ptr != uart_get_write_pos(port)) {
 			if(ninebot_parse(usart_rx_dma_buffer[rd_ptr] ,&frame)	==0){
-
+				//commands_printf(main_uart.phandle, "LEN: %d CMD: %x ARG: %x PAY: %02x %02x %02x %02x", frame.len, frame.cmd, frame.arg, frame.payload[0], frame.payload[1], frame.payload[2], frame.payload[3]);
 				switch(frame.cmd){
 					case 0x64:
 						addCRC((uint8_t*)&m365_to_display, m365_to_display.len+6);
@@ -274,6 +275,9 @@ void task_app(void * argument)
 						//commands_printf(main_uart.phandle, "LEN: %d CMD: %x ARG: %x PAY: %02x %02x %02x %02x", frame.len, frame.cmd, frame.arg, frame.payload[0], frame.payload[1], frame.payload[2], frame.payload[3]);
 						//commands_printf(main_uart.phandle, "Cycles: %d", cyg);
 					break;
+//					default:
+//						commands_printf(main_uart.phandle, "LEN: %d CMD: %x ARG: %x PAY: %02x %02x %02x %02x", frame.len, frame.cmd, frame.arg, frame.payload[0], frame.payload[1], frame.payload[2], frame.payload[3]);
+//						break;
 				}
 			}
 			rd_ptr++;
@@ -284,6 +288,7 @@ void task_app(void * argument)
 			m365_to_display.speed = VescToSTM_get_speed()*3.6;
 			m365_to_display.battery = utils_map(VescToSTM_get_battery_level(0), 0, 1, 0, 96);
 			m365_to_display.beep=0;
+			//m365_to_display.faultcode +=1;
 
 		}else{
 			slow_update_cnt++;

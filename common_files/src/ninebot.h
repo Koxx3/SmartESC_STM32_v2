@@ -75,7 +75,7 @@ typedef struct {
 	uint8_t light;		//8
 	uint8_t beep;		//9
 	uint8_t speed;		//10
-	uint8_t data11;		//11
+	uint8_t faultcode;//11
     uint8_t CheckSum[2];//12-13
 } m365Answer;
 
@@ -83,4 +83,4 @@ typedef struct {
 void addCRC(uint8_t * message, uint8_t size);
 
 
-uint8_t ninebot_parse(uint8_t data, NinebotPack *message);
+uint16_t ninebot_parse(uint8_t data, NinebotPack *message);
