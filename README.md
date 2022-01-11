@@ -18,6 +18,7 @@ Cons :
 - you loose the ability to monitor M365 BMS for now (work in progress), but don't worry, you still have the voltage ;)
 - you loose the ability to update firmwares through bluetooth
 - for now, it needs hall sensors (no sensorless mode). [work in progress]
+
 It can interface :
 - the stock M365/G30 display
 - VESCTool through VESC interface on the BMS UART (full duplex UART).
