@@ -119,25 +119,26 @@ void VescToSTM_set_open_loop(bool enabled, int16_t init_angle, int16_t erpm){
 	}
 }
 
-void VescToSTM_ramp_current(float current){ //in Amps
-	current*=1000;
+void VescToSTM_ramp_current(float iq, float id){ //in Amps
+	iq*=1000;
+	id*=1000;
 	qd_t currComp;
-	currComp.q = 0;
-	currComp.d = 0;
 	for (int i = 0;i < 1000;i++) {
-		currComp.q = current_to_torque((float)i * current / 1000.0);
+		currComp.q = current_to_torque((float)i * iq / 1000.0);
+		currComp.d = current_to_torque((float)i * id / 1000.0);
+
 		MCI_SetCurrentReferences(pMCI[M1],currComp);
 		vTaskDelay(MS_TO_TICKS(1));
 		VescToSTM_timeout_reset();
 	}
 }
 
-void VescToSTM_set_current(float current){ //in Amps
-	current*=1000;
+void VescToSTM_set_current(float iq, float id){ //in Amps
+	iq*=1000;
+	id*=1000;
 	qd_t currComp;
-	currComp.q = 0;
-	currComp.d = 0;
-	currComp.q = current_to_torque(current);
+	currComp.q = current_to_torque(iq);
+	currComp.d = current_to_torque(id);
 	MCI_SetCurrentReferences(pMCI[M1],currComp);
 }
 

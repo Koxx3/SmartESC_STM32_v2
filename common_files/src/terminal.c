@@ -81,7 +81,7 @@ void terminal_process_string(char *str, PACKET_STATE_t * phandle) {
 
 			if (current >= 0 && erpm_target >= 0) {
 				VescToSTM_set_open_loop(true, SpeednTorqCtrlM1.SPD->hElAngle, 0);
-				VescToSTM_ramp_current(current);
+				VescToSTM_ramp_current(current, 0);
 				uint32_t erpm=0;
 				while(erpm < erpm_target){
 					VescToSTM_set_open_loop_rpm(erpm);

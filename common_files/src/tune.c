@@ -37,7 +37,7 @@ bool tune_mcpwm_foc_hall_detect(float current, uint8_t *hall_table) {
 
 	// Lock the motor
 	VescToSTM_set_open_loop(true, 0, 0);
-	VescToSTM_ramp_current(current);
+	VescToSTM_ramp_current(0, current);
 
 	float sin_hall[8];
 	float cos_hall[8];
@@ -73,7 +73,7 @@ bool tune_mcpwm_foc_hall_detect(float current, uint8_t *hall_table) {
 	}
 
 
-	VescToSTM_set_current(0);
+	VescToSTM_set_current(0,0);
 	VescToSTM_set_open_loop(false, 0, 0);
 
 	int fails = 0;
@@ -121,7 +121,7 @@ float tune_foc_measure_resistance(float current, int samples) {
 	// Lock the motor
 	VescToSTM_set_open_loop(true, 0, 0);
 
-	VescToSTM_ramp_current(current);
+	VescToSTM_ramp_current(current,0);
 
 	// Wait for the current to rise and the motor to lock.
 	vTaskDelay(MS_TO_TICKS(200));
@@ -142,7 +142,7 @@ float tune_foc_measure_resistance(float current, int samples) {
 	float current_avg = sqrtf(SQ(fIq) + SQ(fId));
 	float voltage_avg = sqrtf(SQ(fVq) + SQ(fVd));
 
-	VescToSTM_set_current(0);
+	VescToSTM_set_current(0,0);
 	// UnLock the motor
 	VescToSTM_set_open_loop(false, 0, 0);
 
@@ -349,7 +349,7 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 	VescToSTM_set_open_loop(true, 0, 0);
 
 	// Start by locking the motor
-	VescToSTM_ramp_current(current);
+	VescToSTM_ramp_current(current,0);
 
 	float duty_still = 0;
 	float samples = 0;
