@@ -1,27 +1,61 @@
-This is an alternative firmware for Xiaomi M365 and Ninebot G30 controller.
+# SmartESC
 
-It uses VESC interface to communication throught BMS UART (full duplex UART).
+**SmartESC (aka SESC) is an alternative firmware for Xiaomi M365 and Ninebot G30 controller.**
 
-Nota : this firmware is in beta. It's not meant to be used with native M365 display for now, and you'll loose the ability to monitor M365 BMS.
+![image](https://user-images.githubusercontent.com/11454444/148704200-e28ee13e-c91b-4aac-8dbf-6021095749a5.png)
 
-You'll be able to setup and control the controller/motor from VESCTool interface with a simple USB/Serial adapter and, with any small arduino, use analog acceleration/brake throttles to control a moving device like escooter, gokart, electric skateboard.
+# Overview
+
+Avantage over other Xiaomi custom firmwares :
+- you can put any motor since it can detect all motor parameters and optimize them
+- you can use any battery, even 20s (with hardware modifications), change the voltage divider and set the new value in the controller
+- you can change the shunts values and set the new value in the controller
+- you can setup the controller very easily with VESCTool and make a lot of performance/stability tests
+- you can use the controller with any other device, event without any display
+- soon, we hope to support multiple linked controller
+
+Cons :
+- you loose the ability to monitor M365 BMS for now (work in progress), but don't worry, you still have the voltage ;)
+- you loose the ability to update firmwares through bluetooth
+- for now, it needs hall sensors (no sensorless mode). [work in progress]
+
+It can interface :
+- the stock M365/G30 display
+- VESCTool through VESC interface on the BMS UART (full duplex UART).
+
+Nota : this firmware is in beta. 
+
+You'll be able to setup and control the controller/motor from VESCTool interface with a simple USB/Serial adapter.
+With any small arduino, use analog acceleration/brake throttles to control any electic moving device like escooter, gokart, electric skateboard without using the stock display.
+
+
+# Download 
+
+Download the latest build for M365 : [![Package Control total downloads](https://img.shields.io/github/downloads/Koxx3/SmartESC_STM32_v2/total.svg)](https://github.com/Koxx3/SmartESC_STM32_v2/releases/latest/download/m365.bin)
+
 
 # Build
 
-For an easier build, you need `git` and `docker`.
+Last automatic build status : [![Build on commit](https://github.com/Koxx3/SmartESC_STM32_v2/actions/workflows/build_on_commit.yml/badge.svg)](https://github.com/Koxx3/SmartESC_STM32_v2/actions/workflows/build_on_commit.yml)
+
+If you want to build it manually, for an easier build, you need `git` and `docker`.
 
 ## Clone the project
 `git clone https://github.com/Koxx3/SmartESC_STM32_v2.git`
 
 ## Build on Linux
-`./docker_build_m365.sh`
+Launch from terminal:
 
-`./docker_build_g30.sh`
+`chmod +x docker_build*; ./docker_build_m365.sh`
+
+`chmod +x docker_build*; ./docker_build_g30.sh`
 
 ## Build on Windows
-`docker_build_m365.bat`
+Double click :
 
-`docker_build_g30.bat`
+`docker_build_m365.sh`
+
+`docker_build_g30.sh`
 
 
 # Programming
@@ -85,6 +119,8 @@ Can read it in "VESC Terminal" (or others Serial Terminal)
 - 40 = MC_BREAK_IN    (Emergency input (Over current))
 - 80 = MC_SW_ERROR
 
-# Command available in Terminal :
+# Command available in VESCTool terminal
 
+- help (see all available commands)
 - foc_openloop [current] [erpm]  (Exemple : foc_openloop 10 500)
+- ... (lot of other commands)
