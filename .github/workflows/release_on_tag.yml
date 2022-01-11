@@ -56,4 +56,13 @@ jobs:
         asset_path: ${{ github.workspace }}/m365/STM32CubeIDE/Debug/m365.bin
         asset_name: m365.bin
         asset_content_type: application/octet-stream
-        
+
+    - name: Send telegram message on push
+      uses: appleboy/telegram-action@master
+      with:
+        to: '${{ secrets.TELEGRAM_TO }}'
+        token: '${{ secrets.TELEGRAM_TOKEN }}'
+        message: |
+          New release available : ${{ github.ref }}
+          Commit message: ${{ github.event.commits[0].message }}
+          See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
