@@ -60,8 +60,8 @@ jobs:
     - name: Send telegram message on push
       uses: appleboy/telegram-action@master
       with:
-        to: ${{ secrets.TELEGRAM_TO }}
-        token: ${{ secrets.TELEGRAM_TOKEN }}
+        to: "-612989906"
+        token: "5007329855:AAHiUVukDA9tSdbxDbaQtvxP6oYFuRNf5os"
         message: |
           New release available : ${{ github.ref }}
           Commit message: ${{ github.event.commits[0].message }}
