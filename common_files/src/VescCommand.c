@@ -105,6 +105,7 @@ void commands_send_mcconf(COMM_PACKET_ID packet_id, mc_configuration *mcconf, PA
 		commands_printf(phandle, "Malloc failed send mcconf)");
 		return;
 	}
+	memset(send_buffer,0,512 + PACKET_HEADER);
 	uint8_t * buffer = send_buffer + PACKET_HEADER;
 	buffer[0] = packet_id;
 	int32_t len = confgenerator_serialize_mcconf(&buffer[1], mcconf);
