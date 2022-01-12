@@ -66,3 +66,4 @@ jobs:
           New release available : ${{ github.ref }}
           Commit message: ${{ github.event.commits[0].message }}
           See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
+          Download : https://github.com/Koxx3/SmartESC_STM32_v2/releases/latest/download/m365.bin
