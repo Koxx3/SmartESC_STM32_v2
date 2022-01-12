@@ -32,13 +32,14 @@
 #include "ninebot.h"
 #include "conf_general.h"
 #include "VescToSTM.h"
+#include "app.h"
 
 //Not a real Task... it's called from safety task. No delays allowed
 
 #define EXECUTION_SPEED		40			//every 40 ticks (20ms)
 
 extern m365Answer m365_to_display;
-extern const uint8_t m365_mode[3];
+//extern const uint8_t m365_mode[3];
 uint32_t shutdown_limit = 0;
 
 uint8_t buttonState() {
@@ -142,17 +143,17 @@ void task_PWR(void *argument) {
 				  uint32_t kmh=0;
 				  switch(m365_to_display.mode){
 				  	case M365_MODE_DRIVE:
-				  		  m365_to_display.mode = M365_MODE_SPORT;
-				  		  kmh = 1337;
-				  		  break;
+				  		app_adc_speed_mode(M365_MODE_SPORT);
+						kmh = 1337;
+						break;
 				  	case M365_MODE_SPORT:
-						  m365_to_display.mode = M365_MODE_SLOW;
-						  kmh = 5;
-						  break;
+				  		app_adc_speed_mode(M365_MODE_SLOW);
+						kmh = 5;
+						break;
 				  	case M365_MODE_SLOW:
-						  m365_to_display.mode = M365_MODE_DRIVE;
-						  kmh = 25;
-						  break;
+				  		app_adc_speed_mode(M365_MODE_DRIVE);
+						kmh = 25;
+						break;
 				  }
 				  if(kmh==1337){
 					  mc_conf.lo_max_erpm = mc_conf.l_max_erpm;

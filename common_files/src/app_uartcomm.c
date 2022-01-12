@@ -37,7 +37,7 @@
 NinebotPack frame;
 
 
-const uint8_t m365_mode[3] = { M365_MODE_SLOW, M365_MODE_DRIVE, M365_MODE_SPORT};
+//const uint8_t m365_mode[3] = { M365_MODE_SLOW, M365_MODE_DRIVE, M365_MODE_SPORT};
 
 m365Answer m365_to_display = {.start1=NinebotHeader0, .start2=NinebotHeader1, .len=8, .addr=0x21, .cmd=0x64, .arg=0, .mode=1};
 
@@ -235,6 +235,19 @@ void app_adc_stop_output(void) {
 	}
 }
 
+void app_adc_set_mode(uint8_t mode_bit){
+	m365_to_display.mode |= mode_bit;
+}
+
+void app_adc_clear_mode(uint8_t mode_bit){
+	m365_to_display.mode &= ~mode_bit;
+}
+
+void app_adc_speed_mode(uint8_t speed){
+	m365_to_display.mode &= 0xF8;
+	m365_to_display.mode |= speed;
+}
+
 
 void task_app(void * argument)
 {
@@ -273,11 +286,7 @@ void task_app(void * argument)
 							xTimerStart(xTimer, 100);
 						}
 						//commands_printf(main_uart.phandle, "LEN: %d CMD: %x ARG: %x PAY: %02x %02x %02x %02x", frame.len, frame.cmd, frame.arg, frame.payload[0], frame.payload[1], frame.payload[2], frame.payload[3]);
-						//commands_printf(main_uart.phandle, "Cycles: %d", cyg);
 					break;
-//					default:
-//						commands_printf(main_uart.phandle, "LEN: %d CMD: %x ARG: %x PAY: %02x %02x %02x %02x", frame.len, frame.cmd, frame.arg, frame.payload[0], frame.payload[1], frame.payload[2], frame.payload[3]);
-//						break;
 				}
 			}
 			rd_ptr++;
@@ -285,10 +294,15 @@ void task_app(void * argument)
 		}
 
 		if(slow_update_cnt==0){
-			m365_to_display.speed = VescToSTM_get_speed()*3.6;
+			if(m365_to_display.mode & 0x40){
+				m365_to_display.speed = VescToSTM_get_speed()*2.2369;
+			}else{
+				m365_to_display.speed = VescToSTM_get_speed()*3.6;
+
+			}
 			m365_to_display.battery = utils_map(VescToSTM_get_battery_level(0), 0, 1, 0, 96);
 			m365_to_display.beep=0;
-			//m365_to_display.faultcode +=1;
+			m365_to_display.faultcode=pMCI[M1]->pSTM->hFaultOccurred;
 
 		}else{
 			slow_update_cnt++;

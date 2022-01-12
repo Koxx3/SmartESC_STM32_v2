@@ -15,6 +15,7 @@
 #include "current_sense.h"
 #include <math.h>
 #include "app.h"
+#include "ninebot.h"
 
 static float tacho_scale;
 stm_state VescToSTM_mode;
@@ -34,9 +35,10 @@ int16_t VescToSTM_Iq_lim_hook(int16_t iq){
 	int32_t temp_fet_start = mc_conf.l_temp_fet_start;
 	int32_t temp = VescToSTM_get_temperature();
 	if(temp > temp_fet_start){
-		if(temp > temp_fet_start){
-			iq = utils_map_int(temp, temp_fet_start, mc_conf.l_temp_fet_end, iq, 0);
-		}
+		app_adc_set_mode(M365_MODE_TEMP);
+		iq = utils_map_int(temp, temp_fet_start, mc_conf.l_temp_fet_end, iq, 0);
+	}else{
+		app_adc_clear_mode(M365_MODE_TEMP);
 	}
 
 	return iq;

@@ -35,7 +35,6 @@ uint16_t ninebot_parse(uint8_t data , NinebotPack *message){
 	switch (state){
 	case NIN_IDLE:
 		if(data==NinebotHeader0) state = NIN_HEAD;
-		cnt =0;
 		break;
 	case NIN_HEAD:
 		if(data==NinebotHeader1) state = NIN_LEN;
@@ -76,7 +75,6 @@ uint16_t ninebot_parse(uint8_t data , NinebotPack *message){
 		}
 		break;
 	case NIN_CRC:
-		//checksum=checksum + data;
 		message->CheckSum[cnt] = data;
 		if(cnt==1){
 			checksum ^= 0xFFFF;

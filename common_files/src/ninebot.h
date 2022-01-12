@@ -58,10 +58,19 @@ ui8_tx_buffer[10]=MS->Speed;
 */
 
 enum m365_display_mode{
-	M365_MODE_SLOW=3,
 	M365_MODE_DRIVE=1,
+	M365_MODE_SLOW=2,
 	M365_MODE_SPORT=4,
+	M365_MODE_CHARGE=8,
+	M365_MODE_OFF=16,
+	M365_MODE_LOCK=32,
+	M365_MODE_MPH=64,
+	M365_MODE_TEMP=128
 };
+
+//0      	1      		2      		3      		4      		5      		6      		7
+//1		 	2			4	   		8	  		16	 		32			64	   		128
+//Drive		Slow	   	Sport		Charge 		Off	 		Lock		MPH   		Temp
 
 typedef struct {
 	uint8_t start1;  	//0

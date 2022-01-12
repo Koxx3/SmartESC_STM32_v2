@@ -87,10 +87,10 @@
 #define MCCONF_L_CURR_MAX_RPM_FBRAKE_CC	1500	// Maximum electrical RPM to use full brake at with current control
 #endif
 #ifndef MCCONF_L_LIM_TEMP_FET_START
-#define MCCONF_L_LIM_TEMP_FET_START		85.0	// MOSFET temperature where current limiting should begin
+#define MCCONF_L_LIM_TEMP_FET_START		65.0	// MOSFET temperature where current limiting should begin
 #endif
 #ifndef MCCONF_L_LIM_TEMP_FET_END
-#define MCCONF_L_LIM_TEMP_FET_END		100.0	// MOSFET temperature where everything should be shut off
+#define MCCONF_L_LIM_TEMP_FET_END		75.0	// MOSFET temperature where everything should be shut off
 #endif
 #ifndef MCCONF_L_LIM_TEMP_MOTOR_START
 #define MCCONF_L_LIM_TEMP_MOTOR_START	0.0	// MOTOR temperature where current limiting should begin

@@ -10,6 +10,7 @@
 #include "music.h"
 #include "stdlib.h"
 #include "VescToSTM.h"
+#include "ninebot.h"
 
 void terminal_top(PACKET_STATE_t * phandle){
     TaskStatus_t * taskStats;
@@ -44,7 +45,7 @@ void terminal_top(PACKET_STATE_t * phandle){
 #if MUSIC_ENABLE
 extern MUSIC_PARAM bldc_music;
 #endif
-
+extern m365Answer m365_to_display;
 void terminal_process_string(char *str, PACKET_STATE_t * phandle) {
 	enum { kMaxArgs = 16 };
 	int argc = 0;
@@ -96,6 +97,10 @@ void terminal_process_string(char *str, PACKET_STATE_t * phandle) {
 		} else {
 			commands_printf(phandle, "This command requires two arguments.\n");
 		}
+	}else if (strcmp(argv[0], "mode") == 0){
+
+		m365_to_display.mode = atoi(argv[1]);
+		commands_printf(phandle, "Mode %u", m365_to_display.mode);
 	}
 
 }
