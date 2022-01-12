@@ -58,7 +58,7 @@ jobs:
         asset_content_type: application/octet-stream
 
     - name: Send telegram message on push
-      uses: appleboy/telegram-action@master
+      uses: appleboy/telegram-action@0.0.3
       with:
         to: ${{ secrets.TELEGRAM_TO }}
         token: ${{ secrets.TELEGRAM_TOKEN }}
