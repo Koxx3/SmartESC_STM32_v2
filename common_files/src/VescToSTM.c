@@ -335,11 +335,11 @@ float VescToSTM_get_temperature2(){
 
 
 float VescToSTM_get_phase_current(){
-	int32_t wAux1 = FOCVars[M1].Iq_avg * FOCVars[M1].Iq_avg;
-	int32_t wAux2 = FOCVars[M1].Id_avg * FOCVars[M1].Id_avg;
+	int32_t wAux1 = FW_M1.AvAmpere_qd.q * FW_M1.AvAmpere_qd.q;
+	int32_t wAux2 = FW_M1.AvAmpere_qd.d * FW_M1.AvAmpere_qd.d;
 	wAux1 += wAux2;
 	wAux1 = MCM_Sqrt(wAux1);
-	wAux1 = wAux1 * SIGN(FOCVars[M1].Iq_avg);
+	wAux1 = wAux1 * SIGN(FW_M1.AvAmpere_qd.q);
 
 	return (float)wAux1 / CURRENT_FACTOR_A;
 }
@@ -362,7 +362,7 @@ float VescToSTM_get_input_current(){
  * The average D axis current.
  */
 float VescToSTM_get_id(){
-	return (float)FOCVars[M1].Id_avg / CURRENT_FACTOR_A;
+	return (float)FW_M1.AvAmpere_qd.d / CURRENT_FACTOR_A;
 }
 
 /**
@@ -372,7 +372,7 @@ float VescToSTM_get_id(){
  * The average Q axis current.
  */
 float VescToSTM_get_iq(){
-	return (float)FOCVars[M1].Iq_avg / CURRENT_FACTOR_A;
+	return (float)FW_M1.AvAmpere_qd.q / CURRENT_FACTOR_A;
 }
 
 /**
@@ -383,7 +383,7 @@ float VescToSTM_get_iq(){
  */
 float VescToSTM_get_Vd(){
 	float Vin = VescToSTM_get_bus_voltage();
-	float fVd = Vin / 65536.0 * (float)FOCVars[M1].Vd_avg;
+	float fVd = Vin / 65536.0 * (float)FW_M1.AvVolt_qd.d;
 	return fVd;
 }
 
@@ -395,7 +395,7 @@ float VescToSTM_get_Vd(){
  */
 float VescToSTM_get_Vq(){
 	float Vin = VescToSTM_get_bus_voltage();
-	float fVq = Vin / 65536.0 * (float)FOCVars[M1].Vq_avg;
+	float fVq = Vin / 65536.0 * (float)FW_M1.AvVolt_qd.q;
 	return fVq;
 }
 
@@ -608,11 +608,13 @@ float VescToSTM_get_battery_level(float *wh_left) {
 }
 
 float VescToSTM_get_duty_cycle_now(void) {
-	qd_t Vqd = 	MCI_GetVqd(pMCI[M1]);
-	if(mc_conf.m_invert_direction){
-	}
-	float amplitude = (MCI_GetPhaseVoltageAmplitude(pMCI[M1]) * SIGN(Vqd.q)) / 32768.0;
-	return amplitude;
+	int16_t u16Ampl = FW_M1.AvVoltAmpl * SIGN(FW_M1.AvVolt_qd.q);
+	return u16Ampl / 32768.0;
+}
+
+float VescToSTM_get_duty_cycle_now_fast(void) {
+	int32_t AvVoltAmpl = MCM_Sqrt(FW_M1.AvVolt_qd.d * FW_M1.AvVolt_qd.d + FW_M1.AvVolt_qd.q * FW_M1.AvVolt_qd.q)* SIGN(FW_M1.AvVolt_qd.q);
+	return AvVoltAmpl / 32768.0;
 }
 
 /**

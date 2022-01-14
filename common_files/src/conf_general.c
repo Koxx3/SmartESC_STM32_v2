@@ -252,6 +252,46 @@ void conf_general_update_current(mc_configuration *mcconf){
 //	SpeednTorqCtrlM1.MinNegativeTorque 			= current_min;
 }
 
+void conf_general_mcconf_hw_limits(mc_configuration *mcconf) {
+	utils_truncate_number(&mcconf->l_current_max_scale, 0.0, 1.0);
+	utils_truncate_number(&mcconf->l_current_min_scale, 0.0, 1.0);
+
+	// This limit should always be active, as starving the threads never
+	// makes sense.
+
+#ifndef DISABLE_HW_LIMITS
+#ifdef HW_LIM_CURRENT
+	utils_truncate_number(&mcconf->l_current_max, HW_LIM_CURRENT);
+	utils_truncate_number(&mcconf->l_current_min, HW_LIM_CURRENT);
+#endif
+#ifdef HW_LIM_CURRENT_IN
+	utils_truncate_number(&mcconf->l_in_current_max, HW_LIM_CURRENT_IN);
+	utils_truncate_number(&mcconf->l_in_current_min, HW_LIM_CURRENT);
+#endif
+#ifdef HW_LIM_CURRENT_ABS
+	utils_truncate_number(&mcconf->l_abs_current_max, HW_LIM_CURRENT_ABS);
+#endif
+#ifdef HW_LIM_VIN
+	utils_truncate_number(&mcconf->l_max_vin, HW_LIM_VIN);
+	utils_truncate_number(&mcconf->l_min_vin, HW_LIM_VIN);
+#endif
+#ifdef HW_LIM_ERPM
+	utils_truncate_number(&mcconf->l_max_erpm, HW_LIM_ERPM);
+	utils_truncate_number(&mcconf->l_min_erpm, HW_LIM_ERPM);
+#endif
+#ifdef HW_LIM_DUTY_MIN
+	utils_truncate_number(&mcconf->l_min_duty, HW_LIM_DUTY_MIN);
+#endif
+#ifdef HW_LIM_DUTY_MAX
+	utils_truncate_number(&mcconf->l_max_duty, HW_LIM_DUTY_MAX);
+#endif
+#ifdef HW_LIM_TEMP_FET
+	utils_truncate_number(&mcconf->l_temp_fet_start, HW_LIM_TEMP_FET);
+	utils_truncate_number(&mcconf->l_temp_fet_end, HW_LIM_TEMP_FET);
+#endif
+#endif
+}
+
 
 
 void conf_general_setup_mc(mc_configuration *mcconf) {
@@ -287,11 +327,21 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	PIDIqHandle_M1.hKiGain                = mcconf->foc_current_ki * (float)TF_KIDIV / (float)PWM_FREQUENCY;
 	PIDIqHandle_M1.hDefKpGain 			  = PIDIqHandle_M1.hKpGain;
 	PIDIqHandle_M1.hDefKiGain 			  = PIDIqHandle_M1.hKiGain;
+	PIDIqHandle_M1.hUpperOutputLimit	  = INT16_MAX * mcconf->l_max_duty;
+	PIDIqHandle_M1.hLowerOutputLimit	  = -PIDIqHandle_M1.hUpperOutputLimit;
+	PIDIqHandle_M1.wUpperIntegralLimit    = (int32_t)PIDIqHandle_M1.hUpperOutputLimit * TF_KIDIV,
+	PIDIqHandle_M1.wLowerIntegralLimit    = (int32_t)-PIDIqHandle_M1.hUpperOutputLimit * TF_KIDIV,
+	FOCVars[M1].min_duty				  = INT16_MAX *mcconf->l_min_duty;
+
 
 	PIDIdHandle_M1.hKpGain             	  = PIDIqHandle_M1.hKpGain; //Torque and flux has the same P gain
 	PIDIdHandle_M1.hKiGain                = PIDIqHandle_M1.hDefKiGain; //Torque and flux has the same I gain
 	PIDIdHandle_M1.hDefKpGain 			  = PIDIdHandle_M1.hKpGain;
 	PIDIdHandle_M1.hDefKiGain 			  = PIDIdHandle_M1.hKiGain;
+	PIDIdHandle_M1.hUpperOutputLimit	  = INT16_MAX * mcconf->l_max_duty;
+	PIDIdHandle_M1.hLowerOutputLimit	  = -PIDIdHandle_M1.hUpperOutputLimit;
+	PIDIdHandle_M1.wUpperIntegralLimit    = (int32_t)PIDIdHandle_M1.hUpperOutputLimit * TF_KIDIV,
+	PIDIdHandle_M1.wLowerIntegralLimit    = (int32_t)-PIDIdHandle_M1.hUpperOutputLimit * TF_KIDIV,
 
 	FW_M1.wNominalSqCurr 				  = current_max * current_max;
 	if(mcconf->foc_d_gain_scale_start < 0.5){

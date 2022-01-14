@@ -128,10 +128,10 @@ float tune_foc_measure_resistance(float current, int samples) {
 
 	// Sample
 
-	int32_t Vq = pMCI[M1]->pFOCVars->Vq_avg;
-	int32_t Vd = pMCI[M1]->pFOCVars->Vd_avg;
-	int32_t Iq = pMCI[M1]->pFOCVars->Iq_avg;
-	int32_t Id = pMCI[M1]->pFOCVars->Id_avg;
+	int32_t Vq = FW_M1.AvVolt_qd.q;
+	int32_t Vd = FW_M1.AvVolt_qd.d;
+	int32_t Iq = FW_M1.AvAmpere_qd.q;
+	int32_t Id = FW_M1.AvAmpere_qd.d;
 
 	float Vin = VescToSTM_get_bus_voltage();
 	float fVq = Vin / 32768.0 * (float)Vq;
@@ -354,7 +354,7 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 	float duty_still = 0;
 	float samples = 0;
 	for (int i = 0;i < 1000;i++) {
-		duty_still += fabsf(VescToSTM_get_duty_cycle_now());
+		duty_still += fabsf(VescToSTM_get_duty_cycle_now_fast());
 		samples += 1.0;
 		vTaskDelay(MS_TO_TICKS(1));
 	}
@@ -363,14 +363,14 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 	float duty_max = 0.0;
 	const int max_time = 15000;
 
-	while (fabsf(VescToSTM_get_duty_cycle_now()) < duty) {
+	while (fabsf(VescToSTM_get_duty_cycle_now_fast()) < duty) {
 		rpm_now += erpm_per_sec / 1000.0;
 		VescToSTM_set_open_loop_rpm(rpm_now);
 
 		vTaskDelay(MS_TO_TICKS(1));
 		cnt++;
 
-		float duty_now = fabsf(VescToSTM_get_duty_cycle_now());
+		float duty_now = fabsf(VescToSTM_get_duty_cycle_now_fast());
 
 		if (duty_now > duty_max) {
 			duty_max = duty_now;

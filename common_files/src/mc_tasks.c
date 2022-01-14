@@ -557,23 +557,23 @@ __weak void FOC_CalcCurrRef(uint8_t bMotor)
     }*/
 
     //Battery Curren limit -- START
-    int32_t batt_i = (int32_t)((int32_t)FOCVars[bMotor].Iqdref.q * (int32_t)FOCVars[bMotor].Vq_avg) / 32768;
+    int32_t batt_i = (int32_t)((int32_t)FOCVars[bMotor].Iqdref.q * (int32_t)FW_M1.AvVolt_qd.q) / 32768;
     batt_i = abs(batt_i);
     int16_t q_temp = FOCVars[bMotor].Iqdref.q;
 
     uint8_t regen = false;
-    if(FOCVars[bMotor].Iqdref.q > 0 && FOCVars[bMotor].Vq_avg <0){
+    if(FOCVars[bMotor].Iqdref.q > 0 && FW_M1.AvVolt_qd.q <0){
     	regen = true;
-    }else if(FOCVars[bMotor].Iqdref.q < 0 && FOCVars[bMotor].Vq_avg > 0){
+    }else if(FOCVars[bMotor].Iqdref.q < 0 && FW_M1.AvVolt_qd.q > 0){
     	regen = true;
     }
     if(regen){
     	if((-batt_i < FOCVars[bMotor].min_i_batt) ){
-    		q_temp = (int32_t)((int32_t)FOCVars[bMotor].min_i_batt * 32768) / (int32_t)FOCVars[bMotor].Vq_avg;
+    		q_temp = (int32_t)((int32_t)FOCVars[bMotor].min_i_batt * 32768) / (int32_t)FW_M1.AvVolt_qd.q;
     	}
     }else{
     	if((batt_i > FOCVars[bMotor].max_i_batt) ){
-    		q_temp = (int32_t)((int32_t)FOCVars[bMotor].max_i_batt * 32768) / (int32_t)FOCVars[bMotor].Vq_avg;
+    		q_temp = (int32_t)((int32_t)FOCVars[bMotor].max_i_batt * 32768) / (int32_t)FW_M1.AvVolt_qd.q;
     	}
     }
 
@@ -789,6 +789,9 @@ inline uint16_t FOC_CurrControllerM1(void)
 #endif
 
   Vqd.d = PI_Controller(pPIDId[M1], (int32_t)(FOCVars[M1].Iqdref.d) - Iqd.d);
+  //min duty limit
+  if(abs(Vqd.q) < FOCVars[M1].min_duty) Vqd.q = 0;
+  if(abs(Vqd.d) < FOCVars[M1].min_duty) Vqd.d = 0;
 
   Vqd = Circle_Limitation(pCLM[M1], Vqd);
   hElAngle += SPD_GetInstElSpeedDpp(speedHandle)*REV_PARK_ANGLE_COMPENSATION_FACTOR;
@@ -798,27 +801,9 @@ inline uint16_t FOC_CurrControllerM1(void)
   FOCVars[M1].Iab = Iab;
   FOCVars[M1].Ialphabeta = Ialphabeta;
   FOCVars[M1].Iqd = Iqd;
-  FOCVars[M1].Iq_sum += Iqd.q;
-  FOCVars[M1].Id_sum += Iqd.d;
-  FOCVars[M1].Vq_sum += Vqd.q;
-  FOCVars[M1].Vd_sum += Vqd.d;
-  if(FOCVars[M1].samples<512){
-	  FOCVars[M1].samples++;
-  }else{
-	  FOCVars[M1].Iq_avg = FOCVars[M1].Iq_sum / AVG_SAMPLES;
-	  FOCVars[M1].Iq_sum = 0;
-	  FOCVars[M1].Id_avg = FOCVars[M1].Id_sum / AVG_SAMPLES;
-	  FOCVars[M1].Id_sum = 0;
-	  FOCVars[M1].Vq_avg = FOCVars[M1].Vq_sum / AVG_SAMPLES;
-	  FOCVars[M1].Vq_sum = 0;
-	  FOCVars[M1].Vd_avg = FOCVars[M1].Vd_sum / AVG_SAMPLES;
-	  FOCVars[M1].Vd_sum = 0;
-	  FOCVars[M1].samples=0;
-  }
-
   FOCVars[M1].Valphabeta = Valphabeta;
   FOCVars[M1].hElAngle = hElAngle;
-  FW_DataProcess(pFW[M1], Vqd);
+  FW_DataProcess(pFW[M1], Vqd, Iqd);
   return(hCodeError);
 }
 

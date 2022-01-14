@@ -455,17 +455,8 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 
 				if (confgenerator_deserialize_mcconf(data, mcconf)) {
-					utils_truncate_number(&mcconf->l_current_max_scale , 0.0, 1.0);
-					utils_truncate_number(&mcconf->l_current_min_scale , 0.0, 1.0);
 
-
-					/*mcconf->lo_current_max = mcconf->l_current_max * mcconf->l_current_max_scale;
-					mcconf->lo_current_min = mcconf->l_current_min * mcconf->l_current_min_scale;
-					mcconf->lo_in_current_max = mcconf->l_in_current_max;
-					mcconf->lo_in_current_min = mcconf->l_in_current_min;
-					mcconf->lo_current_motor_max_now = mcconf->lo_current_max;
-					mcconf->lo_current_motor_min_now = mcconf->lo_current_min;*/
-
+					conf_general_mcconf_hw_limits(mcconf);
 					conf_general_setup_mc(mcconf);
 					conf_general_store_mc_configuration(mcconf, 0);
 

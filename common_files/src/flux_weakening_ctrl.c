@@ -39,10 +39,12 @@ __weak void FW_Clear( FW_Handle_t * pHandle )
   * @param  Vqd Voltage componets to be averaged.
   * @retval none
   */
-__weak void FW_DataProcess( FW_Handle_t * pHandle, qd_t Vqd )
+__weak void FW_DataProcess( FW_Handle_t * pHandle, qd_t Vqd, qd_t Iqd)
 {
 	  pHandle->AvVolt_qd.q = (Vqd.q + (pHandle->hVqdLowPassFilterBW - 1) * pHandle->AvVolt_qd.q) >> pHandle->hVqdLowPassFilterBWLOG;
 	  pHandle->AvVolt_qd.d = (Vqd.d + (pHandle->hVqdLowPassFilterBW - 1) * pHandle->AvVolt_qd.d) >> pHandle->hVqdLowPassFilterBWLOG;
+	  pHandle->AvAmpere_qd.q = (Iqd.q + (pHandle->hVqdLowPassFilterBW - 1) * pHandle->AvAmpere_qd.q) >> pHandle->hVqdLowPassFilterBWLOG;
+	  pHandle->AvAmpere_qd.d = (Iqd.d + (pHandle->hVqdLowPassFilterBW - 1) * pHandle->AvAmpere_qd.d) >> pHandle->hVqdLowPassFilterBWLOG;
 }
 
 /**

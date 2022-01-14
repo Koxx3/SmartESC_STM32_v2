@@ -75,6 +75,16 @@
 
 #define ADC_SAMPLE_MAX_LEN 													 1000
 
+// Setting limits
+#define HW_LIM_CURRENT			-70.0, 70.0
+#define HW_LIM_CURRENT_IN		-70.0, 70.0
+#define HW_LIM_CURRENT_ABS		0.0, 100.0
+#define HW_LIM_VIN				6.0, 57.0
+#define HW_LIM_ERPM				-40e3, 40e3
+#define HW_LIM_DUTY_MIN			0.0, 0.1
+#define HW_LIM_DUTY_MAX			0.0, 0.99
+#define HW_LIM_TEMP_FET			-40.0, 75.0
+
 
 
 #endif
@@ -105,16 +115,5 @@
 #define PRIO_BELOW_NORMAL 4
 #define PRIO_NORMAL  5
 #define PRIO_HIGHER  6
-
-
-// Setting limits
-#define HW_LIM_CURRENT			-120.0, 120.0
-#define HW_LIM_CURRENT_IN		-120.0, 120.0
-#define HW_LIM_CURRENT_ABS		0.0, 160.0
-#define HW_LIM_VIN				6.0, 57.0
-#define HW_LIM_ERPM				-200e3, 200e3
-#define HW_LIM_DUTY_MIN			0.0, 0.1
-#define HW_LIM_DUTY_MAX			0.0, 0.99
-#define HW_LIM_TEMP_FET			-40.0, 110.0
 
 #endif /* APP_PRODUCT_H_ */

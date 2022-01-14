@@ -60,6 +60,7 @@ float VescToSTM_get_battery_level(float *wh_left);
 void VescToSTM_set_current_rel(float val);
 void VescToSTM_set_current_rel_int(int32_t val);
 float VescToSTM_get_duty_cycle_now(void);
+float VescToSTM_get_duty_cycle_now_fast(void);
 float VescToSTM_get_ADC1();
 float VescToSTM_get_ADC2();
 void VescToSTM_set_ADC1(float val);
