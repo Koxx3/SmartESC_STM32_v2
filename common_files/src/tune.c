@@ -15,6 +15,7 @@
 #include "conf_general.h"
 #include "product.h"
 #include "hall_speed_pos_fdbk.h"
+#include "qfplib.h"
 
 
 /**
@@ -53,8 +54,8 @@ bool tune_mcpwm_foc_hall_detect(float current, uint8_t *hall_table) {
 			pMCI[M1]->pSTC->SPD->open_angle = 65536.0 / (2 *M_PI) * m_phase_now_override;
 			vTaskDelay(1);
 			int hall = HALL_M1.HallState;
-			sin_hall[hall] += sinf(m_phase_now_override);
-			cos_hall[hall] += cosf(m_phase_now_override);
+			sin_hall[hall] += qfp_fsin(m_phase_now_override);
+			cos_hall[hall] += qfp_fcos(m_phase_now_override);
 			hall_iterations[hall]++;
 		}
 	}
@@ -66,8 +67,8 @@ bool tune_mcpwm_foc_hall_detect(float current, uint8_t *hall_table) {
 			pMCI[M1]->pSTC->SPD->open_angle =65536.0 / (2 *M_PI) * m_phase_now_override;
 			vTaskDelay(1);
 			int hall = HALL_M1.HallState;
-			sin_hall[hall] += sinf(m_phase_now_override);
-			cos_hall[hall] += cosf(m_phase_now_override);
+			sin_hall[hall] += qfp_fsin(m_phase_now_override);
+			cos_hall[hall] += qfp_fcos(m_phase_now_override);
 			hall_iterations[hall]++;
 		}
 	}
@@ -79,7 +80,7 @@ bool tune_mcpwm_foc_hall_detect(float current, uint8_t *hall_table) {
 	int fails = 0;
 	for(int i = 0;i < 8;i++) {
 		if (hall_iterations[i] > 30) {
-			float ang = atan2f(sin_hall[i], cos_hall[i]) * 180.0 / M_PI;
+			float ang = qfp_fatan2(sin_hall[i], cos_hall[i]) * 180.0 / M_PI;
 			utils_norm_angle(&ang);
 			hall_table[i] = (uint8_t)(ang * 255.0 / 360.0);
 		} else {
@@ -139,8 +140,8 @@ float tune_foc_measure_resistance(float current, int samples) {
 	float fIq = (float)Iq / CURRENT_FACTOR_A;
 	float fId = (float)Id / CURRENT_FACTOR_A;
 
-	float current_avg = sqrtf(SQ(fIq) + SQ(fId));
-	float voltage_avg = sqrtf(SQ(fVq) + SQ(fVd));
+	float current_avg = qfp_fsqrt(SQ(fIq) + SQ(fId));
+	float voltage_avg = qfp_fsqrt(SQ(fVq) + SQ(fVd));
 
 	VescToSTM_set_current(0,0);
 	// UnLock the motor
@@ -217,7 +218,7 @@ float tune_foc_measure_inductance(float voltage, float * used_current, uint32_t 
 	Id /= samples;
 	float fIq = (float)Iq / CURRENT_FACTOR_A;
 	float fId = (float)Id / CURRENT_FACTOR_A;
-	current_avg = sqrtf(SQ(fIq) + SQ(fId));
+	current_avg = qfp_fsqrt(SQ(fIq) + SQ(fId));
 	if(used_current!=NULL){
 		*used_current = current_avg;
 	}
@@ -422,8 +423,8 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 		id_avg /= samples2;
 
 		float rad_s = rpm_now * ((2.0 * M_PI) / 60.0);
-		float v_mag = sqrtf(SQ(vq_avg) + SQ(vd_avg));
-		float i_mag = sqrtf(SQ(iq_avg) + SQ(id_avg));
+		float v_mag = qfp_fsqrt(SQ(vq_avg) + SQ(vd_avg));
+		float i_mag = qfp_fsqrt(SQ(iq_avg) + SQ(id_avg));
 		*linkage = (v_mag - (2.0 / 3.0) * res * i_mag) / rad_s - (2.0 / 3.0) * i_mag * ind;
 
 
@@ -471,7 +472,7 @@ bool tune_foc_measure_r_l_imax(float current_min, float current_max, float max_p
 	mc_conf.foc_motor_r = *r;
 
 	*l = tune_foc_measure_inductance_current(i_last, 100) * 1e-6;
-	*i_max = sqrtf(max_power_loss / *r);
+	*i_max = qfp_fsqrt(max_power_loss / *r);
 	utils_truncate_number(i_max, HW_LIM_CURRENT);
 
 	mc_conf.foc_motor_r = res_old;

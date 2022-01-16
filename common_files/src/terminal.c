@@ -46,6 +46,7 @@ void terminal_top(PACKET_STATE_t * phandle){
 extern MUSIC_PARAM bldc_music;
 #endif
 extern m365Answer m365_to_display;
+uint32_t xx_load;
 void terminal_process_string(char *str, PACKET_STATE_t * phandle) {
 	enum { kMaxArgs = 16 };
 	int argc = 0;
@@ -101,6 +102,8 @@ void terminal_process_string(char *str, PACKET_STATE_t * phandle) {
 
 		m365_to_display.mode = atoi(argv[1]);
 		commands_printf(phandle, "Mode %u", m365_to_display.mode);
+	}else if (strcmp(argv[0], "bench") == 0){
+		commands_printf(phandle, "Cycles: %u", xx_load);
 	}
 
 }

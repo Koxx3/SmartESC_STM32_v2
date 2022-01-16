@@ -77,8 +77,9 @@ static float decoded_level2 = 0.0;
 
 volatile uint32_t cyg;
 
-
+uint32_t xx_load;
 void vTimerCallback( TimerHandle_t xTimer ){
+	uint32_t cycles = *DWT_CYCCNT;
 	if(SpeednTorqCtrlM1.SPD->open_loop==true) return;
 	uint32_t temp1 = adc1;
 	uint32_t temp2 = adc2;
@@ -218,6 +219,7 @@ void vTimerCallback( TimerHandle_t xTimer ){
 	default:
 		break;
 	}
+	xx_load = *DWT_CYCCNT - cycles;
 }
 
 float app_adc_get_decoded_level(void) {
