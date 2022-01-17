@@ -37,6 +37,7 @@
 #include "tune.h"
 #include "mcconf_default.h"
 #include <string.h>
+#include "main.h"
 
 mc_configuration mc_conf;
 app_configuration appconf;
@@ -289,12 +290,67 @@ void conf_general_mcconf_hw_limits(mc_configuration *mcconf) {
 	utils_truncate_number(&mcconf->l_temp_fet_start, HW_LIM_TEMP_FET);
 	utils_truncate_number(&mcconf->l_temp_fet_end, HW_LIM_TEMP_FET);
 #endif
+#ifdef HW_LIM_F_SW
+	utils_truncate_number(&mcconf->foc_f_sw, HW_LIM_F_SW);
+#endif
+
 #endif
 }
 
 
 
+
+void conf_general_setup_f_sw(uint32_t f_sw){
+
+	uint32_t regulation_exec_rate = (f_sw > 20000) ? 2 : 1;
+
+	uint16_t pwm_p_cycles = (uint16_t)((ADV_TIM_CLK_MHz*(uint32_t)1000000u/((uint32_t)(f_sw)))&0xFFFE);
+
+	PWM_Handle_M1._Super.hT_Sqrt3 	 = (pwm_p_cycles*SQRT3FACTOR)/16384u;
+	PWM_Handle_M1._Super.PWMperiod   = pwm_p_cycles;
+	PWM_Handle_M1.Half_PWMPeriod = pwm_p_cycles/2;
+	HALL_M1._Super.hMeasurementFrequency = (uint16_t) ((uint32_t)(f_sw)/(regulation_exec_rate*PWM_FREQ_SCALING));
+	RampExtMngrHFParamsM1.FrequencyHz = (uint32_t) ((uint32_t)(f_sw)/(regulation_exec_rate));
+	R3_2_ParamsM1.RepetitionCounter = (uint16_t) ((regulation_exec_rate *2u)-1u);
+	htim1.Init.Period = ((pwm_p_cycles) / 2);
+	htim1.Init.RepetitionCounter = (uint16_t) ((regulation_exec_rate *2u)-1u);
+	HAL_TIM_Base_Init(&htim1);
+	HAL_TIM_PWM_Init(&htim1);
+	TIM_OC_InitTypeDef sConfigOC = {0};
+
+	sConfigOC.OCMode = TIM_OCMODE_PWM1;
+	sConfigOC.Pulse = 0;
+	sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+	sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
+	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+	sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
+	sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
+	if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+	{
+	Error_Handler();
+	}
+	if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+	{
+	Error_Handler();
+	}
+	if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+	{
+	Error_Handler();
+	}
+	sConfigOC.OCMode = TIM_OCMODE_PWM2;
+	sConfigOC.Pulse = (((pwm_p_cycles) / 2) - (HTMIN));
+	if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
+	{
+	Error_Handler();
+	};
+}
+
+
+
 void conf_general_setup_mc(mc_configuration *mcconf) {
+
+	conf_general_setup_f_sw(mcconf->foc_f_sw);
+
 	float current_max = mcconf->l_current_max * CURRENT_FACTOR_A * mcconf->l_current_max_scale;
 	float current_min = mcconf->l_current_min * CURRENT_FACTOR_A * mcconf->l_current_min_scale;
 	uint16_t max_app_speed;
@@ -324,7 +380,7 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	PIDSpeedHandle_M1.hDefKiGain 		  = PIDSpeedHandle_M1.hKiGain;
 
 	PIDIqHandle_M1.hKpGain          	  = mcconf->foc_current_kp * (float)TF_KPDIV;
-	PIDIqHandle_M1.hKiGain                = mcconf->foc_current_ki * (float)TF_KIDIV / (float)PWM_FREQUENCY;
+	PIDIqHandle_M1.hKiGain                = mcconf->foc_current_ki * (float)TF_KIDIV / (float)mcconf->foc_f_sw;
 	PIDIqHandle_M1.hDefKpGain 			  = PIDIqHandle_M1.hKpGain;
 	PIDIqHandle_M1.hDefKiGain 			  = PIDIqHandle_M1.hKiGain;
 	PIDIqHandle_M1.hUpperOutputLimit	  = INT16_MAX * mcconf->l_max_duty;

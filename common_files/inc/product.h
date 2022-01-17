@@ -84,6 +84,7 @@
 #define HW_LIM_DUTY_MIN			0.0, 0.1
 #define HW_LIM_DUTY_MAX			0.0, 0.99
 #define HW_LIM_TEMP_FET			-40.0, 75.0
+#define HW_LIM_F_SW			    4000.0, 20000.0
 
 
 

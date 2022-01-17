@@ -7,6 +7,7 @@
 #include "mc_config.h"
 #include "mc_tuning.h"
 #include "mc_interface.h"
+#include "mc_parameters.h"
 
 // Firmware version
 #define FW_VERSION_MAJOR			5
@@ -34,10 +35,7 @@ extern MCI_Handle_t* pMCI[NBR_OF_MOTORS];
 extern PQD_MotorPowMeas_Handle_t *pMPM[NBR_OF_MOTORS];
 extern SpeednTorqCtrl_Handle_t *pSTC[NBR_OF_MOTORS];
 extern FOCVars_t FOCVars[NBR_OF_MOTORS];
-
-
-
-
+extern TIM_HandleTypeDef htim1;
 
 
 #endif

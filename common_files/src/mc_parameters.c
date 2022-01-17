@@ -36,7 +36,7 @@
 /**
   * @brief  Current sensor parameters Motor 1 - three shunt
   */
-const R3_2_Params_t R3_2_ParamsM1 =
+R3_2_Params_t R3_2_ParamsM1 =
 {
   .FreqRatio         = FREQ_RATIO,
   .IsHigherFreqTim   = FREQ_RELATION,

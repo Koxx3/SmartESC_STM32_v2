@@ -28,7 +28,7 @@
 
 /* USER CODE END Additional include */
 
-extern const R3_2_Params_t R3_2_ParamsM1;
+extern R3_2_Params_t R3_2_ParamsM1;
 
 /* USER CODE BEGIN Additional extern */
 
