@@ -17,8 +17,8 @@ Tutorial for Simple 20S modification
 
 - Hardware modification : https://docs.google.com/spreadsheets/d/15NJW5ABOqHJWt1sHm2iTJhP_wqReokJQz8fKPkYVTDk/edit?usp=sharing
 
-- Software :
-- 
+- Software : 
+
 For match the Hardware and the Software you have to set VOLTAGE_DIVIDER_GAIN line 51 in the product.h at "1480" with CubeIDE
 
 Warning
