@@ -17,9 +17,11 @@ Tutorial for Simple 20S modification
 
 - Hardware modification : https://docs.google.com/spreadsheets/d/15NJW5ABOqHJWt1sHm2iTJhP_wqReokJQz8fKPkYVTDk/edit?usp=sharing
 
+- Software :
+- 
 For match the Hardware and the Software you have to change the VOLTAGE_DIVIDER_GAIN line 51 for M365 in the product.h with CubeIDE
 
-Warnin :
+Warning
 the Main voltage Regulator is limited at 90v ABSOLUT MAX, so you need to select the maximum voltage protection in VESC Tool at 86~88v maximum, and be carful with the electric brake and the current with 20S full charged battery, i recommand to dont charge the battery at maximum, something like 82-83v will be good
 
 you can see the road here : 
