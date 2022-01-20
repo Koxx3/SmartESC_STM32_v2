@@ -348,7 +348,7 @@
 #define MCCONF_FOC_TEMP_COMP_BASE_TEMP	25.0	// Motor temperature compensation base temperature
 #endif
 #ifndef MCCONF_FOC_CURRENT_FILTER_CONST
-#define MCCONF_FOC_CURRENT_FILTER_CONST	0.1		// Filter constant for the filtered currents
+#define MCCONF_FOC_CURRENT_FILTER_CONST	0.0		// Filter constant for the filtered currents
 #endif
 #ifndef MCCONF_FOC_CC_DECOUPLING
 #define MCCONF_FOC_CC_DECOUPLING		FOC_CC_DECOUPLING_BEMF // Current controller decoupling

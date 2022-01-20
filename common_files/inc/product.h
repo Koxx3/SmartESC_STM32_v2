@@ -103,6 +103,8 @@
 #define BATTERY_VOLTAGE_GAIN     											 ((VOLTAGE_DIVIDER_GAIN * ADC_GAIN) * 512.0)
 #define CURRENT_FACTOR_A 													 ((32767.0*RSHUNT*AMPLIFICATION_GAIN)/(3.3/2))
 #define CURRENT_FACTOR_mA 													 (CURRENT_FACTOR_A/1000.0)
+#define ABS_OVR_CURRENT_TRIP_MS												 2.0
+
 
 #define DEMCR_TRCENA    0x01000000
 #define DEMCR           (*((volatile uint32_t *)0xE000EDFC))

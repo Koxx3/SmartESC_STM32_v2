@@ -561,7 +561,7 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 		mcconf->l_max_vin = MCCONF_L_MAX_VOLTAGE;
 		mcconf->l_battery_cut_end = MCCONF_L_BATTERY_CUT_END;
 		mcconf->l_battery_cut_start = MCCONF_L_BATTERY_CUT_START;
-//		bool l_slow_abs_current;
+		mcconf->l_slow_abs_current = MCCONF_L_SLOW_ABS_OVERCURRENT;
 		mcconf->l_temp_fet_start = MCCONF_L_LIM_TEMP_FET_START;
 		mcconf->l_temp_fet_end = MCCONF_L_LIM_TEMP_FET_END;
 //		float l_temp_motor_start;
@@ -636,7 +636,7 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 //	float foc_sat_comp;
 //	bool foc_temp_comp;
 //	float foc_temp_comp_base_temp;
-//	float foc_current_filter_const;
+    mcconf->foc_current_filter_const = MCCONF_FOC_CURRENT_FILTER_CONST;
 //	mc_foc_cc_decoupling_mode foc_cc_decoupling;
 //	mc_foc_observer_type foc_observer_type;
 //	float foc_hfi_voltage_start;
@@ -722,7 +722,7 @@ void confgenerator_set_defaults_appconf(app_configuration *conf) {
 	//conf->can_mode = APPCONF_CAN_MODE;
 	//conf->uavcan_esc_index = APPCONF_UAVCAN_ESC_INDEX;
 	//conf->uavcan_raw_mode = APPCONF_UAVCAN_RAW_MODE;
-	conf->app_to_use = APP_ADC;
+	conf->app_to_use = APP_ADC_UART;
 	conf->app_adc_conf.ctrl_type = APPCONF_ADC_CTRL_TYPE;
 	conf->app_adc_conf.hyst = APPCONF_ADC_HYST;
 	conf->app_adc_conf.voltage_start = APPCONF_ADC_VOLTAGE_START;

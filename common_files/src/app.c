@@ -64,6 +64,7 @@ void app_set_configuration(app_configuration *conf) {
 			task_cli_init(&aux_uart);
 			break;
 		case APP_ADC:
+		case APP_ADC_UART:
 			if( xTaskGetSchedulerState() == taskSCHEDULER_RUNNING){
 				task_cli_kill(&aux_uart);
 			}

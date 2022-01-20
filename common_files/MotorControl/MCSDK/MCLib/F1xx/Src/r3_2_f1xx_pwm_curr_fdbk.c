@@ -31,6 +31,7 @@
 #include "r3_2_f1xx_pwm_curr_fdbk.h"
 
 #include "mc_type.h"
+#include "stdlib.h"
 
 /** @addtogroup MCSDK
   * @{
@@ -125,6 +126,8 @@ __weak void R3_2_Init( PWMC_R3_2_Handle_t * pHandle )
 
   pHandle->OverCurrentFlag = false;
   pHandle->_Super.DTTest = 0u;
+
+  pHandle->_Super.OverCurrentCyclesCounter = 0;
 
 }
 
@@ -359,9 +362,20 @@ __weak void R3_2_GetPhaseCurrents( PWMC_Handle_t * pHdl, ab_t* pStator_Currents 
       break;
   }
 
+
   pHandle->_Super.Ia = pStator_Currents->a;
   pHandle->_Super.Ib = pStator_Currents->b;
   pHandle->_Super.Ic = -pStator_Currents->a - pStator_Currents->b;
+
+  if(pHandle->_Super.OverCurrent && ((abs(pHandle->_Super.Ia) > pHandle->_Super.OverCurrent) || (abs(pHandle->_Super.Ia) > pHandle->_Super.OverCurrent) || (abs(pHandle->_Super.Ic) > pHandle->_Super.OverCurrent))){
+	  pHandle->_Super.OverCurrentCyclesCounter++;
+	  if(pHandle->_Super.OverCurrentCyclesCounter > pHandle->_Super.OverCurrentCycles){
+		  pHandle->OverCurrentFlag = true;
+	  	  R3_2_SwitchOffPWM(pHdl);
+	  }
+  }else{
+	  pHandle->_Super.OverCurrentCyclesCounter = 0;
+  }
 }
 
 /**

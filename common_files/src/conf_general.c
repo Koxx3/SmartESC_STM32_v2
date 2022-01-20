@@ -355,6 +355,14 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	float current_min = mcconf->l_current_min * CURRENT_FACTOR_A * mcconf->l_current_min_scale;
 	uint16_t max_app_speed;
 
+	PWM_Handle_M1._Super.OverCurrent = mcconf->l_abs_current_max * CURRENT_FACTOR_A;
+
+	if(mcconf->l_slow_abs_current){
+		PWM_Handle_M1._Super.OverCurrentCycles = utils_map(mcconf->foc_current_filter_const,1,0,0,ABS_OVR_CURRENT_TRIP_MS) / (1000.0 / mcconf->foc_f_sw);
+	}else{
+		PWM_Handle_M1._Super.OverCurrentCycles = 0;  //instant trip
+	}
+
 	FOCVars[M1].max_i_batt = mcconf->l_in_current_max * CURRENT_FACTOR_A;
 	FOCVars[M1].min_i_batt = mcconf->l_in_current_min * CURRENT_FACTOR_A;
 
