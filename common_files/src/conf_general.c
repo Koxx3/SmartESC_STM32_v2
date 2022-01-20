@@ -567,7 +567,7 @@ int conf_general_detect_apply_all_foc(float max_power_loss,	bool store_mcconf_on
 		// This will also store the settings to emulated eeprom and send them to vesc tool
 
 		uint8_t hall_tab[8];
-		bool res = tune_mcpwm_foc_hall_detect((i_max / 3.0)*1000.0, hall_tab);
+		bool res = tune_mcpwm_foc_hall_detect((i_max / 3.0), hall_tab);
 		if(res==true){
 			memcpy(mcconf_old->foc_hall_table,hall_tab, 8);
 			conf_general_setup_mc(mcconf_old);

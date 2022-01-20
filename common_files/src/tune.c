@@ -334,15 +334,9 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 	// Disable timeout
 	VescToSTM_enable_timeout(false);
 
-	mc_configuration * mcconf_old = pvPortMalloc(sizeof(mc_configuration));
-	*mcconf_old = mc_conf;
-
-	mc_conf.foc_current_ki = 10.0;
-	mc_conf.foc_current_kp = 0.005;
-	conf_general_setup_mc(&mc_conf);
-
 	MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
 	MCI_StartMotor( pMCI[M1] );
+	vTaskDelay(MS_TO_TICKS(500));
 
 	int cnt = 0;
 	float rpm_now = 0;
@@ -433,15 +427,12 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 		vTaskDelay(1);
 		VescToSTM_set_open_loop(false, 0, 0);
 
-		vTaskDelay(MS_TO_TICKS(5));
+		vTaskDelay(MS_TO_TICKS(500));
 
 		*linkage_undriven = *linkage;
 
 		result = true;
 	}
-	conf_general_setup_mc(mcconf_old);
-	vPortFree(mcconf_old);
-	vTaskDelay(MS_TO_TICKS(500));
 	MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
 	MCI_StartMotor(pMCI[M1]);
 
