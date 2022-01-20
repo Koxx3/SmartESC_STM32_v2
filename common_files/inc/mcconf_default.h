@@ -75,10 +75,10 @@
 #define MCCONF_L_SLOW_ABS_OVERCURRENT	true	// Use the filtered (and hence slower) current for the overcurrent fault detection
 #endif
 #ifndef MCCONF_L_MIN_DUTY
-#define MCCONF_L_MIN_DUTY				0.005	// Minimum duty cycle
+#define MCCONF_L_MIN_DUTY				0.00	// Minimum duty cycle
 #endif
 #ifndef MCCONF_L_MAX_DUTY
-#define MCCONF_L_MAX_DUTY				0.95	// Maximum duty cycle
+#define MCCONF_L_MAX_DUTY				0.99	// Maximum duty cycle
 #endif
 #ifndef MCCONF_L_CURR_MAX_RPM_FBRAKE
 #define MCCONF_L_CURR_MAX_RPM_FBRAKE	300		// Maximum electrical RPM to use full brake at

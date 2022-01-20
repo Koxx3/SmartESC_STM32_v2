@@ -567,8 +567,8 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 //		float l_temp_motor_start;
 //		float l_temp_motor_end;
 //		float l_temp_accel_dec;
-//		float l_min_duty;
-//		float l_max_duty;
+		mcconf->l_min_duty = MCCONF_L_MIN_DUTY;
+		mcconf->l_max_duty = MCCONF_L_MAX_DUTY;
 //		float l_watt_max;
 //		float l_watt_min;
 		mcconf->l_current_max_scale = MCCONF_L_CURRENT_MAX_SCALE;
