@@ -17,10 +17,15 @@ Tutorial for Simple 20S modification
 
 - Hardware modification : https://docs.google.com/spreadsheets/d/15NJW5ABOqHJWt1sHm2iTJhP_wqReokJQz8fKPkYVTDk/edit?usp=sharing
 
+For match the Hardware and the Software you have to change the VOLTAGE_DIVIDER_GAIN line 51 for M365 in the product.h with CubeIDE
 
-![alt text](https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?raw=true)
+you can see the road here : 
+![Image](https://github.com/Koxx3/SmartESC_STM32_v2/blob/vesc_comp/Hardware/Images/CubeIDE.png)
 
-![Test Image 6](Pictures\CubeIDE)
+![Image](https://github.com/Koxx3/SmartESC_STM32_v2/blob/vesc_comp/Hardware/Images/CubeIDE2.png)
+
+
+
 
 
 by Foujiwara
