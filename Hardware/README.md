@@ -19,6 +19,9 @@ Tutorial for Simple 20S modification
 
 For match the Hardware and the Software you have to change the VOLTAGE_DIVIDER_GAIN line 51 for M365 in the product.h with CubeIDE
 
+Warnin :
+the Main voltage Regulator is limited at 90v ABSOLUT MAX, so you need to select the maximum voltage protection in VESC Tool at 86~88v maximum, and be carful with the electric brake and the current with 20S full charged battery, i recommand to dont charge the battery at maximum, something like 82-83v will be good
+
 you can see the road here : 
 ![Image](https://github.com/Koxx3/SmartESC_STM32_v2/blob/vesc_comp/Hardware/Images/CubeIDE.png)
 
