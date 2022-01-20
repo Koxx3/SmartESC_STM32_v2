@@ -20,8 +20,7 @@ Tutorial for Simple 20S modification
 
 ![alt text](https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?raw=true)
 
-![Test Image 6](assets\images\CubeIDE.png)
-
+![Test Image 6](Pictures\CubeIDE)
 
 
 by Foujiwara
