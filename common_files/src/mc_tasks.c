@@ -856,16 +856,16 @@ __weak void TSK_SafetyTask_PWMOFF(uint8_t bMotor)
 	  if(voltage_fault==MC_UNDER_VOLT){
 		  CodeReturn |=  errMask[bMotor] & voltage_fault;
 
-		  MCI_StopMotor( &Mci[M1] );
+		  VescToSTM_pwm_stop();
 		  last_pwm_state = false;
 	  }else if (voltage_fault==MC_OVER_VOLT){
 		  CodeReturn |=  errMask[bMotor] & voltage_fault;
 
-		  MCI_StopMotor( &Mci[M1] );
+		  VescToSTM_pwm_stop();
 		  last_pwm_state = false;
 	  }else if (last_pwm_state==false){
 		  if(CodeReturn == MC_NO_ERROR){
-			  MCI_StartMotor( &Mci[M1] );
+			  VescToSTM_pwm_start();
 			  last_pwm_state=true;
 		  }
 	  }
@@ -875,7 +875,7 @@ __weak void TSK_SafetyTask_PWMOFF(uint8_t bMotor)
   switch (STM_GetState(&STM[bMotor])) /* Acts on PWM outputs in case of faults */
   {
   case FAULT_NOW:
-    PWMC_SwitchOffPWM(pwmcHandle[bMotor]);
+	VescToSTM_pwm_stop();
     FOC_Clear(bMotor);
     MPM_Clear((MotorPowMeas_Handle_t*)pMPM[bMotor]);
     /* USER CODE BEGIN TSK_SafetyTask_PWMOFF 1 */
@@ -883,7 +883,7 @@ __weak void TSK_SafetyTask_PWMOFF(uint8_t bMotor)
     /* USER CODE END TSK_SafetyTask_PWMOFF 1 */
     break;
   case FAULT_OVER:
-    PWMC_SwitchOffPWM(pwmcHandle[bMotor]);
+	VescToSTM_pwm_stop();
 	/* USER CODE BEGIN TSK_SafetyTask_PWMOFF 2 */
 
     /* USER CODE END TSK_SafetyTask_PWMOFF 2 */

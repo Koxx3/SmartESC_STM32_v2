@@ -30,6 +30,7 @@
 #include "task.h"
 #include "product.h"
 #include "VescCommand.h"
+#include "VescToSTM.h"
 
 
 TaskHandle_t LEDHandle;
@@ -77,15 +78,9 @@ void task_LED(void * argument)
 
 #if AUTO_RESET_FAULT
 				MCI_FaultAcknowledged(pMCI[M1]);
-				vTaskDelay(MS_TO_TICKS(100));
-				MCI_StopMotor(pMCI[M1]);
-				vTaskDelay(MS_TO_TICKS(100));
-				MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
-				if(MCI_GetAvrgMecSpeedUnit(pMCI[M1]) == 0){
-					MCI_StartMotor(pMCI[M1]);
-				}else{
-					pMCI[M1]->pSTM->bState = CLEAR;
-				}
+				VescToSTM_set_current(0, 0);
+				STM[M1].bState = RUN;
+				VescToSTM_pwm_start();
 
 				last_fault = 0;
 #endif

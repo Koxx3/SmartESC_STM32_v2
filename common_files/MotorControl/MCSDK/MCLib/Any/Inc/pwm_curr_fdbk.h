@@ -199,6 +199,7 @@ struct PWMC_Handle
   int16_t   OverCurrent;
   uint32_t  OverCurrentCycles;
   uint32_t  OverCurrentCyclesCounter;
+  bool PWM_off;
 };
 
 /**

@@ -23,12 +23,19 @@ stm_state VescToSTM_mode;
 float adc_1;
 float adc_2;
 
+int32_t minimum_current;
+
 #define DIR_MUL   (mc_conf.m_invert_direction ? -1 : 1)
 
 int32_t current_to_torque(int32_t curr_ma){
 	float ret = curr_ma * CURRENT_FACTOR_mA;
 	return ret;
 }
+
+void VescToSTM_set_minimum_current(float current){
+	minimum_current = current_to_torque(current*1000);
+}
+
 
 int16_t VescToSTM_Iq_lim_hook(int16_t iq){
 
@@ -41,6 +48,11 @@ int16_t VescToSTM_Iq_lim_hook(int16_t iq){
 		app_adc_clear_mode(M365_MODE_TEMP);
 	}
 
+	if(abs(iq) <= minimum_current && abs(FW_M1.AvVolt_qd.q) < MIN_DUTY_PWM){
+		VescToSTM_pwm_stop();
+	}else{
+		VescToSTM_pwm_start();  //Function checks if PWM off otherwise it does nothing
+	}
 	return iq;
 }
 
@@ -194,6 +206,30 @@ void VescToSTM_enable_timeout(bool enbale){
 	timeout_enable = enbale;
 }
 
+void VescToSTM_pwm_stop(void){
+	if(PWM_Handle_M1._Super.PWM_off == false){
+		PWMC_SwitchOffPWM(&PWM_Handle_M1._Super);
+		PIDIdHandle_M1.wIntegralTerm = 0;
+		PIDIqHandle_M1.wIntegralTerm = 0;
+		FOCVars[M1].Vqd.d=0;
+		FOCVars[M1].Vqd.q=0;
+		FW_Clear(&FW_M1);
+	}
+}
+
+void VescToSTM_pwm_start(void){
+	if(PWM_Handle_M1._Super.PWM_off){
+		int32_t erpm = VescToSTM_get_erpm_fast();
+		float rad_s = erpm * ((2.0 * M_PI) / 60.0);
+		float volt = rad_s * mc_conf.foc_motor_flux_linkage;
+		float fVd = 32768.0 / VescToSTM_get_bus_voltage() * volt;
+		utils_truncate_number(&fVd, -32767, 32767);
+		PIDIqHandle_M1.wIntegralTerm = fVd * TF_KIDIV;
+		PIDIdHandle_M1.wIntegralTerm = -PIDIqHandle_M1.wIntegralTerm/4;
+		PWMC_SwitchOnPWM(&PWM_Handle_M1._Super);
+	}
+}
+
 void VescToSTM_update_torque(int32_t q, int32_t min_erpm, int32_t max_erpm){
 	q *= DIR_MUL;
 	if(q >= 0){
@@ -204,6 +240,7 @@ void VescToSTM_update_torque(int32_t q, int32_t min_erpm, int32_t max_erpm){
 		SpeednTorqCtrlM1.PISpeed->hUpperOutputLimit = q;
 		SpeednTorqCtrlM1.PISpeed->hLowerOutputLimit = mc_conf.s_pid_allow_braking ? -q : 0;
 		//HALL_M1.q = q;
+
 		MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(max_erpm), 0);
 
 	}else{
@@ -383,7 +420,7 @@ float VescToSTM_get_iq(){
  */
 float VescToSTM_get_Vd(){
 	float Vin = VescToSTM_get_bus_voltage();
-	float fVd = Vin / 65536.0 * (float)FW_M1.AvVolt_qd.d;
+	float fVd = Vin / 32768.0 * (float)FW_M1.AvVolt_qd.d;
 	return fVd;
 }
 
@@ -395,7 +432,7 @@ float VescToSTM_get_Vd(){
  */
 float VescToSTM_get_Vq(){
 	float Vin = VescToSTM_get_bus_voltage();
-	float fVq = Vin / 65536.0 * (float)FW_M1.AvVolt_qd.q;
+	float fVq = Vin / 32768.0 * (float)FW_M1.AvVolt_qd.q;
 	return fVq;
 }
 

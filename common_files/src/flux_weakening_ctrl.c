@@ -28,6 +28,7 @@ __weak void FW_Clear( FW_Handle_t * pHandle )
 
 	pHandle->AvVoltAmpl = 0;
 	pHandle->AvVolt_qd = NULL_qd;
+	pHandle->AvAmpere_qd = NULL_qd;
 
 	PID_SetIntegralTerm( pHandle->pFluxWeakeningPID, 0 );
 }

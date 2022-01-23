@@ -94,17 +94,18 @@
 #define PRODUCT_FIRMWARE_VERSION                                      		 0x0001
 #define VESC_TOOL_ENABLE													 1
 #define AUTO_RESET_FAULT													 1
-#define ERROR_PRINTING														 0
+#define ERROR_PRINTING														 1
 #define MUSIC_ENABLE														 0
 #define BATTERY_SUPPORT_LIION												 1
 #define BATTERY_SUPPORT_LIFEPO												 1
 #define BATTERY_SUPPORT_LEAD												 1
+#define ABS_OVR_CURRENT_TRIP_MS												 2.0
+#define MIN_DUTY_FOR_PWM_FREEWHEEL											 80
 
 #define BATTERY_VOLTAGE_GAIN     											 ((VOLTAGE_DIVIDER_GAIN * ADC_GAIN) * 512.0)
 #define CURRENT_FACTOR_A 													 ((32767.0*RSHUNT*AMPLIFICATION_GAIN)/(3.3/2))
 #define CURRENT_FACTOR_mA 													 (CURRENT_FACTOR_A/1000.0)
-#define ABS_OVR_CURRENT_TRIP_MS												 2.0
-
+#define MIN_DUTY_PWM												         (32768 * MIN_DUTY_FOR_PWM_FREEWHEEL / 100)
 
 #define DEMCR_TRCENA    0x01000000
 #define DEMCR           (*((volatile uint32_t *)0xE000EDFC))

@@ -481,8 +481,10 @@ __weak void R3_2_TurnOnLowSides( PWMC_Handle_t * pHdl )
   */
 __weak void R3_2_SwitchOnPWM( PWMC_Handle_t * pHdl )
 {  
+
   PWMC_R3_2_Handle_t * pHandle = (PWMC_R3_2_Handle_t *) pHdl;
   TIM_TypeDef* TIMx = pHandle->pParams_str->TIMx;
+  pHdl->PWM_off = false;
 
   pHandle->_Super.TurnOnLowSidesAction = false;
 
@@ -538,6 +540,7 @@ __weak void R3_2_SwitchOffPWM( PWMC_Handle_t * pHdl )
 { 
   PWMC_R3_2_Handle_t * pHandle = (PWMC_R3_2_Handle_t *) pHdl;
   TIM_TypeDef* TIMx = pHandle->pParams_str->TIMx;
+  pHdl->PWM_off = true;
 
   /* Disable UPDATE ISR */
   LL_TIM_DisableIT_UPDATE( TIMx );

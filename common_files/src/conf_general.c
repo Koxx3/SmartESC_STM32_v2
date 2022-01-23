@@ -54,6 +54,8 @@ void conf_general_init(void) {
 	DEMCR |= DEMCR_TRCENA;
 	DWT_CTRL |= CYCCNTENA;
 
+	MCI_StartMotor(pMCI[M1]);
+
 }
 
 /**
@@ -354,6 +356,8 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	float current_max = mcconf->l_current_max * CURRENT_FACTOR_A * mcconf->l_current_max_scale;
 	float current_min = mcconf->l_current_min * CURRENT_FACTOR_A * mcconf->l_current_min_scale;
 	uint16_t max_app_speed;
+
+	VescToSTM_set_minimum_current(mcconf->cc_min_current);
 
 	PWM_Handle_M1._Super.OverCurrent = mcconf->l_abs_current_max * CURRENT_FACTOR_A;
 

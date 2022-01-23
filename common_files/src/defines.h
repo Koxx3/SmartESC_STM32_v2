@@ -36,6 +36,7 @@ extern PQD_MotorPowMeas_Handle_t *pMPM[NBR_OF_MOTORS];
 extern SpeednTorqCtrl_Handle_t *pSTC[NBR_OF_MOTORS];
 extern FOCVars_t FOCVars[NBR_OF_MOTORS];
 extern TIM_HandleTypeDef htim1;
+extern STM_Handle_t STM[NBR_OF_MOTORS];
 
 
 #endif
