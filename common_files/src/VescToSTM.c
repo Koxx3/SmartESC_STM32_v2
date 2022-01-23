@@ -16,6 +16,7 @@
 #include <math.h>
 #include "app.h"
 #include "ninebot.h"
+#include "VescCommand.h"
 
 static float tacho_scale;
 stm_state VescToSTM_mode;
@@ -48,7 +49,7 @@ int16_t VescToSTM_Iq_lim_hook(int16_t iq){
 		app_adc_clear_mode(M365_MODE_TEMP);
 	}
 
-	if(abs(iq) <= minimum_current && abs(FW_M1.AvVolt_qd.q) < MIN_DUTY_PWM){
+	if(abs(iq) <= minimum_current && abs(FW_M1.AvVolt_qd.q) < MIN_DUTY_PWM && samples.state == SAMP_IDLE){
 		VescToSTM_pwm_stop();
 	}else{
 		VescToSTM_pwm_start();  //Function checks if PWM off otherwise it does nothing
