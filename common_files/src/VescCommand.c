@@ -187,6 +187,7 @@ void send_sample(PACKET_STATE_t * phandle){
 			vPortFree(samples.m_v0_samples);
 			vPortFree(samples.m_v1_samples);
 			vPortFree(samples.m_v2_samples);
+			VescToSTM_pwm_force(false, false);
 
 #endif
 			samples.phandle = NULL;
@@ -571,6 +572,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						samples.index = 0;
 						samples.dec_state = 0;
 						samples.state = SAMP_START;
+						VescToSTM_pwm_force(true, true);
 					}
 
 				} break;

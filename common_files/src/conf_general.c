@@ -341,7 +341,11 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	float current_min = mcconf->l_current_min * CURRENT_FACTOR_A * mcconf->l_current_min_scale;
 	uint16_t max_app_speed;
 
-	VescToSTM_set_minimum_current(mcconf->cc_min_current);
+	if(mcconf->foc_motor_flux_linkage==0){
+		VescToSTM_set_minimum_current(0);  //PWM always ON
+	}else{
+		VescToSTM_set_minimum_current(mcconf->cc_min_current);
+	}
 
 	PWM_Handle_M1._Super.OverCurrent = mcconf->l_abs_current_max * CURRENT_FACTOR_A;
 
@@ -439,6 +443,7 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 
 	VescToSTM_init_odometer(mcconf);
 	mc_conf = *mcconf;
+
 }
 
 void conf_general_calc_apply_foc_cc_kp_ki_gain(mc_configuration *mcconf, float tc) {

@@ -26,7 +26,7 @@ float adc_2;
 
 float motor_voltage; //calculates motor voltage from ERPM and flux linkage
 int32_t minimum_current;
-bool pwm_force; //State of PWM force on
+volatile bool pwm_force; //State of PWM force on
 
 #define DIR_MUL   (mc_conf.m_invert_direction ? -1 : 1)
 
@@ -40,10 +40,14 @@ void VescToSTM_set_minimum_current(float current){
 }
 
 
-void VescToSTM_pwm_force(bool force){
+void VescToSTM_pwm_force(bool force, bool update){
 	pwm_force = force;
-	if(force == true){
-		VescToSTM_pwm_start();
+	if(update==true){
+		if(force == true){
+			VescToSTM_pwm_start();
+		}else{
+			VescToSTM_pwm_stop();
+		}
 	}
 }
 
@@ -58,11 +62,12 @@ int16_t VescToSTM_Iq_lim_hook(int16_t iq){
 		app_adc_clear_mode(M365_MODE_TEMP);
 	}
 
-
-	if(pwm_force == false && abs(iq) <= minimum_current && abs(FW_M1.AvVolt_qd.q) < MIN_DUTY_PWM){
-		VescToSTM_pwm_stop();
-	}else{
-		VescToSTM_pwm_start();  //Function checks if PWM off otherwise it does nothing
+	if(minimum_current>0 && pMCI[M1]->pSTM->hFaultOccurred == 0){
+		if(pwm_force == false && abs(iq) <= minimum_current && abs(FW_M1.AvVolt_qd.q) < MIN_DUTY_PWM){
+			VescToSTM_pwm_stop();
+		}else{
+			VescToSTM_pwm_start();  //Function checks if PWM off otherwise it does nothing
+		}
 	}
 	return iq;
 }
@@ -244,6 +249,7 @@ void VescToSTM_pwm_start(void){
 }
 
 void VescToSTM_update_torque(int32_t q, int32_t min_erpm, int32_t max_erpm){
+	VescToSTM_pwm_force(false, false);
 	q *= DIR_MUL;
 	if(q >= 0){
 		FW_M1.wNominalSqCurr = q*q;
