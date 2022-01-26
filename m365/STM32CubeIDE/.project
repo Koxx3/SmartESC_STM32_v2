@@ -287,16 +287,6 @@
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/qfplib.h</locationURI>
 		</link>
 		<link>
-			<name>Application/User/r_divider_phase_voltage_sensor.c</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/r_divider_phase_voltage_sensor.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/r_divider_phase_voltage_sensor.h</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/r_divider_phase_voltage_sensor.h</locationURI>
-		</link>
-		<link>
 			<name>Application/User/stm32f10x_mc_it.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/stm32f10x_mc_it.c</locationURI>

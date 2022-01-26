@@ -239,21 +239,6 @@ mc_configuration* mc_interface_get_configuration(void){
 	return &mc_conf;
 }
 
-
-void conf_general_update_current(mc_configuration *mcconf){
-	//Also something broken
-//	float current_max = mcconf->lo_current_max * CURRENT_FACTOR_A;
-//	float current_min = mcconf->lo_current_min * CURRENT_FACTOR_A;
-//	PIDSpeedHandle_M1.wUpperIntegralLimit = current_max * SP_KIDIV;
-//	PIDSpeedHandle_M1.wLowerIntegralLimit = current_min * SP_KIDIV;
-//	PIDSpeedHandle_M1.hUpperOutputLimit   = current_max;
-//	PIDSpeedHandle_M1.hLowerOutputLimit   = current_min;
-//	FW_M1.wNominalSqCurr 				  = current_max * current_max;
-//	FW_M1.hDemagCurrent					  = -(current_max*mcconf->foc_d_gain_scale_max_mod);
-//	SpeednTorqCtrlM1.MaxPositiveTorque			= current_max;
-//	SpeednTorqCtrlM1.MinNegativeTorque 			= current_min;
-}
-
 void conf_general_mcconf_hw_limits(mc_configuration *mcconf) {
 	utils_truncate_number(&mcconf->l_current_max_scale, 0.0, 1.0);
 	utils_truncate_number(&mcconf->l_current_min_scale, 0.0, 1.0);
@@ -432,7 +417,7 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	}
 	HALL_M1.SwitchSpeed = VescToSTM_erpm_to_speed(mcconf->foc_hall_interp_erpm);
 
-	if(mcconf->l_temp_fet_end > 75.0) mcconf->l_temp_fet_end = 75.0;  //cannot measure more than 75°C for now (Hardware?)
+	utils_truncate_number(&mcconf->l_temp_fet_end, 0, 75); //cannot measure more than 75°C for now (Hardware?)
 	float t_threshold = ((V0_V + (dV_dT * (T0_C-mcconf->l_temp_fet_end)))*INT_SUPPLY_VOLTAGE);
 	TempSensorParamsM1.hOverTempThreshold      = (uint16_t)(t_threshold);
 	t_threshold = ((V0_V + (dV_dT * (OV_TEMPERATURE_HYSTERESIS_C+T0_C-mcconf->l_temp_fet_end)))*INT_SUPPLY_VOLTAGE);
@@ -443,11 +428,6 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 
 	RealBusVoltageSensorParamsM1.UnderVoltageThreshold = mcconf->l_min_vin * BATTERY_VOLTAGE_GAIN;
 	RealBusVoltageSensorParamsM1.OverVoltageThreshold = mcconf->l_max_vin * BATTERY_VOLTAGE_GAIN;
-
-	//save fixed_point vars;
-	mcconf->si_wheel_diameter_s16q16 = float_to_s16q16(mcconf->si_wheel_diameter);
-	mcconf->si_gear_ratio_s16_q16 = float_to_s16q16(mcconf->si_wheel_diameter);
-
 
 	// BLDC switching and drive
 	mcconf->motor_type = MOTOR_TYPE_FOC;
@@ -470,7 +450,6 @@ void conf_general_calc_apply_foc_cc_kp_ki_gain(mc_configuration *mcconf, float t
 	float kp = l * bw;
 	float ki = r * bw;
 	float gain = 1.0e-3 / (lambda * lambda);
-//	float gain = (0.00001 / r) / (lambda * lambda); // Old method
 
 	mcconf->foc_current_kp = kp;
 	mcconf->foc_current_ki = ki;

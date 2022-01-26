@@ -32,7 +32,6 @@
 #include "pqd_motor_power_measurement.h"
 #include "flux_weakening_ctrl.h"
 #include "r3_2_f1xx_pwm_curr_fdbk.h"
-#include "r_divider_phase_voltage_sensor.h"
 
 #include "max_torque_per_ampere.h"
 #include "hall_speed_pos_fdbk.h"
@@ -59,7 +58,6 @@ extern RDivider_Handle_t RealBusVoltageSensorParamsM1;
 extern CircleLimitation_Handle_t CircleLimitationM1;
 extern RampExtMngr_Handle_t RampExtMngrHFParamsM1;
 extern MTPA_Handle_t MTPARegM1;
-extern RPhase_Handle_t RealPhaseVoltageSensorParamsM1;
 
 /* USER CODE BEGIN Additional extern */
 

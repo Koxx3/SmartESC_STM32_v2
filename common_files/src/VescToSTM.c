@@ -24,7 +24,9 @@ stm_state VescToSTM_mode;
 float adc_1;
 float adc_2;
 
+float motor_voltage; //calculates motor voltage from ERPM and flux linkage
 int32_t minimum_current;
+bool pwm_force; //State of PWM force on
 
 #define DIR_MUL   (mc_conf.m_invert_direction ? -1 : 1)
 
@@ -37,13 +39,14 @@ void VescToSTM_set_minimum_current(float current){
 	minimum_current = current_to_torque(current*1000);
 }
 
-bool pwm_force;
+
 void VescToSTM_pwm_force(bool force){
 	pwm_force = force;
-	VescToSTM_pwm_start();
+	if(force == true){
+		VescToSTM_pwm_start();
+	}
 }
 
-float volt;
 int16_t VescToSTM_Iq_lim_hook(int16_t iq){
 
 	int32_t temp_fet_start = mc_conf.l_temp_fet_start;
@@ -56,8 +59,7 @@ int16_t VescToSTM_Iq_lim_hook(int16_t iq){
 	}
 
 
-
-	if(abs(iq) <= minimum_current && abs(FW_M1.AvVolt_qd.q) < MIN_DUTY_PWM && !pwm_force){
+	if(pwm_force == false && abs(iq) <= minimum_current && abs(FW_M1.AvVolt_qd.q) < MIN_DUTY_PWM){
 		VescToSTM_pwm_stop();
 	}else{
 		VescToSTM_pwm_start();  //Function checks if PWM off otherwise it does nothing
@@ -165,7 +167,7 @@ void VescToSTM_set_current(float iq, float id){ //in Amps
 	MCI_SetCurrentReferences(pMCI[M1],currComp);
 }
 
-void VescToSTM_set_open_loop_rpm(int16_t erpm){
+void VescToSTM_set_open_loop_erpm(int16_t erpm){
 	SpeednTorqCtrlM1.SPD->open_speed = erpm_to_int16(erpm);
 }
 
@@ -227,15 +229,13 @@ void VescToSTM_pwm_stop(void){
 	}else{
 		int32_t erpm = VescToSTM_get_erpm_fast();
 		float rad_s = erpm * ((2.0 * M_PI) / 60.0);
-		volt = rad_s * mc_conf.foc_motor_flux_linkage;
-
+		motor_voltage = rad_s * mc_conf.foc_motor_flux_linkage;
 	}
 }
 
 void VescToSTM_pwm_start(void){
 	if(PWM_Handle_M1._Super.PWM_off){
-
-		float fVd = 32768.0 / VescToSTM_get_bus_voltage() * volt;
+		float fVd = 32768.0 / VescToSTM_get_bus_voltage() * motor_voltage;
 		utils_truncate_number(&fVd, -32767, 32767);
 		PIDIqHandle_M1.wIntegralTerm = fVd * TF_KIDIV;
 		PIDIdHandle_M1.wIntegralTerm = -PIDIqHandle_M1.wIntegralTerm/4;
@@ -449,20 +449,44 @@ float VescToSTM_get_Vq(){
 	return fVq;
 }
 
+/**
+ * Calculates the bus voltage
+ *
+ * @return
+ * Voltage
+ */
 float VescToSTM_get_bus_voltage(){
 	return (float)(VBS_GetAvBusVoltage_d(pMCT[M1]->pBusVoltageSensor)) / BATTERY_VOLTAGE_GAIN;
 }
 
+/**
+ * Calculates the ERPM from internal average speed
+ *
+ * @return
+ * erpm
+ */
 int32_t VescToSTM_get_erpm(){
 	int32_t erpm = VescToSTM_speed_to_erpm(MCI_GetAvrgMecSpeedUnit( pMCI[M1] ));
 	return erpm;
 }
 
+/**
+ * Calculates the ERPM from internal instant speed
+ *
+ * @return
+ * erpm
+ */
 int32_t VescToSTM_get_erpm_fast(){
 	int32_t speed = ( (  HALL_M1._Super.hElSpeedDpp * ( int32_t )HALL_M1._Super.hMeasurementFrequency * (int32_t) SPEED_UNIT ) / (( int32_t ) HALL_M1._Super.DPPConvFactor));
 	return VescToSTM_speed_to_erpm(speed);
 }
 
+/**
+ * Calculates the RPM from internal average speed
+ *
+ * @return
+ * rpm
+ */
 int32_t VescToSTM_get_rpm(){
 	int32_t rpm = VescToSTM_speed_to_rpm(MCI_GetAvrgMecSpeedUnit( pMCI[M1] ));
 	return rpm;
@@ -659,7 +683,7 @@ float VescToSTM_get_battery_level(float *wh_left) {
 
 float VescToSTM_get_duty_cycle_now(void) {
 	if(PWM_Handle_M1._Super.PWM_off){
-		return 1.0 / VescToSTM_get_bus_voltage() * volt;
+		return 1.0 / VescToSTM_get_bus_voltage() * motor_voltage;
 	}else{
 		int16_t u16Ampl = FW_M1.AvVoltAmpl * SIGN(FW_M1.AvVolt_qd.q);
 		return u16Ampl / 32768.0;
@@ -732,6 +756,9 @@ mc_fault_code VescToSTM_get_fault(void) {
 		break;
 	case MC_UNDER_VOLT:
 		return FAULT_CODE_UNDER_VOLTAGE;
+		break;
+	case MC_BREAK_IN:
+		return FAULT_CODE_ABS_OVER_CURRENT;
 		break;
 	default:
 		return FAULT_CODE_NONE;

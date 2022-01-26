@@ -73,7 +73,7 @@ mc_fault_code VescToSTM_get_fault(void);
 uint8_t VescToSTM_get_uid(uint8_t * ptr, uint8_t size);
 void VescToSTM_enable_timeout(bool enbale);
 void VescToSTM_set_open_loop(bool enabled, int16_t init_angle, int16_t erpm);
-void VescToSTM_set_open_loop_rpm(int16_t erpm);
+void VescToSTM_set_open_loop_erpm(int16_t erpm);
 void VescToSTM_ramp_current(float iq, float id);
 void VescToSTM_set_current(float iq, float id);
 void VescToSTM_set_brake_current_rel(float val);

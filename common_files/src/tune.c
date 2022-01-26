@@ -333,7 +333,7 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 	VescToSTM_enable_timeout(false);
 
 	int cnt = 0;
-	float rpm_now = 0;
+	float erpm_now = 0;
 
 	VescToSTM_set_open_loop(true, 0, 0);
 
@@ -353,8 +353,8 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 	const int max_time = 15000;
 
 	while (fabsf(VescToSTM_get_duty_cycle_now_fast()) < duty) {
-		rpm_now += erpm_per_sec / 1000.0;
-		VescToSTM_set_open_loop_rpm(rpm_now);
+		erpm_now += erpm_per_sec / 1000.0;
+		VescToSTM_set_open_loop_erpm(erpm_now);
 
 		vTaskDelay(MS_TO_TICKS(1));
 		cnt++;
@@ -382,7 +382,7 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 			break;
 		}
 
-		if (rpm_now >= 12000) {
+		if (erpm_now >= 12000) {
 			break;
 		}
 	}
@@ -410,7 +410,7 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 		iq_avg /= samples2;
 		id_avg /= samples2;
 
-		float rad_s = rpm_now * ((2.0 * M_PI) / 60.0);
+		float rad_s = erpm_now * ((2.0 * M_PI) / 60.0);
 		float v_mag = qfp_fsqrt(SQ(vq_avg) + SQ(vd_avg));
 		float i_mag = qfp_fsqrt(SQ(iq_avg) + SQ(id_avg));
 		*linkage = (v_mag - (2.0 / 3.0) * res * i_mag) / rad_s - (2.0 / 3.0) * i_mag * ind;

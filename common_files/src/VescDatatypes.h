@@ -429,9 +429,7 @@ typedef struct {
 	// Setup info
 	uint8_t si_motor_poles;
 	float si_gear_ratio;
-	int32_t si_gear_ratio_s16_q16;
 	float si_wheel_diameter;
-	int32_t si_wheel_diameter_s16q16;
 	BATTERY_TYPE si_battery_type;
 	int si_battery_cells;
 	float si_battery_ah;

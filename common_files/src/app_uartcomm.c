@@ -36,11 +36,7 @@
 
 NinebotPack frame;
 
-
-//const uint8_t m365_mode[3] = { M365_MODE_SLOW, M365_MODE_DRIVE, M365_MODE_SPORT};
-
 m365Answer m365_to_display = {.start1=NinebotHeader0, .start2=NinebotHeader1, .len=8, .addr=0x21, .cmd=0x64, .arg=0, .mode=1};
-
 
 uint8_t app_connection_timout = 8;
 
@@ -75,11 +71,8 @@ static float decoded_level2 = 0.0;
 #define TimeMsElapsedSinceX(start)                                        \
   ((uint32_t)((xTaskGetTickCount()- (start))/2))
 
-volatile uint32_t cyg;
 
-uint32_t xx_load;
 void vTimerCallback( TimerHandle_t xTimer ){
-	uint32_t cycles = *DWT_CYCCNT;
 	if(SpeednTorqCtrlM1.SPD->open_loop==true) return;
 	uint32_t temp1 = adc1;
 	uint32_t temp2 = adc2;
@@ -219,7 +212,6 @@ void vTimerCallback( TimerHandle_t xTimer ){
 	default:
 		break;
 	}
-	xx_load = *DWT_CYCCNT - cycles;
 }
 
 float app_adc_get_decoded_level(void) {
@@ -327,7 +319,7 @@ void task_app(void * argument)
 
 void task_app_init(port_str * port){
 	if(port->task_handle == NULL){
-		xTaskCreate(task_app, "APP-USART", 128, (void*)port, PRIO_BELOW_NORMAL, &port->task_handle);
+		xTaskCreate(task_app, "APP-ADC", 128, (void*)port, PRIO_BELOW_NORMAL, &port->task_handle);
 	}
 }
 

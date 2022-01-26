@@ -867,15 +867,6 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					mcconf->lo_in_current_min = mcconf->l_in_current_min;
 					mcconf->lo_in_current_max = mcconf->l_in_current_max;
 
-					//VescToSTM_set_erpm_limits(mcconf);
-
-					conf_general_update_current(mcconf);
-
-					//if (store) {
-					//	conf_general_store_mc_configuration(mcconf, mc_interface_get_motor_thread() == 2);
-					//}
-
-
 					if (ack) {
 						ind = 0;
 						uint8_t send_buffer[PACKET_SIZE(20)];
