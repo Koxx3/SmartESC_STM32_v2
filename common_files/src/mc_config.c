@@ -287,6 +287,27 @@ RDivider_Handle_t RealBusVoltageSensorParamsM1 =
   .UnderVoltageThreshold =  UD_VOLTAGE_THRESHOLD_V * BATTERY_VOLTAGE_GAIN,
   .aBuffer = RealBusVoltageSensorFilterBufferM1,
 };
+
+
+RPhase_Handle_t RealPhaseVoltageSensorParamsM1 = {
+		.Phase[0] = {
+			.regADC = ADC1,
+			.channel = PHASE_A_V_ADC_CHANNEL,
+			.samplingTime = LL_ADC_SAMPLINGTIME_1CYCLE_5
+		},
+		.Phase[1] = {
+			.regADC = ADC1,
+			.channel = PHASE_B_V_ADC_CHANNEL,
+			.samplingTime = LL_ADC_SAMPLINGTIME_1CYCLE_5
+		},
+		.Phase[2] = {
+			.regADC = ADC1,
+			.channel = PHASE_C_V_ADC_CHANNEL,
+			.samplingTime = LL_ADC_SAMPLINGTIME_1CYCLE_5
+		}
+};
+
+
 /*
 UI_Handle_t UI_Params =
 {

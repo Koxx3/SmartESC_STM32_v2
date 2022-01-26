@@ -46,7 +46,7 @@ int16_t VescToSTM_Iq_lim_hook(int16_t iq);
 void VescToSTM_pwm_stop(void);
 void VescToSTM_pwm_start(void);
 void VescToSTM_set_minimum_current(float current);
-
+void VescToSTM_pwm_force(bool force);
 void VescToSTM_timeout_reset();
 void VescToSTM_handle_timeout();
 

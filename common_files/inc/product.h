@@ -48,6 +48,9 @@
 
 #ifdef M365
 #define VBUS_ADC_CHANNEL                                                     MC_ADC_CHANNEL_2
+#define PHASE_A_V_ADC_CHANNEL                                                MC_ADC_CHANNEL_6
+#define PHASE_B_V_ADC_CHANNEL                                                MC_ADC_CHANNEL_7
+#define PHASE_C_V_ADC_CHANNEL                                                MC_ADC_CHANNEL_9
 #define VOLTAGE_DIVIDER_GAIN     											 (float)2650.0
 
 #define VESC_USART_DMA													     huart3

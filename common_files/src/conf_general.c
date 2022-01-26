@@ -42,14 +42,13 @@
 mc_configuration mc_conf;
 app_configuration appconf;
 
-
 void conf_general_init(void) {
 	conf_general_read_app_configuration(&appconf);
 	app_set_configuration(&appconf);
 
 	conf_general_read_mc_configuration(&mc_conf, 0);
 	conf_general_setup_mc(&mc_conf);
-	
+
 	//enable cycle counter
 	DEMCR |= DEMCR_TRCENA;
 	DWT_CTRL |= CYCCNTENA;

@@ -37,7 +37,13 @@ void VescToSTM_set_minimum_current(float current){
 	minimum_current = current_to_torque(current*1000);
 }
 
+bool pwm_force;
+void VescToSTM_pwm_force(bool force){
+	pwm_force = force;
+	VescToSTM_pwm_start();
+}
 
+float volt;
 int16_t VescToSTM_Iq_lim_hook(int16_t iq){
 
 	int32_t temp_fet_start = mc_conf.l_temp_fet_start;
@@ -49,7 +55,9 @@ int16_t VescToSTM_Iq_lim_hook(int16_t iq){
 		app_adc_clear_mode(M365_MODE_TEMP);
 	}
 
-	if(abs(iq) <= minimum_current && abs(FW_M1.AvVolt_qd.q) < MIN_DUTY_PWM && samples.state == SAMP_IDLE){
+
+
+	if(abs(iq) <= minimum_current && abs(FW_M1.AvVolt_qd.q) < MIN_DUTY_PWM && !pwm_force){
 		VescToSTM_pwm_stop();
 	}else{
 		VescToSTM_pwm_start();  //Function checks if PWM off otherwise it does nothing
@@ -207,6 +215,7 @@ void VescToSTM_enable_timeout(bool enbale){
 	timeout_enable = enbale;
 }
 
+
 void VescToSTM_pwm_stop(void){
 	if(PWM_Handle_M1._Super.PWM_off == false){
 		PWMC_SwitchOffPWM(&PWM_Handle_M1._Super);
@@ -215,14 +224,17 @@ void VescToSTM_pwm_stop(void){
 		FOCVars[M1].Vqd.d=0;
 		FOCVars[M1].Vqd.q=0;
 		FW_Clear(&FW_M1);
+	}else{
+		int32_t erpm = VescToSTM_get_erpm_fast();
+		float rad_s = erpm * ((2.0 * M_PI) / 60.0);
+		volt = rad_s * mc_conf.foc_motor_flux_linkage;
+
 	}
 }
 
 void VescToSTM_pwm_start(void){
 	if(PWM_Handle_M1._Super.PWM_off){
-		int32_t erpm = VescToSTM_get_erpm_fast();
-		float rad_s = erpm * ((2.0 * M_PI) / 60.0);
-		float volt = rad_s * mc_conf.foc_motor_flux_linkage;
+
 		float fVd = 32768.0 / VescToSTM_get_bus_voltage() * volt;
 		utils_truncate_number(&fVd, -32767, 32767);
 		PIDIqHandle_M1.wIntegralTerm = fVd * TF_KIDIV;
@@ -646,9 +658,14 @@ float VescToSTM_get_battery_level(float *wh_left) {
 }
 
 float VescToSTM_get_duty_cycle_now(void) {
-	int16_t u16Ampl = FW_M1.AvVoltAmpl * SIGN(FW_M1.AvVolt_qd.q);
-	return u16Ampl / 32768.0;
+	if(PWM_Handle_M1._Super.PWM_off){
+		return 1.0 / VescToSTM_get_bus_voltage() * volt;
+	}else{
+		int16_t u16Ampl = FW_M1.AvVoltAmpl * SIGN(FW_M1.AvVolt_qd.q);
+		return u16Ampl / 32768.0;
+	}
 }
+
 
 float VescToSTM_get_duty_cycle_now_fast(void) {
 	int32_t AvVoltAmpl = MCM_Sqrt(FW_M1.AvVolt_qd.d * FW_M1.AvVolt_qd.d + FW_M1.AvVolt_qd.q * FW_M1.AvVolt_qd.q)* SIGN(FW_M1.AvVolt_qd.q);

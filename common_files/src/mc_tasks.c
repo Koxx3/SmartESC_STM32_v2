@@ -195,6 +195,7 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
   /********************************************************/
   pBusSensorM1 = &RealBusVoltageSensorParamsM1;
   RVBS_Init(pBusSensorM1);
+  RVPS_Init(&RealPhaseVoltageSensorParamsM1);
 
   /*************************************************/
   /*   Power measurement component initialization  */
@@ -849,6 +850,7 @@ __weak void TSK_SafetyTask_PWMOFF(uint8_t bMotor)
   CodeReturn |= errMask[bMotor] & NTC_CalcAvTemp(pTemperatureSensor[bMotor]); /* check for fault if FW protection is activated. It returns MC_OVER_TEMP or MC_NO_ERROR */
   CodeReturn |= PWMC_CheckOverCurrent(pwmcHandle[bMotor]);                    /* check for fault. It return MC_BREAK_IN or MC_NO_FAULTS (for STM32F30x can return MC_OVER_VOLT in case of HW Overvoltage) */
   CodeReturn |= CURR_CalcMainCurrent(pMainCurrentSensor);
+  RVPS_get_phases(&RealPhaseVoltageSensorParamsM1);
 
   if(bMotor == M1)
   {
