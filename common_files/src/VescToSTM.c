@@ -713,7 +713,7 @@ float VescToSTM_get_duty_cycle_now(void) {
 
 
 float VescToSTM_get_duty_cycle_now_fast(void) {
-	int32_t AvVoltAmpl = MCM_Sqrt(SQ(FW_M1.AvVolt_qd.q) + SQ(FW_M1.AvVolt_qd.q))* SIGN(FW_M1.AvVolt_qd.q);
+	int32_t AvVoltAmpl = MCM_Sqrt(SQ(FW_M1.AvVolt_qd.q) + SQ(FW_M1.AvVolt_qd.d))* SIGN(FW_M1.AvVolt_qd.q);
 	return AvVoltAmpl / 32768.0;
 }
 

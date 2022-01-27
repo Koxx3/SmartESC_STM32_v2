@@ -414,6 +414,12 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 		float i_mag = qfp_fsqrt(SQ(iq_avg) + SQ(id_avg));
 		*linkage = (v_mag - (2.0 / 3.0) * res * i_mag) / rad_s - (2.0 / 3.0) * i_mag * ind;
 
+		while (erpm_now) {
+			erpm_now -= erpm_per_sec / 1000.0;
+			VescToSTM_set_open_loop_erpm(erpm_now);
+			vTaskDelay(MS_TO_TICKS(1));
+		}
+
 		VescToSTM_set_current(0, 0);
 		VescToSTM_pwm_force(false, false);
 		VescToSTM_stop_motor();
@@ -427,6 +433,7 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 		result = true;
 	}
 	VescToSTM_set_current(0, 0);
+	//vTaskDelay(4000);
 	MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
 	VescToSTM_start_motor();
 	VescToSTM_enable_timeout(true);
