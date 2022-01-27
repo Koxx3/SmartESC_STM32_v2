@@ -114,10 +114,10 @@ Can read it in "VESC Terminal" (or others Serial Terminal)
 - 2 = MC_OVER_VOLT    (Software over voltage)
 - 4 = MC_UNDER_VOLT   (Software under voltage)
 - 8 = MC_OVER_TEMP    (Software over temperature)
-- 10 = MC_START_UP    (Startup failed)
-- 20 = MC_SPEED_FDBK  (Speed feedback)
-- 40 = MC_BREAK_IN    (Emergency input (Over current))
-- 80 = MC_SW_ERROR
+- 16 = MC_START_UP    (Startup failed)
+- 32 = MC_SPEED_FDBK  (Speed feedback)
+- 64 = MC_BREAK_IN    (Emergency input (Over current))
+- 128 = MC_SW_ERROR
 
 # Command available in VESCTool terminal
 
