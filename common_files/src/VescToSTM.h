@@ -6,6 +6,8 @@
 #include <stdint.h>
 #include "VescDatatypes.h"
 
+#define DIR_MUL   (mc_conf.m_invert_direction ? -1 : 1)
+
 typedef enum {
    STM_STATE_IDLE = 0,
    STM_STATE_SPEED,

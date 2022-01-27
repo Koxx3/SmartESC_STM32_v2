@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <string.h>
+#include <math.h>
 #include "VescToSTM.h"
 #include "mc_interface.h"
 #include "stm32f1xx_hal.h"
@@ -10,10 +12,8 @@
 #include "task.h"
 #include "conf_general.h"
 #include "utils.h"
-#include <string.h>
 #include "product.h"
 #include "current_sense.h"
-#include <math.h>
 #include "app.h"
 #include "ninebot.h"
 #include "VescCommand.h"
@@ -28,18 +28,33 @@ float motor_voltage; //calculates motor voltage from ERPM and flux linkage
 int32_t minimum_current;
 volatile bool pwm_force; //State of PWM force on
 
-#define DIR_MUL   (mc_conf.m_invert_direction ? -1 : 1)
-
+/**
+ * Calculates integer torque from mA.
+ *
+ * @param curr_ma
+ * Setpoint in mA
+ *
+ * @return
+ * Speed, in m/s
+ */
 int32_t current_to_torque(int32_t curr_ma){
 	float ret = curr_ma * CURRENT_FACTOR_mA;
 	return ret;
 }
 
+/**
+ * Sets the minimum current for PWM off feature
+ *
+ * @param currrent
+ * Limit in Ampere
+ */
 void VescToSTM_set_minimum_current(float current){
 	minimum_current = current_to_torque(current*1000);
 }
 
-
+/**
+ * Force PWM on
+ */
 void VescToSTM_pwm_force(bool force, bool update){
 	pwm_force = force;
 	if(update==true){
@@ -391,8 +406,8 @@ float VescToSTM_get_temperature2(){
 
 
 float VescToSTM_get_phase_current(){
-	int32_t wAux1 = FW_M1.AvAmpere_qd.q * FW_M1.AvAmpere_qd.q;
-	int32_t wAux2 = FW_M1.AvAmpere_qd.d * FW_M1.AvAmpere_qd.d;
+	int32_t wAux1 = SQ(FW_M1.AvAmpere_qd.q);
+	int32_t wAux2 = SQ(FW_M1.AvAmpere_qd.d);
 	wAux1 += wAux2;
 	wAux1 = MCM_Sqrt(wAux1);
 	wAux1 = wAux1 * SIGN(FW_M1.AvAmpere_qd.q);
@@ -559,7 +574,7 @@ uint32_t VescToSTM_get_odometer(void) {
  */
 float VescToSTM_get_speed(void) {
 	float temp = (((float)MCI_GetAvrgMecSpeedUnit(pMCI[M1]) / 10.0) * mc_conf.si_wheel_diameter * M_PI) / mc_conf.si_gear_ratio / mc_conf.si_motor_poles;
-	return temp;
+	return temp * DIR_MUL;
 }
 
 /**
@@ -698,7 +713,7 @@ float VescToSTM_get_duty_cycle_now(void) {
 
 
 float VescToSTM_get_duty_cycle_now_fast(void) {
-	int32_t AvVoltAmpl = MCM_Sqrt(FW_M1.AvVolt_qd.d * FW_M1.AvVolt_qd.d + FW_M1.AvVolt_qd.q * FW_M1.AvVolt_qd.q)* SIGN(FW_M1.AvVolt_qd.q);
+	int32_t AvVoltAmpl = MCM_Sqrt(SQ(FW_M1.AvVolt_qd.q) + SQ(FW_M1.AvVolt_qd.q))* SIGN(FW_M1.AvVolt_qd.q);
 	return AvVoltAmpl / 32768.0;
 }
 

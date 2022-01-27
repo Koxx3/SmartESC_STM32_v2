@@ -54,7 +54,6 @@ void conf_general_init(void) {
 	DWT_CTRL |= CYCCNTENA;
 
 	MCI_StartMotor(pMCI[M1]);
-
 }
 
 /**
@@ -243,6 +242,7 @@ void conf_general_mcconf_hw_limits(mc_configuration *mcconf) {
 	utils_truncate_number(&mcconf->l_current_max_scale, 0.0, 1.0);
 	utils_truncate_number(&mcconf->l_current_min_scale, 0.0, 1.0);
 
+	if(mcconf->override_limits == true) return;
 	// This limit should always be active, as starving the threads never
 	// makes sense.
 

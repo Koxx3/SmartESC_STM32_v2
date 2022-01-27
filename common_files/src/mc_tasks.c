@@ -86,8 +86,6 @@ NTC_Handle_t *pTemperatureSensor[NBR_OF_MOTORS];
 CURR_Handle_t *pMainCurrentSensor;
 
 PWMC_Handle_t * pwmcHandle[NBR_OF_MOTORS];
-DOUT_handle_t *pR_Brake[NBR_OF_MOTORS];
-DOUT_handle_t *pOCPDisabling[NBR_OF_MOTORS];
 PQD_MotorPowMeas_Handle_t *pMPM[NBR_OF_MOTORS];
 CircleLimitation_Handle_t *pCLM[NBR_OF_MOTORS];
 FW_Handle_t *pFW[NBR_OF_MOTORS];
@@ -592,6 +590,8 @@ __weak void FOC_CalcCurrRef(uint8_t bMotor)
        FOCVars[bMotor].Iqdref = FW_CalcCurrRef(pFW[bMotor],IqdTmp);
     }
 
+  }else{
+	  FOCVars[bMotor].Iqdref.q =  VescToSTM_Iq_lim_hook(FOCVars[bMotor].Iqdref.q);
   }
   /* USER CODE BEGIN FOC_CalcCurrRef 1 */
 

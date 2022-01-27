@@ -11,6 +11,7 @@
 #include "stdlib.h"
 #include "VescToSTM.h"
 #include "ninebot.h"
+#include "conf_general.h"
 
 void terminal_top(PACKET_STATE_t * phandle){
     TaskStatus_t * taskStats;
@@ -96,6 +97,19 @@ void terminal_process_string(char *str, PACKET_STATE_t * phandle) {
 			}
 		} else {
 			commands_printf(phandle, "This command requires two arguments.\n");
+		}
+	}else if (strcmp(argv[0], "limits") == 0){
+		if (argc == 2){
+			uint32_t enable = atoi(argv[1]);
+			if(enable){
+				mc_conf.override_limits = true;
+				commands_printf(phandle, "Hardware limits override active!");
+			}else{
+				mc_conf.override_limits = false;
+				commands_printf(phandle, "Hardware limits override inactive.");
+			}
+		}else{
+			commands_printf(phandle, "Usage: limits 0/1");
 		}
 	}
 }
