@@ -187,7 +187,7 @@ void send_sample(PACKET_STATE_t * phandle){
 			vPortFree(samples.m_v0_samples);
 			vPortFree(samples.m_v1_samples);
 			vPortFree(samples.m_v2_samples);
-			VescToSTM_pwm_force(false, false);
+			VescToSTM_pwm_force(false, true);
 
 #endif
 			samples.phandle = NULL;

@@ -58,11 +58,9 @@ void VescToSTM_set_minimum_current(float current){
 void VescToSTM_pwm_force(bool force, bool update){
 	pwm_force = force;
 	if(update==true){
-		if(force == true){
-			VescToSTM_pwm_start();
-		}else{
-			VescToSTM_pwm_stop();
-		}
+		VescToSTM_pwm_start();
+	}else{
+		VescToSTM_pwm_stop();
 	}
 }
 
@@ -264,7 +262,6 @@ void VescToSTM_pwm_start(void){
 }
 
 void VescToSTM_update_torque(int32_t q, int32_t min_erpm, int32_t max_erpm){
-	VescToSTM_pwm_force(false, false);
 	q *= DIR_MUL;
 	if(q >= 0){
 		FW_M1.wNominalSqCurr = q*q;

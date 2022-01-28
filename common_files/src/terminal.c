@@ -101,7 +101,7 @@ void terminal_process_string(char *str, PACKET_STATE_t * phandle) {
 	}else if (strcmp(argv[0], "limits") == 0){
 		if (argc == 2){
 			uint32_t enable = atoi(argv[1]);
-			if(enable){
+			if(enable==0){
 				mc_conf.override_limits = true;
 				commands_printf(phandle, "Hardware limits override active!");
 			}else{

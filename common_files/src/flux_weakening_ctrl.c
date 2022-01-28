@@ -1,5 +1,6 @@
 #include "flux_weakening_ctrl.h"
 #include "main.h"
+#include "product.h"
 
 /**
   * @brief  Initializes all the object variables, usually it has to be called
@@ -44,8 +45,8 @@ __weak void FW_DataProcess( FW_Handle_t * pHandle, qd_t Vqd, qd_t Iqd)
 {
 	  pHandle->AvVolt_qd.q = (Vqd.q + (pHandle->hVqdLowPassFilterBW - 1) * pHandle->AvVolt_qd.q) >> pHandle->hVqdLowPassFilterBWLOG;
 	  pHandle->AvVolt_qd.d = (Vqd.d + (pHandle->hVqdLowPassFilterBW - 1) * pHandle->AvVolt_qd.d) >> pHandle->hVqdLowPassFilterBWLOG;
-	  pHandle->AvAmpere_qd.q = (Iqd.q + (pHandle->hVqdLowPassFilterBW - 1) * pHandle->AvAmpere_qd.q) >> pHandle->hVqdLowPassFilterBWLOG;
-	  pHandle->AvAmpere_qd.d = (Iqd.d + (pHandle->hVqdLowPassFilterBW - 1) * pHandle->AvAmpere_qd.d) >> pHandle->hVqdLowPassFilterBWLOG;
+	  pHandle->AvAmpere_qd.q = ((Iqd.q + CURRENT_DISPLAY_OFFSET + (pHandle->hVqdLowPassFilterBW - 1) * pHandle->AvAmpere_qd.q) >> pHandle->hVqdLowPassFilterBWLOG);
+	  pHandle->AvAmpere_qd.d = ((Iqd.d + CURRENT_DISPLAY_OFFSET + (pHandle->hVqdLowPassFilterBW - 1) * pHandle->AvAmpere_qd.d) >> pHandle->hVqdLowPassFilterBWLOG);
 }
 
 /**

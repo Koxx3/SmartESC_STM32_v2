@@ -541,15 +541,16 @@ int conf_general_detect_apply_all_foc(float max_power_loss,	bool store_mcconf_on
 		mcconf_old->foc_motor_r = r;
 		mcconf_old->foc_motor_l = l;
 		mcconf_old->foc_motor_flux_linkage = lambda;
+		VescToSTM_stop_motor();
 		conf_general_calc_apply_foc_cc_kp_ki_gain(mcconf_old, 1000);
 		conf_general_setup_mc(mcconf_old);
 
 
 		// TODO: optionally apply temperature compensation here.
 
-		vTaskDelay(MS_TO_TICKS(3000));
+		vTaskDelay(MS_TO_TICKS(1000));
 		//wait_motor_stop(10000);
-
+		VescToSTM_start_motor();
 
 		// This will also store the settings to emulated eeprom and send them to vesc tool
 

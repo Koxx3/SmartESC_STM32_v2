@@ -149,7 +149,7 @@ float tune_foc_measure_resistance(float current, int samples) {
 
 	// Enable timeout
 	VescToSTM_enable_timeout(true);
-	VescToSTM_pwm_force(false, false);
+	VescToSTM_pwm_force(false, true);
 	return (voltage_avg / current_avg) / (SQRT_3) / 2.0;
 }
 
@@ -236,7 +236,7 @@ float tune_foc_measure_inductance(float voltage, float * used_current, uint32_t 
 
 	// Enable timeout
 	VescToSTM_enable_timeout(true);
-	VescToSTM_pwm_force(false, false);
+	VescToSTM_pwm_force(false, true);
 	return inductance / SQRT_3 / 2.0;
 }
 
@@ -414,28 +414,20 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 		float i_mag = qfp_fsqrt(SQ(iq_avg) + SQ(id_avg));
 		*linkage = (v_mag - (2.0 / 3.0) * res * i_mag) / rad_s - (2.0 / 3.0) * i_mag * ind;
 
-		while (erpm_now) {
+		while (erpm_now>0) {
 			erpm_now -= erpm_per_sec / 1000.0;
 			VescToSTM_set_open_loop_erpm(erpm_now);
 			vTaskDelay(MS_TO_TICKS(1));
 		}
 
 		VescToSTM_set_current(0, 0);
-		VescToSTM_pwm_force(false, false);
-		VescToSTM_stop_motor();
-		vTaskDelay(1);
 		VescToSTM_set_open_loop(false, 0, 0);
-
-		vTaskDelay(MS_TO_TICKS(500));
 
 		*linkage_undriven = *linkage;
 
 		result = true;
 	}
-	VescToSTM_set_current(0, 0);
-	//vTaskDelay(4000);
-	MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
-	VescToSTM_start_motor();
+	VescToSTM_pwm_force(false, true);
 	VescToSTM_enable_timeout(true);
 	return result;
 }
