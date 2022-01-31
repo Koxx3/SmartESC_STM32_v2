@@ -25,7 +25,18 @@ float adc_1;
 float adc_2;
 
 float motor_voltage; //calculates motor voltage from ERPM and flux linkage
-int32_t minimum_current;
+
+
+typedef struct {
+	uint16_t battery_cut_start;
+	uint16_t battery_cut_end;
+	uint16_t temp_cut_start;
+	uint16_t temp_cut_end;
+	int32_t minimum_current;
+}fp_struct;
+
+fp_struct fp;
+
 volatile bool pwm_force; //State of PWM force on
 
 /**
@@ -49,8 +60,29 @@ int32_t current_to_torque(int32_t curr_ma){
  * Limit in Ampere
  */
 void VescToSTM_set_minimum_current(float current){
-	minimum_current = current_to_torque(current*1000);
+	fp.minimum_current = current_to_torque(current*1000);
 }
+
+void VescToSTM_set_battery_cut(float start, float end){
+	fp.battery_cut_start = start * VOLTAGE_DIVIDER_GAIN;
+	fp.battery_cut_end = end * VOLTAGE_DIVIDER_GAIN;
+}
+
+uint16_t VescToSTM_temp_to_int(float temp){
+	float ret = ((V0_V + (dV_dT * (T0_C-temp)))*INT_SUPPLY_VOLTAGE);
+	return ret;
+}
+
+void VescToSTM_set_temp_cut(float start, float end){
+	utils_truncate_number(&end, 0, 75); //cannot measure more than 75°C for now (Hardware?)
+	utils_truncate_number(&start, 0, 75); //cannot measure more than 75°C for now (Hardware?)
+	TempSensorParamsM1.hOverTempThreshold      = VescToSTM_temp_to_int(end);
+	fp.temp_cut_end							   = VescToSTM_temp_to_int(end);
+	fp.temp_cut_start 						   = VescToSTM_temp_to_int(start);
+	TempSensorParamsM1.hOverTempDeactThreshold = VescToSTM_temp_to_int(end-OV_TEMPERATURE_HYSTERESIS_C);
+}
+
+
 
 /**
  * Force PWM on
@@ -66,17 +98,30 @@ void VescToSTM_pwm_force(bool force, bool update){
 
 int16_t VescToSTM_Iq_lim_hook(int16_t iq){
 
-	int32_t temp_fet_start = mc_conf.l_temp_fet_start;
-	int32_t temp = VescToSTM_get_temperature();
-	if(temp > temp_fet_start){
+	//Do temperature Iq limit
+	uint16_t temp = NTC_GetAvTemp_d(pMCT[M1]->pTemperatureSensor);
+	if(temp > fp.temp_cut_start){
 		app_adc_set_mode(M365_MODE_TEMP);
-		iq = utils_map_int(temp, temp_fet_start, mc_conf.l_temp_fet_end, iq, 0);
+		iq = utils_map_int(temp, fp.temp_cut_start, fp.battery_cut_end, iq, 0);
 	}else{
 		app_adc_clear_mode(M365_MODE_TEMP);
 	}
 
-	if(minimum_current>0 && pMCI[M1]->pSTM->hFaultOccurred == 0){
-		if(pwm_force == false && abs(iq) <= minimum_current && abs(FW_M1.AvVolt_qd.q) < MIN_DUTY_PWM){
+	//Do battery Iq limit
+	if(VescToSTM_mode != STM_STATE_BRAKE){
+		uint16_t Vin = VBS_GetAvBusVoltage_d(pMCT[M1]->pBusVoltageSensor);
+		if(Vin < fp.battery_cut_start){
+			if(Vin < fp.battery_cut_end){
+				iq=0;
+			}else{
+				iq = utils_map_int(Vin, fp.battery_cut_start, fp.battery_cut_end, iq, 0);
+			}
+		}
+	}
+
+	//Do PWM off feature
+	if(fp.minimum_current>0 && pMCI[M1]->pSTM->hFaultOccurred == 0){
+		if(pwm_force == false && abs(iq) <= fp.minimum_current && abs(FW_M1.AvVolt_qd.q) < MIN_DUTY_PWM){
 			VescToSTM_pwm_stop();
 		}else{
 			VescToSTM_pwm_start();  //Function checks if PWM off otherwise it does nothing
@@ -293,16 +338,6 @@ void VescToSTM_set_torque(int32_t current){
 	int q = current_to_torque(current);
 	utils_truncate_number_int(&q, SpeednTorqCtrlM1.MinNegativeTorque, SpeednTorqCtrlM1.MaxPositiveTorque);
 
-	volatile float Vin = VescToSTM_get_bus_voltage();
-	if(Vin < mc_conf.l_battery_cut_start){
-		float diff = mc_conf.l_battery_cut_start - mc_conf.l_battery_cut_end;
-		float VinDiff = Vin - mc_conf.l_battery_cut_end;
-		float qRed = (float)q / diff * VinDiff;
-		q = qRed;
-	}
-	if(Vin < mc_conf.l_battery_cut_end){
-		q=0;
-	}
 	VescToSTM_update_torque(q, mc_conf.lo_min_erpm, mc_conf.lo_max_erpm);
 }
 

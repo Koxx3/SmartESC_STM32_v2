@@ -51,6 +51,8 @@ void VescToSTM_set_minimum_current(float current);
 void VescToSTM_pwm_force(bool force, bool update);
 void VescToSTM_timeout_reset();
 void VescToSTM_handle_timeout();
+void VescToSTM_set_battery_cut(float start, float end);
+void VescToSTM_set_temp_cut(float start, float end);
 
 void VescToSTM_stop_motor();
 void VescToSTM_start_motor();

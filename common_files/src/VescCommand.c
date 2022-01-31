@@ -119,6 +119,7 @@ void commands_send_appconf(COMM_PACKET_ID packet_id, app_configuration *appconf,
 		commands_printf(phandle, "Malloc failed send appconf)");
 		return;
 	}
+	memset(send_buffer,0,512 + PACKET_HEADER);
 	uint8_t * buffer = send_buffer + PACKET_HEADER;
 	buffer[0] = packet_id;
 	int32_t len = confgenerator_serialize_appconf(&buffer[1], appconf);
@@ -256,7 +257,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 	switch (packet_id) {
 	case COMM_FW_VERSION: {
 		int32_t ind = 0;
-		uint8_t send_buffer[PACKET_SIZE(50)];
+		uint8_t send_buffer[PACKET_SIZE(60)];
 		uint8_t * buffer = send_buffer + PACKET_HEADER;
 		buffer[ind++] = COMM_FW_VERSION;
 		buffer[ind++] = FW_VERSION_MAJOR;
@@ -982,6 +983,8 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					if (mcconf->l_battery_cut_start != start || mcconf->l_battery_cut_end != end) {
 						mcconf->l_battery_cut_start = start;
 						mcconf->l_battery_cut_end = end;
+
+						VescToSTM_set_battery_cut(start, end);
 
 						/*if (store) {
 							conf_general_store_mc_configuration(mcconf,

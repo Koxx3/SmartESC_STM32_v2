@@ -10,8 +10,8 @@
 #include "mc_parameters.h"
 
 // Firmware version
-#define FW_VERSION_MAJOR			5
-#define FW_VERSION_MINOR			02
+#define FW_VERSION_MAJOR			6
+#define FW_VERSION_MINOR			00
 
 // Set to 0 for building a release and iterate during beta test builds
 #define FW_TEST_VERSION_NUMBER		0

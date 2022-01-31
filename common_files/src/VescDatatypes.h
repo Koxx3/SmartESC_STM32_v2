@@ -272,6 +272,24 @@ typedef struct {
 } bms_soc_soh_temp_stat;
 */
 
+typedef enum {
+	PID_RATE_25_HZ = 0,
+	PID_RATE_50_HZ,
+	PID_RATE_100_HZ,
+	PID_RATE_250_HZ,
+	PID_RATE_500_HZ,
+	PID_RATE_1000_HZ,
+	PID_RATE_2500_HZ,
+	PID_RATE_5000_HZ,
+	PID_RATE_10000_HZ,
+} PID_RATE;
+
+typedef enum {
+	MTPA_MODE_OFF = 0,
+	MTPA_MODE_IQ_TARGET,
+	MTPA_MODE_IQ_MEASURED
+} MTPA_MODE;
+
 typedef struct {
 	// Limits
 	float l_current_max;
@@ -334,7 +352,7 @@ typedef struct {
 	float foc_current_ki;
 	float foc_f_sw;
 	float foc_dt_us;
-	float foc_encoder_offset;
+//	float foc_encoder_offset;
 //	bool foc_encoder_inverted;
 //	float foc_encoder_ratio;
 //	float foc_encoder_sin_offset;
@@ -348,6 +366,7 @@ typedef struct {
 	float foc_motor_flux_linkage;
 	float foc_observer_gain;
 	float foc_observer_gain_slow;
+	float foc_observer_offset;
 	float foc_pll_kp;
 	float foc_pll_ki;
 	float foc_duty_dowmramp_kp;
@@ -372,13 +391,25 @@ typedef struct {
 	float foc_current_filter_const;
 	mc_foc_cc_decoupling_mode foc_cc_decoupling;
 	mc_foc_observer_type foc_observer_type;
-//	float foc_hfi_voltage_start;
-//	float foc_hfi_voltage_run;
-//	float foc_hfi_voltage_max;
-//	float foc_sl_erpm_hfi;
-//	uint16_t foc_hfi_start_samples;
-//	float foc_hfi_obs_ovr_sec;
-//	uint8_t foc_hfi_samples;
+	float foc_hfi_voltage_start;
+	float foc_hfi_voltage_run;
+	float foc_hfi_voltage_max;
+	float foc_sl_erpm_hfi;
+	uint16_t foc_hfi_start_samples;
+	float foc_hfi_obs_ovr_sec;
+	foc_hfi_samples foc_hfi_samples;
+	bool foc_offsets_cal_on_boot;
+	float foc_offsets_current[3];
+	float foc_offsets_voltage[3];
+	float foc_offsets_voltage_undriven[3];
+	bool foc_phase_filter_enable;
+	float foc_phase_filter_max_erpm;
+	MTPA_MODE foc_mtpa_mode;
+	// Field Weakening
+	float foc_fw_current_max;
+	float foc_fw_duty_start;
+	float foc_fw_ramp_time;
+	float foc_fw_q_current_factor;
 
 	// GPDrive
 //	int gpd_buffer_notify_left;
@@ -386,6 +417,8 @@ typedef struct {
 //	float gpd_current_filter_const;
 //	float gpd_current_kp;
 //	float gpd_current_ki;
+
+	PID_RATE sp_pid_loop_rate;
 
 	// Speed PID
 	float s_pid_kp;
@@ -426,6 +459,8 @@ typedef struct {
 	temp_sensor_type m_motor_temp_sens_type;
 	float m_ptc_motor_coeff;
 	int m_hall_extra_samples;
+	float m_ntcx_ptcx_temp_base;
+	float m_ntcx_ptcx_res;
 	// Setup info
 	uint8_t si_motor_poles;
 	float si_gear_ratio;
@@ -433,7 +468,10 @@ typedef struct {
 	BATTERY_TYPE si_battery_type;
 	int si_battery_cells;
 	float si_battery_ah;
+	float si_motor_nl_current;
+
 	bool override_limits;
+
 	// BMS Configuration
 //	bms_config bms;
 
@@ -463,6 +501,12 @@ typedef enum {
 	THR_EXP_NATURAL,
 	THR_EXP_POLY
 } thr_exp_mode;
+
+typedef enum {
+	SAFE_START_DISABLED = 0,
+	SAFE_START_REGULAR,
+	SAFE_START_NO_FAULT
+} SAFE_START_MODE;
 
 // PPM control types
 typedef enum {
@@ -530,6 +574,14 @@ typedef enum {
 	PAS_SENSOR_TYPE_QUADRATURE = 0
 } pas_sensor_type;
 
+typedef enum {
+	KILL_SW_MODE_DISABLED = 0,
+	KILL_SW_MODE_PPM_LOW,
+	KILL_SW_MODE_PPM_HIGH,
+	KILL_SW_MODE_ADC2_LOW,
+	KILL_SW_MODE_ADC2_HIGH
+} KILL_SW_MODE;
+
 typedef struct {
 	adc_control_type ctrl_type;
 	float hyst;
@@ -539,7 +591,7 @@ typedef struct {
 	float voltage2_start;
 	float voltage2_end;
 	bool use_filter;
-	bool safe_start;
+	SAFE_START_MODE safe_start;
 	bool cc_button_inverted;
 	bool rev_button_inverted;
 	bool voltage_inverted;
@@ -770,11 +822,14 @@ typedef struct {
 	bool pairing_done;
 	bool permanent_uart_enabled;
 	SHUTDOWN_MODE shutdown_mode;
+	bool servo_out_enable;
+	KILL_SW_MODE kill_sw_mode;
 
 	// CAN modes
 	CAN_MODE can_mode;
 	uint8_t uavcan_esc_index;
 	UAVCAN_RAW_MODE uavcan_raw_mode;
+	float uavcan_raw_rpm_max;
 
 	// Application to use
 	app_use app_to_use;
@@ -807,6 +862,7 @@ typedef struct {
 	uint16_t crc;
 } app_configuration;
 
+// Communication commands
 // Communication commands
 typedef enum {
 	COMM_FW_VERSION = 0,
@@ -927,6 +983,39 @@ typedef enum {
 	COMM_ERASE_BOOTLOADER_ALL_CAN_HW,
 
 	COMM_SET_ODOMETER,
+
+	// Power switch commands
+	COMM_PSW_GET_STATUS,
+	COMM_PSW_SWITCH,
+
+	COMM_BMS_FWD_CAN_RX,
+	COMM_BMS_HW_DATA,
+	COMM_GET_BATTERY_CUT,
+	COMM_BM_HALT_REQ,
+	COMM_GET_QML_UI_HW,
+	COMM_GET_QML_UI_APP,
+	COMM_CUSTOM_HW_DATA,
+	COMM_QMLUI_ERASE,
+	COMM_QMLUI_WRITE,
+
+	// IO Board
+	COMM_IO_BOARD_GET_ALL,
+	COMM_IO_BOARD_SET_PWM,
+	COMM_IO_BOARD_SET_DIGITAL,
+
+	COMM_BM_MEM_WRITE,
+	COMM_BMS_BLNC_SELFTEST,
+	COMM_GET_EXT_HUM_TMP,
+	COMM_GET_STATS,
+	COMM_RESET_STATS,
+
+	// Lisp
+	COMM_LISP_READ_CODE,
+	COMM_LISP_WRITE_CODE,
+	COMM_LISP_ERASE_CODE,
+	COMM_LISP_SET_RUNNING,
+	COMM_LISP_GET_STATS,
+	COMM_LISP_PRINT
 } COMM_PACKET_ID;
 
 // CAN commands

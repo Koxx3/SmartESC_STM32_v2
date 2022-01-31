@@ -421,17 +421,13 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	}
 	HALL_M1.SwitchSpeed = VescToSTM_erpm_to_speed(mcconf->foc_hall_interp_erpm);
 
-	utils_truncate_number(&mcconf->l_temp_fet_end, 0, 75); //cannot measure more than 75°C for now (Hardware?)
-	float t_threshold = ((V0_V + (dV_dT * (T0_C-mcconf->l_temp_fet_end)))*INT_SUPPLY_VOLTAGE);
-	TempSensorParamsM1.hOverTempThreshold      = (uint16_t)(t_threshold);
-	t_threshold = ((V0_V + (dV_dT * (OV_TEMPERATURE_HYSTERESIS_C+T0_C-mcconf->l_temp_fet_end)))*INT_SUPPLY_VOLTAGE);
-	TempSensorParamsM1.hOverTempDeactThreshold = (uint16_t)(t_threshold);
 	TempSensorParamsM1.hSensitivity            = (uint16_t)(ADC_REFERENCE_VOLTAGE/dV_dT);
 	TempSensorParamsM1.wV0                     = (uint16_t)(V0_V *65536/ ADC_REFERENCE_VOLTAGE);
 	TempSensorParamsM1.hT0                     = T0_C;
 
 	RealBusVoltageSensorParamsM1.UnderVoltageThreshold = mcconf->l_min_vin * BATTERY_VOLTAGE_GAIN;
 	RealBusVoltageSensorParamsM1.OverVoltageThreshold = mcconf->l_max_vin * BATTERY_VOLTAGE_GAIN;
+	VescToSTM_set_battery_cut(mcconf->l_battery_cut_start, mcconf->l_battery_cut_end);
 
 	// BLDC switching and drive
 	mcconf->motor_type = MOTOR_TYPE_FOC;
