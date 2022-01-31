@@ -274,6 +274,9 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 		buffer[ind++] = HW_TYPE_VESC;
 
 		buffer[ind++] = 0; // No custom config
+		buffer[ind++] = 0; //No phase filters
+		buffer[ind++] = 0;
+		buffer[ind++] = 0;
 
 		fw_version_sent_cnt++;
 
@@ -392,6 +395,12 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 			}
 			if (mask & ((uint32_t)1 << 20)) {
 				buffer_append_float32(buffer, VescToSTM_get_Vq(), 1e3, &ind);
+			}
+			if (mask & ((uint32_t)1 << 21)) {
+				uint8_t status = 0;
+				//status |= timeout_has_timeout();
+				//status |= timeout_kill_sw_active() << 1;
+				buffer[ind++] = status;
 			}
 
 			reply_func(send_buffer, ind, phandle);
@@ -702,7 +711,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					val.wh_charge_tot = 0;
 					val.wh_tot = 0;
 
-					float wh_batt_left = 0.0;
+					float wh_batt_left = 1.0;
 					float battery_level = VescToSTM_get_battery_level(&wh_batt_left);
 
 					int32_t ind = 0;
@@ -770,7 +779,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					}
 					if (mask & ((uint32_t)1 << 17)) {
 						uint8_t current_controller_id = app_get_configuration()->controller_id;
-						send_buffer[ind++] = current_controller_id;
+						buffer[ind++] = current_controller_id;
 					}
 					if (mask & ((uint32_t)1 << 18)) {
 						buffer[ind++] = val.num_vescs;
@@ -780,6 +789,10 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					}
 					if (mask & ((uint32_t)1 << 20)) {
 						buffer_append_uint32(buffer, VescToSTM_get_odometer(), &ind);
+					}
+					if (mask & ((uint32_t)1 << 21)) {
+						//buffer_append_uint32(send_buffer, chVTGetSystemTimeX() / (CH_CFG_ST_FREQUENCY / 1000), &ind);
+						buffer_append_uint32(buffer, xTaskGetTickCount()/2, &ind);
 					}
 
 					reply_func(send_buffer, ind, phandle);

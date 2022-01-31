@@ -190,8 +190,6 @@ int32_t confgenerator_serialize_mcconf(uint8_t *buffer, const mc_configuration *
 	buffer[ind++] = conf->m_out_aux_mode;
 	buffer[ind++] = conf->m_motor_temp_sens_type;
 	buffer_append_float32_auto(buffer, conf->m_ptc_motor_coeff, &ind);
-	buffer_append_float16(buffer, conf->m_ntcx_ptcx_res, 0.1, &ind);
-	buffer_append_float16(buffer, conf->m_ntcx_ptcx_temp_base, 10, &ind);
 	buffer[ind++] = (uint8_t)conf->m_hall_extra_samples;
 	buffer[ind++] = (uint8_t)conf->si_motor_poles;
 	buffer_append_float32_auto(buffer, conf->si_gear_ratio, &ind);
@@ -587,8 +585,6 @@ bool confgenerator_deserialize_mcconf(const uint8_t *buffer, mc_configuration *c
 	conf->m_out_aux_mode = buffer[ind++];
 	conf->m_motor_temp_sens_type = buffer[ind++];
 	conf->m_ptc_motor_coeff = buffer_get_float32_auto(buffer, &ind);
-	conf->m_ntcx_ptcx_res = buffer_get_float16(buffer, 0.1, &ind);
-	conf->m_ntcx_ptcx_temp_base = buffer_get_float16(buffer, 10, &ind);
 	conf->m_hall_extra_samples = buffer[ind++];
 	conf->si_motor_poles = buffer[ind++];
 	conf->si_gear_ratio = buffer_get_float32_auto(buffer, &ind);
