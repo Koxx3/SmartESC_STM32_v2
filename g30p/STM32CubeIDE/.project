@@ -229,12 +229,12 @@
 		<link>
 			<name>Application/User/ninebot.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/ninebot.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/ninebot.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/ninebot.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Inc/ninebot.h</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/ninebot.h</locationURI>
 		</link>
 		<link>
 			<name>Application/User/printf.c</name>
@@ -245,6 +245,26 @@
 			<name>Application/User/product.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/product.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/qfpio.S</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/qfpio.S</locationURI>
+		</link>
+		<link>
+			<name>Application/User/qfpio.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/qfpio.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/qfplib.S</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/qfplib.S</locationURI>
+		</link>
+		<link>
+			<name>Application/User/qfplib.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/qfplib.h</locationURI>
 		</link>
 		<link>
 			<name>Application/User/stm32f10x_mc_it.c</name>
