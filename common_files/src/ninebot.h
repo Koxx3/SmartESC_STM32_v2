@@ -21,9 +21,14 @@
 // Hardware port by ub4raf
 /****************************************************************************/
 
+
+#ifndef NINEBOT_H_
+#define NINEBOT_H_
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+
 //#include "mbed.h"
 #define NinebotHeader0 0x55//0x55
 #define NinebotHeader1 0xAA//0xAA
@@ -93,3 +98,5 @@ void addCRC(uint8_t * message, uint8_t size);
 
 
 uint16_t ninebot_parse(uint8_t data, NinebotPack *message);
+
+#endif
