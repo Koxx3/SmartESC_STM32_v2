@@ -22,6 +22,7 @@
  */
 
 #include "task_pwr.h"
+#include "task_led.h"
 #include "task_init.h"
 #include "main.h"
 #include "task.h"
@@ -132,9 +133,16 @@ void task_PWR(void *argument) {
 			  case NO_PRESS : break ;
 			  case SINGLE_PRESS : {
 				  m365_to_display.light = !m365_to_display.light;
+				  if(m365_to_display.light){
+					  task_LED_set_brake_light(BRAKE_LIGHT_ON);
+				  }else{
+					  task_LED_set_brake_light(BRAKE_LIGHT_OFF);
+				  }
+
 			  } break ;
 			  case LONG_PRESS :   {
 				  power_control(DEV_PWR_OFF);
+
 			  } break ;
 			  case VERY_LONG_PRESS :   {
 

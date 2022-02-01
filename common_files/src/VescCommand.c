@@ -398,7 +398,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 			}
 			if (mask & ((uint32_t)1 << 21)) {
 				uint8_t status = 0;
-				//status |= timeout_has_timeout();
+				status |= VescToSTM_get_timeout_state();
 				//status |= timeout_kill_sw_active() << 1;
 				buffer[ind++] = status;
 			}

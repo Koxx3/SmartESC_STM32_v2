@@ -34,23 +34,43 @@
 
 
 TaskHandle_t LEDHandle;
-const osThreadAttr_t LED_attributes = {
-  .name = "LED",
-  .priority = (osPriority_t) osPriorityBelowNormal,
-  .stack_size = 128 * 4
-};
+
+en_brake brake_mode = BRAKE_LIGHT_OFF;
+
+extern stm_state VescToSTM_mode;
 
 void prv_LED_blink(uint32_t speed){
 	static uint16_t cnt=0;
+	static uint8_t brake_cnt=0;
 	if(cnt>speed){
 		cnt=0;
 		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 	}else{
 		cnt++;
 	}
+
+
+	if(VescToSTM_mode == STM_STATE_BRAKE && (FW_M1.AvAmpere_qd.q < (-1*CURRENT_FACTOR_A) || FW_M1.AvAmpere_qd.q > (1*CURRENT_FACTOR_A))){
+		if(brake_cnt>20){
+			brake_cnt=0;
+			HAL_GPIO_TogglePin(BRAKE_LIGHT_GPIO_Port, BRAKE_LIGHT_Pin);
+		}else{
+			brake_cnt++;
+		}
+	}else{
+		if(brake_mode == BRAKE_LIGHT_ON){
+			HAL_GPIO_WritePin(BRAKE_LIGHT_GPIO_Port, BRAKE_LIGHT_Pin, GPIO_PIN_RESET);
+			brake_cnt=20;
+		}else{
+			HAL_GPIO_WritePin(BRAKE_LIGHT_GPIO_Port, BRAKE_LIGHT_Pin, GPIO_PIN_SET);
+			brake_cnt=0;
+		}
+	}
+
+
 }
 
-en_brake brake_mode;
+
 
 void task_LED_set_brake_light(en_brake mode){
 	brake_mode = mode;

@@ -261,8 +261,16 @@ float VescToSTM_get_pid_pos_now(){
 
 uint32_t last_reset=0;
 bool timeout_enable = true;
+bool timeout_triggerd = false;
+
+bool VescToSTM_get_timeout_state(){
+	return timeout_triggerd;
+}
+
+
 void VescToSTM_timeout_reset(){
 	last_reset = xTaskGetTickCount();
+	timeout_triggerd = false;
 };
 void VescToSTM_handle_timeout(){
 	if(!timeout_enable) {
@@ -273,6 +281,7 @@ void VescToSTM_handle_timeout(){
 			VescToSTM_set_brake(appconf.timeout_brake_current*1000);
 			app_adc_stop_output();
 			last_reset = xTaskGetTickCount();
+			timeout_triggerd = true;
 		}
 	}
 };
