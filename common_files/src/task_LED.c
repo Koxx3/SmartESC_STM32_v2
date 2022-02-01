@@ -40,12 +40,22 @@ const osThreadAttr_t LED_attributes = {
   .stack_size = 128 * 4
 };
 
-void prv_LED_blink(uint32_t ticks){
-	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, pdFALSE);
-	vTaskDelay(ticks);
-	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, pdTRUE);
-	vTaskDelay(ticks);
+void prv_LED_blink(uint32_t speed){
+	static uint16_t cnt=0;
+	if(cnt>speed){
+		cnt=0;
+		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+	}else{
+		cnt++;
+	}
 }
+
+en_brake brake_mode;
+
+void task_LED_set_brake_light(en_brake mode){
+	brake_mode = mode;
+}
+
 
 
 //#define  MC_NO_ERROR  (uint16_t)(0x0000u)      /**< @brief No error.*/
@@ -61,8 +71,8 @@ void prv_LED_blink(uint32_t ticks){
 
 void task_LED(void * argument)
 {
-	volatile uint32_t last_fault_time=0;
-	volatile uint16_t last_fault = 0;
+	uint32_t last_fault_time=0;
+	uint16_t last_fault = 0;
 	/* Infinite loop */
 	for(;;)
 	{
@@ -85,11 +95,13 @@ void task_LED(void * argument)
 				last_fault = 0;
 #endif
 			}
-			prv_LED_blink(MS_TO_TICKS(100));
+			prv_LED_blink(10);
 		}else{
-			prv_LED_blink(MS_TO_TICKS(500));
+			prv_LED_blink(50);
 		}
 
+
+		vTaskDelay(MS_TO_TICKS(10));
 	}
 }
 
