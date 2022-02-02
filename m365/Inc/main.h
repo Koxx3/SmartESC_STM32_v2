@@ -106,6 +106,8 @@ void Error_Handler(void);
 #define M1_PWM_VH_GPIO_Port GPIOA
 #define M1_PWM_WH_Pin GPIO_PIN_10
 #define M1_PWM_WH_GPIO_Port GPIOA
+#define BRAKE_LIGHT_Pin GPIO_PIN_15
+#define BRAKE_LIGHT_GPIO_Port GPIOA
 #define M1_HALL_H1_Pin GPIO_PIN_4
 #define M1_HALL_H1_GPIO_Port GPIOB
 #define M1_HALL_H2_Pin GPIO_PIN_5

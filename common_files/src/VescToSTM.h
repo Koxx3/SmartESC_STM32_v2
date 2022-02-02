@@ -51,6 +51,8 @@ void VescToSTM_set_minimum_current(float current);
 void VescToSTM_pwm_force(bool force, bool update);
 void VescToSTM_timeout_reset();
 void VescToSTM_handle_timeout();
+void VescToSTM_set_battery_cut(float start, float end);
+void VescToSTM_set_temp_cut(float start, float end);
 
 void VescToSTM_stop_motor();
 void VescToSTM_start_motor();
@@ -74,6 +76,7 @@ void VescToSTM_set_ADC2(float val);
 mc_fault_code VescToSTM_get_fault(void);
 uint8_t VescToSTM_get_uid(uint8_t * ptr, uint8_t size);
 void VescToSTM_enable_timeout(bool enbale);
+bool VescToSTM_get_timeout_state();
 void VescToSTM_set_open_loop(bool enabled, int16_t init_angle, int16_t erpm);
 void VescToSTM_set_open_loop_erpm(int16_t erpm);
 void VescToSTM_ramp_current(float iq, float id);

@@ -147,6 +147,12 @@ void conf_general_read_mc_configuration(mc_configuration *conf, bool is_motor_2)
 
 	if (!is_ok) {
 		confgenerator_set_defaults_mcconf(conf);
+		conf->modes_curr_scale[0] = MODE_SLOW_CURR;
+		conf->modes_curr_scale[1] = MODE_DRIVE_CURR;
+		conf->modes_curr_scale[2] = MODE_SPORT_CURR;
+		conf->modes_kmh_limits[0] = MODE_SLOW_SPEED;
+		conf->modes_kmh_limits[1] = MODE_DRIVE_SPEED;
+		conf->modes_kmh_limits[2] = MODE_SPORT_SPEED;
 	}
 
 }
@@ -331,8 +337,6 @@ void conf_general_setup_f_sw(uint32_t f_sw){
 	};
 }
 
-
-
 void conf_general_setup_mc(mc_configuration *mcconf) {
 
 	conf_general_setup_f_sw(mcconf->foc_f_sw);
@@ -400,12 +404,9 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	PIDIdHandle_M1.wLowerIntegralLimit    = (int32_t)-PIDIdHandle_M1.hUpperOutputLimit * TF_KIDIV,
 
 	FW_M1.wNominalSqCurr 				  = current_max * current_max;
-	if(mcconf->foc_d_gain_scale_start < 0.5){
-		mcconf->foc_d_gain_scale_start = 0.5;
-	}
-	FW_M1.hFW_V_Ref						  = 1000.0 * mcconf->foc_d_gain_scale_start;
-	FW_M1.hDemagCurrent					  = -(current_max*mcconf->foc_d_gain_scale_max_mod);
-	PIDFluxWeakeningHandle_M1.wLowerIntegralLimit = (int32_t)(-current_max*mcconf->foc_d_gain_scale_max_mod) * (int32_t)FW_KIDIV,
+	FW_M1.hFW_V_Ref						  = 1000.0 * mcconf->foc_fw_duty_start;
+	FW_M1.hDemagCurrent					  = -(mcconf->foc_fw_current_max * CURRENT_FACTOR_A);
+	PIDFluxWeakeningHandle_M1.wLowerIntegralLimit = (int32_t)FW_M1.hDemagCurrent * (int32_t)FW_KIDIV;
 
 	SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit = VescToSTM_erpm_to_speed(mcconf->l_max_erpm * 1.15);
 	SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit = VescToSTM_erpm_to_speed(mcconf->l_min_erpm * 1.15);
@@ -421,17 +422,15 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	}
 	HALL_M1.SwitchSpeed = VescToSTM_erpm_to_speed(mcconf->foc_hall_interp_erpm);
 
-	utils_truncate_number(&mcconf->l_temp_fet_end, 0, 75); //cannot measure more than 75°C for now (Hardware?)
-	float t_threshold = ((V0_V + (dV_dT * (T0_C-mcconf->l_temp_fet_end)))*INT_SUPPLY_VOLTAGE);
-	TempSensorParamsM1.hOverTempThreshold      = (uint16_t)(t_threshold);
-	t_threshold = ((V0_V + (dV_dT * (OV_TEMPERATURE_HYSTERESIS_C+T0_C-mcconf->l_temp_fet_end)))*INT_SUPPLY_VOLTAGE);
-	TempSensorParamsM1.hOverTempDeactThreshold = (uint16_t)(t_threshold);
+	VescToSTM_set_temp_cut(mcconf->l_temp_fet_start, mcconf->l_temp_fet_end);
+
 	TempSensorParamsM1.hSensitivity            = (uint16_t)(ADC_REFERENCE_VOLTAGE/dV_dT);
 	TempSensorParamsM1.wV0                     = (uint16_t)(V0_V *65536/ ADC_REFERENCE_VOLTAGE);
 	TempSensorParamsM1.hT0                     = T0_C;
 
 	RealBusVoltageSensorParamsM1.UnderVoltageThreshold = mcconf->l_min_vin * BATTERY_VOLTAGE_GAIN;
 	RealBusVoltageSensorParamsM1.OverVoltageThreshold = mcconf->l_max_vin * BATTERY_VOLTAGE_GAIN;
+	VescToSTM_set_battery_cut(mcconf->l_battery_cut_start, mcconf->l_battery_cut_end);
 
 	// BLDC switching and drive
 	mcconf->motor_type = MOTOR_TYPE_FOC;

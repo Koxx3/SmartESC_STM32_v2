@@ -106,6 +106,7 @@
 #endif
 /****************************************************************************/
 
+#define KMH_NO_LIMIT														 1337
 #define PRODUCT_FIRMWARE_VERSION                                      		 0x0001
 #define VESC_TOOL_ENABLE													 1
 #define AUTO_RESET_FAULT													 1
@@ -116,7 +117,14 @@
 #define BATTERY_SUPPORT_LEAD												 1
 #define ABS_OVR_CURRENT_TRIP_MS												 2.0
 #define MIN_DUTY_FOR_PWM_FREEWHEEL											 80
-#define CURRENT_DISPLAY_OFFSET											     60   //in cnts
+#define CURRENT_DISPLAY_OFFSET											     80   //in cnts
+
+#define MODE_SLOW_CURR														 0.5
+#define MODE_DRIVE_CURR														 0.8
+#define MODE_SPORT_CURR														 1.0
+#define MODE_SLOW_SPEED														 10
+#define MODE_DRIVE_SPEED													 25
+#define MODE_SPORT_SPEED													 KMH_NO_LIMIT
 
 #define BATTERY_VOLTAGE_GAIN     											 ((VOLTAGE_DIVIDER_GAIN * ADC_GAIN) * 512.0)
 #define CURRENT_FACTOR_A 													 ((32767.0*RSHUNT*AMPLIFICATION_GAIN)/(3.3/2))

@@ -22,6 +22,7 @@
  */
 
 #include "task_pwr.h"
+#include "task_led.h"
 #include "task_init.h"
 #include "main.h"
 #include "task.h"
@@ -132,9 +133,16 @@ void task_PWR(void *argument) {
 			  case NO_PRESS : break ;
 			  case SINGLE_PRESS : {
 				  m365_to_display.light = !m365_to_display.light;
+				  if(m365_to_display.light){
+					  task_LED_set_brake_light(BRAKE_LIGHT_ON);
+				  }else{
+					  task_LED_set_brake_light(BRAKE_LIGHT_OFF);
+				  }
+
 			  } break ;
 			  case LONG_PRESS :   {
 				  power_control(DEV_PWR_OFF);
+
 			  } break ;
 			  case VERY_LONG_PRESS :   {
 
@@ -144,15 +152,18 @@ void task_PWR(void *argument) {
 				  switch(m365_to_display.mode){
 				  	case M365_MODE_DRIVE:
 				  		app_adc_speed_mode(M365_MODE_SPORT);
-						kmh = 1337;
+						kmh = mc_conf.modes_kmh_limits[2];
+						mc_conf.lo_current_max_scale =  mc_conf.modes_curr_scale[2];
 						break;
 				  	case M365_MODE_SPORT:
 				  		app_adc_speed_mode(M365_MODE_SLOW);
-						kmh = 5;
+				  		kmh = mc_conf.modes_kmh_limits[0];
+				  		mc_conf.lo_current_max_scale = mc_conf.l_current_max * mc_conf.modes_curr_scale[0];
 						break;
 				  	case M365_MODE_SLOW:
 				  		app_adc_speed_mode(M365_MODE_DRIVE);
-						kmh = 25;
+				  		kmh = mc_conf.modes_kmh_limits[1];
+				  		mc_conf.lo_current_max_scale = mc_conf.l_current_max * mc_conf.modes_curr_scale[1];
 						break;
 				  }
 				  if(kmh==1337){

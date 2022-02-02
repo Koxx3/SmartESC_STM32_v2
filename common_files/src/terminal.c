@@ -12,6 +12,7 @@
 #include "VescToSTM.h"
 #include "ninebot.h"
 #include "conf_general.h"
+#include "utils.h"
 
 void terminal_top(PACKET_STATE_t * phandle){
     TaskStatus_t * taskStats;
@@ -111,5 +112,31 @@ void terminal_process_string(char *str, PACKET_STATE_t * phandle) {
 		}else{
 			commands_printf(phandle, "Usage: limits 0/1");
 		}
+	}else if (strcmp(argv[0], "mode_speed") == 0){
+		if (argc == 3){
+			int num = atoi(argv[1]);
+			utils_truncate_number_int(&num, 1, 3);
+			int speed = atoi(argv[2]);
+			utils_truncate_number_int(&speed, 5, 1338);
+			mc_conf.modes_kmh_limits[num-1] = speed;
+			commands_printf(phandle, "Set mode %d to %d kmh", num, speed);
+		}else{
+			commands_printf(phandle, "Usage: mode_speed [1-3] [kmh]");
+		}
+	}else if (strcmp(argv[0], "mode_scale") == 0){
+		if (argc == 3){
+			int num = atoi(argv[1]);
+			utils_truncate_number_int(&num, 1, 3);
+			num--;
+			int percent = atoi(argv[2]);
+			utils_truncate_number_int(&percent, 0, 100);
+			float scale = 1.0 / 100 * percent;
+			mc_conf.modes_curr_scale[num] = scale;
+			commands_printf(phandle, "Set mode %d to %d percent", num, percent);
+		}else{
+			commands_printf(phandle, "Usage: mode_scale [1-3] [percent]");
+		}
 	}
+
+
 }

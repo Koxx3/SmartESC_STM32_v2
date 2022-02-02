@@ -28,7 +28,15 @@
 
 extern osThreadId_t task_LED_handle;
 
+typedef enum {
+	BRAKE_LIGHT_ON,
+	BRAKE_LIGHT_OFF
+}en_brake;
+
 void task_LED_init();
+void task_LED_set_brake_light(en_brake mode);
+
+
 
 
 #endif /* TASK_LED_H_ */
