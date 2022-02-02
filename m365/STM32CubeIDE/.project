@@ -319,7 +319,7 @@
 		<link>
 			<name>Application/User/task_LED.h</name>
 			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/task_LED.h</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/task_LED.h</locationURI>
 		</link>
 		<link>
 			<name>Application/User/task_cli.c</name>
@@ -344,7 +344,7 @@
 		<link>
 			<name>Application/User/task_pwr.h</name>
 			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/task_pwr.h</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/task_pwr.h</locationURI>
 		</link>
 		<link>
 			<name>Drivers/CMSIS/system_stm32f1xx.c</name>
