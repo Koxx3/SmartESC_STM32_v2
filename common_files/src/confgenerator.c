@@ -8,6 +8,7 @@
 #include "mc_stm_types.h"
 #include "mcconf_default.h"
 #include "appconf_default.h"
+#include "product.h"
 
 
 int32_t confgenerator_serialize_mcconf(uint8_t *buffer, const mc_configuration *conf) {
@@ -855,10 +856,10 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 //	float foc_encoder_cos_offset;
 //	float foc_encoder_cos_gain;
 //	float foc_encoder_sincos_filter_constant;
-//	float foc_motor_l;
+    mcconf->foc_motor_l = MCCONF_FOC_MOTOR_L;
 //	float foc_motor_ld_lq_diff;
-//	float foc_motor_r;
-//	float foc_motor_flux_linkage;
+    mcconf->foc_motor_r = MCCONF_FOC_MOTOR_R;
+    mcconf->foc_motor_flux_linkage = MCCONF_FOC_MOTOR_FLUX_LINKAGE;
 //	float foc_observer_gain;
 //	float foc_observer_gain_slow;
 //	float foc_pll_kp;
@@ -900,7 +901,10 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 //	uint16_t foc_hfi_start_samples;
 //	float foc_hfi_obs_ovr_sec;
 //	uint8_t foc_hfi_samples;
-
+    mcconf->foc_fw_current_max = MCCONF_FOC_FW_CURRENT_MAX;
+    mcconf->foc_fw_duty_start = MCCONF_FOC_FW_DUTY_START;
+    mcconf->foc_fw_q_current_factor = MCCONF_FOC_FW_Q_CURRENT_FACTOR;
+    mcconf->foc_fw_ramp_time = MCCONF_FOC_FW_RAMP_TIME;
 	// GPDrive
 //	int gpd_buffer_notify_left;
 //	int gpd_buffer_interpol;
@@ -956,6 +960,8 @@ void confgenerator_set_defaults_mcconf(mc_configuration *mcconf) {
 	mcconf->si_battery_type = MCCONF_SI_BATTERY_TYPE;
 	mcconf->si_battery_cells = MCCONF_SI_BATTERY_CELLS;
 	mcconf->si_battery_ah = MCCONF_SI_BATTERY_AH;
+	mcconf->lo_current_max_scale = 1.0;
+	mcconf->lo_current_min_scale = 1.0;
 
 	// BMS Configuration
 //	bms_config bms;

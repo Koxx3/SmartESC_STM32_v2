@@ -255,13 +255,13 @@
 #define MCCONF_FOC_PLL_KI				30000.0
 #endif
 #ifndef MCCONF_FOC_MOTOR_L
-#define MCCONF_FOC_MOTOR_L				0.000010
+#define MCCONF_FOC_MOTOR_L				0.0001
 #endif
 #ifndef MCCONF_FOC_MOTOR_R
-#define MCCONF_FOC_MOTOR_R				0.015
+#define MCCONF_FOC_MOTOR_R				0.1
 #endif
 #ifndef MCCONF_FOC_MOTOR_FLUX_LINKAGE
-#define MCCONF_FOC_MOTOR_FLUX_LINKAGE	0.0012
+#define MCCONF_FOC_MOTOR_FLUX_LINKAGE	0.012
 #endif
 #ifndef MCCONF_FOC_MOTOR_LD_LQ_DIFF
 #define MCCONF_FOC_MOTOR_LD_LQ_DIFF		0.0
@@ -376,6 +376,21 @@
 #endif
 #ifndef MCCONF_FOC_HFI_SAMPLES
 #define MCCONF_FOC_HFI_SAMPLES			HFI_SAMPLES_16 // Samples per motor revolution for HFI
+#endif
+#ifndef MCCONF_FOC_MTPA_MODE
+#define MCCONF_FOC_MTPA_MODE				MTPA_MODE_OFF // Maximum torque per amp (MTPA) algorithm mode
+#endif
+#ifndef MCCONF_FOC_FW_CURRENT_MAX
+#define MCCONF_FOC_FW_CURRENT_MAX		0.0 // Maximum field weakening current
+#endif
+#ifndef MCCONF_FOC_FW_DUTY_START
+#define MCCONF_FOC_FW_DUTY_START		0.9 // Start field weakening at this fraction of max duty cycle
+#endif
+#ifndef MCCONF_FOC_FW_RAMP_TIME
+#define MCCONF_FOC_FW_RAMP_TIME			0.2 // Ramp time for field weakening current
+#endif
+#ifndef MCCONF_FOC_FW_Q_CURRENT_FACTOR
+#define MCCONF_FOC_FW_Q_CURRENT_FACTOR	0.02 // Factor of the FW-current to feed to the Q-axis to slow motor down when setting 0 current
 #endif
 
 // GPD

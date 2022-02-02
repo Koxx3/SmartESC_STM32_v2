@@ -322,6 +322,8 @@ typedef struct {
 	// Overridden limits (Computed during runtime)
 	float lo_current_max;
 	float lo_current_min;
+	float lo_current_max_scale;
+	float lo_current_min_scale;
 	float lo_in_current_max;
 	float lo_in_current_min;
 	float lo_current_motor_max_now;
@@ -471,6 +473,8 @@ typedef struct {
 	float si_motor_nl_current;
 
 	bool override_limits;
+	uint16_t modes_kmh_limits[3];
+	float modes_curr_scale[3];
 
 	// BMS Configuration
 //	bms_config bms;

@@ -36,7 +36,7 @@
 
 NinebotPack frame;
 
-m365Answer m365_to_display = {.start1=NinebotHeader0, .start2=NinebotHeader1, .len=8, .addr=0x21, .cmd=0x64, .arg=0, .mode=1};
+m365Answer m365_to_display = {.start1=NinebotHeader0, .start2=NinebotHeader1, .len=8, .addr=0x21, .cmd=0x64, .arg=0, .mode=M365_MODE_SPORT};
 
 uint8_t app_connection_timout = 8;
 
@@ -124,6 +124,7 @@ void vTimerCallback( TimerHandle_t xTimer ){
 	if (config.voltage_inverted) {
 		pwr = 1.0 - pwr;
 	}
+	pwr *= mc_conf.lo_current_max_scale;
 	utils_truncate_number(&pwr, 0.0, 1.0);
 
 	brake = utils_map(brake, config.voltage2_start, config.voltage2_end, 0.0, 1.0);

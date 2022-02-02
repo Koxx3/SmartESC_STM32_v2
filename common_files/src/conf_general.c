@@ -147,6 +147,12 @@ void conf_general_read_mc_configuration(mc_configuration *conf, bool is_motor_2)
 
 	if (!is_ok) {
 		confgenerator_set_defaults_mcconf(conf);
+		conf->modes_curr_scale[0] = MODE_SLOW_CURR;
+		conf->modes_curr_scale[1] = MODE_DRIVE_CURR;
+		conf->modes_curr_scale[2] = MODE_SPORT_CURR;
+		conf->modes_kmh_limits[0] = MODE_SLOW_SPEED;
+		conf->modes_kmh_limits[1] = MODE_DRIVE_SPEED;
+		conf->modes_kmh_limits[2] = MODE_SPORT_SPEED;
 	}
 
 }
@@ -330,8 +336,6 @@ void conf_general_setup_f_sw(uint32_t f_sw){
 	Error_Handler();
 	};
 }
-
-
 
 void conf_general_setup_mc(mc_configuration *mcconf) {
 
