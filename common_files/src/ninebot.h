@@ -78,19 +78,19 @@ enum m365_display_mode{
 //Drive		Slow	   	Sport		Charge 		Off	 		Lock		MPH   		Temp
 
 typedef struct {
-	uint8_t start1;  	//0
-	uint8_t start2;  	//1
-	uint8_t len;		//2
-	uint8_t addr;		//3
-	uint8_t cmd;		//4
-    uint8_t arg;		//5
-    uint8_t mode; 		//6
-	uint8_t battery;	//7
-	uint8_t light;		//8
-	uint8_t beep;		//9
-	uint8_t speed;		//10
-	uint8_t faultcode;//11
-    uint8_t CheckSum[2];//12-13
+	uint8_t start1;  	//0x55
+	uint8_t start2;  	//0xAA
+	uint8_t len;
+	uint8_t addr;
+	uint8_t cmd;
+    uint8_t arg;
+    uint8_t mode;
+	uint8_t battery;
+	uint8_t light;
+	uint8_t beep;
+	uint8_t speed;
+	uint8_t faultcode;
+    uint8_t CheckSum[2];
 } m365Answer;
 
 

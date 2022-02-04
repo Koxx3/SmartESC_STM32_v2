@@ -320,7 +320,7 @@ void VescToSTM_update_torque(int32_t q, int32_t min_erpm, int32_t max_erpm){
 	if(q >= 0){
 		//FW_M1.wNominalSqCurr = q*q;
 		//FW_M1.hDemagCurrent	= -((float)q*mc_conf.foc_d_gain_scale_max_mod);
-		SpeednTorqCtrlM1.PISpeed->wUpperIntegralLimit = q * SP_KDDIV;
+		SpeednTorqCtrlM1.PISpeed->wUpperIntegralLimit = q * SP_KIDIV;
 		SpeednTorqCtrlM1.PISpeed->wLowerIntegralLimit = mc_conf.s_pid_allow_braking ? -q : 0;
 		SpeednTorqCtrlM1.PISpeed->hUpperOutputLimit = q;
 		SpeednTorqCtrlM1.PISpeed->hLowerOutputLimit = mc_conf.s_pid_allow_braking ? -q : 0;
@@ -332,7 +332,7 @@ void VescToSTM_update_torque(int32_t q, int32_t min_erpm, int32_t max_erpm){
 		//FW_M1.wNominalSqCurr = q*q;
 		//FW_M1.hDemagCurrent	= ((float)q*mc_conf.foc_d_gain_scale_max_mod);
 		SpeednTorqCtrlM1.PISpeed->wUpperIntegralLimit = mc_conf.s_pid_allow_braking ? -q : 0;
-		SpeednTorqCtrlM1.PISpeed->wLowerIntegralLimit = q * SP_KDDIV;
+		SpeednTorqCtrlM1.PISpeed->wLowerIntegralLimit = q * SP_KIDIV;
 		SpeednTorqCtrlM1.PISpeed->hUpperOutputLimit = mc_conf.s_pid_allow_braking ? -q : 0;
 		SpeednTorqCtrlM1.PISpeed->hLowerOutputLimit = q;
 		//HALL_M1.q = q;
