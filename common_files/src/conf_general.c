@@ -343,6 +343,7 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 
 	float current_max = mcconf->l_current_max * CURRENT_FACTOR_A * mcconf->l_current_max_scale;
 	float current_min = mcconf->l_current_min * CURRENT_FACTOR_A * mcconf->l_current_min_scale;
+	mcconf->lo_current_max_scale = 1.0;
 	uint16_t max_app_speed;
 
 	if(mcconf->foc_motor_flux_linkage==0){

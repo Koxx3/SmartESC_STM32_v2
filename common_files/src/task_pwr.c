@@ -158,12 +158,12 @@ void task_PWR(void *argument) {
 				  	case M365_MODE_SPORT:
 				  		app_adc_speed_mode(M365_MODE_SLOW);
 				  		kmh = mc_conf.modes_kmh_limits[0];
-				  		mc_conf.lo_current_max_scale = mc_conf.l_current_max * mc_conf.modes_curr_scale[0];
+				  		mc_conf.lo_current_max_scale = mc_conf.modes_curr_scale[0];
 						break;
 				  	case M365_MODE_SLOW:
 				  		app_adc_speed_mode(M365_MODE_DRIVE);
 				  		kmh = mc_conf.modes_kmh_limits[1];
-				  		mc_conf.lo_current_max_scale = mc_conf.l_current_max * mc_conf.modes_curr_scale[1];
+				  		mc_conf.lo_current_max_scale = mc_conf.modes_curr_scale[1];
 						break;
 				  }
 				  if(kmh==1337){
