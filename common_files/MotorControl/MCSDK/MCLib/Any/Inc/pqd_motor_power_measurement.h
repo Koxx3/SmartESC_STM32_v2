@@ -56,6 +56,7 @@ typedef struct
 
   pFOCVars_t pFOCVars;    /*!< Pointer to FOC vars used by MPM.*/
   BusVoltageSensor_Handle_t * pVBS;              /*!< Bus voltage sensor object used by MPM.*/
+  uint16_t meas_count;
 } PQD_MotorPowMeas_Handle_t;
 
 

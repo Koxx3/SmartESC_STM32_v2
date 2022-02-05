@@ -51,6 +51,10 @@ typedef struct
                                         motor power measurement. */
   int16_t hAvrgElMotorPowerW; /*!< The average measured motor power expressed in
                                      watt. */
+  uint32_t SumWDraw;
+  uint32_t SumdADraw;
+  uint32_t WsDraw;
+  uint32_t dAsDraw;
 } MotorPowMeas_Handle_t;
 
 /**

@@ -471,6 +471,45 @@ float VescToSTM_get_input_current(){
 }
 
 /**
+ * Get the amount of amp hours drawn from the input source.
+ *
+ * @param reset
+ * If true, the counter will be reset after this call.
+ *
+ * @return
+ * The amount of amp hours drawn.
+ */
+float VescToSTM_get_amp_hours(bool reset) {
+	float val = (float)PQD_MotorPowMeasM1._super.dAsDraw / 360000.0;
+
+	if (reset) {
+		PQD_MotorPowMeasM1._super.dAsDraw = 0;
+	}
+
+	return val;
+}
+
+
+/**
+ * Get the amount of watt hours drawn from the input source.
+ *
+ * @param reset
+ * If true, the counter will be reset after this call.
+ *
+ * @return
+ * The amount of watt hours drawn.
+ */
+float VescToSTM_get_watt_hours(bool reset) {
+	float val = (float)PQD_MotorPowMeasM1._super.WsDraw / 3600.0;
+
+	if (reset) {
+		PQD_MotorPowMeasM1._super.WsDraw = 0;
+	}
+
+	return val;
+}
+
+/**
  * Read and reset the average direct axis motor current. (FOC only)
  *
  * @return

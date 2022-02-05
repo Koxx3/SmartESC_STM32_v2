@@ -351,16 +351,14 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				buffer_append_float16(buffer, VescToSTM_get_bus_voltage(), 1e1, &ind);
 			}
 			if (mask & ((uint32_t)1 << 9)) {
-				//buffer_append_float32(send_buffer, mc_interface_get_amp_hours(false), 1e4, &ind);
-				buffer_append_float32(buffer, 0, 1e4, &ind);
+				buffer_append_float32(buffer, VescToSTM_get_amp_hours(false), 1e4, &ind);
 			}
 			if (mask & ((uint32_t)1 << 10)) {
 				//buffer_append_float32(send_buffer, mc_interface_get_amp_hours_charged(false), 1e4, &ind);
 				buffer_append_float32(buffer, 0, 1e4, &ind);
 			}
 			if (mask & ((uint32_t)1 << 11)) {
-				//buffer_append_float32(send_buffer, mc_interface_get_watt_hours(false), 1e4, &ind);
-				buffer_append_float32(buffer, 0, 1e4, &ind);
+				buffer_append_float32(buffer, VescToSTM_get_watt_hours(false), 1e4, &ind);
 			}
 			if (mask & ((uint32_t)1 << 12)) {
 				//buffer_append_float32(send_buffer, mc_interface_get_watt_hours_charged(false), 1e4, &ind);
@@ -707,7 +705,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					val.ah_tot = 0;
 					val.current_in_tot = 0;
 					val.current_tot = 0;
-					val.num_vescs = 0;
+					val.num_vescs = 1;
 					val.wh_charge_tot = 0;
 					val.wh_tot = 0;
 
@@ -733,10 +731,12 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						buffer_append_float16(buffer, VescToSTM_get_temperature2(), 1e1, &ind);
 					}
 					if (mask & ((uint32_t)1 << 2)) {
-						buffer_append_float32(buffer, val.current_tot, 1e2, &ind);
+						//buffer_append_float32(buffer, val.current_tot, 1e2, &ind);
+						buffer_append_float32(buffer, VescToSTM_get_phase_current(), 1e2, &ind);
 					}
 					if (mask & ((uint32_t)1 << 3)) {
-						buffer_append_float32(buffer, val.current_in_tot, 1e2, &ind);
+						//buffer_append_float32(buffer, val.current_in_tot, 1e2, &ind);
+						buffer_append_float32(buffer, VescToSTM_get_input_current(), 1e2, &ind);
 					}
 					if (mask & ((uint32_t)1 << 4)) {
 						buffer_append_float16(buffer, VescToSTM_get_duty_cycle_now(), 1e3, &ind);

@@ -35,6 +35,8 @@ float VescToSTM_get_iq();
 float VescToSTM_get_Vd();
 float VescToSTM_get_Vq();
 float VescToSTM_get_bus_voltage();
+float VescToSTM_get_amp_hours(bool reset);
+float VescToSTM_get_watt_hours(bool reset);
 int32_t VescToSTM_get_erpm();
 int32_t VescToSTM_get_erpm_fast();
 int32_t VescToSTM_get_rpm();
