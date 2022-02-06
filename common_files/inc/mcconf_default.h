@@ -54,7 +54,7 @@
 #define MCCONF_L_MIN_VOLTAGE			8.0		// Minimum input voltage
 #endif
 #ifndef MCCONF_L_MAX_VOLTAGE
-#define MCCONF_L_MAX_VOLTAGE			57.0	// Maximum input voltage
+#define MCCONF_L_MAX_VOLTAGE			56.0	// Maximum input voltage
 #endif
 #ifndef MCCONF_L_BATTERY_CUT_START
 #define MCCONF_L_BATTERY_CUT_START		34.0	// Start limiting the positive current at this voltage
@@ -384,7 +384,7 @@
 #define MCCONF_FOC_FW_CURRENT_MAX		0.0 // Maximum field weakening current
 #endif
 #ifndef MCCONF_FOC_FW_DUTY_START
-#define MCCONF_FOC_FW_DUTY_START		0.9 // Start field weakening at this fraction of max duty cycle
+#define MCCONF_FOC_FW_DUTY_START		0.95 // Start field weakening at this fraction of max duty cycle
 #endif
 #ifndef MCCONF_FOC_FW_RAMP_TIME
 #define MCCONF_FOC_FW_RAMP_TIME			0.2 // Ramp time for field weakening current

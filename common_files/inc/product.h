@@ -63,7 +63,7 @@
 #define PHASE_A_V_ADC_CHANNEL                                                MC_ADC_CHANNEL_6
 #define PHASE_B_V_ADC_CHANNEL                                                MC_ADC_CHANNEL_7
 #define PHASE_C_V_ADC_CHANNEL                                                MC_ADC_CHANNEL_9
-#define VOLTAGE_DIVIDER_GAIN     											 (float)2650.0
+#define VOLTAGE_DIVIDER_GAIN     											 (float)2808.6359
 
 #define VESC_USART_DMA													     huart3
 #define VESC_USART_TX_DMA													 hdma_usart3_tx
@@ -94,7 +94,7 @@
 #define HW_LIM_CURRENT			-70.0, 70.0
 #define HW_LIM_CURRENT_IN		-70.0, 70.0
 #define HW_LIM_CURRENT_ABS		0.0, 100.0
-#define HW_LIM_VIN				6.0, 57.0
+#define HW_LIM_VIN				6.0, 56.0
 #define HW_LIM_ERPM				-100e3, 100e3
 #define HW_LIM_DUTY_MIN			0.0, 0.1
 #define HW_LIM_DUTY_MAX			0.0, 0.99
