@@ -1,6 +1,7 @@
 #include "flux_weakening_ctrl.h"
 #include "main.h"
 #include "product.h"
+#include "utils.h"
 
 /**
   * @brief  Initializes all the object variables, usually it has to be called
@@ -98,6 +99,8 @@ __weak qd_t FW_CalcCurrRef( FW_Handle_t * pHandle, qd_t Iqdref ){
 		  if ( Iqdref.q > sqRoot || (sqRoot = -sqRoot, Iqdref.q < sqRoot) ){
 		      Iqdref.q = sqRoot;
 		  }
+		  int32_t aux = ((Iqdref.d * pHandle->fw_q_current_factor) / INT16_MAX);
+		  Iqdref.q += aux;
 	  }
 
 

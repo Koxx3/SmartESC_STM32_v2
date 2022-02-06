@@ -407,6 +407,7 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	FW_M1.wNominalSqCurr 				  = current_max * current_max;
 	FW_M1.hFW_V_Ref						  = 1000.0 * mcconf->foc_fw_duty_start;
 	FW_M1.hDemagCurrent					  = -(mcconf->foc_fw_current_max * CURRENT_FACTOR_A);
+	FW_M1.fw_q_current_factor			  = mcconf->foc_fw_q_current_factor * INT16_MAX;
 	PIDFluxWeakeningHandle_M1.wLowerIntegralLimit = (int32_t)FW_M1.hDemagCurrent * (int32_t)FW_KIDIV;
 
 	SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit = VescToSTM_erpm_to_speed(mcconf->l_max_erpm * 1.15);

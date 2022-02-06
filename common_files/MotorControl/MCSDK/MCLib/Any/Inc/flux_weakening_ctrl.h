@@ -71,6 +71,7 @@ typedef struct
                                                equal to log with base two of previous
                                                definition */
   uint16_t        hVqdLowPassFilterBWLOG; //30 /**< hVqdLowPassFilterBW expressed as power of 2. E.g. if gain divisor is 512 the value must be 9 because 2^9 = 512 */
+  int16_t		  fw_q_current_factor;
 } FW_Handle_t;
 
 /**
