@@ -96,6 +96,14 @@ void VescToSTM_pwm_force(bool force, bool update){
 	}
 }
 
+bool VescToSTM_overspeed(){
+	if(MCI_GetAvrgMecSpeedUnit(pMCI[M1]) > MCI_GetLastRampFinalSpeed(pMCI[M1])){
+		return true;
+	}else{
+		return false;
+	}
+}
+
 int16_t VescToSTM_Iq_lim_hook(int16_t iq){
 
 	//Do temperature Iq limit
@@ -122,14 +130,15 @@ int16_t VescToSTM_Iq_lim_hook(int16_t iq){
 	//Do PWM off feature
 	if(fp.minimum_current>0 && pMCI[M1]->pSTM->hFaultOccurred == 0){
 		if(pwm_force == false && abs(iq) <= fp.minimum_current && abs(FW_M1.AvVolt_qd.q) < MIN_DUTY_PWM){
-			VescToSTM_pwm_stop();
+			if(VescToSTM_overspeed()==false){
+				VescToSTM_pwm_stop();
+			}
 		}else{
 			VescToSTM_pwm_start();  //Function checks if PWM off otherwise it does nothing
 		}
 	}
 	return iq;
 }
-
 
 int32_t VescToSTM_rpm_to_speed(int32_t rpm){
 	int32_t speed = ((rpm*SPEED_UNIT*mc_conf.si_motor_poles)/_RPM);
@@ -318,25 +327,22 @@ void VescToSTM_pwm_start(void){
 void VescToSTM_update_torque(int32_t q, int32_t min_erpm, int32_t max_erpm){
 	q *= DIR_MUL;
 	if(q >= 0){
-		//FW_M1.wNominalSqCurr = q*q;
-		//FW_M1.hDemagCurrent	= -((float)q*mc_conf.foc_d_gain_scale_max_mod);
 		SpeednTorqCtrlM1.PISpeed->wUpperIntegralLimit = q * SP_KIDIV;
-		SpeednTorqCtrlM1.PISpeed->wLowerIntegralLimit = mc_conf.s_pid_allow_braking ? -q : 0;
+		SpeednTorqCtrlM1.PISpeed->wLowerIntegralLimit = mc_conf.s_pid_allow_braking ? -q * SP_KIDIV : 0;
 		SpeednTorqCtrlM1.PISpeed->hUpperOutputLimit = q;
-		SpeednTorqCtrlM1.PISpeed->hLowerOutputLimit = mc_conf.s_pid_allow_braking ? -q : 0;
-		//HALL_M1.q = q;
-
-		MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(max_erpm), 0);
+		SpeednTorqCtrlM1.PISpeed->hLowerOutputLimit = mc_conf.s_pid_allow_braking ? -q * SP_KIDIV : 0;
+		if(MCI_RampCompleted(pMCI[M1])){
+			MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(max_erpm), 0);
+		}
 
 	}else{
-		//FW_M1.wNominalSqCurr = q*q;
-		//FW_M1.hDemagCurrent	= ((float)q*mc_conf.foc_d_gain_scale_max_mod);
-		SpeednTorqCtrlM1.PISpeed->wUpperIntegralLimit = mc_conf.s_pid_allow_braking ? -q : 0;
+		SpeednTorqCtrlM1.PISpeed->wUpperIntegralLimit = mc_conf.s_pid_allow_braking ? -q * SP_KIDIV : 0;
 		SpeednTorqCtrlM1.PISpeed->wLowerIntegralLimit = q * SP_KIDIV;
-		SpeednTorqCtrlM1.PISpeed->hUpperOutputLimit = mc_conf.s_pid_allow_braking ? -q : 0;
+		SpeednTorqCtrlM1.PISpeed->hUpperOutputLimit = mc_conf.s_pid_allow_braking ? -q * SP_KIDIV : 0;
 		SpeednTorqCtrlM1.PISpeed->hLowerOutputLimit = q;
-		//HALL_M1.q = q;
-		MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(min_erpm) , 0);
+		if(MCI_RampCompleted(pMCI[M1])){
+			MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(min_erpm) , 0);
+		}
 	}
 }
 
@@ -415,15 +421,11 @@ void VescToSTM_set_speed(int32_t erpm){
 	}
 	VescToSTM_set_open_loop(false, 0, 0);
 	if(erpm>=0){
-		//FW_M1.wNominalSqCurr = SpeednTorqCtrlM1.MaxPositiveTorque*SpeednTorqCtrlM1.MaxPositiveTorque;
-		//FW_M1.hDemagCurrent	= -((float)SpeednTorqCtrlM1.MaxPositiveTorque*mc_conf.foc_d_gain_scale_max_mod);
 		SpeednTorqCtrlM1.PISpeed->wUpperIntegralLimit = (int32_t)SpeednTorqCtrlM1.MaxPositiveTorque * SP_KIDIV;
 		SpeednTorqCtrlM1.PISpeed->wLowerIntegralLimit = mc_conf.s_pid_allow_braking ? (int32_t)SpeednTorqCtrlM1.MinNegativeTorque * SP_KIDIV: 0;
 		SpeednTorqCtrlM1.PISpeed->hUpperOutputLimit = SpeednTorqCtrlM1.MaxPositiveTorque;
 		SpeednTorqCtrlM1.PISpeed->hLowerOutputLimit = mc_conf.s_pid_allow_braking ? SpeednTorqCtrlM1.MinNegativeTorque : 0;
 	}else{
-		//FW_M1.wNominalSqCurr = SpeednTorqCtrlM1.MinNegativeTorque*SpeednTorqCtrlM1.MinNegativeTorque;
-		//FW_M1.hDemagCurrent = ((float)SpeednTorqCtrlM1.MinNegativeTorque*mc_conf.foc_d_gain_scale_max_mod);
 		SpeednTorqCtrlM1.PISpeed->wUpperIntegralLimit = mc_conf.s_pid_allow_braking ? (int32_t)SpeednTorqCtrlM1.MaxPositiveTorque * SP_KIDIV: 0;
 		SpeednTorqCtrlM1.PISpeed->wLowerIntegralLimit = (int32_t)SpeednTorqCtrlM1.MinNegativeTorque * SP_KIDIV;
 		SpeednTorqCtrlM1.PISpeed->hUpperOutputLimit = mc_conf.s_pid_allow_braking ? SpeednTorqCtrlM1.MaxPositiveTorque : 0;
@@ -466,7 +468,6 @@ float VescToSTM_get_input_current(){
 
 #ifdef G30P
 	return (float)pMPM[M1]->_super.hAvrgElMotorPowerW/(float)VBS_GetAvBusVoltage_V(pMCT[M1]->pBusVoltageSensor);
-	//return (float)CURR_GetCurrent(pMCT[M1]->pMainCurrentSensor);// NOT WORKING :(
 #endif
 }
 

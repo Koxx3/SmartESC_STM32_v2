@@ -27,6 +27,7 @@ void vEnableOutput( TimerHandle_t xTimer ){
  */
 void app_set_configuration(app_configuration *conf) {
 	appconf = *conf;
+	static app_use old_app;
 
 	if(app_disable==NULL){
 		app_disable = xTimerCreate("DIS_TMR",MS_TO_TICKS(20) , pdFALSE, ( void * ) 0,vEnableOutput );
@@ -68,20 +69,25 @@ void app_set_configuration(app_configuration *conf) {
 	switch (appconf.app_to_use) {
 		case APP_UART:
 			if( xTaskGetSchedulerState() == taskSCHEDULER_RUNNING){
-				task_app_kill(&aux_uart);
+				if(old_app != APP_UART){
+					task_app_kill(&aux_uart);
+				}
 			}
 			task_cli_init(&aux_uart);
 			break;
 		case APP_ADC:
 		case APP_ADC_UART:
 			if( xTaskGetSchedulerState() == taskSCHEDULER_RUNNING){
-				task_cli_kill(&aux_uart);
+				if(old_app == APP_UART){
+					task_cli_kill(&aux_uart);
+				}
 			}
 			task_app_init(&aux_uart);
 			break;
 		default:
 			break;
 	}
+	old_app = appconf.app_to_use;
 }
 
 
