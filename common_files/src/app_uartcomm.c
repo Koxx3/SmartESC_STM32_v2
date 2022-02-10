@@ -168,6 +168,7 @@ void vTimerCallback( TimerHandle_t xTimer ){
 
 	// Apply deadband
 	utils_deadband(&pwr, config.hyst, 1.0);
+	utils_deadband(&brake, config.hyst, 1.0);
 
 	// Apply throttle curve
 	pwr = utils_throttle_curve(pwr, config.throttle_exp, config.throttle_exp_brake, config.throttle_exp_mode);
