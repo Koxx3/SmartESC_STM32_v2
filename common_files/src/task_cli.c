@@ -35,18 +35,11 @@
 #include "product.h"
 
 
-
-/**
- * \brief           Calculate length of statically allocated array
- */
-
-
 void putbuffer(unsigned char *buf, unsigned int len, port_str * port){
 	if(port->half_duplex){
 		port->uart->Instance->CR1 &= ~USART_CR1_RE;
 		vTaskDelay(1);
 	}
-	//HAL_UART_Transmit(port->uart, buf, len, 500);
 	HAL_UART_Transmit_DMA(port->uart, buf, len);
 	while(port->uart->hdmatx->State != HAL_DMA_STATE_READY){
 		port->uart->gState = HAL_UART_STATE_READY;
@@ -96,7 +89,6 @@ void task_cli(void * argument)
 		send_sample(port->phandle);
 		send_position(port->phandle);
 		VescToSTM_handle_timeout();
-		//vTaskDelay(1);
 
 		if(ulTaskNotifyTake(pdTRUE, 1)){
 			HAL_UART_MspDeInit(port->uart);

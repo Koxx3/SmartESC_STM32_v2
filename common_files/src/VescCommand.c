@@ -40,6 +40,7 @@
 #include "terminal.h"
 #include "product.h"
 #include "app.h"
+#include "ninebot.h"
 
 
 static void(* volatile send_func)(unsigned char *data, unsigned int len, PACKET_STATE_t * phandle) = 0;
@@ -216,14 +217,14 @@ void send_position(PACKET_STATE_t * phandle){
 		commands_send_rotor_pos(phandle, SpeednTorqCtrlM1.SPD->hElAngle);
 
 		break;
-	case DISP_POS_MODE_PID_POS:
-		//commands_send_rotor_pos(SpeednTorqCtrlM1.SPD->hElAngle);
-		break;
-
-	case DISP_POS_MODE_PID_POS_ERROR:
-		//commands_send_rotor_pos(utils_angle_difference(mc_interface_get_pid_pos_set(), mc_interface_get_pid_pos_now()));
-		break;
-
+//	case DISP_POS_MODE_PID_POS:
+//		//commands_send_rotor_pos(SpeednTorqCtrlM1.SPD->hElAngle);
+//		break;
+//
+//	case DISP_POS_MODE_PID_POS_ERROR:
+//		//commands_send_rotor_pos(utils_angle_difference(mc_interface_get_pid_pos_set(), mc_interface_get_pid_pos_now()));
+//		break;
+//
 	default:
 		break;
 	}
@@ -1136,6 +1137,26 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					buffer[ind++] = COMM_DETECT_APPLY_ALL_FOC;
 					buffer_append_int16(buffer, res, &ind);
 					reply_func(send_buffer, ind, phandle);
+				} break;
+				case CAMILO_FROM_DASH: {
+					int32_t ind = 0;
+					uint8_t ad1 = data[ind++];
+					uint8_t ad2 = data[ind++];
+					app_adc_set_adc(ad1, ad2);
+				} break;
+				case CAMILO_TO_DASH: {
+					int32_t ind = 0;
+					uint8_t send_buffer[PACKET_SIZE(20)];
+					uint8_t * buffer = send_buffer + PACKET_HEADER;
+					buffer[ind++] = packet_id;
+					buffer[ind++] = m365_to_display.mode;
+					buffer[ind++] = m365_to_display.battery;
+					buffer[ind++] = m365_to_display.light;
+					buffer[ind++] = m365_to_display.beep;
+					buffer[ind++] = m365_to_display.speed;
+					buffer[ind++] = m365_to_display.faultcode;
+					reply_func(send_buffer, ind, phandle);
+
 				} break;
 				case COMM_BM_CONNECT:
 				case COMM_BM_ERASE_FLASH_ALL:

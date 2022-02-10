@@ -95,7 +95,7 @@ typedef struct {
 
 
 void addCRC(uint8_t * message, uint8_t size);
-
+extern m365Answer m365_to_display;
 
 uint16_t ninebot_parse(uint8_t data, NinebotPack *message);
 

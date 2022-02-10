@@ -137,6 +137,4 @@ void terminal_process_string(char *str, PACKET_STATE_t * phandle) {
 			commands_printf(phandle, "Usage: mode_scale [1-3] [percent]");
 		}
 	}
-
-
 }

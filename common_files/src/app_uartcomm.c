@@ -41,6 +41,7 @@ m365Answer m365_to_display = {.start1=NinebotHeader0, .start2=NinebotHeader1, .l
 uint8_t app_connection_timout = 8;
 
 TaskHandle_t task_app_handle;
+TimerHandle_t xTimer;
 
 void my_uart_send_data(unsigned char *buf, unsigned int len, port_str * port){
 	if(port->half_duplex){
@@ -60,9 +61,18 @@ static uint32_t uart_get_write_pos(port_str * port){
 	return ( ((uint32_t)port->rx_buffer_size - port->uart->hdmarx->Instance->CNDTR) & ((uint32_t)port->rx_buffer_size -1));
 }
 
-
 static uint8_t adc1;
 static uint8_t adc2;
+void app_adc_set_adc(uint8_t AD1, uint8_t AD2){
+	if(xTimerIsTimerActive(xTimer)==pdFALSE){
+		xTimerStart(xTimer, 100);
+	}
+	adc1 = AD1;
+	adc2 = AD2;
+}
+
+
+
 static float decoded_level = 0.0;
 static float decoded_level2 = 0.0;
 
@@ -174,6 +184,9 @@ void vTimerCallback( TimerHandle_t xTimer ){
 		pwr = pwr_ramp;
 	}
 
+	if(app_is_output_disabled()){
+		return;
+	}
 
 	// Use the filtered and mapped voltage for control according to the configuration.
 	switch (config.ctrl_type) {
@@ -222,8 +235,6 @@ float app_adc_get_decoded_level2(void) {
 	return decoded_level2;
 }
 
-TimerHandle_t xTimer;
-
 void app_adc_stop_output(void) {
 	if(xTimer!=NULL){
 		xTimerStop(xTimer, 2000);
@@ -243,6 +254,20 @@ void app_adc_speed_mode(uint8_t speed){
 	m365_to_display.mode |= speed;
 }
 
+uint32_t app_updaterate(){
+	return 2000 / config.update_rate_hz;
+}
+
+void app_check_timer(){
+	if(xTimerIsTimerActive(xTimer)==pdFALSE){
+		xTimerChangePeriod(xTimer, app_updaterate(),100);
+		xTimerStart(xTimer, 100);
+	}
+}
+
+void app_timer_update_period(){
+	xTimerChangePeriod(xTimer, app_updaterate(), 1000);
+}
 
 void task_app(void * argument)
 {
@@ -257,9 +282,11 @@ void task_app(void * argument)
 	CLEAR_BIT(port->uart->Instance->CR3, USART_CR3_EIE);
 
 	if(xTimer==NULL){
-		xTimer = xTimerCreate("ADC_UP",MS_TO_TICKS(20) , pdTRUE, ( void * ) 0,vTimerCallback );
+		xTimer = xTimerCreate("ADC_UP",app_updaterate() , pdTRUE, ( void * ) 0,vTimerCallback );
 	}
+
 	xTimerStart(xTimer, 100);
+
 
 	uint16_t slow_update_cnt=0;
   /* Infinite loop */
@@ -277,9 +304,7 @@ void task_app(void * argument)
 						adc1 = frame.payload[1];
 						adc2 = frame.payload[2];
 						VescToSTM_timeout_reset();
-						if(xTimerIsTimerActive(xTimer)==pdFALSE){
-							xTimerStart(xTimer, 100);
-						}
+						app_check_timer();
 						//commands_printf(main_uart.phandle, "LEN: %d CMD: %x ARG: %x PAY: %02x %02x %02x %02x", frame.len, frame.cmd, frame.arg, frame.payload[0], frame.payload[1], frame.payload[2], frame.payload[3]);
 					break;
 				}
@@ -322,6 +347,8 @@ void task_app(void * argument)
 void task_app_init(port_str * port){
 	if(port->task_handle == NULL){
 		xTaskCreate(task_app, "APP-ADC", 128, (void*)port, PRIO_BELOW_NORMAL, &port->task_handle);
+	}else{
+		app_timer_update_period();
 	}
 }
 
