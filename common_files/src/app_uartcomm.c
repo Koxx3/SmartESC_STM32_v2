@@ -40,6 +40,9 @@ m365Answer m365_to_display = {.start1=NinebotHeader0, .start2=NinebotHeader1, .l
 
 uint8_t app_connection_timout = 8;
 
+void vTimerCallback( TimerHandle_t xTimer );
+uint32_t app_updaterate();
+
 TaskHandle_t task_app_handle;
 TimerHandle_t xTimer;
 
@@ -64,6 +67,9 @@ static uint32_t uart_get_write_pos(port_str * port){
 static uint8_t adc1;
 static uint8_t adc2;
 void app_adc_set_adc(uint8_t AD1, uint8_t AD2){
+	if(xTimer==NULL){
+		xTimer = xTimerCreate("ADC_UP",app_updaterate() , pdTRUE, ( void * ) 0,vTimerCallback );
+	}
 	if(xTimerIsTimerActive(xTimer)==pdFALSE){
 		xTimerStart(xTimer, 100);
 	}
