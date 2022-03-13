@@ -3,13 +3,19 @@
 #include "product.h"
 #include "task_pwr.h"
 #include "task_init.h"
+#include "utils.h"
+#include "timers.h"
 
 extern app_configuration appconf;
-static bool output_vt_init_done = false;
 static volatile bool output_disabled_now = false;
+TimerHandle_t app_disable;
 
 app_configuration* app_get_configuration(void) {
 	return &appconf;
+}
+
+void vEnableOutput( TimerHandle_t xTimer ){
+	output_disabled_now = false;
 }
 
 
@@ -21,6 +27,11 @@ app_configuration* app_get_configuration(void) {
  */
 void app_set_configuration(app_configuration *conf) {
 	appconf = *conf;
+	static app_use old_app;
+
+	if(app_disable==NULL){
+		app_disable = xTimerCreate("DIS_TMR",MS_TO_TICKS(20) , pdFALSE, ( void * ) 0,vEnableOutput );
+	}
 
 	VESC_USART_DMA.Init.BaudRate = appconf.app_uart_baudrate;
 
@@ -53,26 +64,33 @@ void app_set_configuration(app_configuration *conf) {
 		break;
 	}
 
-
-
+	utils_truncate_number_int((int*)&appconf.app_adc_conf.update_rate_hz, 1, 200);
 
 	switch (appconf.app_to_use) {
 		case APP_UART:
 			if( xTaskGetSchedulerState() == taskSCHEDULER_RUNNING){
-				task_app_kill(&aux_uart);
+				if(old_app != APP_UART){
+					task_app_kill(&aux_uart);
+				}
 			}
 			task_cli_init(&aux_uart);
 			break;
-		case APP_CUSTOM:
+		case APP_ADC:
+		case APP_ADC_UART:
 			if( xTaskGetSchedulerState() == taskSCHEDULER_RUNNING){
-				task_cli_kill(&aux_uart);
+				if(old_app == APP_UART){
+					task_cli_kill(&aux_uart);
+				}
 			}
 			task_app_init(&aux_uart);
 			break;
 		default:
 			break;
 	}
+	old_app = appconf.app_to_use;
 }
+
+
 
 /**
  * Disable output on apps
@@ -84,16 +102,13 @@ void app_set_configuration(app_configuration *conf) {
  * >0: Amount of milliseconds to disable output
  */
 void app_disable_output(int time_ms) {
-	if (!output_vt_init_done) {
-		//chVTObjectInit(&output_vt);
-		output_vt_init_done = true;
-	}
-
 	if (time_ms == 0) {
 		output_disabled_now = false;
 	} else if (time_ms == -1) {
 		output_disabled_now = true;
 	} else {
+		xTimerChangePeriod(app_disable, MS_TO_TICKS(time_ms),100);
+		xTimerStart(app_disable, 100);
 		output_disabled_now = true;
 	}
 }

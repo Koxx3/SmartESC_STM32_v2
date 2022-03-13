@@ -40,6 +40,7 @@
 #include "terminal.h"
 #include "product.h"
 #include "app.h"
+#include "ninebot.h"
 
 
 static void(* volatile send_func)(unsigned char *data, unsigned int len, PACKET_STATE_t * phandle) = 0;
@@ -105,6 +106,7 @@ void commands_send_mcconf(COMM_PACKET_ID packet_id, mc_configuration *mcconf, PA
 		commands_printf(phandle, "Malloc failed send mcconf)");
 		return;
 	}
+	memset(send_buffer,0,512 + PACKET_HEADER);
 	uint8_t * buffer = send_buffer + PACKET_HEADER;
 	buffer[0] = packet_id;
 	int32_t len = confgenerator_serialize_mcconf(&buffer[1], mcconf);
@@ -118,6 +120,7 @@ void commands_send_appconf(COMM_PACKET_ID packet_id, app_configuration *appconf,
 		commands_printf(phandle, "Malloc failed send appconf)");
 		return;
 	}
+	memset(send_buffer,0,512 + PACKET_HEADER);
 	uint8_t * buffer = send_buffer + PACKET_HEADER;
 	buffer[0] = packet_id;
 	int32_t len = confgenerator_serialize_appconf(&buffer[1], appconf);
@@ -186,6 +189,7 @@ void send_sample(PACKET_STATE_t * phandle){
 			vPortFree(samples.m_v0_samples);
 			vPortFree(samples.m_v1_samples);
 			vPortFree(samples.m_v2_samples);
+			VescToSTM_pwm_force(false, true);
 
 #endif
 			samples.phandle = NULL;
@@ -213,14 +217,14 @@ void send_position(PACKET_STATE_t * phandle){
 		commands_send_rotor_pos(phandle, SpeednTorqCtrlM1.SPD->hElAngle);
 
 		break;
-	case DISP_POS_MODE_PID_POS:
-		//commands_send_rotor_pos(SpeednTorqCtrlM1.SPD->hElAngle);
-		break;
-
-	case DISP_POS_MODE_PID_POS_ERROR:
-		//commands_send_rotor_pos(utils_angle_difference(mc_interface_get_pid_pos_set(), mc_interface_get_pid_pos_now()));
-		break;
-
+//	case DISP_POS_MODE_PID_POS:
+//		//commands_send_rotor_pos(SpeednTorqCtrlM1.SPD->hElAngle);
+//		break;
+//
+//	case DISP_POS_MODE_PID_POS_ERROR:
+//		//commands_send_rotor_pos(utils_angle_difference(mc_interface_get_pid_pos_set(), mc_interface_get_pid_pos_now()));
+//		break;
+//
 	default:
 		break;
 	}
@@ -254,7 +258,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 	switch (packet_id) {
 	case COMM_FW_VERSION: {
 		int32_t ind = 0;
-		uint8_t send_buffer[PACKET_SIZE(50)];
+		uint8_t send_buffer[PACKET_SIZE(60)];
 		uint8_t * buffer = send_buffer + PACKET_HEADER;
 		buffer[ind++] = COMM_FW_VERSION;
 		buffer[ind++] = FW_VERSION_MAJOR;
@@ -271,6 +275,9 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 		buffer[ind++] = HW_TYPE_VESC;
 
 		buffer[ind++] = 0; // No custom config
+		buffer[ind++] = 0; //No phase filters
+		buffer[ind++] = 0;
+		buffer[ind++] = 0;
 
 		fw_version_sent_cnt++;
 
@@ -345,16 +352,14 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 				buffer_append_float16(buffer, VescToSTM_get_bus_voltage(), 1e1, &ind);
 			}
 			if (mask & ((uint32_t)1 << 9)) {
-				//buffer_append_float32(send_buffer, mc_interface_get_amp_hours(false), 1e4, &ind);
-				buffer_append_float32(buffer, 0, 1e4, &ind);
+				buffer_append_float32(buffer, VescToSTM_get_amp_hours(false), 1e4, &ind);
 			}
 			if (mask & ((uint32_t)1 << 10)) {
 				//buffer_append_float32(send_buffer, mc_interface_get_amp_hours_charged(false), 1e4, &ind);
 				buffer_append_float32(buffer, 0, 1e4, &ind);
 			}
 			if (mask & ((uint32_t)1 << 11)) {
-				//buffer_append_float32(send_buffer, mc_interface_get_watt_hours(false), 1e4, &ind);
-				buffer_append_float32(buffer, 0, 1e4, &ind);
+				buffer_append_float32(buffer, VescToSTM_get_watt_hours(false), 1e4, &ind);
 			}
 			if (mask & ((uint32_t)1 << 12)) {
 				//buffer_append_float32(send_buffer, mc_interface_get_watt_hours_charged(false), 1e4, &ind);
@@ -389,6 +394,12 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 			}
 			if (mask & ((uint32_t)1 << 20)) {
 				buffer_append_float32(buffer, VescToSTM_get_Vq(), 1e3, &ind);
+			}
+			if (mask & ((uint32_t)1 << 21)) {
+				uint8_t status = 0;
+				status |= VescToSTM_get_timeout_state();
+				//status |= timeout_kill_sw_active() << 1;
+				buffer[ind++] = status;
 			}
 
 			reply_func(send_buffer, ind, phandle);
@@ -454,17 +465,8 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 
 
 				if (confgenerator_deserialize_mcconf(data, mcconf)) {
-					utils_truncate_number(&mcconf->l_current_max_scale , 0.0, 1.0);
-					utils_truncate_number(&mcconf->l_current_min_scale , 0.0, 1.0);
 
-
-					/*mcconf->lo_current_max = mcconf->l_current_max * mcconf->l_current_max_scale;
-					mcconf->lo_current_min = mcconf->l_current_min * mcconf->l_current_min_scale;
-					mcconf->lo_in_current_max = mcconf->l_in_current_max;
-					mcconf->lo_in_current_min = mcconf->l_in_current_min;
-					mcconf->lo_current_motor_max_now = mcconf->lo_current_max;
-					mcconf->lo_current_motor_min_now = mcconf->lo_current_min;*/
-
+					conf_general_mcconf_hw_limits(mcconf);
 					conf_general_setup_mc(mcconf);
 					conf_general_store_mc_configuration(mcconf, 0);
 
@@ -579,6 +581,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						samples.index = 0;
 						samples.dec_state = 0;
 						samples.state = SAMP_START;
+						VescToSTM_pwm_force(true, true);
 					}
 
 				} break;
@@ -611,13 +614,13 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					uint8_t send_buffer[PACKET_SIZE(20)];
 					uint8_t * buffer = send_buffer + PACKET_HEADER;
 					buffer[ind++] = COMM_GET_DECODED_ADC;
-					buffer_append_int32(buffer, (int32_t)(VescToSTM_get_battery_level(NULL) * 1000000.0), &ind);
+					buffer_append_int32(buffer, app_adc_get_decoded_level() * 1000000.0, &ind);
 					//buffer_append_int32(send_buffer, (int32_t)(app_adc_get_voltage() * 1000000.0), &ind);
-					buffer_append_int32(buffer, (int32_t)(VBS_GetAvBusVoltage_V(pMCT[M1]->pBusVoltageSensor) * 1000000.0), &ind);
+					buffer_append_int32(buffer, VescToSTM_get_ADC1() * 1000000.0, &ind);
 					//buffer_append_int32(send_buffer, (int32_t)(app_adc_get_decoded_level2() * 1000000.0), &ind);
-					buffer_append_int32(buffer, 0, &ind);
+					buffer_append_int32(buffer, app_adc_get_decoded_level2() * 1000000.0, &ind);
 					//buffer_append_int32(send_buffer, (int32_t)(app_adc_get_voltage2() * 1000000.0), &ind);
-					buffer_append_int32(buffer, 0, &ind);
+					buffer_append_int32(buffer, VescToSTM_get_ADC2() * 1000000.0, &ind);
 					reply_func(send_buffer, ind, phandle);
 				} break;
 
@@ -626,7 +629,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					uint8_t send_buffer[PACKET_SIZE(20)];
 					uint8_t * buffer = send_buffer + PACKET_HEADER;
 					buffer[ind++] = COMM_GET_DECODED_CHUK;
-					buffer_append_int32(send_buffer, (int32_t)(VescToStm_nunchuk_get_decoded_chuk() * 1000000.0), &ind);
+					buffer_append_int32(buffer, (int32_t)(VescToStm_nunchuk_get_decoded_chuk() * 1000000.0), &ind);
 					reply_func(send_buffer, ind, phandle);
 				} break;
 
@@ -703,11 +706,11 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					val.ah_tot = 0;
 					val.current_in_tot = 0;
 					val.current_tot = 0;
-					val.num_vescs = 0;
+					val.num_vescs = 1;
 					val.wh_charge_tot = 0;
 					val.wh_tot = 0;
 
-					float wh_batt_left = 0.0;
+					float wh_batt_left = 1.0;
 					float battery_level = VescToSTM_get_battery_level(&wh_batt_left);
 
 					int32_t ind = 0;
@@ -729,10 +732,12 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						buffer_append_float16(buffer, VescToSTM_get_temperature2(), 1e1, &ind);
 					}
 					if (mask & ((uint32_t)1 << 2)) {
-						buffer_append_float32(buffer, val.current_tot, 1e2, &ind);
+						//buffer_append_float32(buffer, val.current_tot, 1e2, &ind);
+						buffer_append_float32(buffer, VescToSTM_get_phase_current(), 1e2, &ind);
 					}
 					if (mask & ((uint32_t)1 << 3)) {
-						buffer_append_float32(buffer, val.current_in_tot, 1e2, &ind);
+						//buffer_append_float32(buffer, val.current_in_tot, 1e2, &ind);
+						buffer_append_float32(buffer, VescToSTM_get_input_current(), 1e2, &ind);
 					}
 					if (mask & ((uint32_t)1 << 4)) {
 						buffer_append_float16(buffer, VescToSTM_get_duty_cycle_now(), 1e3, &ind);
@@ -775,7 +780,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					}
 					if (mask & ((uint32_t)1 << 17)) {
 						uint8_t current_controller_id = app_get_configuration()->controller_id;
-						send_buffer[ind++] = current_controller_id;
+						buffer[ind++] = current_controller_id;
 					}
 					if (mask & ((uint32_t)1 << 18)) {
 						buffer[ind++] = val.num_vescs;
@@ -785,6 +790,10 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					}
 					if (mask & ((uint32_t)1 << 20)) {
 						buffer_append_uint32(buffer, VescToSTM_get_odometer(), &ind);
+					}
+					if (mask & ((uint32_t)1 << 21)) {
+						//buffer_append_uint32(send_buffer, chVTGetSystemTimeX() / (CH_CFG_ST_FREQUENCY / 1000), &ind);
+						buffer_append_uint32(buffer, xTaskGetTickCount()/2, &ind);
 					}
 
 					reply_func(send_buffer, ind, phandle);
@@ -874,15 +883,6 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					mcconf->lo_current_motor_max_now = mcconf->lo_current_max;
 					mcconf->lo_in_current_min = mcconf->l_in_current_min;
 					mcconf->lo_in_current_max = mcconf->l_in_current_max;
-
-					//VescToSTM_set_erpm_limits(mcconf);
-
-					conf_general_update_current(mcconf);
-
-					//if (store) {
-					//	conf_general_store_mc_configuration(mcconf, mc_interface_get_motor_thread() == 2);
-					//}
-
 
 					if (ack) {
 						ind = 0;
@@ -998,6 +998,8 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 						mcconf->l_battery_cut_start = start;
 						mcconf->l_battery_cut_end = end;
 
+						VescToSTM_set_battery_cut(start, end);
+
 						/*if (store) {
 							conf_general_store_mc_configuration(mcconf,
 									mc_interface_get_motor_thread() == 2);
@@ -1068,7 +1070,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					uint8_t hall_tab[8];
 					uint8_t send_buffer[PACKET_SIZE(50)];
 					uint8_t * buffer = send_buffer + PACKET_HEADER;
-					bool res = tune_mcpwm_foc_hall_detect(buffer_get_int32(data, &ind), hall_tab);
+					bool res = tune_mcpwm_foc_hall_detect((float)buffer_get_int32(data, &ind)/1000.0, hall_tab);
 					ind=0;
 					buffer[ind++] = COMM_DETECT_HALL_FOC;
 					memcpy(buffer + ind, hall_tab, 8);
@@ -1135,6 +1137,26 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					buffer[ind++] = COMM_DETECT_APPLY_ALL_FOC;
 					buffer_append_int16(buffer, res, &ind);
 					reply_func(send_buffer, ind, phandle);
+				} break;
+				case CAMILO_FROM_DASH: {
+					int32_t ind = 0;
+					uint8_t ad1 = data[ind++];
+					uint8_t ad2 = data[ind++];
+					app_adc_set_adc(ad1, ad2);
+				} break;
+				case CAMILO_TO_DASH: {
+					int32_t ind = 0;
+					uint8_t send_buffer[PACKET_SIZE(20)];
+					uint8_t * buffer = send_buffer + PACKET_HEADER;
+					buffer[ind++] = packet_id;
+					buffer[ind++] = m365_to_display.mode;
+					buffer[ind++] = m365_to_display.battery;
+					buffer[ind++] = m365_to_display.light;
+					buffer[ind++] = m365_to_display.beep;
+					buffer[ind++] = m365_to_display.speed;
+					buffer[ind++] = m365_to_display.faultcode;
+					reply_func(send_buffer, ind, phandle);
+
 				} break;
 				case COMM_BM_CONNECT:
 				case COMM_BM_ERASE_FLASH_ALL:

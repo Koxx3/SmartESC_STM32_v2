@@ -1,5 +1,7 @@
 #include "flux_weakening_ctrl.h"
 #include "main.h"
+#include "product.h"
+#include "utils.h"
 
 /**
   * @brief  Initializes all the object variables, usually it has to be called
@@ -28,6 +30,7 @@ __weak void FW_Clear( FW_Handle_t * pHandle )
 
 	pHandle->AvVoltAmpl = 0;
 	pHandle->AvVolt_qd = NULL_qd;
+	pHandle->AvAmpere_qd = NULL_qd;
 
 	PID_SetIntegralTerm( pHandle->pFluxWeakeningPID, 0 );
 }
@@ -39,10 +42,12 @@ __weak void FW_Clear( FW_Handle_t * pHandle )
   * @param  Vqd Voltage componets to be averaged.
   * @retval none
   */
-__weak void FW_DataProcess( FW_Handle_t * pHandle, qd_t Vqd )
+__weak void FW_DataProcess( FW_Handle_t * pHandle, qd_t Vqd, qd_t Iqd)
 {
 	  pHandle->AvVolt_qd.q = (Vqd.q + (pHandle->hVqdLowPassFilterBW - 1) * pHandle->AvVolt_qd.q) >> pHandle->hVqdLowPassFilterBWLOG;
 	  pHandle->AvVolt_qd.d = (Vqd.d + (pHandle->hVqdLowPassFilterBW - 1) * pHandle->AvVolt_qd.d) >> pHandle->hVqdLowPassFilterBWLOG;
+	  pHandle->AvAmpere_qd.q = ((Iqd.q + CURRENT_DISPLAY_OFFSET + (pHandle->hVqdLowPassFilterBW - 1) * pHandle->AvAmpere_qd.q) >> pHandle->hVqdLowPassFilterBWLOG);
+	  pHandle->AvAmpere_qd.d = ((Iqd.d + CURRENT_DISPLAY_OFFSET + (pHandle->hVqdLowPassFilterBW - 1) * pHandle->AvAmpere_qd.d) >> pHandle->hVqdLowPassFilterBWLOG);
 }
 
 /**
@@ -94,6 +99,8 @@ __weak qd_t FW_CalcCurrRef( FW_Handle_t * pHandle, qd_t Iqdref ){
 		  if ( Iqdref.q > sqRoot || (sqRoot = -sqRoot, Iqdref.q < sqRoot) ){
 		      Iqdref.q = sqRoot;
 		  }
+		  int32_t aux = ((Iqdref.d * pHandle->fw_q_current_factor) / INT16_MAX);
+		  Iqdref.q += aux;
 	  }
 
 

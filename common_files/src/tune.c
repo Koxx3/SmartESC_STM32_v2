@@ -15,12 +15,7 @@
 #include "conf_general.h"
 #include "product.h"
 #include "hall_speed_pos_fdbk.h"
-
-
-static int16_t current_to_torque(int32_t curr_ma){
-	float ret = curr_ma * CURRENT_FACTOR_mA;
-	return ret;
-}
+#include "qfplib.h"
 
 
 /**
@@ -37,25 +32,12 @@ static int16_t current_to_torque(int32_t curr_ma){
  * false: Something went wrong
  */
 bool tune_mcpwm_foc_hall_detect(float current, uint8_t *hall_table) {
-	VescToSTM_enable_timeout(false);
-	MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
-	MCI_StartMotor( pMCI[M1] );
-
-	qd_t currComp;
-	currComp.q = 0;
-	currComp.d = 0;
-
-	// Lock the motor
 	VescToSTM_set_open_loop(true, 0, 0);
-	//int old_phase_shift = HALL_M1.PhaseShift;
-	//HALL_M1.PhaseShift = 0;
+	VescToSTM_pwm_force(true, true);
+	VescToSTM_enable_timeout(false);
+	// Lock the motor
 
-
-	for (int i = 0;i < 1000;i++) {
-		currComp.d = current_to_torque((float)i * current / 1000.0);
-		MCI_SetCurrentReferences(pMCI[M1],currComp);
-		vTaskDelay(MS_TO_TICKS(1));
-	}
+	VescToSTM_ramp_current(0, current);
 
 	float sin_hall[8];
 	float cos_hall[8];
@@ -71,8 +53,8 @@ bool tune_mcpwm_foc_hall_detect(float current, uint8_t *hall_table) {
 			pMCI[M1]->pSTC->SPD->open_angle = 65536.0 / (2 *M_PI) * m_phase_now_override;
 			vTaskDelay(1);
 			int hall = HALL_M1.HallState;
-			sin_hall[hall] += sinf(m_phase_now_override);
-			cos_hall[hall] += cosf(m_phase_now_override);
+			sin_hall[hall] += qfp_fsin(m_phase_now_override);
+			cos_hall[hall] += qfp_fcos(m_phase_now_override);
 			hall_iterations[hall]++;
 		}
 	}
@@ -84,21 +66,20 @@ bool tune_mcpwm_foc_hall_detect(float current, uint8_t *hall_table) {
 			pMCI[M1]->pSTC->SPD->open_angle =65536.0 / (2 *M_PI) * m_phase_now_override;
 			vTaskDelay(1);
 			int hall = HALL_M1.HallState;
-			sin_hall[hall] += sinf(m_phase_now_override);
-			cos_hall[hall] += cosf(m_phase_now_override);
+			sin_hall[hall] += qfp_fsin(m_phase_now_override);
+			cos_hall[hall] += qfp_fcos(m_phase_now_override);
 			hall_iterations[hall]++;
 		}
 	}
 
 
-	currComp.d = 0;
-	MCI_SetCurrentReferences(pMCI[M1],currComp);
+	VescToSTM_set_current(0,0);
 	VescToSTM_set_open_loop(false, 0, 0);
 
 	int fails = 0;
 	for(int i = 0;i < 8;i++) {
 		if (hall_iterations[i] > 30) {
-			float ang = atan2f(sin_hall[i], cos_hall[i]) * 180.0 / M_PI;
+			float ang = qfp_fatan2(sin_hall[i], cos_hall[i]) * 180.0 / M_PI;
 			utils_norm_angle(&ang);
 			hall_table[i] = (uint8_t)(ang * 255.0 / 360.0);
 		} else {
@@ -108,6 +89,7 @@ bool tune_mcpwm_foc_hall_detect(float current, uint8_t *hall_table) {
 	}
 	//HALL_M1.PhaseShift = old_phase_shift;
 	VescToSTM_enable_timeout(true);
+	VescToSTM_pwm_force(false, true);
 	return fails == 2;
 }
 
@@ -130,37 +112,27 @@ bool tune_mcpwm_foc_hall_detect(float current, uint8_t *hall_table) {
  * The calculated motor resistance.
  */
 float tune_foc_measure_resistance(float current, int samples) {
-
-	current *= 1000; //A to mA
-
+	VescToSTM_pwm_force(true, true);
 	// Disable timeout
 	VescToSTM_enable_timeout(false);
 
 	MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
 	MCI_StartMotor( pMCI[M1] );
 
-	qd_t currComp;
-	currComp.q = 0;
-	currComp.d = 0;
-
 	// Lock the motor
 	VescToSTM_set_open_loop(true, 0, 0);
 
-	for (int i = 0;i < 1000;i++) {
-		currComp.q = current_to_torque((float)i * current / 1000.0);
-		MCI_SetCurrentReferences(pMCI[M1],currComp);
-		vTaskDelay(MS_TO_TICKS(1));
-	}
+	VescToSTM_ramp_current(current,0);
 
 	// Wait for the current to rise and the motor to lock.
 	vTaskDelay(MS_TO_TICKS(200));
 
 	// Sample
 
-	int32_t Vq = pMCI[M1]->pFOCVars->Vq_avg;
-	int32_t Vd = pMCI[M1]->pFOCVars->Vd_avg;
-	int32_t Iq = pMCI[M1]->pFOCVars->Iq_avg;
-	int32_t Id = pMCI[M1]->pFOCVars->Id_avg;
+	int32_t Vq = FW_M1.AvVolt_qd.q;
+	int32_t Vd = FW_M1.AvVolt_qd.d;
+	int32_t Iq = FW_M1.AvAmpere_qd.q;
+	int32_t Id = FW_M1.AvAmpere_qd.d;
 
 	float Vin = VescToSTM_get_bus_voltage();
 	float fVq = Vin / 32768.0 * (float)Vq;
@@ -168,15 +140,16 @@ float tune_foc_measure_resistance(float current, int samples) {
 	float fIq = (float)Iq / CURRENT_FACTOR_A;
 	float fId = (float)Id / CURRENT_FACTOR_A;
 
-	float current_avg = sqrtf(SQ(fIq) + SQ(fId));
-	float voltage_avg = sqrtf(SQ(fVq) + SQ(fVd));
+	float current_avg = qfp_fsqrt(SQ(fIq) + SQ(fId));
+	float voltage_avg = qfp_fsqrt(SQ(fVq) + SQ(fVd));
 
+	VescToSTM_set_current(0,0);
 	// UnLock the motor
 	VescToSTM_set_open_loop(false, 0, 0);
 
 	// Enable timeout
 	VescToSTM_enable_timeout(true);
-
+	VescToSTM_pwm_force(false, true);
 	return (voltage_avg / current_avg) / (SQRT_3) / 2.0;
 }
 
@@ -201,17 +174,13 @@ float tune_foc_measure_resistance(float current, int samples) {
 extern PID_Handle_t *pPIDIq[NBR_OF_MOTORS];
 extern PID_Handle_t *pPIDId[NBR_OF_MOTORS];
 float tune_foc_measure_inductance(float voltage, float * used_current, uint32_t samples) {
-
+	VescToSTM_pwm_force(true, true);
 	float voltage_calc = 32768.0 / VescToSTM_get_bus_voltage() * voltage;
 
 	int32_t volt_int = voltage_calc;
 
 	// Disable timeout
 	VescToSTM_enable_timeout(false);
-
-	MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
-	MCI_StartMotor( pMCI[M1] );
-
 
 	// Lock the motor
 	pMCI[M1]->pSTC->SPD->open_loop = true;
@@ -245,7 +214,7 @@ float tune_foc_measure_inductance(float voltage, float * used_current, uint32_t 
 	Id /= samples;
 	float fIq = (float)Iq / CURRENT_FACTOR_A;
 	float fId = (float)Id / CURRENT_FACTOR_A;
-	current_avg = sqrtf(SQ(fIq) + SQ(fId));
+	current_avg = qfp_fsqrt(SQ(fIq) + SQ(fId));
 	if(used_current!=NULL){
 		*used_current = current_avg;
 	}
@@ -267,7 +236,7 @@ float tune_foc_measure_inductance(float voltage, float * used_current, uint32_t 
 
 	// Enable timeout
 	VescToSTM_enable_timeout(true);
-
+	VescToSTM_pwm_force(false, true);
 	return inductance / SQRT_3 / 2.0;
 }
 
@@ -356,35 +325,24 @@ bool tune_foc_measure_res_ind(float *res, float *ind) {
 bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 		float erpm_per_sec, float res, float ind, float *linkage,
 		float *linkage_undriven, float *undriven_samples) {
+	VescToSTM_pwm_force(true, true);
 	bool result = false;
-	current *= 1000; //A to mA
 
 	// Disable timeout
 	VescToSTM_enable_timeout(false);
 
-	MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
-	MCI_StartMotor( pMCI[M1] );
-
-	qd_t currComp;
-	currComp.q = 0;
-	currComp.d = 0;
-
-
 	int cnt = 0;
-	float rpm_now = 0;
+	float erpm_now = 0;
 
 	VescToSTM_set_open_loop(true, 0, 0);
+
 	// Start by locking the motor
-	for (int i = 0;i < 1000;i++) {
-		currComp.q = current_to_torque((float)i * current / 1000.0);
-		MCI_SetCurrentReferences(pMCI[M1],currComp);
-		vTaskDelay(MS_TO_TICKS(1));
-	}
+	VescToSTM_ramp_current(current,0);
 
 	float duty_still = 0;
 	float samples = 0;
 	for (int i = 0;i < 1000;i++) {
-		duty_still += fabsf(VescToSTM_get_duty_cycle_now());
+		duty_still += fabsf(VescToSTM_get_duty_cycle_now_fast());
 		samples += 1.0;
 		vTaskDelay(MS_TO_TICKS(1));
 	}
@@ -393,14 +351,14 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 	float duty_max = 0.0;
 	const int max_time = 15000;
 
-	while (fabsf(VescToSTM_get_duty_cycle_now()) < duty) {
-		rpm_now += erpm_per_sec / 1000.0;
-		VescToSTM_set_open_loop_rpm(rpm_now);
+	while (fabsf(VescToSTM_get_duty_cycle_now_fast()) < duty) {
+		erpm_now += erpm_per_sec / 1000.0;
+		VescToSTM_set_open_loop_erpm(erpm_now);
 
 		vTaskDelay(MS_TO_TICKS(1));
 		cnt++;
 
-		float duty_now = fabsf(VescToSTM_get_duty_cycle_now());
+		float duty_now = fabsf(VescToSTM_get_duty_cycle_now_fast());
 
 		if (duty_now > duty_max) {
 			duty_max = duty_now;
@@ -423,7 +381,7 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 			break;
 		}
 
-		if (rpm_now >= 12000) {
+		if (erpm_now >= 12000) {
 			break;
 		}
 	}
@@ -451,56 +409,25 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 		iq_avg /= samples2;
 		id_avg /= samples2;
 
-		float rad_s = rpm_now * ((2.0 * M_PI) / 60.0);
-		float v_mag = sqrtf(SQ(vq_avg) + SQ(vd_avg));
-		float i_mag = sqrtf(SQ(iq_avg) + SQ(id_avg));
+		float rad_s = erpm_now * ((2.0 * M_PI) / 60.0);
+		float v_mag = qfp_fsqrt(SQ(vq_avg) + SQ(vd_avg));
+		float i_mag = qfp_fsqrt(SQ(iq_avg) + SQ(id_avg));
 		*linkage = (v_mag - (2.0 / 3.0) * res * i_mag) / rad_s - (2.0 / 3.0) * i_mag * ind;
 
-//		mc_conf.foc_motor_r = res;
-//		mc_conf.foc_motor_l = ind;
-//		mc_conf.foc_motor_flux_linkage = *linkage;
-//		mc_conf.foc_observer_gain = 0.5e3 / SQ(*linkage);
-		//mc_interface_set_configuration(mcconf);
+		while (erpm_now>0) {
+			erpm_now -= erpm_per_sec / 1000.0;
+			VescToSTM_set_open_loop_erpm(erpm_now);
+			vTaskDelay(MS_TO_TICKS(1));
+		}
 
-		*linkage/=10.0;
-		vTaskDelay(MS_TO_TICKS(500));
-		currComp.q = 0;
-
-		MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
-		MCI_StopMotor(pMCI[M1]);
-		vTaskDelay(1);
+		VescToSTM_set_current(0, 0);
 		VescToSTM_set_open_loop(false, 0, 0);
 
-		vTaskDelay(MS_TO_TICKS(5));
-
-//		float linkage_sum = 0.0;
-//		float linkage_samples = 0.0;
-//		for (int i = 0;i < 20000;i++) {
-//			float rad_s_now = VescToSTM_get_erpm_fast() * ((2.0 * M_PI) / 60.0); //Faster
-//			if (fabsf(VescToSTM_get_duty_cycle_now()) < 0.01) {
-//				break;
-//			}
-//
-//			linkage_sum += VescToSTM_get_Vq() / SQRT_3 / rad_s_now;
-//			linkage_samples += 1.0;
-//			vTaskDelay(MS_TO_TICKS(1));
-//		}
-//
-//		*undriven_samples = linkage_samples;
-//
-//		if (linkage_samples > 0) {
-//			*linkage_undriven = linkage_sum / linkage_samples;
-//		} else {
-//			*linkage_undriven = 0.0;
-//		}
 		*linkage_undriven = *linkage;
 
 		result = true;
 	}
-	vTaskDelay(MS_TO_TICKS(500));
-	MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
-	MCI_StartMotor(pMCI[M1]);
-
+	VescToSTM_pwm_force(false, true);
 	VescToSTM_enable_timeout(true);
 	return result;
 }
@@ -528,7 +455,7 @@ bool tune_foc_measure_r_l_imax(float current_min, float current_max, float max_p
 	mc_conf.foc_motor_r = *r;
 
 	*l = tune_foc_measure_inductance_current(i_last, 100) * 1e-6;
-	*i_max = sqrtf(max_power_loss / *r);
+	*i_max = qfp_fsqrt(max_power_loss / *r);
 	utils_truncate_number(i_max, HW_LIM_CURRENT);
 
 	mc_conf.foc_motor_r = res_old;

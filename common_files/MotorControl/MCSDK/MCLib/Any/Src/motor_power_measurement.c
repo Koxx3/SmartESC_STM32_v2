@@ -72,7 +72,6 @@ __weak int16_t MPM_CalcElMotorPower( MotorPowMeas_Handle_t * pHandle, int16_t Cu
 {
   uint16_t i;
   int32_t wAux = 0;
-
   /* Store the measured values in the buffer.*/
   pHandle->hMeasBuffer[pHandle->hNextMeasBufferIndex] = CurrentMotorPower;
   pHandle->hLastMeasBufferIndex = pHandle->hNextMeasBufferIndex;

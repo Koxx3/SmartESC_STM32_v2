@@ -10,6 +10,9 @@
 #include "music.h"
 #include "stdlib.h"
 #include "VescToSTM.h"
+#include "ninebot.h"
+#include "conf_general.h"
+#include "utils.h"
 
 void terminal_top(PACKET_STATE_t * phandle){
     TaskStatus_t * taskStats;
@@ -44,7 +47,6 @@ void terminal_top(PACKET_STATE_t * phandle){
 #if MUSIC_ENABLE
 extern MUSIC_PARAM bldc_music;
 #endif
-
 void terminal_process_string(char *str, PACKET_STATE_t * phandle) {
 	enum { kMaxArgs = 16 };
 	int argc = 0;
@@ -80,11 +82,12 @@ void terminal_process_string(char *str, PACKET_STATE_t * phandle) {
 			erpm_target = atoi(argv[2]);
 
 			if (current >= 0 && erpm_target >= 0) {
+				VescToSTM_pwm_force(true, true);
 				VescToSTM_set_open_loop(true, SpeednTorqCtrlM1.SPD->hElAngle, 0);
-				VescToSTM_ramp_current(current);
+				VescToSTM_ramp_current(current, 0);
 				uint32_t erpm=0;
 				while(erpm < erpm_target){
-					VescToSTM_set_open_loop_rpm(erpm);
+					VescToSTM_set_open_loop_erpm(erpm);
 					erpm += 1;
 					vTaskDelay(MS_TO_TICKS(1));
 					VescToSTM_timeout_reset();
@@ -96,6 +99,42 @@ void terminal_process_string(char *str, PACKET_STATE_t * phandle) {
 		} else {
 			commands_printf(phandle, "This command requires two arguments.\n");
 		}
+	}else if (strcmp(argv[0], "limits") == 0){
+		if (argc == 2){
+			uint32_t enable = atoi(argv[1]);
+			if(enable==0){
+				mc_conf.override_limits = true;
+				commands_printf(phandle, "Hardware limits override active!");
+			}else{
+				mc_conf.override_limits = false;
+				commands_printf(phandle, "Hardware limits override inactive.");
+			}
+		}else{
+			commands_printf(phandle, "Usage: limits 0/1");
+		}
+	}else if (strcmp(argv[0], "mode_speed") == 0){
+		if (argc == 3){
+			int num = atoi(argv[1]);
+			utils_truncate_number_int(&num, 1, 3);
+			int speed = atoi(argv[2]);
+			utils_truncate_number_int(&speed, 5, 1338);
+			mc_conf.modes_kmh_limits[num-1] = speed;
+			commands_printf(phandle, "Set mode %d to %d kmh", num, speed);
+		}else{
+			commands_printf(phandle, "Usage: mode_speed [1-3] [kmh]");
+		}
+	}else if (strcmp(argv[0], "mode_scale") == 0){
+		if (argc == 3){
+			int num = atoi(argv[1]);
+			utils_truncate_number_int(&num, 1, 3);
+			num--;
+			int percent = atoi(argv[2]);
+			utils_truncate_number_int(&percent, 0, 100);
+			float scale = 1.0 / 100 * percent;
+			mc_conf.modes_curr_scale[num] = scale;
+			commands_printf(phandle, "Set mode %d to %d percent", num, percent);
+		}else{
+			commands_printf(phandle, "Usage: mode_scale [1-3] [percent]");
+		}
 	}
-
 }

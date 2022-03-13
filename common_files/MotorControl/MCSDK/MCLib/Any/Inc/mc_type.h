@@ -206,15 +206,7 @@ typedef struct
   uint16_t hCodeError;         /**< @brief error message */
   CurrRefSource_t bDriveInput; /**< @brief It specifies whether the current reference source must be
                                  *         #INTERNAL or #EXTERNAL*/
-  int32_t Iq_sum;
-  int32_t Id_sum;
-  int32_t Vq_sum;
-  int32_t Vd_sum;
-  int16_t Iq_avg;
-  int16_t Id_avg;
-  int16_t Vq_avg;
-  int16_t Vd_avg;
-  uint16_t samples;
+  int16_t min_duty;
   uint32_t cycles_last;
   uint32_t cycles_max;
   int16_t max_i_batt;

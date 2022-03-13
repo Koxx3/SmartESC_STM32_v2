@@ -22,6 +22,7 @@
  */
 
 #include "task_pwr.h"
+#include "task_led.h"
 #include "task_init.h"
 #include "main.h"
 #include "task.h"
@@ -32,13 +33,14 @@
 #include "ninebot.h"
 #include "conf_general.h"
 #include "VescToSTM.h"
+#include "app.h"
 
 //Not a real Task... it's called from safety task. No delays allowed
 
 #define EXECUTION_SPEED		40			//every 40 ticks (20ms)
 
 extern m365Answer m365_to_display;
-extern const uint8_t m365_mode[3];
+//extern const uint8_t m365_mode[3];
 uint32_t shutdown_limit = 0;
 
 uint8_t buttonState() {
@@ -131,30 +133,44 @@ void task_PWR(void *argument) {
 			  case NO_PRESS : break ;
 			  case SINGLE_PRESS : {
 				  m365_to_display.light = !m365_to_display.light;
+				  if(m365_to_display.light){
+					  task_LED_set_brake_light(BRAKE_LIGHT_ON);
+				  }else{
+					  task_LED_set_brake_light(BRAKE_LIGHT_OFF);
+				  }
+
 			  } break ;
 			  case LONG_PRESS :   {
 				  power_control(DEV_PWR_OFF);
+
 			  } break ;
 			  case VERY_LONG_PRESS :   {
 
 			  } break ;
 			  case DOUBLE_PRESS : {
-				  float kmh=0;
+				  uint32_t kmh=0;
 				  switch(m365_to_display.mode){
 				  	case M365_MODE_DRIVE:
-				  		  m365_to_display.mode = M365_MODE_SPORT;
-				  		  kmh = 25;
-				  		  break;
+				  		app_adc_speed_mode(M365_MODE_SPORT);
+						kmh = mc_conf.modes_kmh_limits[2];
+						mc_conf.lo_current_max_scale =  mc_conf.modes_curr_scale[2];
+						break;
 				  	case M365_MODE_SPORT:
-						  m365_to_display.mode = M365_MODE_SLOW;
-						  kmh = 5;
-						  break;
+				  		app_adc_speed_mode(M365_MODE_SLOW);
+				  		kmh = mc_conf.modes_kmh_limits[0];
+				  		mc_conf.lo_current_max_scale = mc_conf.modes_curr_scale[0];
+						break;
 				  	case M365_MODE_SLOW:
-						  m365_to_display.mode = M365_MODE_DRIVE;
-						  kmh = 10;
-						  break;
+				  		app_adc_speed_mode(M365_MODE_DRIVE);
+				  		kmh = mc_conf.modes_kmh_limits[1];
+				  		mc_conf.lo_current_max_scale = mc_conf.modes_curr_scale[1];
+						break;
 				  }
-				  mc_conf.lo_max_erpm = ((kmh * 1000.0 / 60.0)/(mc_conf.si_wheel_diameter*M_PI)) * mc_conf.si_motor_poles * mc_conf.si_gear_ratio;
+				  if(kmh==1337){
+					  mc_conf.lo_max_erpm = mc_conf.l_max_erpm;
+				  }else{
+					  mc_conf.lo_max_erpm = (((float)kmh * 1000.0 / 60.0)/(mc_conf.si_wheel_diameter*M_PI)) * mc_conf.si_motor_poles * mc_conf.si_gear_ratio;
+				  }
 				  MCI_ExecSpeedRamp(pMCI[M1], VescToSTM_erpm_to_speed(mc_conf.lo_max_erpm), 0);
 			  } break ;
 		 }

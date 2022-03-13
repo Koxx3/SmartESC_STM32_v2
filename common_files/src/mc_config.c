@@ -287,6 +287,8 @@ RDivider_Handle_t RealBusVoltageSensorParamsM1 =
   .UnderVoltageThreshold =  UD_VOLTAGE_THRESHOLD_V * BATTERY_VOLTAGE_GAIN,
   .aBuffer = RealBusVoltageSensorFilterBufferM1,
 };
+
+
 /*
 UI_Handle_t UI_Params =
 {

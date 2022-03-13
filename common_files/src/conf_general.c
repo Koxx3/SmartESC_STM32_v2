@@ -37,10 +37,10 @@
 #include "tune.h"
 #include "mcconf_default.h"
 #include <string.h>
+#include "main.h"
 
 mc_configuration mc_conf;
 app_configuration appconf;
-
 
 void conf_general_init(void) {
 	conf_general_read_app_configuration(&appconf);
@@ -48,11 +48,12 @@ void conf_general_init(void) {
 
 	conf_general_read_mc_configuration(&mc_conf, 0);
 	conf_general_setup_mc(&mc_conf);
-	
+
 	//enable cycle counter
 	DEMCR |= DEMCR_TRCENA;
 	DWT_CTRL |= CYCCNTENA;
 
+	MCI_StartMotor(pMCI[M1]);
 }
 
 /**
@@ -146,6 +147,12 @@ void conf_general_read_mc_configuration(mc_configuration *conf, bool is_motor_2)
 
 	if (!is_ok) {
 		confgenerator_set_defaults_mcconf(conf);
+		conf->modes_curr_scale[0] = MODE_SLOW_CURR;
+		conf->modes_curr_scale[1] = MODE_DRIVE_CURR;
+		conf->modes_curr_scale[2] = MODE_SPORT_CURR;
+		conf->modes_kmh_limits[0] = MODE_SLOW_SPEED;
+		conf->modes_kmh_limits[1] = MODE_DRIVE_SPEED;
+		conf->modes_kmh_limits[2] = MODE_SPORT_SPEED;
 	}
 
 }
@@ -193,6 +200,8 @@ bool conf_general_write_flash(uint8_t page, uint8_t * data, uint16_t size){
  */
 bool conf_general_store_app_configuration(app_configuration *conf) {
 	bool is_ok = true;
+	VescToSTM_stop_motor();
+	vTaskDelay(300);
 
 	conf->crc = app_calc_crc(conf);
 
@@ -200,6 +209,8 @@ bool conf_general_store_app_configuration(app_configuration *conf) {
 	is_ok = conf_general_write_flash(APP_PAGE, (uint8_t*)conf, sizeof(app_configuration));
 
 	vTaskDelay(500);
+	MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
+	VescToSTM_start_motor();
 
 	return is_ok;
 }
@@ -233,27 +244,121 @@ mc_configuration* mc_interface_get_configuration(void){
 	return &mc_conf;
 }
 
+void conf_general_mcconf_hw_limits(mc_configuration *mcconf) {
+	utils_truncate_number(&mcconf->l_current_max_scale, 0.0, 1.0);
+	utils_truncate_number(&mcconf->l_current_min_scale, 0.0, 1.0);
 
-void conf_general_update_current(mc_configuration *mcconf){
-	//Also something broken
-//	float current_max = mcconf->lo_current_max * CURRENT_FACTOR_A;
-//	float current_min = mcconf->lo_current_min * CURRENT_FACTOR_A;
-//	PIDSpeedHandle_M1.wUpperIntegralLimit = current_max * SP_KIDIV;
-//	PIDSpeedHandle_M1.wLowerIntegralLimit = current_min * SP_KIDIV;
-//	PIDSpeedHandle_M1.hUpperOutputLimit   = current_max;
-//	PIDSpeedHandle_M1.hLowerOutputLimit   = current_min;
-//	FW_M1.wNominalSqCurr 				  = current_max * current_max;
-//	FW_M1.hDemagCurrent					  = -(current_max*mcconf->foc_d_gain_scale_max_mod);
-//	SpeednTorqCtrlM1.MaxPositiveTorque			= current_max;
-//	SpeednTorqCtrlM1.MinNegativeTorque 			= current_min;
+	if(mcconf->override_limits == true) return;
+	// This limit should always be active, as starving the threads never
+	// makes sense.
+
+#ifndef DISABLE_HW_LIMITS
+#ifdef HW_LIM_CURRENT
+	utils_truncate_number(&mcconf->l_current_max, HW_LIM_CURRENT);
+	utils_truncate_number(&mcconf->l_current_min, HW_LIM_CURRENT);
+#endif
+#ifdef HW_LIM_CURRENT_IN
+	utils_truncate_number(&mcconf->l_in_current_max, HW_LIM_CURRENT_IN);
+	utils_truncate_number(&mcconf->l_in_current_min, HW_LIM_CURRENT);
+#endif
+#ifdef HW_LIM_CURRENT_ABS
+	utils_truncate_number(&mcconf->l_abs_current_max, HW_LIM_CURRENT_ABS);
+#endif
+#ifdef HW_LIM_VIN
+	utils_truncate_number(&mcconf->l_max_vin, HW_LIM_VIN);
+	utils_truncate_number(&mcconf->l_min_vin, HW_LIM_VIN);
+#endif
+#ifdef HW_LIM_ERPM
+	utils_truncate_number(&mcconf->l_max_erpm, HW_LIM_ERPM);
+	utils_truncate_number(&mcconf->l_min_erpm, HW_LIM_ERPM);
+#endif
+#ifdef HW_LIM_DUTY_MIN
+	utils_truncate_number(&mcconf->l_min_duty, HW_LIM_DUTY_MIN);
+#endif
+#ifdef HW_LIM_DUTY_MAX
+	utils_truncate_number(&mcconf->l_max_duty, HW_LIM_DUTY_MAX);
+#endif
+#ifdef HW_LIM_TEMP_FET
+	utils_truncate_number(&mcconf->l_temp_fet_start, HW_LIM_TEMP_FET);
+	utils_truncate_number(&mcconf->l_temp_fet_end, HW_LIM_TEMP_FET);
+#endif
+#ifdef HW_LIM_F_SW
+	utils_truncate_number(&mcconf->foc_f_sw, HW_LIM_F_SW);
+#endif
+
+#endif
 }
 
 
 
+
+void conf_general_setup_f_sw(uint32_t f_sw){
+
+	uint32_t regulation_exec_rate = (f_sw > 20000) ? 2 : 1;
+
+	uint16_t pwm_p_cycles = (uint16_t)((ADV_TIM_CLK_MHz*(uint32_t)1000000u/((uint32_t)(f_sw)))&0xFFFE);
+
+	PWM_Handle_M1._Super.hT_Sqrt3 	 = (pwm_p_cycles*SQRT3FACTOR)/16384u;
+	PWM_Handle_M1._Super.PWMperiod   = pwm_p_cycles;
+	PWM_Handle_M1.Half_PWMPeriod = pwm_p_cycles/2;
+	HALL_M1._Super.hMeasurementFrequency = (uint16_t) ((uint32_t)(f_sw)/(regulation_exec_rate*PWM_FREQ_SCALING));
+	RampExtMngrHFParamsM1.FrequencyHz = (uint32_t) ((uint32_t)(f_sw)/(regulation_exec_rate));
+	R3_2_ParamsM1.RepetitionCounter = (uint16_t) ((regulation_exec_rate *2u)-1u);
+	htim1.Init.Period = ((pwm_p_cycles) / 2);
+	htim1.Init.RepetitionCounter = (uint16_t) ((regulation_exec_rate *2u)-1u);
+	HAL_TIM_Base_Init(&htim1);
+	HAL_TIM_PWM_Init(&htim1);
+	TIM_OC_InitTypeDef sConfigOC = {0};
+
+	sConfigOC.OCMode = TIM_OCMODE_PWM1;
+	sConfigOC.Pulse = 0;
+	sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+	sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
+	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+	sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
+	sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
+	if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+	{
+	Error_Handler();
+	}
+	if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+	{
+	Error_Handler();
+	}
+	if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+	{
+	Error_Handler();
+	}
+	sConfigOC.OCMode = TIM_OCMODE_PWM2;
+	sConfigOC.Pulse = (((pwm_p_cycles) / 2) - (HTMIN));
+	if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
+	{
+	Error_Handler();
+	};
+}
+
 void conf_general_setup_mc(mc_configuration *mcconf) {
+
+	conf_general_setup_f_sw(mcconf->foc_f_sw);
+
 	float current_max = mcconf->l_current_max * CURRENT_FACTOR_A * mcconf->l_current_max_scale;
 	float current_min = mcconf->l_current_min * CURRENT_FACTOR_A * mcconf->l_current_min_scale;
+	mcconf->lo_current_max_scale = 1.0;
 	uint16_t max_app_speed;
+
+	if(mcconf->foc_motor_flux_linkage==0){
+		VescToSTM_set_minimum_current(0);  //PWM always ON
+	}else{
+		VescToSTM_set_minimum_current(mcconf->cc_min_current);
+	}
+
+	PWM_Handle_M1._Super.OverCurrent = mcconf->l_abs_current_max * CURRENT_FACTOR_A;
+
+	if(mcconf->l_slow_abs_current){
+		PWM_Handle_M1._Super.OverCurrentCycles = utils_map(mcconf->foc_current_filter_const,1,0,0,ABS_OVR_CURRENT_TRIP_MS) / (1000.0 / mcconf->foc_f_sw);
+	}else{
+		PWM_Handle_M1._Super.OverCurrentCycles = 0;  //instant trip
+	}
 
 	FOCVars[M1].max_i_batt = mcconf->l_in_current_max * CURRENT_FACTOR_A;
 	FOCVars[M1].min_i_batt = mcconf->l_in_current_min * CURRENT_FACTOR_A;
@@ -280,22 +385,30 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	PIDSpeedHandle_M1.hDefKiGain 		  = PIDSpeedHandle_M1.hKiGain;
 
 	PIDIqHandle_M1.hKpGain          	  = mcconf->foc_current_kp * (float)TF_KPDIV;
-	PIDIqHandle_M1.hKiGain                = mcconf->foc_current_ki * (float)TF_KIDIV / (float)PWM_FREQUENCY;
+	PIDIqHandle_M1.hKiGain                = mcconf->foc_current_ki * (float)TF_KIDIV / (float)mcconf->foc_f_sw;
 	PIDIqHandle_M1.hDefKpGain 			  = PIDIqHandle_M1.hKpGain;
 	PIDIqHandle_M1.hDefKiGain 			  = PIDIqHandle_M1.hKiGain;
+	PIDIqHandle_M1.hUpperOutputLimit	  = INT16_MAX * mcconf->l_max_duty;
+	PIDIqHandle_M1.hLowerOutputLimit	  = -PIDIqHandle_M1.hUpperOutputLimit;
+	PIDIqHandle_M1.wUpperIntegralLimit    = (int32_t)PIDIqHandle_M1.hUpperOutputLimit * TF_KIDIV,
+	PIDIqHandle_M1.wLowerIntegralLimit    = (int32_t)-PIDIqHandle_M1.hUpperOutputLimit * TF_KIDIV,
+	FOCVars[M1].min_duty				  = INT16_MAX *mcconf->l_min_duty;
+
 
 	PIDIdHandle_M1.hKpGain             	  = PIDIqHandle_M1.hKpGain; //Torque and flux has the same P gain
 	PIDIdHandle_M1.hKiGain                = PIDIqHandle_M1.hDefKiGain; //Torque and flux has the same I gain
 	PIDIdHandle_M1.hDefKpGain 			  = PIDIdHandle_M1.hKpGain;
 	PIDIdHandle_M1.hDefKiGain 			  = PIDIdHandle_M1.hKiGain;
+	PIDIdHandle_M1.hUpperOutputLimit	  = INT16_MAX * mcconf->l_max_duty;
+	PIDIdHandle_M1.hLowerOutputLimit	  = -PIDIdHandle_M1.hUpperOutputLimit;
+	PIDIdHandle_M1.wUpperIntegralLimit    = (int32_t)PIDIdHandle_M1.hUpperOutputLimit * TF_KIDIV,
+	PIDIdHandle_M1.wLowerIntegralLimit    = (int32_t)-PIDIdHandle_M1.hUpperOutputLimit * TF_KIDIV,
 
 	FW_M1.wNominalSqCurr 				  = current_max * current_max;
-	if(mcconf->foc_d_gain_scale_start < 0.5){
-		mcconf->foc_d_gain_scale_start = 0.5;
-	}
-	FW_M1.hFW_V_Ref						  = 1000.0 * mcconf->foc_d_gain_scale_start;
-	FW_M1.hDemagCurrent					  = -(current_max*mcconf->foc_d_gain_scale_max_mod);
-	PIDFluxWeakeningHandle_M1.wLowerIntegralLimit = (int32_t)(-current_max*mcconf->foc_d_gain_scale_max_mod) * (int32_t)FW_KIDIV,
+	FW_M1.hFW_V_Ref						  = 1000.0 * mcconf->foc_fw_duty_start;
+	FW_M1.hDemagCurrent					  = -(mcconf->foc_fw_current_max * CURRENT_FACTOR_A);
+	FW_M1.fw_q_current_factor			  = mcconf->foc_fw_q_current_factor * INT16_MAX;
+	PIDFluxWeakeningHandle_M1.wLowerIntegralLimit = (int32_t)FW_M1.hDemagCurrent * (int32_t)FW_KIDIV;
 
 	SpeednTorqCtrlM1.MaxAppPositiveMecSpeedUnit = VescToSTM_erpm_to_speed(mcconf->l_max_erpm * 1.15);
 	SpeednTorqCtrlM1.MinAppNegativeMecSpeedUnit = VescToSTM_erpm_to_speed(mcconf->l_min_erpm * 1.15);
@@ -311,22 +424,19 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 	}
 	HALL_M1.SwitchSpeed = VescToSTM_erpm_to_speed(mcconf->foc_hall_interp_erpm);
 
-	if(mcconf->l_temp_fet_end > 75.0) mcconf->l_temp_fet_end = 75.0;  //cannot measure more than 75°C for now (Hardware?)
-	float t_threshold = ((V0_V + (dV_dT * (T0_C-mcconf->l_temp_fet_end)))*INT_SUPPLY_VOLTAGE);
-	TempSensorParamsM1.hOverTempThreshold      = (uint16_t)(t_threshold);
-	t_threshold = ((V0_V + (dV_dT * (OV_TEMPERATURE_HYSTERESIS_C+T0_C-mcconf->l_temp_fet_end)))*INT_SUPPLY_VOLTAGE);
-	TempSensorParamsM1.hOverTempDeactThreshold = (uint16_t)(t_threshold);
+	VescToSTM_set_temp_cut(mcconf->l_temp_fet_start, mcconf->l_temp_fet_end);
+
 	TempSensorParamsM1.hSensitivity            = (uint16_t)(ADC_REFERENCE_VOLTAGE/dV_dT);
 	TempSensorParamsM1.wV0                     = (uint16_t)(V0_V *65536/ ADC_REFERENCE_VOLTAGE);
 	TempSensorParamsM1.hT0                     = T0_C;
 
+	float temp = mcconf->l_min_vin * BATTERY_VOLTAGE_GAIN;
+	utils_truncate_number(&temp, 0, UINT16_MAX);
 	RealBusVoltageSensorParamsM1.UnderVoltageThreshold = mcconf->l_min_vin * BATTERY_VOLTAGE_GAIN;
+	temp = mcconf->l_max_vin * BATTERY_VOLTAGE_GAIN;
+	utils_truncate_number(&temp, 0, UINT16_MAX);
 	RealBusVoltageSensorParamsM1.OverVoltageThreshold = mcconf->l_max_vin * BATTERY_VOLTAGE_GAIN;
-
-	//save fixed_point vars;
-	mcconf->si_wheel_diameter_s16q16 = float_to_s16q16(mcconf->si_wheel_diameter);
-	mcconf->si_gear_ratio_s16_q16 = float_to_s16q16(mcconf->si_wheel_diameter);
-
+	VescToSTM_set_battery_cut(mcconf->l_battery_cut_start, mcconf->l_battery_cut_end);
 
 	// BLDC switching and drive
 	mcconf->motor_type = MOTOR_TYPE_FOC;
@@ -338,6 +448,7 @@ void conf_general_setup_mc(mc_configuration *mcconf) {
 
 	VescToSTM_init_odometer(mcconf);
 	mc_conf = *mcconf;
+
 }
 
 void conf_general_calc_apply_foc_cc_kp_ki_gain(mc_configuration *mcconf, float tc) {
@@ -349,7 +460,6 @@ void conf_general_calc_apply_foc_cc_kp_ki_gain(mc_configuration *mcconf, float t
 	float kp = l * bw;
 	float ki = r * bw;
 	float gain = 1.0e-3 / (lambda * lambda);
-//	float gain = (0.00001 / r) / (lambda * lambda); // Old method
 
 	mcconf->foc_current_kp = kp;
 	mcconf->foc_current_ki = ki;
@@ -436,20 +546,21 @@ int conf_general_detect_apply_all_foc(float max_power_loss,	bool store_mcconf_on
 		mcconf_old->foc_motor_r = r;
 		mcconf_old->foc_motor_l = l;
 		mcconf_old->foc_motor_flux_linkage = lambda;
+		VescToSTM_stop_motor();
 		conf_general_calc_apply_foc_cc_kp_ki_gain(mcconf_old, 1000);
 		conf_general_setup_mc(mcconf_old);
 
 
 		// TODO: optionally apply temperature compensation here.
 
-		vTaskDelay(MS_TO_TICKS(3000));
+		vTaskDelay(MS_TO_TICKS(1000));
 		//wait_motor_stop(10000);
-
+		VescToSTM_start_motor();
 
 		// This will also store the settings to emulated eeprom and send them to vesc tool
 
 		uint8_t hall_tab[8];
-		bool res = tune_mcpwm_foc_hall_detect((i_max / 3.0)*1000.0, hall_tab);
+		bool res = tune_mcpwm_foc_hall_detect((i_max / 3.0), hall_tab);
 		if(res==true){
 			memcpy(mcconf_old->foc_hall_table,hall_tab, 8);
 			conf_general_setup_mc(mcconf_old);

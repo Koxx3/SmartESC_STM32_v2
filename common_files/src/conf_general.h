@@ -20,12 +20,6 @@
 #ifndef CONF_GENERAL_H_
 #define CONF_GENERAL_H_
 
-// Firmware version
-#define FW_VERSION_MAJOR			5
-#define FW_VERSION_MINOR			02
-// Set to 0 for building a release and iterate during beta test builds
-#define FW_TEST_VERSION_NUMBER		0
-
 #include "VescDatatypes.h"
 #include "packet.h"
 
@@ -44,9 +38,11 @@ void conf_general_init(void);
 void conf_general_read_app_configuration(app_configuration *conf);
 void conf_general_read_mc_configuration(mc_configuration *conf, bool is_motor_2);
 bool conf_general_store_mc_configuration(mc_configuration *conf, bool is_motor_2);
+void conf_update_override_current(mc_configuration *mcconf);
 void conf_general_setup_mc(mc_configuration *mcconf);
 void conf_general_update_current(mc_configuration *mcconf);
 mc_configuration* mc_interface_get_configuration(void);
 bool conf_general_store_app_configuration(app_configuration *conf);
+void conf_general_mcconf_hw_limits(mc_configuration *mcconf);
 int conf_general_detect_apply_all_foc_can(bool detect_can, float max_power_loss, float min_current_in, float max_current_in, float openloop_rpm, float sl_erpm, PACKET_STATE_t * phandle);
 #endif /* CONF_GENERAL_H_ */

@@ -196,7 +196,10 @@ struct PWMC_Handle
                                                            *  @f$hDTCompCnt = (DT_s \cdot TimerFreq_{CLK})/2@f$ */
   uint16_t  Ton;                                         /**< Reserved */
   uint16_t  Toff;                                        /**< Reserved */
-
+  int16_t   OverCurrent;
+  uint32_t  OverCurrentCycles;
+  uint32_t  OverCurrentCyclesCounter;
+  bool PWM_off;
 };
 
 /**

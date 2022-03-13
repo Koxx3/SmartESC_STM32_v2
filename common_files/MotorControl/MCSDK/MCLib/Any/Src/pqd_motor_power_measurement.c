@@ -74,6 +74,17 @@ __weak void PQD_CalcElMotorPower( PQD_MotorPowMeas_Handle_t * pHandle )
   wAux3 *= 6; /* 6 is max bus voltage expressed in thousend of volt.*/
   wAux3 /= 10;
   wAux3 /= 65536;
+  pHandle->_super.SumWDraw += wAux3;
+  pHandle->_super.SumdADraw += ((wAux3*100) / VBS_GetAvBusVoltage_V( pHandle->pVBS ));
+  if(pHandle->meas_count < 1000){
+	  pHandle->meas_count++;
+  }else{
+	  pHandle->meas_count=0;
+	  pHandle->_super.WsDraw += pHandle->_super.SumWDraw / 1000;
+	  pHandle->_super.dAsDraw += pHandle->_super.SumdADraw / 1000;
+	  pHandle->_super.SumWDraw = 0;
+	  pHandle->_super.SumdADraw = 0;
+  }
 
   MPM_CalcElMotorPower( &pHandle->_super, wAux3 );
 

@@ -22,13 +22,13 @@
 
 // Default settings
 #ifndef MCCONF_DEFAULT_MOTOR_TYPE
-#define MCCONF_DEFAULT_MOTOR_TYPE		MOTOR_TYPE_BLDC
+#define MCCONF_DEFAULT_MOTOR_TYPE		MOTOR_TYPE_FOC
 #endif
 #ifndef MCCONF_PWM_MODE
 #define MCCONF_PWM_MODE					PWM_MODE_SYNCHRONOUS // Default PWM mode
 #endif
 #ifndef MCCONF_SENSOR_MODE
-#define MCCONF_SENSOR_MODE				SENSOR_MODE_SENSORLESS // Sensor mode
+#define MCCONF_SENSOR_MODE				SENSOR_MODE_SENSORED // Sensor mode
 #endif
 #ifndef MCCONF_COMM_MODE
 #define MCCONF_COMM_MODE				COMM_MODE_INTEGRATE	// The commutation mode to use
@@ -36,10 +36,10 @@
 
 // Limits
 #ifndef MCCONF_L_CURRENT_MAX
-#define MCCONF_L_CURRENT_MAX			20.0	// Current limit in Amperes (Upper)
+#define MCCONF_L_CURRENT_MAX			30.0	// Current limit in Amperes (Upper)
 #endif
 #ifndef MCCONF_L_CURRENT_MIN
-#define MCCONF_L_CURRENT_MIN			-20.0	// Current limit in Amperes (Lower)
+#define MCCONF_L_CURRENT_MIN			-30.0	// Current limit in Amperes (Lower)
 #endif
 #ifndef MCCONF_L_IN_CURRENT_MAX
 #define MCCONF_L_IN_CURRENT_MAX			20.0	// Input current limit in Amperes (Upper)
@@ -54,13 +54,13 @@
 #define MCCONF_L_MIN_VOLTAGE			8.0		// Minimum input voltage
 #endif
 #ifndef MCCONF_L_MAX_VOLTAGE
-#define MCCONF_L_MAX_VOLTAGE			57.0	// Maximum input voltage
+#define MCCONF_L_MAX_VOLTAGE			56.0	// Maximum input voltage
 #endif
 #ifndef MCCONF_L_BATTERY_CUT_START
 #define MCCONF_L_BATTERY_CUT_START		34.0	// Start limiting the positive current at this voltage
 #endif
 #ifndef MCCONF_L_BATTERY_CUT_END
-#define MCCONF_L_BATTERY_CUT_END		31.0		// Limit the positive current completely at this voltage
+#define MCCONF_L_BATTERY_CUT_END		30.0		// Limit the positive current completely at this voltage
 #endif
 #ifndef MCCONF_L_RPM_MAX
 #define MCCONF_L_RPM_MAX				60000.0	// The motor speed limit (Upper)
@@ -75,10 +75,10 @@
 #define MCCONF_L_SLOW_ABS_OVERCURRENT	true	// Use the filtered (and hence slower) current for the overcurrent fault detection
 #endif
 #ifndef MCCONF_L_MIN_DUTY
-#define MCCONF_L_MIN_DUTY				0.005	// Minimum duty cycle
+#define MCCONF_L_MIN_DUTY				0.00	// Minimum duty cycle
 #endif
 #ifndef MCCONF_L_MAX_DUTY
-#define MCCONF_L_MAX_DUTY				0.95	// Maximum duty cycle
+#define MCCONF_L_MAX_DUTY				0.99	// Maximum duty cycle
 #endif
 #ifndef MCCONF_L_CURR_MAX_RPM_FBRAKE
 #define MCCONF_L_CURR_MAX_RPM_FBRAKE	300		// Maximum electrical RPM to use full brake at
@@ -87,10 +87,10 @@
 #define MCCONF_L_CURR_MAX_RPM_FBRAKE_CC	1500	// Maximum electrical RPM to use full brake at with current control
 #endif
 #ifndef MCCONF_L_LIM_TEMP_FET_START
-#define MCCONF_L_LIM_TEMP_FET_START		85.0	// MOSFET temperature where current limiting should begin
+#define MCCONF_L_LIM_TEMP_FET_START		65.0	// MOSFET temperature where current limiting should begin
 #endif
 #ifndef MCCONF_L_LIM_TEMP_FET_END
-#define MCCONF_L_LIM_TEMP_FET_END		100.0	// MOSFET temperature where everything should be shut off
+#define MCCONF_L_LIM_TEMP_FET_END		75.0	// MOSFET temperature where everything should be shut off
 #endif
 #ifndef MCCONF_L_LIM_TEMP_MOTOR_START
 #define MCCONF_L_LIM_TEMP_MOTOR_START	0.0	// MOTOR temperature where current limiting should begin
@@ -119,10 +119,10 @@
 
 // Speed PID parameters
 #ifndef MCCONF_S_PID_KP
-#define MCCONF_S_PID_KP					5	// Proportional gain
+#define MCCONF_S_PID_KP					2	// Proportional gain
 #endif
 #ifndef MCCONF_S_PID_KI
-#define MCCONF_S_PID_KI					10	// Integral gain
+#define MCCONF_S_PID_KI					5	// Integral gain
 #endif
 #ifndef MCCONF_S_PID_KD
 #define MCCONF_S_PID_KD					0.0	// Derivative gain
@@ -131,7 +131,7 @@
 #define MCCONF_S_PID_KD_FILTER			0.2	// Derivative filter
 #endif
 #ifndef MCCONF_S_PID_MIN_RPM
-#define MCCONF_S_PID_MIN_RPM			900.0	// Minimum allowed RPM
+#define MCCONF_S_PID_MIN_RPM			0.0	// Minimum allowed RPM
 #endif
 #ifndef MCCONF_S_PID_ALLOW_BRAKING
 #define MCCONF_S_PID_ALLOW_BRAKING		false	// Allow braking in speed control mode
@@ -225,10 +225,10 @@
 
 // FOC
 #ifndef MCCONF_FOC_CURRENT_KP
-#define MCCONF_FOC_CURRENT_KP			0.3
+#define MCCONF_FOC_CURRENT_KP			0.09
 #endif
 #ifndef MCCONF_FOC_CURRENT_KI
-#define MCCONF_FOC_CURRENT_KI			50.0
+#define MCCONF_FOC_CURRENT_KI			110.0
 #endif
 #ifndef MCCONF_FOC_F_SW
 #define MCCONF_FOC_F_SW					16000.0
@@ -255,13 +255,13 @@
 #define MCCONF_FOC_PLL_KI				30000.0
 #endif
 #ifndef MCCONF_FOC_MOTOR_L
-#define MCCONF_FOC_MOTOR_L				0.000007
+#define MCCONF_FOC_MOTOR_L				0.0001
 #endif
 #ifndef MCCONF_FOC_MOTOR_R
-#define MCCONF_FOC_MOTOR_R				0.015
+#define MCCONF_FOC_MOTOR_R				0.1
 #endif
 #ifndef MCCONF_FOC_MOTOR_FLUX_LINKAGE
-#define MCCONF_FOC_MOTOR_FLUX_LINKAGE	0.00245
+#define MCCONF_FOC_MOTOR_FLUX_LINKAGE	0.012
 #endif
 #ifndef MCCONF_FOC_MOTOR_LD_LQ_DIFF
 #define MCCONF_FOC_MOTOR_LD_LQ_DIFF		0.0
@@ -348,7 +348,7 @@
 #define MCCONF_FOC_TEMP_COMP_BASE_TEMP	25.0	// Motor temperature compensation base temperature
 #endif
 #ifndef MCCONF_FOC_CURRENT_FILTER_CONST
-#define MCCONF_FOC_CURRENT_FILTER_CONST	0.1		// Filter constant for the filtered currents
+#define MCCONF_FOC_CURRENT_FILTER_CONST	0.0		// Filter constant for the filtered currents
 #endif
 #ifndef MCCONF_FOC_CC_DECOUPLING
 #define MCCONF_FOC_CC_DECOUPLING		FOC_CC_DECOUPLING_BEMF // Current controller decoupling
@@ -377,6 +377,21 @@
 #ifndef MCCONF_FOC_HFI_SAMPLES
 #define MCCONF_FOC_HFI_SAMPLES			HFI_SAMPLES_16 // Samples per motor revolution for HFI
 #endif
+#ifndef MCCONF_FOC_MTPA_MODE
+#define MCCONF_FOC_MTPA_MODE				MTPA_MODE_OFF // Maximum torque per amp (MTPA) algorithm mode
+#endif
+#ifndef MCCONF_FOC_FW_CURRENT_MAX
+#define MCCONF_FOC_FW_CURRENT_MAX		0.0 // Maximum field weakening current
+#endif
+#ifndef MCCONF_FOC_FW_DUTY_START
+#define MCCONF_FOC_FW_DUTY_START		0.95 // Start field weakening at this fraction of max duty cycle
+#endif
+#ifndef MCCONF_FOC_FW_RAMP_TIME
+#define MCCONF_FOC_FW_RAMP_TIME			0.2 // Ramp time for field weakening current
+#endif
+#ifndef MCCONF_FOC_FW_Q_CURRENT_FACTOR
+#define MCCONF_FOC_FW_Q_CURRENT_FACTOR	0.02 // Factor of the FW-current to feed to the Q-axis to slow motor down when setting 0 current
+#endif
 
 // GPD
 #ifndef MCCONF_GPD_BUFFER_NOTIFY_LEFT
@@ -397,7 +412,7 @@
 
 // Misc
 #ifndef MCCONF_M_FAULT_STOP_TIME
-#define MCCONF_M_FAULT_STOP_TIME		500	// Ignore commands for this duration in msec when faults occur
+#define MCCONF_M_FAULT_STOP_TIME		1000	// Ignore commands for this duration in msec when faults occur
 #endif
 #ifndef MCCONF_M_RAMP_STEP
 #define MCCONF_M_RAMP_STEP				0.02	// Duty cycle ramping step (1000 times/sec) at maximum duty cycle

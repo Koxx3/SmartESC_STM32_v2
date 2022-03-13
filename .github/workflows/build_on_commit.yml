@@ -1,0 +1,44 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Build on commit
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the vesc_comp branch
+  push:
+    branches: [ vesc_comp ]
+  pull_request:
+    branches: [ vesc_comp ]
+    
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    env:
+      # ruleid: allowed-unsecure-commands
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: log untrusted output
+      run: |
+        # disable command workflow processing
+        echo "::stop-commands::`echo -n ${{ github.token }} | sha256sum | head -c 64`"
+        # log untrusted output
+        echo "untrusted output"
+        # enable workflow command processing
+        echo "::`echo -n ${{ github.token }} | sha256sum | head -c 64`::"
+        
+    - name: 'Build M365'
+      uses: docker://wsbu/stm32cubeide:latest
+      with:
+        entrypoint: /opt/stm32cubeide/stm32cubeide
+        args: --launcher.suppressErrors -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild -build m365/Debug -importAll /github/workspace/
+    
+    - name: 'Upload Artifact M365 - with build number'
+      uses: actions/upload-artifact@v2
+      with:
+        path: ${{ github.workspace }}/m365/STM32CubeIDE/Debug/m365.bin
+        name: ${{ github.run_number }}
+        retention-days: 5

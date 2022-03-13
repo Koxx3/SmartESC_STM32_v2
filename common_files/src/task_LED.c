@@ -30,21 +30,52 @@
 #include "task.h"
 #include "product.h"
 #include "VescCommand.h"
+#include "VescToSTM.h"
 
 
 TaskHandle_t LEDHandle;
-const osThreadAttr_t LED_attributes = {
-  .name = "LED",
-  .priority = (osPriority_t) osPriorityBelowNormal,
-  .stack_size = 128 * 4
-};
 
-void prv_LED_blink(uint32_t ticks){
-	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, pdFALSE);
-	vTaskDelay(ticks);
-	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, pdTRUE);
-	vTaskDelay(ticks);
+en_brake brake_mode = BRAKE_LIGHT_OFF;
+
+extern stm_state VescToSTM_mode;
+
+void prv_LED_blink(uint32_t speed){
+	static uint16_t cnt=0;
+	static uint8_t brake_cnt=0;
+	if(cnt>speed){
+		cnt=0;
+		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+	}else{
+		cnt++;
+	}
+
+
+	if(VescToSTM_mode == STM_STATE_BRAKE && (FW_M1.AvAmpere_qd.q < (-1*CURRENT_FACTOR_A) || FW_M1.AvAmpere_qd.q > (1*CURRENT_FACTOR_A))){
+		if(brake_cnt>20){
+			brake_cnt=0;
+			HAL_GPIO_TogglePin(BRAKE_LIGHT_GPIO_Port, BRAKE_LIGHT_Pin);
+		}else{
+			brake_cnt++;
+		}
+	}else{
+		if(brake_mode == BRAKE_LIGHT_ON){
+			HAL_GPIO_WritePin(BRAKE_LIGHT_GPIO_Port, BRAKE_LIGHT_Pin, GPIO_PIN_RESET);
+			brake_cnt=20;
+		}else{
+			HAL_GPIO_WritePin(BRAKE_LIGHT_GPIO_Port, BRAKE_LIGHT_Pin, GPIO_PIN_SET);
+			brake_cnt=0;
+		}
+	}
+
+
 }
+
+
+
+void task_LED_set_brake_light(en_brake mode){
+	brake_mode = mode;
+}
+
 
 
 //#define  MC_NO_ERROR  (uint16_t)(0x0000u)      /**< @brief No error.*/
@@ -60,8 +91,8 @@ void prv_LED_blink(uint32_t ticks){
 
 void task_LED(void * argument)
 {
-	volatile uint32_t last_fault_time=0;
-	volatile uint16_t last_fault = 0;
+	uint32_t last_fault_time=0;
+	uint16_t last_fault = 0;
 	/* Infinite loop */
 	for(;;)
 	{
@@ -77,24 +108,20 @@ void task_LED(void * argument)
 
 #if AUTO_RESET_FAULT
 				MCI_FaultAcknowledged(pMCI[M1]);
-				vTaskDelay(MS_TO_TICKS(100));
-				MCI_StopMotor(pMCI[M1]);
-				vTaskDelay(MS_TO_TICKS(100));
-				MCI_ExecTorqueRamp(pMCI[M1], 0, 0);
-				if(MCI_GetAvrgMecSpeedUnit(pMCI[M1]) == 0){
-					MCI_StartMotor(pMCI[M1]);
-				}else{
-					pMCI[M1]->pSTM->bState = CLEAR;
-				}
+				VescToSTM_set_current(0, 0);
+				STM[M1].bState = RUN;
+				VescToSTM_pwm_start();
 
 				last_fault = 0;
 #endif
 			}
-			prv_LED_blink(MS_TO_TICKS(100));
+			prv_LED_blink(10);
 		}else{
-			prv_LED_blink(MS_TO_TICKS(500));
+			prv_LED_blink(50);
 		}
 
+
+		vTaskDelay(MS_TO_TICKS(10));
 	}
 }
 

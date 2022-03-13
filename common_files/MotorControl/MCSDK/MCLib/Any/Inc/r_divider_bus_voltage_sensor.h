@@ -72,7 +72,6 @@ typedef struct
   uint8_t        elem;                  /*!< Number of stored elements in the average buffer.*/
   uint8_t        index;                 /*!< Index of last stored element in the average buffer.*/
   uint8_t        convHandle;            /*!< handle to the regular conversion */
-
 } RDivider_Handle_t;
 
 /* Exported functions ------------------------------------------------------- */

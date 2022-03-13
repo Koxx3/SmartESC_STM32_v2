@@ -49,6 +49,8 @@ typedef struct
 
   qd_t            AvVolt_qd;              /**< Average stator voltage in qd
                                                  reference frame */
+  qd_t            AvAmpere_qd;              /**< Average stator voltage in qd
+                                                 reference frame */
   int16_t         AvVoltAmpl;  //(14)           /**< Average stator voltage amplitude */
   int16_t         hIdRefOffset;  //(16)         /**< Id reference offset */
   uint16_t        hMaxModule;    //18         /**< Circle limitation maximum allowed module */
@@ -69,6 +71,7 @@ typedef struct
                                                equal to log with base two of previous
                                                definition */
   uint16_t        hVqdLowPassFilterBWLOG; //30 /**< hVqdLowPassFilterBW expressed as power of 2. E.g. if gain divisor is 512 the value must be 9 because 2^9 = 512 */
+  int16_t		  fw_q_current_factor;
 } FW_Handle_t;
 
 /**
@@ -117,7 +120,7 @@ qd_t FW_CalcCurrRef( FW_Handle_t * pHandle, qd_t Iqdref );
   * @param  Vqd Voltage componets to be averaged.
   * @retval none
   */
-void FW_DataProcess( FW_Handle_t * pHandle, qd_t Vqd );
+void FW_DataProcess( FW_Handle_t * pHandle, qd_t Vqd, qd_t Iqd);
 
 /**
   * @brief  Use this method to set a new value for the voltage reference used by

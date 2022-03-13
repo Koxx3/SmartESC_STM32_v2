@@ -21,6 +21,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
+#include "qfplib.h"
 
 // Private variables
 static volatile int sys_lock_cnt = 0;
@@ -343,7 +344,7 @@ float utils_fast_atan2(float y, float x) {
  */
 bool utils_saturate_vector_2d(float *x, float *y, float max) {
 	bool retval = false;
-	float mag = sqrtf(SQ(*x) + SQ(*y));
+	float mag = qfp_fsqrt(SQ(*x) + SQ(*y));
 	max = fabsf(max);
 
 	if (mag < 1e-10) {
@@ -563,18 +564,18 @@ float utils_throttle_curve(float val, float curve_acc, float curve_brake, int mo
 	// http://math.stackexchange.com/questions/297768/how-would-i-create-a-exponential-ramp-function-from-0-0-to-1-1-with-a-single-val
 	if (mode == 0) { // Exponential
 		if (curve >= 0.0) {
-			ret = 1.0 - powf(1.0 - val_a, 1.0 + curve);
+			ret = 1.0 - pow(1.0 - val_a, 1.0 + curve);
 		} else {
-			ret = powf(val_a, 1.0 - curve);
+			ret = pow(val_a, 1.0 - curve);
 		}
 	} else if (mode == 1) { // Natural
 		if (fabsf(curve) < 1e-10) {
 			ret = val_a;
 		} else {
 			if (curve >= 0.0) {
-				ret = 1.0 - ((expf(curve * (1.0 - val_a)) - 1.0) / (expf(curve) - 1.0));
+				ret = 1.0 - ((qfp_fexp(curve * (1.0 - val_a)) - 1.0) / (qfp_fexp(curve) - 1.0));
 			} else {
-				ret = (expf(-curve * val_a) - 1.0) / (expf(-curve) - 1.0);
+				ret = (qfp_fexp(-curve * val_a) - 1.0) / (qfp_fexp(-curve) - 1.0);
 			}
 		}
 	} else if (mode == 2) { // Polynomial

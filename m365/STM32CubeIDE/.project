@@ -212,6 +212,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/flux_weakening_ctrl.c</locationURI>
 		</link>
 		<link>
+			<name>Application/User/functions.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/functions.c</locationURI>
+		</link>
+		<link>
 			<name>Application/User/m365_register_map.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/m365_register_map.h</locationURI>
@@ -262,6 +267,26 @@
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/inc/product.h</locationURI>
 		</link>
 		<link>
+			<name>Application/User/qfpio.S</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/qfpio.S</locationURI>
+		</link>
+		<link>
+			<name>Application/User/qfpio.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/qfpio.h</locationURI>
+		</link>
+		<link>
+			<name>Application/User/qfplib.S</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/qfplib.S</locationURI>
+		</link>
+		<link>
+			<name>Application/User/qfplib.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/qfplib.h</locationURI>
+		</link>
+		<link>
 			<name>Application/User/stm32f10x_mc_it.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/stm32f10x_mc_it.c</locationURI>
@@ -292,6 +317,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/task_LED.c</locationURI>
 		</link>
 		<link>
+			<name>Application/User/task_LED.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/task_LED.h</locationURI>
+		</link>
+		<link>
 			<name>Application/User/task_cli.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/task_cli.c</locationURI>
@@ -310,6 +340,11 @@
 			<name>Application/User/task_pwr.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/task_pwr.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/task_pwr.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/task_pwr.h</locationURI>
 		</link>
 		<link>
 			<name>Drivers/CMSIS/system_stm32f1xx.c</name>
