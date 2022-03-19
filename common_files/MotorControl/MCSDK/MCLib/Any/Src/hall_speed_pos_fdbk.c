@@ -163,6 +163,7 @@ __weak void HALL_Init( HALL_Handle_t * pHandle )
   {
     pHandle->SensorPeriod[bIndex]  = pHandle->MaxPeriod;
   }
+  pHandle->HallState = HALL_read(pHandle);
 }
 
 /**
@@ -235,8 +236,6 @@ __weak int16_t HALL_CalcElAngle( HALL_Handle_t * pHandle )
 {
 if ( pHandle->_Super.hElSpeedDpp != HALL_MAX_PSEUDO_SPEED )
   {
-    //pHandle->MeasuredElAngle += pHandle->MeasuredElAngle;
-    //pHandle->_Super.hElAngle += pHandle->_Super.hElSpeedDpp + pHandle->CompSpeed;
 	int diff = pHandle->_Super.hElAngle - pHandle->MeasuredElAngle;
 
 	if (diff > 32000) {
@@ -245,7 +244,12 @@ if ( pHandle->_Super.hElSpeedDpp != HALL_MAX_PSEUDO_SPEED )
 		diff += 65536;
 	}
 	if(abs(diff)<(5461*2)){
-		pHandle->_Super.hElAngle += pHandle->_Super.hElSpeedDpp + pHandle->CompSpeed;
+		if((abs(pHandle->AvrElSpeedDpp) < pHandle->SwitchSpeed) ){
+			pHandle->_Super.hElAngle += pHandle->_Super.hElSpeedDpp;
+		}else{
+			pHandle->MeasuredElAngle += pHandle->_Super.hElSpeedDpp;
+			pHandle->_Super.hElAngle += pHandle->_Super.hElSpeedDpp + pHandle->CompSpeed;
+		}
 	}
 
 	pHandle->PrevRotorFreq = pHandle->_Super.hElSpeedDpp;
@@ -258,6 +262,37 @@ if ( pHandle->_Super.hElSpeedDpp != HALL_MAX_PSEUDO_SPEED )
   return pHandle->_Super.hElAngle;
 }
 
+//__weak int16_t HALL_CalcElAngle( HALL_Handle_t * pHandle )
+//{
+//
+//  if ( pHandle->_Super.hElSpeedDpp != HALL_MAX_PSEUDO_SPEED )
+//  {
+//    pHandle->MeasuredElAngle += pHandle->_Super.hElSpeedDpp;
+//    pHandle->_Super.hElAngle += pHandle->_Super.hElSpeedDpp + pHandle->CompSpeed;
+//    pHandle->PrevRotorFreq = pHandle->_Super.hElSpeedDpp;
+//  }
+//  else
+//  {
+//    pHandle->_Super.hElAngle += pHandle->PrevRotorFreq;
+//  }
+//
+//  return pHandle->_Super.hElAngle;
+//}
+
+#if defined (CCMRAM)
+#if defined (__ICCARM__)
+#pragma location = ".ccmram"
+#elif defined (__CC_ARM) || defined(__GNUC__)
+__attribute__( ( section ( ".ccmram" ) ) )
+#endif
+#endif
+
+uint8_t HALL_read( HALL_Handle_t * pHandle )
+{
+	return  (uint8_t) ((LL_GPIO_IsInputPinSet( pHandle->H3Port, pHandle->H3Pin ) << 2)
+							| (LL_GPIO_IsInputPinSet( pHandle->H2Port, pHandle->H2Pin ) << 1)
+							| LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin ) );
+}
 
 /**
   * @brief  This method must be called - at least - with the same periodicity
@@ -380,10 +415,7 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
     bPrevHallState = pHandle->lut[pHandle->HallState];
     PrevDirection = pHandle->Direction;
 
-	pHandle->HallState  = (uint8_t) ((LL_GPIO_IsInputPinSet( pHandle->H3Port, pHandle->H3Pin ) << 2)
-						| (LL_GPIO_IsInputPinSet( pHandle->H2Port, pHandle->H2Pin ) << 1)
-						| LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin ) );
-
+    pHandle->HallState  = HALL_read(pHandle);
 
     if(pHandle->HallState == 0 || pHandle->HallState == 7){
     	pHandle->_Super.bSpeedErrorNumber++;
@@ -411,6 +443,7 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
 		}
 
 		pHandle->MeasuredElAngle = (((uint16_t)pHandle->lut[pHandle->HallState]-(diff/2))<<8);
+		//pHandle->_Super.hElAngle = pHandle->MeasuredElAngle;
     }
 
     /* We need to check that the direction has not changed.
@@ -448,16 +481,10 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
        on the SpeedPeriod buffer values */
     }
 
+    if((abs(pHandle->AvrElSpeedDpp) < pHandle->SwitchSpeed) ){
+    	pHandle->_Super.hElAngle = pHandle->MeasuredElAngle;
+	}
 
-
-    if (pHandle->HallMtpa == true)
-    {
-      pHandle->_Super.hElAngle = pHandle->MeasuredElAngle;
-    }
-    else
-    {
-      /* Nothing to do */
-    }
 
     /* Discard first capture */
     if ( pHandle->FirstCapt == 0u )
@@ -568,11 +595,6 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
               pHandle->AvrElSpeedDpp = ( int16_t )((int32_t) pHandle->PseudoFreqConv / ( pHandle->ElPeriodSum / pHandle->SpeedBufferSize )); /* Average value */
 
             }
-
-            if((abs(pHandle->AvrElSpeedDpp) < pHandle->SwitchSpeed) ){
-            	pHandle->HallMtpa = true;
-            }
-
           }
           else /* Sensor is not reliable */
           {
@@ -655,9 +677,7 @@ static void HALL_Init_Electrical_Angle( HALL_Handle_t * pHandle )
 	uint8_t bPrevHallState;
 	bPrevHallState = pHandle->lut[pHandle->HallState];
 
-	pHandle->HallState  =(uint8_t) ((LL_GPIO_IsInputPinSet( pHandle->H3Port, pHandle->H3Pin ) << 2)
-						| (LL_GPIO_IsInputPinSet( pHandle->H2Port, pHandle->H2Pin ) << 1)
-						| LL_GPIO_IsInputPinSet( pHandle->H1Port, pHandle->H1Pin ) );
+	pHandle->HallState  = HALL_read(pHandle);
 
     if(pHandle->HallState == 0 || pHandle->HallState == 7){
     	pHandle->_Super.bSpeedErrorNumber++;
@@ -687,7 +707,6 @@ static void HALL_Init_Electrical_Angle( HALL_Handle_t * pHandle )
 		}
 
 		pHandle->MeasuredElAngle = (((uint16_t)pHandle->lut[pHandle->HallState]-(diff/2))<<8);
-
     	//pHandle->_Super.hElAngle = pHandle->PhaseShift + (((uint16_t)pHandle->lut[pHandle->HallState])<<8);
     	/* Initialize the measured angle */
     	//pHandle->MeasuredElAngle = pHandle->_Super.hElAngle;
