@@ -329,7 +329,8 @@ void task_app(void * argument)
 
 			}
 			m365_to_display.speed *= DIR_MUL;
-			m365_to_display.battery = utils_map(VescToSTM_get_battery_level(0), 0, 1, 0, 96);
+			int temp = utils_map(VescToSTM_get_battery_level(0), 0, 1, 0, 100);
+			m365_to_display.battery = temp>100?100:temp;
 			m365_to_display.beep=0;
 			m365_to_display.faultcode=pMCI[M1]->pSTM->hFaultOccurred;
 
