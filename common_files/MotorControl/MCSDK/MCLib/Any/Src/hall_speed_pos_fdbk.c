@@ -236,6 +236,8 @@ __weak int16_t HALL_CalcElAngle( HALL_Handle_t * pHandle )
 {
 if ( pHandle->_Super.hElSpeedDpp != HALL_MAX_PSEUDO_SPEED )
   {
+    //pHandle->MeasuredElAngle += pHandle->MeasuredElAngle;
+    //pHandle->_Super.hElAngle += pHandle->_Super.hElSpeedDpp + pHandle->CompSpeed;
 	int diff = pHandle->_Super.hElAngle - pHandle->MeasuredElAngle;
 
 	if (diff > 32000) {
@@ -244,12 +246,7 @@ if ( pHandle->_Super.hElSpeedDpp != HALL_MAX_PSEUDO_SPEED )
 		diff += 65536;
 	}
 	if(abs(diff)<(5461*2)){
-		if((abs(pHandle->AvrElSpeedDpp) < pHandle->SwitchSpeed) ){
-			pHandle->_Super.hElAngle += pHandle->_Super.hElSpeedDpp;
-		}else{
-			pHandle->MeasuredElAngle += pHandle->_Super.hElSpeedDpp;
-			pHandle->_Super.hElAngle += pHandle->_Super.hElSpeedDpp + pHandle->CompSpeed;
-		}
+		pHandle->_Super.hElAngle += pHandle->_Super.hElSpeedDpp + pHandle->CompSpeed;
 	}
 
 	pHandle->PrevRotorFreq = pHandle->_Super.hElSpeedDpp;
@@ -262,22 +259,6 @@ if ( pHandle->_Super.hElSpeedDpp != HALL_MAX_PSEUDO_SPEED )
   return pHandle->_Super.hElAngle;
 }
 
-//__weak int16_t HALL_CalcElAngle( HALL_Handle_t * pHandle )
-//{
-//
-//  if ( pHandle->_Super.hElSpeedDpp != HALL_MAX_PSEUDO_SPEED )
-//  {
-//    pHandle->MeasuredElAngle += pHandle->_Super.hElSpeedDpp;
-//    pHandle->_Super.hElAngle += pHandle->_Super.hElSpeedDpp + pHandle->CompSpeed;
-//    pHandle->PrevRotorFreq = pHandle->_Super.hElSpeedDpp;
-//  }
-//  else
-//  {
-//    pHandle->_Super.hElAngle += pHandle->PrevRotorFreq;
-//  }
-//
-//  return pHandle->_Super.hElAngle;
-//}
 
 #if defined (CCMRAM)
 #if defined (__ICCARM__)
@@ -481,10 +462,16 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
        on the SpeedPeriod buffer values */
     }
 
-    if((abs(pHandle->AvrElSpeedDpp) < pHandle->SwitchSpeed) ){
-    	pHandle->_Super.hElAngle = pHandle->MeasuredElAngle;
-	}
 
+
+    if (pHandle->HallMtpa == true)
+    {
+      pHandle->_Super.hElAngle = pHandle->MeasuredElAngle;
+    }
+    else
+    {
+      /* Nothing to do */
+    }
 
     /* Discard first capture */
     if ( pHandle->FirstCapt == 0u )
@@ -595,6 +582,11 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
               pHandle->AvrElSpeedDpp = ( int16_t )((int32_t) pHandle->PseudoFreqConv / ( pHandle->ElPeriodSum / pHandle->SpeedBufferSize )); /* Average value */
 
             }
+
+            if((abs(pHandle->AvrElSpeedDpp) < pHandle->SwitchSpeed) ){
+            	pHandle->HallMtpa = true;
+            }
+
           }
           else /* Sensor is not reliable */
           {

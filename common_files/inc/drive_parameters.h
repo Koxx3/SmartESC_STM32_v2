@@ -46,7 +46,7 @@
 #define HALL_AVERAGING_FIFO_DEPTH        12 /*!< depth of the FIFO used to
                                                            average mechanical speed in
                                                            0.1Hz resolution */
-#define HALL_MTPA  false
+#define HALL_MTPA  true
 
 /* USER CODE BEGIN angle reconstruction M1 */
 #define REV_PARK_ANGLE_COMPENSATION_FACTOR 0
