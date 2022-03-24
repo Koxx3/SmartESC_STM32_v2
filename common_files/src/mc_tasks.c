@@ -706,8 +706,10 @@ __weak uint8_t TSK_HighFrequencyTask(void)
 		samples.dec_state++;
 		if(samples.dec_state == samples.dec){
 			samples.dec_state = 0;
-			samples.m_curr0_samples[samples.index] = (uint16_t)FOCVars[M1].Iab.a >>4; //Make room for position
-			samples.m_curr1_samples[samples.index] = (uint16_t)FOCVars[M1].Iab.b >>4; //Make room for position
+			//samples.m_curr0_samples[samples.index] = (uint16_t)FOCVars[M1].Iab.a >>4; //Make room for position
+			samples.m_curr0_samples[samples.index] = (uint16_t)HALL_M1._Super.last_id >> 4; //Make room for position
+			//samples.m_curr1_samples[samples.index] = (uint16_t)FOCVars[M1].Iab.b >>4; //Make room for position
+			samples.m_curr1_samples[samples.index] = (uint16_t)HALL_M1._Super.last_iq >> 4; //Make room for position
 			samples.m_curr0_samples[samples.index] |= (((uint16_t)HALL_M1._Super.hElAngle<<4) & 0xF000);
 			samples.m_curr1_samples[samples.index] |= (uint16_t)HALL_M1._Super.hElAngle & 0xF000;
 #if SCOPE_UVW == 1
@@ -762,24 +764,25 @@ __attribute__((section (".ccmram")))
   *         next PWM Update event, MC_FOC_DURATION otherwise
   */
 #define AVG_SAMPLES 512
+#define HF 1000
 
 inline uint16_t FOC_CurrControllerM1(void)
 {
   qd_t Iqd, Vqd;
   ab_t Iab;
   alphabeta_t Ialphabeta, Valphabeta;
-
+  static int16_t hfi = HF;
 
   int16_t hElAngle;
   uint16_t hCodeError;
   SpeednPosFdbk_Handle_t *speedHandle;
-
 #if MUSIC_ENABLE
   music_update(&bldc_music);
 #endif
-
+ static int count =0;
   speedHandle = STC_GetSpeedSensor(pSTC[M1]);
-  hElAngle = SPD_GetElAngle(speedHandle);
+  //hElAngle = SPD_GetElAngle(speedHandle);
+  hElAngle = 0;
   PWMC_GetPhaseCurrents(pwmcHandle[M1], &Iab);
   Ialphabeta = MCM_Clarke(Iab);
   Iqd = MCM_Park(Ialphabeta, hElAngle);
@@ -792,6 +795,21 @@ inline uint16_t FOC_CurrControllerM1(void)
   //min duty limit
   if(abs(Vqd.q) < FOCVars[M1].min_duty) Vqd.q = 0;
   if(abs(Vqd.d) < FOCVars[M1].min_duty) Vqd.d = 0;
+
+  Vqd.d += hfi;
+  Vqd.q += hfi;
+
+  if(Iqd.d > 0){
+	  hfi = -HF;
+	  speedHandle->diff_sig++;
+  }else if(Iqd.d < 0){
+	  hfi = HF;
+	  speedHandle->diff_sig--;
+  }
+
+
+
+
 
   Vqd = Circle_Limitation(pCLM[M1], Vqd);
   hElAngle += SPD_GetInstElSpeedDpp(speedHandle)*REV_PARK_ANGLE_COMPENSATION_FACTOR;
