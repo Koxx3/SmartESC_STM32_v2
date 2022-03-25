@@ -42,6 +42,7 @@
 #include "music.h"
 #include "current_sense.h"
 #include "VescToSTM.h"
+#include "utils.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -120,7 +121,7 @@ void TSK_SafetyTask_PWMOFF(uint8_t motor);
 void UI_Scheduler(void);
 
 /* USER CODE BEGIN Private Functions */
-
+void calcHFI(void);
 
 /* USER CODE END Private Functions */
 /**
@@ -414,6 +415,7 @@ __weak void TSK_MediumFrequencyTaskM1(void)
       /* USER CODE END MediumFrequencyTask M1 1 */
 	  FOC_InitAdditionalMethods(M1);
       FOC_CalcCurrRef( M1 );
+
       STM_NextState( &STM[M1], RUN );
     }
     STC_ForceSpeedReferenceToCurrentSpeed( pSTC[M1] ); /* Init the reference speed to current speed */
@@ -428,7 +430,7 @@ __weak void TSK_MediumFrequencyTaskM1(void)
 
     MCI_ExecBufferedCommands( oMCInterface[M1] );
     FOC_CalcCurrRef( M1 );
-
+    calcHFI();
     if( !IsSpeedReliable )
     {
       STM_FaultProcessing( &STM[M1], MC_SPEED_FDBK, 0 );
@@ -706,10 +708,8 @@ __weak uint8_t TSK_HighFrequencyTask(void)
 		samples.dec_state++;
 		if(samples.dec_state == samples.dec){
 			samples.dec_state = 0;
-			//samples.m_curr0_samples[samples.index] = (uint16_t)FOCVars[M1].Iab.a >>4; //Make room for position
-			samples.m_curr0_samples[samples.index] = (uint16_t)HALL_M1._Super.last_id >> 4; //Make room for position
-			//samples.m_curr1_samples[samples.index] = (uint16_t)FOCVars[M1].Iab.b >>4; //Make room for position
-			samples.m_curr1_samples[samples.index] = (uint16_t)HALL_M1._Super.last_iq >> 4; //Make room for position
+			samples.m_curr0_samples[samples.index] = (uint16_t)FOCVars[M1].Iab.a >>4; //Make room for position
+			samples.m_curr1_samples[samples.index] = (uint16_t)FOCVars[M1].Iab.b >>4; //Make room for position
 			samples.m_curr0_samples[samples.index] |= (((uint16_t)HALL_M1._Super.hElAngle<<4) & 0xF000);
 			samples.m_curr1_samples[samples.index] |= (uint16_t)HALL_M1._Super.hElAngle & 0xF000;
 #if SCOPE_UVW == 1
@@ -764,22 +764,34 @@ __attribute__((section (".ccmram")))
   *         next PWM Update event, MC_FOC_DURATION otherwise
   */
 #define AVG_SAMPLES 512
-#define HF 1000
+int16_t hfi_v = 8000;
+volatile int16_t hfi_angle;
+Trig_Components last;
+int32_t prev_samp;
+volatile int32_t d_dout=0;
+volatile int32_t d_count=0;
+int8_t sign_last = 1;
+int16_t hfi_hys = 500;
+
+int16_t shift =0;
+void mc_interface_set_pid_pos(float pos) {
+	float pos_in = (65536.0 / 360.0) * pos;
+	shift = pos_in;
+
+}
 
 inline uint16_t FOC_CurrControllerM1(void)
 {
   qd_t Iqd, Vqd;
   ab_t Iab;
   alphabeta_t Ialphabeta, Valphabeta;
-  static int16_t hfi = HF;
-
   int16_t hElAngle;
   uint16_t hCodeError;
   SpeednPosFdbk_Handle_t *speedHandle;
 #if MUSIC_ENABLE
   music_update(&bldc_music);
 #endif
- static int count =0;
+ static uint8_t samp = 0;
   speedHandle = STC_GetSpeedSensor(pSTC[M1]);
   //hElAngle = SPD_GetElAngle(speedHandle);
   hElAngle = 0;
@@ -796,24 +808,45 @@ inline uint16_t FOC_CurrControllerM1(void)
   if(abs(Vqd.q) < FOCVars[M1].min_duty) Vqd.q = 0;
   if(abs(Vqd.d) < FOCVars[M1].min_duty) Vqd.d = 0;
 
-  Vqd.d += hfi;
-  Vqd.q += hfi;
-
-  if(Iqd.d > 0){
-	  hfi = -HF;
-	  speedHandle->diff_sig++;
-  }else if(Iqd.d < 0){
-	  hfi = HF;
-	  speedHandle->diff_sig--;
-  }
-
-
 
 
 
   Vqd = Circle_Limitation(pCLM[M1], Vqd);
-  hElAngle += SPD_GetInstElSpeedDpp(speedHandle)*REV_PARK_ANGLE_COMPENSATION_FACTOR;
+  //hElAngle += SPD_GetInstElSpeedDpp(speedHandle)*REV_PARK_ANGLE_COMPENSATION_FACTOR;
   Valphabeta = MCM_Rev_Park(Vqd, hElAngle);
+
+  if(samp){
+	  if(abs(Iqd.q) > hfi_hys){
+		  sign_last = SIGN(Iqd.q);
+	  }
+
+	int32_t sample_now = (((int32_t)last.hCos * (int32_t)Ialphabeta.alpha)>>10) +
+					   	 (((int32_t)last.hSin * (int32_t)Ialphabeta.beta)>>10);
+	int32_t di = (sample_now - prev_samp);
+
+	if (di > 0) {
+		d_dout += sign_last * (di-2450);
+		//hfi_angle -= sign_last * di;
+		d_count++;
+	}
+
+
+
+	last = MCM_Trig_Functions( hfi_angle * sign_last + (8192*2));
+	int32_t temp_alpha = ((int32_t)hfi_v * (int32_t)last.hCos) >> 15;
+	int32_t temp_beta = ((int32_t)hfi_v * (int32_t)last.hSin) >> 15;
+	Valphabeta.alpha -= temp_alpha;
+	Valphabeta.beta -= temp_beta;
+  }else{
+	  prev_samp = 	(((int32_t)last.hCos * (int32_t)Ialphabeta.alpha)>>10) +
+	 		  	  	(((int32_t)last.hSin * (int32_t)Ialphabeta.beta)>>10);
+	  int32_t temp_alpha = ((int32_t)hfi_v * (int32_t)last.hCos) >> 15;
+	  int32_t temp_beta = ((int32_t)hfi_v * (int32_t)last.hSin) >> 15;
+	  Valphabeta.alpha += temp_alpha;
+	  Valphabeta.beta += temp_beta;
+  }
+  samp = !samp;
+
   hCodeError = PWMC_SetPhaseVoltage(pwmcHandle[M1], Valphabeta);
   FOCVars[M1].Vqd = Vqd;
   FOCVars[M1].Iab = Iab;
@@ -825,6 +858,17 @@ inline uint16_t FOC_CurrControllerM1(void)
   return(hCodeError);
 }
 
+void calcHFI(void){
+	if(d_count > 512){
+		int32_t ind = d_dout / d_count;
+		d_dout=0;
+		d_count=0;
+		//HALL_M1._Super.diff_sig = ind;
+		hfi_angle -= ind/2;
+		HALL_M1._Super.diff_sig = hfi_angle;
+	}
+
+}
 
 /**
   * @brief  Executes safety checks (e.g. bus voltage and temperature) for all drive instances.

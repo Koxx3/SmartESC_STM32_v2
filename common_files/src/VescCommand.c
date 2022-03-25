@@ -46,7 +46,7 @@
 static void(* volatile send_func)(unsigned char *data, unsigned int len, PACKET_STATE_t * phandle) = 0;
 static volatile int fw_version_sent_cnt = 0;
 static disp_pos_mode display_position_mode;
-
+void mc_interface_set_pid_pos(float pos);
 
 
 #define PRINTF_STACK_SIZE 128u
@@ -430,8 +430,8 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 			} break;
 
 			case COMM_SET_POS: {
-				//int32_t ind = 0;
-				//mc_interface_set_pid_pos((float)buffer_get_int32(data, &ind) / 1000000.0);
+				int32_t ind = 0;
+				mc_interface_set_pid_pos((float)buffer_get_int32(data, &ind) / 1000000.0);
 				VescToSTM_timeout_reset();
 			} break;
 
