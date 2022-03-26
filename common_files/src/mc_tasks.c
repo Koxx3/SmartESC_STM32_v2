@@ -764,7 +764,7 @@ __attribute__((section (".ccmram")))
   *         next PWM Update event, MC_FOC_DURATION otherwise
   */
 #define AVG_SAMPLES 512
-int16_t hfi_v = 8000;
+int16_t hfi_v = 1000;
 volatile int16_t hfi_angle;
 Trig_Components last;
 int32_t prev_samp;
@@ -772,10 +772,14 @@ volatile int32_t d_dout=0;
 volatile int32_t d_count=0;
 int8_t sign_last = 1;
 int16_t hfi_hys = 500;
+int32_t temp_alpha;
+int32_t temp_beta;
+int16_t va;
+int16_t vb;
 
 int16_t shift =0;
 void mc_interface_set_pid_pos(float pos) {
-	float pos_in = (65536.0 / 360.0) * pos;
+	float pos_in = (36000 / 360.0) * pos;
 	shift = pos_in;
 
 }
@@ -792,9 +796,13 @@ inline uint16_t FOC_CurrControllerM1(void)
   music_update(&bldc_music);
 #endif
  static uint8_t samp = 0;
+ static uint8_t samp1 = 0;
   speedHandle = STC_GetSpeedSensor(pSTC[M1]);
   //hElAngle = SPD_GetElAngle(speedHandle);
   hElAngle = 0;
+  //hElAngle = hfi_angle+16380;
+  //FOCVars[M1].Iqdref.q = 1000;
+  //FOCVars[M1].Iqdref.d = 0;
   PWMC_GetPhaseCurrents(pwmcHandle[M1], &Iab);
   Ialphabeta = MCM_Clarke(Iab);
   Iqd = MCM_Park(Ialphabeta, hElAngle);
@@ -815,37 +823,36 @@ inline uint16_t FOC_CurrControllerM1(void)
   //hElAngle += SPD_GetInstElSpeedDpp(speedHandle)*REV_PARK_ANGLE_COMPENSATION_FACTOR;
   Valphabeta = MCM_Rev_Park(Vqd, hElAngle);
 
-  if(samp){
-	  if(abs(Iqd.q) > hfi_hys){
-		  sign_last = SIGN(Iqd.q);
+  if(samp1){
+	  if(samp){
+		  if(abs(Iqd.q) > hfi_hys){
+			  sign_last = SIGN(Iqd.q);
+		  }
+
+		int32_t sample_now = (((int32_t)last.hCos * (int32_t)Ialphabeta.alpha)) +
+							 (((int32_t)last.hSin * (int32_t)Ialphabeta.beta));
+		int32_t di = (sample_now - prev_samp)>>8;
+		//if (di > 0) {
+			d_dout += sign_last * (di-shift);
+			//hfi_angle -= sign_last * di;
+			d_count++;
+		//}
+
+		va = -temp_alpha;
+		vb = -temp_beta;
+	  }else{
+		  prev_samp = 	(((int32_t)last.hCos * (int32_t)Ialphabeta.alpha)) +
+						(((int32_t)last.hSin * (int32_t)Ialphabeta.beta));
+		  va = temp_alpha;
+		  vb = temp_beta;
 	  }
-
-	int32_t sample_now = (((int32_t)last.hCos * (int32_t)Ialphabeta.alpha)>>10) +
-					   	 (((int32_t)last.hSin * (int32_t)Ialphabeta.beta)>>10);
-	int32_t di = (sample_now - prev_samp);
-
-	if (di > 0) {
-		d_dout += sign_last * (di-2450);
-		//hfi_angle -= sign_last * di;
-		d_count++;
-	}
-
-
-
-	last = MCM_Trig_Functions( hfi_angle * sign_last + (8192*2));
-	int32_t temp_alpha = ((int32_t)hfi_v * (int32_t)last.hCos) >> 15;
-	int32_t temp_beta = ((int32_t)hfi_v * (int32_t)last.hSin) >> 15;
-	Valphabeta.alpha -= temp_alpha;
-	Valphabeta.beta -= temp_beta;
-  }else{
-	  prev_samp = 	(((int32_t)last.hCos * (int32_t)Ialphabeta.alpha)>>10) +
-	 		  	  	(((int32_t)last.hSin * (int32_t)Ialphabeta.beta)>>10);
-	  int32_t temp_alpha = ((int32_t)hfi_v * (int32_t)last.hCos) >> 15;
-	  int32_t temp_beta = ((int32_t)hfi_v * (int32_t)last.hSin) >> 15;
-	  Valphabeta.alpha += temp_alpha;
-	  Valphabeta.beta += temp_beta;
+	  samp = !samp;
   }
-  samp = !samp;
+  samp1 = !samp1;
+  Valphabeta.alpha +=va;
+  Valphabeta.beta +=vb;
+
+
 
   hCodeError = PWMC_SetPhaseVoltage(pwmcHandle[M1], Valphabeta);
   FOCVars[M1].Vqd = Vqd;
@@ -859,12 +866,16 @@ inline uint16_t FOC_CurrControllerM1(void)
 }
 
 void calcHFI(void){
-	if(d_count > 512){
+	if(d_count > 1){
 		int32_t ind = d_dout / d_count;
 		d_dout=0;
 		d_count=0;
 		//HALL_M1._Super.diff_sig = ind;
-		hfi_angle -= ind/2;
+		hfi_angle += ind/8;
+		//hfi_angle = 0;
+		last = MCM_Trig_Functions( hfi_angle + (sign_last*4096));
+		temp_alpha = ((int32_t)hfi_v * (int32_t)last.hCos) >> 15;
+		temp_beta = ((int32_t)hfi_v * (int32_t)last.hSin) >> 15;
 		HALL_M1._Super.diff_sig = hfi_angle;
 	}
 
