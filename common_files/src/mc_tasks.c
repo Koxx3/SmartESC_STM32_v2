@@ -728,15 +728,15 @@ __weak uint8_t TSK_HighFrequencyTask(void)
 	}
 
 	/* USER CODE END HighFrequencyTask SINGLEDRIVE_2 */
-	if(hFOCreturn == MC_FOC_DURATION){
-		STM_FaultProcessing(&STM[M1], MC_FOC_DURATION, 0);
-	}
-	else
-	{
-	/* USER CODE BEGIN HighFrequencyTask SINGLEDRIVE_3 */
-
-	/* USER CODE END HighFrequencyTask SINGLEDRIVE_3 */
-	}
+//	if(hFOCreturn == MC_FOC_DURATION){
+//		STM_FaultProcessing(&STM[M1], MC_FOC_DURATION, 0);
+//	}
+//	else
+//	{
+//	/* USER CODE BEGIN HighFrequencyTask SINGLEDRIVE_3 */
+//
+//	/* USER CODE END HighFrequencyTask SINGLEDRIVE_3 */
+//	}
 	/* USER CODE BEGIN HighFrequencyTask 1 */
 	FOCVars[M1].cycles_last = *DWT_CYCCNT - cycles;
 	if(FOCVars[M1].cycles_last > FOCVars[M1].cycles_max){
@@ -771,11 +771,12 @@ int32_t prev_samp;
 volatile int32_t d_dout=0;
 volatile int32_t d_count=0;
 int8_t sign_last = 1;
-int16_t hfi_hys = 500;
+int16_t hfi_hys = 200;
 int32_t temp_alpha;
 int32_t temp_beta;
 int16_t va;
 int16_t vb;
+uint32_t hfi_count=0;
 
 int16_t shift =0;
 void mc_interface_set_pid_pos(float pos) {
@@ -799,8 +800,15 @@ inline uint16_t FOC_CurrControllerM1(void)
  static uint8_t samp1 = 0;
   speedHandle = STC_GetSpeedSensor(pSTC[M1]);
   //hElAngle = SPD_GetElAngle(speedHandle);
-  hElAngle = 0;
-  //hElAngle = hfi_angle+16380;
+  if(hfi_count<20000){
+	  hfi_count = 32000;
+	  hElAngle = 0;
+  }else{
+	  //hElAngle = hfi_angle;
+	  hfi_count = 32000;
+	  //hElAngle = SPD_GetElAngle(speedHandle);
+	  hElAngle = 65536-hfi_angle;
+  }
   //FOCVars[M1].Iqdref.q = 1000;
   //FOCVars[M1].Iqdref.d = 0;
   PWMC_GetPhaseCurrents(pwmcHandle[M1], &Iab);
@@ -826,7 +834,10 @@ inline uint16_t FOC_CurrControllerM1(void)
   if(samp1){
 	  if(samp){
 		  if(abs(Iqd.q) > hfi_hys){
+			  hfi_count++;
 			  sign_last = SIGN(Iqd.q);
+		  }else{
+			  hfi_count=0;
 		  }
 
 		int32_t sample_now = (((int32_t)last.hCos * (int32_t)Ialphabeta.alpha)) +
@@ -834,7 +845,6 @@ inline uint16_t FOC_CurrControllerM1(void)
 		int32_t di = (sample_now - prev_samp)>>8;
 		//if (di > 0) {
 			d_dout += sign_last * (di-shift);
-			//hfi_angle -= sign_last * di;
 			d_count++;
 		//}
 
@@ -866,14 +876,15 @@ inline uint16_t FOC_CurrControllerM1(void)
 }
 
 void calcHFI(void){
-	if(d_count > 1){
+	if(d_count > 8){
 		int32_t ind = d_dout / d_count;
 		d_dout=0;
 		d_count=0;
 		//HALL_M1._Super.diff_sig = ind;
-		hfi_angle += ind/8;
+		hfi_angle -= ind/2;
 		//hfi_angle = 0;
-		last = MCM_Trig_Functions( hfi_angle + (sign_last*4096));
+		last = MCM_Trig_Functions( hfi_angle + (sign_last*8192));
+		//last = MCM_Trig_Functions( 0 + (sign_last*8192));
 		temp_alpha = ((int32_t)hfi_v * (int32_t)last.hCos) >> 15;
 		temp_beta = ((int32_t)hfi_v * (int32_t)last.hSin) >> 15;
 		HALL_M1._Super.diff_sig = hfi_angle;
