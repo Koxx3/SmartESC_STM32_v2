@@ -67,10 +67,7 @@ static uint32_t uart_get_write_pos(port_str * port){
 static uint8_t adc1;
 static uint8_t adc2;
 void app_adc_set_adc(uint8_t AD1, uint8_t AD2){
-	if(xTimer==NULL){
-		xTimer = xTimerCreate("ADC_UP",app_updaterate() , pdTRUE, ( void * ) 0,vTimerCallback );
-	}
-	if(xTimerIsTimerActive(xTimer)==pdFALSE){
+	if(xTimer!=NULL && xTimerIsTimerActive(xTimer)==pdFALSE){
 		xTimerStart(xTimer, 100);
 	}
 	adc1 = AD1;
@@ -272,6 +269,12 @@ void app_check_timer(){
 	}
 }
 
+void app_adc_init_timer(){
+	if(xTimer==NULL){
+		xTimer = xTimerCreate("ADC_UP",app_updaterate() , pdTRUE, ( void * ) 0,vTimerCallback );
+	}
+}
+
 void app_timer_update_period(){
 	xTimerChangePeriod(xTimer, app_updaterate(), 1000);
 }
@@ -288,9 +291,7 @@ void task_app(void * argument)
 	HAL_UART_Receive_DMA(port->uart, usart_rx_dma_buffer, port->rx_buffer_size);
 	CLEAR_BIT(port->uart->Instance->CR3, USART_CR3_EIE);
 
-	if(xTimer==NULL){
-		xTimer = xTimerCreate("ADC_UP",app_updaterate() , pdTRUE, ( void * ) 0,vTimerCallback );
-	}
+	app_adc_init_timer();
 
 	xTimerStart(xTimer, 100);
 
@@ -328,7 +329,8 @@ void task_app(void * argument)
 
 			}
 			m365_to_display.speed *= DIR_MUL;
-			m365_to_display.battery = utils_map(VescToSTM_get_battery_level(0), 0, 1, 0, 96);
+			int temp = utils_map(VescToSTM_get_battery_level(0), 0, 1, 0, 100);
+			m365_to_display.battery = temp>100?100:temp;
 			m365_to_display.beep=0;
 			m365_to_display.faultcode=pMCI[M1]->pSTM->hFaultOccurred;
 

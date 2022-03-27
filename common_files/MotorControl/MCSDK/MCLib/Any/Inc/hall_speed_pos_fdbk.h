@@ -219,7 +219,7 @@ void HALL_Clear( HALL_Handle_t * pHandle );
 int16_t HALL_CalcElAngle( HALL_Handle_t * pHandle );
 bool HALL_CalcAvrgMecSpeedUnit( HALL_Handle_t * pHandle, int16_t * hMecSpeedUnit );
 void HALL_SetMecAngle( HALL_Handle_t * pHandle, int16_t hMecAngle );
-
+uint8_t HALL_read( HALL_Handle_t * pHandle );
 /**
   * @}
   */

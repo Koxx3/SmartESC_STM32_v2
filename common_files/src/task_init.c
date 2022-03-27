@@ -25,6 +25,7 @@
 #include "task_LED.h"
 #include "task_pwr.h"
 #include "product.h"
+#include "app.h"
 
 unsigned long getRunTimeCounterValue(void){
 	return HAL_GetTick();
@@ -44,6 +45,7 @@ port_str aux_uart = {	.uart = &APP_USART_DMA,
 };
 
 void task_init(){
+	app_adc_init_timer();
 	task_cli_init(&main_uart);
 	task_LED_init(&main_uart);  //Bring up the blinky
 	task_PWR_init(&main_uart);  //Manage power button

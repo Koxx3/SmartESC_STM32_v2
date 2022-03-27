@@ -69,20 +69,28 @@ void app_set_configuration(app_configuration *conf) {
 	switch (appconf.app_to_use) {
 		case APP_UART:
 			if( xTaskGetSchedulerState() == taskSCHEDULER_RUNNING){
-				if(old_app != APP_UART){
+				if(old_app == APP_ADC){
 					task_app_kill(&aux_uart);
 				}
 			}
 			task_cli_init(&aux_uart);
 			break;
 		case APP_ADC:
-		case APP_ADC_UART:
 			if( xTaskGetSchedulerState() == taskSCHEDULER_RUNNING){
-				if(old_app == APP_UART){
+				if(old_app == APP_UART || old_app == APP_ADC_UART){
 					task_cli_kill(&aux_uart);
 				}
 			}
 			task_app_init(&aux_uart);
+		case APP_ADC_UART:
+			if( xTaskGetSchedulerState() == taskSCHEDULER_RUNNING){
+				if(old_app == APP_ADC){
+					task_app_kill(&aux_uart);
+				}else if(old_app == APP_UART){
+					task_cli_kill(&aux_uart);
+				}
+			}
+			task_cli_init(&aux_uart);
 			break;
 		default:
 			break;

@@ -33,6 +33,9 @@
 #include "VescCommand.h"
 #include "VescToSTM.h"
 #include "product.h"
+#include "app.h"
+#include "ninebot.h"
+#include "utils.h"
 
 
 void putbuffer(unsigned char *buf, unsigned int len, port_str * port){
@@ -76,6 +79,10 @@ void task_cli(void * argument)
 
 	VescToSTM_set_brake_rel_int(0);
 
+	app_check_timer();
+
+	uint16_t slow_update_cnt=0;
+
   /* Infinite loop */
 	for(;;)
 	{
@@ -90,7 +97,31 @@ void task_cli(void * argument)
 		send_position(port->phandle);
 		VescToSTM_handle_timeout();
 
+		if(appconf.app_to_use == APP_ADC_UART){
+			app_check_timer();
+
+			if(slow_update_cnt==0){
+				if(m365_to_display.mode & 0x40){
+					m365_to_display.speed = VescToSTM_get_speed()*2.2369;
+				}else{
+					m365_to_display.speed = VescToSTM_get_speed()*3.6;
+
+				}
+				m365_to_display.speed *= DIR_MUL;
+				m365_to_display.battery = utils_map(VescToSTM_get_battery_level(0), 0, 1, 0, 96);
+				m365_to_display.beep=0;
+				m365_to_display.faultcode=pMCI[M1]->pSTM->hFaultOccurred;
+
+			}else{
+				slow_update_cnt++;
+				if(slow_update_cnt==100) slow_update_cnt=0;
+			}
+		}
+
 		if(ulTaskNotifyTake(pdTRUE, 1)){
+			if(appconf.app_to_use == APP_ADC_UART){
+				app_adc_stop_output();
+			}
 			HAL_UART_MspDeInit(port->uart);
 			port->task_handle = NULL;
 			packet_free(port->phandle);
