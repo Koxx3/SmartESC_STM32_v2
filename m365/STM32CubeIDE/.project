@@ -217,6 +217,16 @@
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/functions.c</locationURI>
 		</link>
 		<link>
+			<name>Application/User/hfi_speed_pos_fdbk.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/hfi_speed_pos_fdbk.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/hfi_speed_pos_fdbk.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/hfi_speed_pos_fdbk.h</locationURI>
+		</link>
+		<link>
 			<name>Application/User/m365_register_map.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/m365_register_map.h</locationURI>

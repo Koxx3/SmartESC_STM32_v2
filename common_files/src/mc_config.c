@@ -229,6 +229,15 @@ HALL_Handle_t HALL_M1 =
  .lut				 = {0,1,2,3,4,5,6,7}
 };
 
+
+HFI_Handle_t HFI_M1 =
+{
+	.hfi_voltage = 2000,
+	.hfi_hyst = 200,
+	.samples_avg = 8,
+	.inductance = 22000
+};
+
 /**
   * temperature sensor parameters Motor 1
   */

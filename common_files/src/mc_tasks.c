@@ -43,6 +43,7 @@
 #include "current_sense.h"
 #include "VescToSTM.h"
 #include "utils.h"
+#include "hfi_speed_pos_fdbk.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -93,6 +94,8 @@ FW_Handle_t *pFW[NBR_OF_MOTORS];
 MTPA_Handle_t *pMaxTorquePerAmpere[2] = {MC_NULL,MC_NULL};
 RampExtMngr_Handle_t *pREMNG[NBR_OF_MOTORS];   /*!< Ramp manager used to modify the Iq ref
                                                     during the start-up switch over.*/
+HFI_Handle_t * hfiHandle[NBR_OF_MOTORS];
+
 
 static volatile uint16_t hMFTaskCounterM1 = 0;
 static volatile uint16_t hBootCapDelayCounterM1 = 0;
@@ -217,6 +220,12 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
 
   pREMNG[M1] = &RampExtMngrHFParamsM1;
   REMNG_Init(pREMNG[M1]);
+
+  /*******************************************************/
+  /*   HFI Sensorless								     */
+  /*******************************************************/
+  HFI_Init(&HFI_M1);
+  hfiHandle[M1] = &HFI_M1;
 
   /*******************************************************/
   /*   Flux weakening component initialization           */
@@ -430,7 +439,7 @@ __weak void TSK_MediumFrequencyTaskM1(void)
 
     MCI_ExecBufferedCommands( oMCInterface[M1] );
     FOC_CalcCurrRef( M1 );
-    calcHFI();
+    HFI_update(hfiHandle[M1]);
     if( !IsSpeedReliable )
     {
       STM_FaultProcessing( &STM[M1], MC_SPEED_FDBK, 0 );
@@ -728,15 +737,15 @@ __weak uint8_t TSK_HighFrequencyTask(void)
 	}
 
 	/* USER CODE END HighFrequencyTask SINGLEDRIVE_2 */
-//	if(hFOCreturn == MC_FOC_DURATION){
-//		STM_FaultProcessing(&STM[M1], MC_FOC_DURATION, 0);
-//	}
-//	else
-//	{
-//	/* USER CODE BEGIN HighFrequencyTask SINGLEDRIVE_3 */
-//
-//	/* USER CODE END HighFrequencyTask SINGLEDRIVE_3 */
-//	}
+	if(hFOCreturn == MC_FOC_DURATION){
+		STM_FaultProcessing(&STM[M1], MC_FOC_DURATION, 0);
+	}
+	else
+	{
+	/* USER CODE BEGIN HighFrequencyTask SINGLEDRIVE_3 */
+
+	/* USER CODE END HighFrequencyTask SINGLEDRIVE_3 */
+	}
 	/* USER CODE BEGIN HighFrequencyTask 1 */
 	FOCVars[M1].cycles_last = *DWT_CYCCNT - cycles;
 	if(FOCVars[M1].cycles_last > FOCVars[M1].cycles_max){
@@ -763,28 +772,6 @@ __attribute__((section (".ccmram")))
   * @retval int16_t It returns MC_NO_FAULTS if the FOC has been ended before
   *         next PWM Update event, MC_FOC_DURATION otherwise
   */
-#define AVG_SAMPLES 512
-int16_t hfi_v = 1000;
-volatile int16_t hfi_angle;
-Trig_Components last;
-int32_t prev_samp;
-volatile int32_t d_dout=0;
-volatile int32_t d_count=0;
-int8_t sign_last = 1;
-int16_t hfi_hys = 200;
-int32_t temp_alpha;
-int32_t temp_beta;
-int16_t va;
-int16_t vb;
-uint32_t hfi_count=0;
-
-int16_t shift =0;
-void mc_interface_set_pid_pos(float pos) {
-	float pos_in = (36000 / 360.0) * pos;
-	shift = pos_in;
-
-}
-
 inline uint16_t FOC_CurrControllerM1(void)
 {
   qd_t Iqd, Vqd;
@@ -796,21 +783,14 @@ inline uint16_t FOC_CurrControllerM1(void)
 #if MUSIC_ENABLE
   music_update(&bldc_music);
 #endif
- static uint8_t samp = 0;
- static uint8_t samp1 = 0;
+
   speedHandle = STC_GetSpeedSensor(pSTC[M1]);
   //hElAngle = SPD_GetElAngle(speedHandle);
-  if(hfi_count<20000){
-	  hfi_count = 32000;
-	  hElAngle = 0;
+  if(HFI_is_ready(hfiHandle[M1])){
+	  hElAngle = HFI_get_angle(hfiHandle[M1]);
   }else{
-	  //hElAngle = hfi_angle;
-	  hfi_count = 32000;
-	  //hElAngle = SPD_GetElAngle(speedHandle);
-	  hElAngle = 65536-hfi_angle;
+	  hElAngle = 0;
   }
-  //FOCVars[M1].Iqdref.q = 1000;
-  //FOCVars[M1].Iqdref.d = 0;
   PWMC_GetPhaseCurrents(pwmcHandle[M1], &Iab);
   Ialphabeta = MCM_Clarke(Iab);
   Iqd = MCM_Park(Ialphabeta, hElAngle);
@@ -824,46 +804,13 @@ inline uint16_t FOC_CurrControllerM1(void)
   if(abs(Vqd.q) < FOCVars[M1].min_duty) Vqd.q = 0;
   if(abs(Vqd.d) < FOCVars[M1].min_duty) Vqd.d = 0;
 
-
-
-
   Vqd = Circle_Limitation(pCLM[M1], Vqd);
   //hElAngle += SPD_GetInstElSpeedDpp(speedHandle)*REV_PARK_ANGLE_COMPENSATION_FACTOR;
   Valphabeta = MCM_Rev_Park(Vqd, hElAngle);
 
-  if(samp1){
-	  if(samp){
-		  if(abs(Iqd.q) > hfi_hys){
-			  hfi_count++;
-			  sign_last = SIGN(Iqd.q);
-		  }else{
-			  hfi_count=0;
-		  }
 
-		int32_t sample_now = (((int32_t)last.hCos * (int32_t)Ialphabeta.alpha)) +
-							 (((int32_t)last.hSin * (int32_t)Ialphabeta.beta));
-		int32_t di = (sample_now - prev_samp)>>8;
-		//if (di > 0) {
-			d_dout += sign_last * (di-shift);
-			d_count++;
-		//}
-
-		va = -temp_alpha;
-		vb = -temp_beta;
-	  }else{
-		  prev_samp = 	(((int32_t)last.hCos * (int32_t)Ialphabeta.alpha)) +
-						(((int32_t)last.hSin * (int32_t)Ialphabeta.beta));
-		  va = temp_alpha;
-		  vb = temp_beta;
-	  }
-	  samp = !samp;
-  }
-  samp1 = !samp1;
-  Valphabeta.alpha +=va;
-  Valphabeta.beta +=vb;
-
-
-
+  Valphabeta = HFI_Inject(hfiHandle[M1], Valphabeta, Ialphabeta, FOCVars[M1].Iqdref);
+  HALL_M1._Super.diff_sig = hfiHandle[M1]->_Super.hAvrMecSpeedUnit;
   hCodeError = PWMC_SetPhaseVoltage(pwmcHandle[M1], Valphabeta);
   FOCVars[M1].Vqd = Vqd;
   FOCVars[M1].Iab = Iab;
@@ -875,22 +822,6 @@ inline uint16_t FOC_CurrControllerM1(void)
   return(hCodeError);
 }
 
-void calcHFI(void){
-	if(d_count > 8){
-		int32_t ind = d_dout / d_count;
-		d_dout=0;
-		d_count=0;
-		//HALL_M1._Super.diff_sig = ind;
-		hfi_angle -= ind/2;
-		//hfi_angle = 0;
-		last = MCM_Trig_Functions( hfi_angle + (sign_last*8192));
-		//last = MCM_Trig_Functions( 0 + (sign_last*8192));
-		temp_alpha = ((int32_t)hfi_v * (int32_t)last.hCos) >> 15;
-		temp_beta = ((int32_t)hfi_v * (int32_t)last.hSin) >> 15;
-		HALL_M1._Super.diff_sig = hfi_angle;
-	}
-
-}
 
 /**
   * @brief  Executes safety checks (e.g. bus voltage and temperature) for all drive instances.

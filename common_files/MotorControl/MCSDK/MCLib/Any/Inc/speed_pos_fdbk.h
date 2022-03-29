@@ -99,7 +99,7 @@ typedef struct
 {
   alphabeta_t  Valfa_beta;
   alphabeta_t  Ialfa_beta;
-  uint16_t         Vbus;
+  uint16_t     Vbus;
 } Observer_Inputs_t;
 
 

@@ -214,7 +214,7 @@ void send_position(PACKET_STATE_t * phandle){
 	switch (display_position_mode) {
 	case DISP_POS_MODE_OBSERVER:{
 		if(phandle->port->half_duplex==true && (xTaskGetTickCount() % 100)) break;
-		commands_send_rotor_pos(phandle, 65536-hfi_angle);
+		commands_send_rotor_pos(phandle, HFI_M1._Super.hElAngle);
 	}
 	break;
 	case DISP_POS_MODE_ENCODER:
@@ -224,7 +224,7 @@ void send_position(PACKET_STATE_t * phandle){
 		break;
 	case DISP_POS_MODE_ENCODER_OBSERVER_ERROR:{
 			if(phandle->port->half_duplex==true && (xTaskGetTickCount() % 100)) break;
-			int32_t temp = (65536-hfi_angle) - SpeednTorqCtrlM1.SPD->hElAngle;
+			int32_t temp = HFI_M1._Super.hElAngle - SpeednTorqCtrlM1.SPD->hElAngle;
 			commands_send_rotor_pos(phandle, temp);
 		}
 		break;
@@ -441,8 +441,8 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 			} break;
 
 			case COMM_SET_POS: {
-				int32_t ind = 0;
-				mc_interface_set_pid_pos((float)buffer_get_int32(data, &ind) / 1000000.0);
+				//int32_t ind = 0;
+				//mc_interface_set_pid_pos((float)buffer_get_int32(data, &ind) / 1000000.0);
 				VescToSTM_timeout_reset();
 			} break;
 

@@ -32,6 +32,7 @@
 #include "pqd_motor_power_measurement.h"
 #include "flux_weakening_ctrl.h"
 #include "r3_2_f1xx_pwm_curr_fdbk.h"
+#include "hfi_speed_pos_fdbk.h"
 
 #include "max_torque_per_ampere.h"
 #include "hall_speed_pos_fdbk.h"
@@ -54,6 +55,7 @@ extern SpeednTorqCtrl_Handle_t SpeednTorqCtrlM1;
 extern PQD_MotorPowMeas_Handle_t PQD_MotorPowMeasM1;
 extern PQD_MotorPowMeas_Handle_t *pPQD_MotorPowMeasM1;
 extern HALL_Handle_t HALL_M1;
+extern HFI_Handle_t HFI_M1;
 extern RDivider_Handle_t RealBusVoltageSensorParamsM1;
 extern CircleLimitation_Handle_t CircleLimitationM1;
 extern RampExtMngr_Handle_t RampExtMngrHFParamsM1;
