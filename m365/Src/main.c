@@ -315,7 +315,6 @@ static void MX_ADC1_Init(void)
   /** Configure Injected Channel
   */
   sConfigInjected.InjectedChannel = ADC_CHANNEL_4;
-  sConfigInjected.InjectedRank = ADC_INJECTED_RANK_2;
   if (HAL_ADCEx_InjectedConfigChannel(&hadc1, &sConfigInjected) != HAL_OK)
   {
     Error_Handler();
@@ -323,7 +322,6 @@ static void MX_ADC1_Init(void)
   /** Configure Injected Channel
   */
   sConfigInjected.InjectedChannel = ADC_CHANNEL_5;
-  sConfigInjected.InjectedRank = ADC_INJECTED_RANK_3;
   if (HAL_ADCEx_InjectedConfigChannel(&hadc1, &sConfigInjected) != HAL_OK)
   {
     Error_Handler();
