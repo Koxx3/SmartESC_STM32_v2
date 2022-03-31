@@ -51,10 +51,10 @@
 #define MCCONF_L_MAX_ABS_CURRENT		60.0	// The maximum absolute current above which a fault is generated
 #endif
 #ifndef MCCONF_L_MIN_VOLTAGE
-#define MCCONF_L_MIN_VOLTAGE			8.0		// Minimum input voltage
+#define MCCONF_L_MIN_VOLTAGE			PRODUCT_L_MIN_VOLTAGE		// Minimum input voltage
 #endif
 #ifndef MCCONF_L_MAX_VOLTAGE
-#define MCCONF_L_MAX_VOLTAGE			56.0	// Maximum input voltage
+#define MCCONF_L_MAX_VOLTAGE			PRODUCT_L_MAX_VOLTAGE	// Maximum input voltage
 #endif
 #ifndef MCCONF_L_BATTERY_CUT_START
 #define MCCONF_L_BATTERY_CUT_START		34.0	// Start limiting the positive current at this voltage
