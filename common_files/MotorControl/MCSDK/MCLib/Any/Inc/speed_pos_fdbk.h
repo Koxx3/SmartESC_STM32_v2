@@ -84,6 +84,11 @@ typedef struct
   uint8_t open_loop;
   int16_t open_angle;
   int16_t open_speed;
+  int16_t last_id;
+  int16_t last_iq;
+  int16_t diff_id;
+  int16_t diff_iq;
+  int32_t diff_sig;
 
 } SpeednPosFdbk_Handle_t;
 
@@ -94,7 +99,7 @@ typedef struct
 {
   alphabeta_t  Valfa_beta;
   alphabeta_t  Ialfa_beta;
-  uint16_t         Vbus;
+  uint16_t     Vbus;
 } Observer_Inputs_t;
 
 
