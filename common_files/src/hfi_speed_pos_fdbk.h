@@ -44,8 +44,8 @@ typedef struct
   
   alphabeta_t Vinject;
   uint8_t inject_seq;
-  int16_t inductance;
-  int32_t inductance_now;
+  uint32_t inductance; //uH *10
+  int32_t inductance_diff;
   int32_t sample_prev;
   int32_t d_out;
   int32_t d_cnt;
@@ -53,11 +53,13 @@ typedef struct
   uint32_t hfi_cnt;
   int16_t hfi_hyst;
   int16_t hfi_voltage;
+  int32_t hfi_duty;
   int16_t hfi_angle;
   int16_t speed_avg;
   int16_t hElAngle_last;
   uint16_t samples_avg;
   Trig_Components trig;
+  uint16_t pwm_freq;
 } HFI_Handle_t;
 
 
@@ -70,6 +72,7 @@ alphabeta_t HFI_Inject( HFI_Handle_t * pHandle, alphabeta_t Valfabeta, alphabeta
 void HFI_update(HFI_Handle_t * pHandle);
 bool HFI_is_ready(HFI_Handle_t * pHandle);
 int16_t HFI_get_angle(HFI_Handle_t * pHandle);
+void HFI_update_busvoltage(HFI_Handle_t * pHandle, int32_t volt_d);
 
 #ifdef __cplusplus
 }

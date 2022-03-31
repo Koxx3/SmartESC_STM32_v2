@@ -571,8 +571,7 @@ float VescToSTM_get_bus_voltage(){
  * erpm
  */
 int32_t VescToSTM_get_erpm(){
-	//int32_t erpm = VescToSTM_speed_to_erpm(MCI_GetAvrgMecSpeedUnit( pMCI[M1] ));
-	int32_t erpm = HALL_M1._Super.diff_sig;
+	int32_t erpm = VescToSTM_speed_to_erpm(MCI_GetAvrgMecSpeedUnit( pMCI[M1] ));
 	return erpm;
 }
 

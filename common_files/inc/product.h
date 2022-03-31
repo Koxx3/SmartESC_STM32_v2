@@ -79,6 +79,10 @@
 #define NOMINAL_CURRENT         											 2000
 #define ID_DEMAG														     -2000
 
+#define MOTOR_VOLTAGE_CONSTANT  3.5 /*!< Volts RMS ph-ph /kRPM */
+#define RS                     0.300 /* Stator resistance , ohm*/
+#define LS                     0.000200 /* Stator inductance, H*/
+
 #define SCOPE_UVW															 1
 
 #define POLE_PAIR_NUM                                                 	 	 (uint8_t)15
