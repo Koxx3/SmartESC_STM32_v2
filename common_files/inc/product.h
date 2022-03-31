@@ -78,6 +78,11 @@
 #define NOMINAL_CURRENT         											 2000
 #define ID_DEMAG														     -2000
 
+
+#define MOTOR_VOLTAGE_CONSTANT  3.5 /*!< Volts RMS ph-ph /kRPM */
+#define RS                     0.300 /* Stator resistance , ohm*/
+#define LS                     0.000200 /* Stator inductance, H*/
+
 #define PRODUCT_L_MAX_VOLTAGE												 56
 #define PRODUCT_L_MIN_VOLTAGE												 8
 
@@ -120,7 +125,7 @@
 #define BATTERY_SUPPORT_LEAD												 1
 #define ABS_OVR_CURRENT_TRIP_MS												 2.0
 #define MIN_DUTY_FOR_PWM_FREEWHEEL											 80
-#define CURRENT_DISPLAY_OFFSET											     80   //in cnts
+#define CURRENT_DISPLAY_OFFSET											     0   //in cnts
 
 #define MODE_SLOW_CURR														 0.5
 #define MODE_DRIVE_CURR														 0.8
