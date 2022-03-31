@@ -46,7 +46,7 @@
 static void(* volatile send_func)(unsigned char *data, unsigned int len, PACKET_STATE_t * phandle) = 0;
 static volatile int fw_version_sent_cnt = 0;
 static disp_pos_mode display_position_mode;
-void mc_interface_set_pid_pos(float pos);
+
 
 
 #define PRINTF_STACK_SIZE 128u
@@ -209,26 +209,13 @@ void commands_send_rotor_pos(PACKET_STATE_t * phandle, int16_t angle) {
 	buffer_append_int32(buffer, pos * 10000, &index);
 	commands_send_packet(send_buffer, index, phandle);
 }
-extern volatile int16_t hfi_angle;
+
 void send_position(PACKET_STATE_t * phandle){
 	switch (display_position_mode) {
-	case DISP_POS_MODE_OBSERVER:{
-		if(phandle->port->half_duplex==true && (xTaskGetTickCount() % 100)) break;
-		commands_send_rotor_pos(phandle, STO_CR_M1._Super.hElAngle);
-	}
-	break;
 	case DISP_POS_MODE_ENCODER:
 		if(phandle->port->half_duplex==true && (xTaskGetTickCount() % 100)) break;
-		commands_send_rotor_pos(phandle, HFI_M1._Super.hElAngle);
-		//commands_send_rotor_pos(phandle, STO_CR_M1._Super.hElAngle);
+		commands_send_rotor_pos(phandle, SpeednTorqCtrlM1.SPD->hElAngle);
 
-		break;
-	case DISP_POS_MODE_ENCODER_OBSERVER_ERROR:{
-			if(phandle->port->half_duplex==true && (xTaskGetTickCount() % 100)) break;
-			//int32_t temp = HFI_M1._Super.hElAngle - SpeednTorqCtrlM1.SPD->hElAngle;
-			int32_t temp = HALL_M1._Super.hElAngle - STO_CR_M1._Super.hElAngle;
-			commands_send_rotor_pos(phandle, temp);
-		}
 		break;
 //	case DISP_POS_MODE_PID_POS:
 //		//commands_send_rotor_pos(SpeednTorqCtrlM1.SPD->hElAngle);
