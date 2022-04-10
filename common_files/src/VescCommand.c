@@ -217,8 +217,8 @@ void send_position(PACKET_STATE_t * phandle){
 		commands_send_rotor_pos(phandle, SpeednTorqCtrlM1.SPD->hElAngle);
 
 		break;
-//	case DISP_POS_MODE_PID_POS:
-//		//commands_send_rotor_pos(SpeednTorqCtrlM1.SPD->hElAngle);
+//	case DISP_POS_MODE_OBSERVER:
+//
 //		break;
 //
 //	case DISP_POS_MODE_PID_POS_ERROR:

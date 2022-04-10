@@ -154,6 +154,7 @@ typedef struct
   int16_t MeasuredElAngle;/*!< This is the electrical angle  measured at each
                                Hall sensor signal edge. It is considered the
                                best measurement of electrical rotor angle.*/
+  int16_t CompAngle;
  
   int16_t CompSpeed;     /*!< Speed compensation factor used to syncronize
                                the current electrical angle with the target
