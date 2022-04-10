@@ -60,6 +60,9 @@ void TSK_HardwareFaultTask(void);
 
  /* Locks GPIO pins used for Motor Control to prevent accidental reconfiguration */
 void mc_lock_pins (void);
+
+void startMediumFrequencyTask(void * argument);
+void StartSafetyTask(void * argument);
 /**
   * @}
   */

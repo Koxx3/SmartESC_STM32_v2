@@ -124,5 +124,5 @@ void task_LED(void * argument)
 }
 
 void task_LED_init(port_str * port){
-	xTaskCreate(task_LED, "tskLED", 128, (void*)port, PRIO_NORMAL, &LEDHandle);
+	xTaskCreate(task_LED, "tskLED", 256, (void*)port, PRIO_NORMAL, &LEDHandle);
 }

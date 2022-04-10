@@ -28,6 +28,10 @@
 #include "drive_parameters.h"
 #include "power_stage_parameters.h"
 
+#ifdef M4F
+#include "stm32f3xx_ll_adc.h"
+#endif
+
 #define ADC_REFERENCE_VOLTAGE  3.30
 
 /************************* CONTROL FREQUENCIES & DELAIES **********************/

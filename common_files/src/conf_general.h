@@ -23,12 +23,17 @@
 #include "VescDatatypes.h"
 #include "packet.h"
 
-
+#ifdef M365
 #define APP_PAGE				126
 #define CONF_PAGE				127
+#endif
+#ifdef M365_F302
+#define APP_PAGE				62
+#define CONF_PAGE				63
+#endif
 
-#define ADDR_FLASH_PAGE_126    ((uint32_t)0x08000000+(APP_PAGE*0x400)) /* Base @ of Page 126, 1 Kbytes */
-#define ADDR_FLASH_PAGE_127    ((uint32_t)0x08000000+(CONF_PAGE*0x400)) /* Base @ of Page 127, 1 Kbytes */
+#define ADDR_FLASH_PAGE_126    ((uint32_t)0x08000000+(APP_PAGE*PAGESIZE)) /* Base @ of Page 126, 1/2 Kbytes */
+#define ADDR_FLASH_PAGE_127    ((uint32_t)0x08000000+(CONF_PAGE*PAGESIZE)) /* Base @ of Page 127, 1/2 Kbytes */
 
 extern mc_configuration mc_conf;
 extern app_configuration appconf;

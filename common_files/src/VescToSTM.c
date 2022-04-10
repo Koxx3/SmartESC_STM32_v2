@@ -3,7 +3,11 @@
 #include <math.h>
 #include "VescToSTM.h"
 #include "mc_interface.h"
+#ifndef M4F
 #include "stm32f1xx_hal.h"
+#else
+#include "stm32f3xx_hal.h"
+#endif
 #include "crc.h"
 #include "defines.h"
 #include "drive_parameters.h"

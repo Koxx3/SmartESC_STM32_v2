@@ -26,7 +26,6 @@
 #include "mc_math.h"
 #include "motorcontrol.h"
 #include "regular_conversion_manager.h"
-#include "cmsis_os.h"
 #include "mc_interface.h"
 #include "mc_tuning.h"
 #include "digital_output.h"
@@ -993,7 +992,7 @@ __weak void TSK_HardwareFaultTask(void)
 }
 
 /* startMediumFrequencyTask function */
-void startMediumFrequencyTask(void const * argument)
+void startMediumFrequencyTask(void * argument)
 {
   /* USER CODE BEGIN MF task 1 */
   /* Infinite loop */
@@ -1007,7 +1006,7 @@ void startMediumFrequencyTask(void const * argument)
 }
 
 /* startSafetyTask function */
-void StartSafetyTask(void const * argument)
+void StartSafetyTask(void * argument)
 {
   /* USER CODE BEGIN SF task 1 */
 	vTaskDelay(200);

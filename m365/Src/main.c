@@ -253,18 +253,9 @@ static void MX_NVIC_Init(void)
   /* ADC1_2_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(ADC1_2_IRQn, 2, 0);
   HAL_NVIC_EnableIRQ(ADC1_2_IRQn);
-  /* TIM1_UP_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(TIM1_UP_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(TIM1_UP_IRQn);
-  /* TIM1_BRK_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(TIM1_BRK_IRQn, 4, 0);
-  HAL_NVIC_EnableIRQ(TIM1_BRK_IRQn);
   /* DMA1_Channel1_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
-  /* TIM3_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(TIM3_IRQn, 3, 0);
-  HAL_NVIC_EnableIRQ(TIM3_IRQn);
 }
 
 /**
@@ -315,7 +306,6 @@ static void MX_ADC1_Init(void)
   /** Configure Injected Channel
   */
   sConfigInjected.InjectedChannel = ADC_CHANNEL_4;
-  sConfigInjected.InjectedRank = ADC_INJECTED_RANK_2;
   if (HAL_ADCEx_InjectedConfigChannel(&hadc1, &sConfigInjected) != HAL_OK)
   {
     Error_Handler();
@@ -323,7 +313,6 @@ static void MX_ADC1_Init(void)
   /** Configure Injected Channel
   */
   sConfigInjected.InjectedChannel = ADC_CHANNEL_5;
-  sConfigInjected.InjectedRank = ADC_INJECTED_RANK_3;
   if (HAL_ADCEx_InjectedConfigChannel(&hadc1, &sConfigInjected) != HAL_OK)
   {
     Error_Handler();

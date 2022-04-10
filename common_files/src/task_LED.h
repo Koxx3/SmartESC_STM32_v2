@@ -24,9 +24,6 @@
 #ifndef TASK_LED_H_
 #define TASK_LED_H_
 
-#include "cmsis_os.h"
-
-extern osThreadId_t task_LED_handle;
 
 typedef enum {
 	BRAKE_LIGHT_ON,

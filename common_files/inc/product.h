@@ -11,6 +11,7 @@
 #ifdef G30P
 
 #define VBUS_ADC_CHANNEL                                                     MC_ADC_CHANNEL_1
+#define TEMP_ADC_CHANNEL                                                     MC_ADC_CHANNEL_0
 #define VOLTAGE_DIVIDER_GAIN     											 (float)3363.5
 
 #define VESC_USART                                                 			 USART1
@@ -59,6 +60,7 @@
 
 #ifdef M365
 #define VBUS_ADC_CHANNEL                                                     MC_ADC_CHANNEL_2
+#define TEMP_ADC_CHANNEL                                                     MC_ADC_CHANNEL_0
 #define PHASE_A_V_ADC_CHANNEL                                                MC_ADC_CHANNEL_6
 #define PHASE_B_V_ADC_CHANNEL                                                MC_ADC_CHANNEL_7
 #define PHASE_C_V_ADC_CHANNEL                                                MC_ADC_CHANNEL_9
@@ -109,7 +111,60 @@
 #define HW_LIM_TEMP_FET			-40.0, 75.0
 #define HW_LIM_F_SW			    4000.0, 20000.0
 
+#endif
 
+#ifdef M365_F302
+#define VBUS_ADC_CHANNEL                                                     MC_ADC_CHANNEL_3
+#define TEMP_ADC_CHANNEL                                                     MC_ADC_CHANNEL_1
+//#define PHASE_A_V_ADC_CHANNEL                                                MC_ADC_CHANNEL_6
+//#define PHASE_B_V_ADC_CHANNEL                                                MC_ADC_CHANNEL_7
+//#define PHASE_C_V_ADC_CHANNEL                                                MC_ADC_CHANNEL_9
+#define VOLTAGE_DIVIDER_GAIN     											 (float)2808.6359
+
+#define VESC_USART_DMA													     huart3
+#define VESC_USART_TX_DMA													 hdma_usart3_tx
+#define VESC_USART_RX_DMA													 hdma_usart3_rx
+
+#define APP_USART_DMA														 huart1
+#define APP_USART_TX_DMA												     hdma_usart1_tx
+#define APP_USART_RX_DMA													 hdma_usart1_rx
+
+//Current Measurement
+#define RSHUNT                        										 0.00200
+#define AMPLIFICATION_GAIN            										 8.00
+#define NOMINAL_CURRENT         											 2000
+#define ID_DEMAG														     -2000
+
+
+#define MOTOR_VOLTAGE_CONSTANT  3.5 /*!< Volts RMS ph-ph /kRPM */
+#define RS                     0.300 /* Stator resistance , ohm*/
+#define LS                     0.000200 /* Stator inductance, H*/
+
+#define PRODUCT_L_MAX_VOLTAGE												 56
+#define PRODUCT_L_MIN_VOLTAGE												 8
+
+#define SCOPE_UVW															 1
+
+#define POLE_PAIR_NUM                                                 	 	 (uint8_t)15
+#define HALL_PHASE_SHIFT        											 90
+#define HALL_FAULT_RESET_CNT												 200
+
+#define TEMP_SENSOR_TYPE													 REAL_SENSOR
+#define CURR_SENSOR_TYPE													 VIRTUAL_SENSOR
+
+#define ADC_SAMPLE_MAX_LEN 													 1000
+
+#define PRODUCT_APP_TO_USE													 APP_ADC_UART
+
+// Setting limits
+#define HW_LIM_CURRENT			-70.0, 70.0
+#define HW_LIM_CURRENT_IN		-70.0, 70.0
+#define HW_LIM_CURRENT_ABS		0.0, 100.0
+#define HW_LIM_ERPM				-100e3, 100e3
+#define HW_LIM_DUTY_MIN			0.0, 0.1
+#define HW_LIM_DUTY_MAX			0.0, 0.99
+#define HW_LIM_TEMP_FET			-40.0, 75.0
+#define HW_LIM_F_SW			    4000.0, 20000.0
 
 #endif
 /****************************************************************************/

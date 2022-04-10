@@ -24,13 +24,14 @@
 #ifndef TASK_CLI_H_
 #define TASK_CLI_H_
 
-#include "cmsis_os.h"
+//#include "cmsis_os.h"
 #include "FreeRTOS.h"
 #include "stream_buffer.h"
 #include "main.h"
 #include "task.h"
+#include "stdbool.h"
 
-extern osThreadId_t task_cli_handle;
+//extern osThreadId_t task_cli_handle;
 
 void cli_start_console();
 

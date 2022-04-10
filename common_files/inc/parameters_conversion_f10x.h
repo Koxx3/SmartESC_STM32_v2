@@ -37,10 +37,15 @@
 #define ADC1_2 ADC1
 
 /*************************  IRQ Handler Mapping  *********************/
-
+#ifndef M4F
 #define TIMx_UP_M1_IRQHandler TIM1_UP_IRQHandler
 #define DMAx_R1_M1_IRQHandler DMA1_Channel4_IRQHandler
 #define TIMx_BRK_M1_IRQHandler TIM1_BRK_IRQHandler
+#else
+#define TIMx_UP_M1_IRQHandler TIM1_UP_TIM16_IRQHandler
+#define DMAx_R1_M1_IRQHandler DMA1_Channel4_IRQHandler
+#define TIMx_BRK_M1_IRQHandler TIM1_BRK_TIM15_IRQHandler
+#endif
 
 /*******************  ADC Physical characteristics  ************/
 #define ADC_TRIG_CONV_LATENCY_CYCLES 3

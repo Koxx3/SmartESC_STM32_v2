@@ -22,7 +22,12 @@
 #ifndef MC_PARAMETERS_H
 #define MC_PARAMETERS_H
 
+#ifndef M4F
 #include "r3_2_f1xx_pwm_curr_fdbk.h"
+#else
+#include "r3_2_f30x_pwm_curr_fdbk.h"
+#endif
+
 
 /* USER CODE BEGIN Additional include */
 

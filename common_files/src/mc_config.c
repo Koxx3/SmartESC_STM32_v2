@@ -219,13 +219,21 @@ HALL_Handle_t HALL_M1 =
 
  .PWMFreqScaling      = PWM_FREQ_SCALING,
  .HallMtpa            = HALL_MTPA,
-
+#ifndef M4F
  .H1Port             =  M1_HALL_H1_GPIO_Port,
  .H1Pin              =  M1_HALL_H1_Pin<<8,
  .H2Port             =  M1_HALL_H2_GPIO_Port,
  .H2Pin              =  M1_HALL_H2_Pin<<8,
  .H3Port             =  M1_HALL_H3_GPIO_Port,
  .H3Pin              =  M1_HALL_H3_Pin<<8,
+#else
+ .H1Port             =  M1_HALL_H1_GPIO_Port,
+ .H1Pin              =  M1_HALL_H1_Pin,
+ .H2Port             =  M1_HALL_H2_GPIO_Port,
+ .H2Pin              =  M1_HALL_H2_Pin,
+ .H3Port             =  M1_HALL_H3_GPIO_Port,
+ .H3Pin              =  M1_HALL_H3_Pin,
+#endif
  .lut				 = {0,1,2,3,4,5,6,7}
 };
 
@@ -285,7 +293,7 @@ NTC_Handle_t TempSensorParamsM1 =
   .TempRegConv =
   {
     .regADC = ADC1,
-    .channel = MC_ADC_CHANNEL_0,
+    .channel = TEMP_ADC_CHANNEL,
     .samplingTime = M1_TEMP_SAMPLING_TIME,
   },
   .hLowPassFilterBW        = M1_TEMP_SW_FILTER_BW_FACTOR,

@@ -31,7 +31,13 @@
 #include "virtual_bus_voltage_sensor.h"
 #include "pqd_motor_power_measurement.h"
 #include "flux_weakening_ctrl.h"
+#ifndef M4F
 #include "r3_2_f1xx_pwm_curr_fdbk.h"
+#else
+#include "r3_2_f30x_pwm_curr_fdbk.h"
+#include "stm32f3xx_ll_adc.h"
+#include "stm32f3xx_ll_tim.h"
+#endif
 #include "hfi_speed_pos_fdbk.h"
 #include "sto_cordic_speed_pos_fdbk.h"
 

@@ -18,7 +18,11 @@
     */
 
 #include "crc.h"
-#include "stm32f1xx.h"
+#ifndef M4F
+	#include "stm32f1xx.h"
+#else
+	#include "stm32f3xx.h"
+#endif
 
 unsigned short  crc16(unsigned char *Buffer, unsigned int Len)
 {

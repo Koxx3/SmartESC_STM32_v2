@@ -1,5 +1,7 @@
 #include "main.h"
 #include"music.h"
+#include "mc_math.h"
+#include "drive_parameters.h"
 
 #define LIMIT(A, MIN, MAX) 						 ((A < MIN) ? (MIN) : ((A > MAX) ? (MAX) : (A)))
 #define MUSIC_SAPMLING_TIME                      (int16_t)((1.0/((float)PWM_FREQUENCY)) * ((float)((int32_t)(INT16_MAX))))

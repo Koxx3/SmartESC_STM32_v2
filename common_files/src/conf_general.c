@@ -22,7 +22,11 @@
 #include "mc_interface.h"
 #include "utils.h"
 #include "confgenerator.h"
+#ifndef M4F
 #include "stm32f1xx_hal.h"
+#else
+#include "stm32f3xx_hal.h"
+#endif
 #include "crc.h"
 #include "defines.h"
 #include "drive_parameters.h"
@@ -170,7 +174,7 @@ bool conf_general_write_flash(uint8_t page, uint8_t * data, uint16_t size){
 	uint32_t page_error = 0;
 	FLASH_EraseInitTypeDef s_eraseinit;
 	s_eraseinit.TypeErase   = FLASH_TYPEERASE_PAGES;
-	s_eraseinit.PageAddress = 0x08000000 + ((uint32_t)page*0x400);
+	s_eraseinit.PageAddress = 0x08000000 + ((uint32_t)page*PAGESIZE);
 	s_eraseinit.NbPages     = 1;
 	HAL_FLASHEx_Erase(&s_eraseinit, &page_error);
 

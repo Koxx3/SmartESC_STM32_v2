@@ -24,15 +24,12 @@
 #ifndef TASK_PWR_H_
 #define TASK_PWR_H_
 
-#include "cmsis_os.h"
-
-extern osThreadId_t PwrHandle;
-
 
 #define DEV_PWR_ON                          0x66
 #define DEV_PWR_OFF                         0xDD
 #define DEV_PWR_RESTART                     0xBA
 
+#include <stdint.h>
 
 typedef enum {
     NO_PRESS,

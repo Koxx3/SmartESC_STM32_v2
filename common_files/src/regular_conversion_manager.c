@@ -215,7 +215,11 @@ uint8_t RCM_RegisterRegConv(RegConv_t * regConv)
          /* Before starting a calibration, the ADC must have been in power-on state (ADON bit = 1) for
           * at least two ADC clock cycles. */
         LL_ADC_Enable( regConv->regADC );
+#ifndef M4F
         LL_ADC_StartCalibration( regConv->regADC);
+#else
+        LL_ADC_StartCalibration( regConv->regADC, LL_ADC_SINGLE_ENDED);
+#endif
         while ( LL_ADC_IsCalibrationOnGoing( regConv->regADC ) )
         { }
 
@@ -252,8 +256,11 @@ uint16_t RCM_ExecRegularConv (uint8_t handle)
                                 __LL_ADC_DECIMAL_NB_TO_CHANNEL( RCM_handle_array[handle]->channel ) );
 
   LL_ADC_REG_ReadConversionData12( RCM_handle_array[handle]->regADC );
-
+#ifndef M4F
     LL_ADC_REG_StartConversionSWStart(RCM_handle_array[handle]->regADC);
+#else
+    LL_ADC_REG_StartConversion(RCM_handle_array[handle]->regADC);
+#endif
   while ( LL_ADC_IsActiveFlag_EOS (RCM_handle_array[handle]->regADC ) == 0u) {}
   retVal = LL_ADC_REG_ReadConversionData12( RCM_handle_array[handle]->regADC );
 return retVal;
