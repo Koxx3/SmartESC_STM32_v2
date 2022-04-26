@@ -130,6 +130,9 @@ int16_t VescToSTM_Iq_lim_hook(int16_t iq){
 	//Do PWM off feature
 	if(fp.minimum_current>0 && pMCI[M1]->pSTM->hFaultOccurred == 0){
 		if(pwm_force == false && abs(iq) <= fp.minimum_current && abs(FW_M1.AvVolt_qd.q) < MIN_DUTY_PWM){
+			int32_t erpm = VescToSTM_get_erpm_fast()*2;
+			float rad_s = erpm * ((2.0 * M_PI) / 60.0);
+			motor_voltage = rad_s * mc_conf.foc_motor_flux_linkage;
 			if(VescToSTM_overspeed()==false){
 				VescToSTM_pwm_stop();
 			}
@@ -137,6 +140,13 @@ int16_t VescToSTM_Iq_lim_hook(int16_t iq){
 			VescToSTM_pwm_start();  //Function checks if PWM off otherwise it does nothing
 		}
 	}
+
+	if(VescToSTM_mode == STM_STATE_BRAKE){
+		if(SpeednTorqCtrlM1.SPD->hAvrMecSpeedUnit == 0){
+			SpeednTorqCtrlM1.PISpeed->wIntegralTerm = 0;
+		}
+	}
+
 	return iq;
 }
 
@@ -307,10 +317,6 @@ void VescToSTM_pwm_stop(void){
 		FOCVars[M1].Vqd.d=0;
 		FOCVars[M1].Vqd.q=0;
 		FW_Clear(&FW_M1);
-	}else{
-		int32_t erpm = VescToSTM_get_erpm_fast();
-		float rad_s = erpm * ((2.0 * M_PI) / 60.0);
-		motor_voltage = rad_s * mc_conf.foc_motor_flux_linkage;
 	}
 }
 
@@ -320,6 +326,9 @@ void VescToSTM_pwm_start(void){
 		utils_truncate_number(&fVd, -32767, 32767);
 		PIDIqHandle_M1.wIntegralTerm = fVd * TF_KIDIV;
 		PIDIdHandle_M1.wIntegralTerm = -PIDIqHandle_M1.wIntegralTerm/4;
+		HALL_M1._Super.hElAngle = HALL_M1.MeasuredElAngle;
+		HALL_M1.CompSpeed = 0;
+		HALL_M1._Super.hAvrMecSpeedUnit = 0;
 		PWMC_SwitchOnPWM(&PWM_Handle_M1._Super);
 	}
 }

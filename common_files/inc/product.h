@@ -116,7 +116,7 @@
 #define BATTERY_SUPPORT_LIFEPO												 1
 #define BATTERY_SUPPORT_LEAD												 1
 #define ABS_OVR_CURRENT_TRIP_MS												 2.0
-#define MIN_DUTY_FOR_PWM_FREEWHEEL											 80
+#define MIN_DUTY_FOR_PWM_FREEWHEEL											 20
 #define CURRENT_DISPLAY_OFFSET											     80   //in cnts
 
 #define MODE_SLOW_CURR														 0.5
