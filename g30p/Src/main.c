@@ -61,6 +61,8 @@ UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 DMA_HandleTypeDef hdma_usart1_rx;
 DMA_HandleTypeDef hdma_usart1_tx;
+DMA_HandleTypeDef hdma_usart2_tx;
+DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart3_tx;
 DMA_HandleTypeDef hdma_usart3_rx;
 
@@ -82,8 +84,7 @@ static void MX_USART2_UART_Init(void);
 static void MX_CRC_Init(void);
 static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
-void startMediumFrequencyTask(void *argument);
-extern void StartSafetyTask(void *argument);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -132,55 +133,9 @@ int main(void)
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
-
-  HAL_ADCEx_Calibration_Start(&hadc1);
-  HAL_ADCEx_Calibration_Start(&hadc2);
-
   MX_MotorControl_Init();
   HAL_Delay(100);
-
   conf_general_init();
-  //osKernelInitialize();
-
-  /* USER CODE BEGIN RTOS_MUTEX */
-  /* USER CODE END RTOS_MUTEX */
-
-  /* USER CODE BEGIN RTOS_SEMAPHORES */
-  /* add semaphores, ... */
-  /* USER CODE END RTOS_SEMAPHORES */
-
-  /* USER CODE BEGIN RTOS_TIMERS */
-  /* start timers, add new ones, ... */
-  /* USER CODE END RTOS_TIMERS */
-
-  /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
-  /* USER CODE END RTOS_QUEUES */
-
-  /* Create the thread(s) */
-  /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
-  TaskHandle_t mediumFrequencyHandle;
-
-  TaskHandle_t safetyHandle;
-
-  xTaskCreate(startMediumFrequencyTask, "medTSK", 128, NULL, PRIO_NORMAL, &mediumFrequencyHandle);
-  xTaskCreate(StartSafetyTask, "safety", 128, NULL, PRIO_HIGHER, &safetyHandle);
-
-
-  task_init(); //bring up user tasks
-
-  /* USER CODE END RTOS_THREADS */
-
-  /* USER CODE BEGIN RTOS_EVENTS */
-  /* add events, ... */
-  /* USER CODE END RTOS_EVENTS */
-
-  /* Start scheduler */
-  vTaskStartScheduler();
-
-  /* We should never ge*/
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -252,13 +207,13 @@ static void MX_NVIC_Init(void)
   HAL_NVIC_SetPriority(ADC1_2_IRQn, 2, 0);
   HAL_NVIC_EnableIRQ(ADC1_2_IRQn);
   /* TIM1_UP_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(TIM1_UP_IRQn, 2, 0);
+  HAL_NVIC_SetPriority(TIM1_UP_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(TIM1_UP_IRQn);
   /* TIM1_BRK_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(TIM1_BRK_IRQn, 4, 0);
   HAL_NVIC_EnableIRQ(TIM1_BRK_IRQn);
   /* DMA1_Channel1_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 2, 0);
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
   /* TIM3_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(TIM3_IRQn, 3, 0);
@@ -646,8 +601,7 @@ static void MX_USART2_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART2_Init 2 */
-  __HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);  // enable receive intterupts
-  __HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);  // enable idle line detection
+
   /* USER CODE END USART2_Init 2 */
 
 }
@@ -702,11 +656,17 @@ static void MX_DMA_Init(void)
   HAL_NVIC_SetPriority(DMA1_Channel3_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel3_IRQn);
   /* DMA1_Channel4_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel4_IRQn, 2, 0);
+  HAL_NVIC_SetPriority(DMA1_Channel4_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
   /* DMA1_Channel5_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel5_IRQn, 2, 0);
+  HAL_NVIC_SetPriority(DMA1_Channel5_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel5_IRQn);
+  /* DMA1_Channel6_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel6_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel6_IRQn);
+  /* DMA1_Channel7_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel7_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel7_IRQn);
 
 }
 
@@ -732,7 +692,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(BRAKE_LIGHT_GPIO_Port, BRAKE_LIGHT_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(REAR_LED_GPIO_Port, REAR_LED_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PWR_BTN_Pin */
   GPIO_InitStruct.Pin = PWR_BTN_Pin;
@@ -768,12 +728,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   HAL_GPIO_Init(UNUSED1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : BRAKE_LIGHT_Pin */
-  GPIO_InitStruct.Pin = BRAKE_LIGHT_Pin;
+  /*Configure GPIO pin : REAR_LED_Pin */
+  GPIO_InitStruct.Pin = REAR_LED_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(BRAKE_LIGHT_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(REAR_LED_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure peripheral I/O remapping */
   __HAL_AFIO_REMAP_PD01_ENABLE();

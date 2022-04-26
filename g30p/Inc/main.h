@@ -124,8 +124,8 @@ void Error_Handler(void);
 #define UART1_TX_GPIO_Port GPIOB
 #define UART1_RX_Pin GPIO_PIN_7
 #define UART1_RX_GPIO_Port GPIOB
-#define BRAKE_LIGHT_Pin GPIO_PIN_9
-#define BRAKE_LIGHT_GPIO_Port GPIOB
+#define REAR_LED_Pin GPIO_PIN_9
+#define REAR_LED_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
