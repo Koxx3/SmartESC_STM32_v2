@@ -982,7 +982,7 @@ void confgenerator_set_defaults_appconf(app_configuration *conf) {
 	//conf->can_mode = APPCONF_CAN_MODE;
 	//conf->uavcan_esc_index = APPCONF_UAVCAN_ESC_INDEX;
 	//conf->uavcan_raw_mode = APPCONF_UAVCAN_RAW_MODE;
-	conf->app_to_use = APP_ADC;
+	conf->app_to_use = PRODUCT_APP_TO_USE;
 	conf->app_adc_conf.ctrl_type = APPCONF_ADC_CTRL_TYPE;
 	conf->app_adc_conf.hyst = APPCONF_ADC_HYST;
 	conf->app_adc_conf.voltage_start = APPCONF_ADC_VOLTAGE_START;

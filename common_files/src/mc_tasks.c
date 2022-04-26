@@ -42,6 +42,8 @@
 #include "music.h"
 #include "current_sense.h"
 #include "VescToSTM.h"
+#include "utils.h"
+#include "hfi_speed_pos_fdbk.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -92,6 +94,8 @@ FW_Handle_t *pFW[NBR_OF_MOTORS];
 MTPA_Handle_t *pMaxTorquePerAmpere[2] = {MC_NULL,MC_NULL};
 RampExtMngr_Handle_t *pREMNG[NBR_OF_MOTORS];   /*!< Ramp manager used to modify the Iq ref
                                                     during the start-up switch over.*/
+HFI_Handle_t * hfiHandle[NBR_OF_MOTORS];
+
 
 static volatile uint16_t hMFTaskCounterM1 = 0;
 static volatile uint16_t hBootCapDelayCounterM1 = 0;
@@ -120,7 +124,7 @@ void TSK_SafetyTask_PWMOFF(uint8_t motor);
 void UI_Scheduler(void);
 
 /* USER CODE BEGIN Private Functions */
-
+void calcHFI(void);
 
 /* USER CODE END Private Functions */
 /**
@@ -180,6 +184,11 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
   /******************************************************/
   STC_Init(pSTC[M1],pPIDSpeed[M1], &HALL_M1._Super);
 
+  /******************************************************/
+  /*   Auxiliary speed sensor component initialization  */
+  /******************************************************/
+  STO_CR_Init (&STO_CR_M1);
+
   /********************************************************/
   /*   PID component initialization: current regulation   */
   /********************************************************/
@@ -216,6 +225,12 @@ __weak void MCboot( MCI_Handle_t* pMCIList[NBR_OF_MOTORS],MCT_Handle_t* pMCTList
 
   pREMNG[M1] = &RampExtMngrHFParamsM1;
   REMNG_Init(pREMNG[M1]);
+
+  /*******************************************************/
+  /*   HFI Sensorless								     */
+  /*******************************************************/
+  HFI_Init(&HFI_M1);
+  hfiHandle[M1] = &HFI_M1;
 
   /*******************************************************/
   /*   Flux weakening component initialization           */
@@ -357,6 +372,7 @@ __weak void TSK_MediumFrequencyTaskM1(void)
   State_t StateM1;
   int16_t wAux = 0;
 
+  (void) STO_CR_CalcAvrgMecSpeedUnit( &STO_CR_M1, &wAux );
   bool IsSpeedReliable = HALL_CalcAvrgMecSpeedUnit( &HALL_M1, &wAux );
   PQD_CalcElMotorPower( pMPM[M1] );
 
@@ -391,6 +407,7 @@ __weak void TSK_MediumFrequencyTaskM1(void)
     break;
 
   case CLEAR:
+	STO_CR_Clear( &STO_CR_M1 );
     HALL_Clear( &HALL_M1 );
 
     if ( STM_NextState( &STM[M1], START ) == true )
@@ -414,6 +431,7 @@ __weak void TSK_MediumFrequencyTaskM1(void)
       /* USER CODE END MediumFrequencyTask M1 1 */
 	  FOC_InitAdditionalMethods(M1);
       FOC_CalcCurrRef( M1 );
+
       STM_NextState( &STM[M1], RUN );
     }
     STC_ForceSpeedReferenceToCurrentSpeed( pSTC[M1] ); /* Init the reference speed to current speed */
@@ -428,7 +446,7 @@ __weak void TSK_MediumFrequencyTaskM1(void)
 
     MCI_ExecBufferedCommands( oMCInterface[M1] );
     FOC_CalcCurrRef( M1 );
-
+    HFI_update(hfiHandle[M1]);
     if( !IsSpeedReliable )
     {
       STM_FaultProcessing( &STM[M1], MC_SPEED_FDBK, 0 );
@@ -678,6 +696,9 @@ __weak uint8_t TSK_HighFrequencyTask(void)
 	uint8_t bMotorNbr = 0;
 	uint16_t hFOCreturn;
 
+	Observer_Inputs_t STO_aux_Inputs; /*  only if sensorless aux*/
+	STO_aux_Inputs.Valfa_beta = FOCVars[M1].Valphabeta;  /* only if*/
+
 	HALL_CalcElAngle (&HALL_M1);
 
 	/* USER CODE BEGIN HighFrequencyTask SINGLEDRIVE_1 */
@@ -708,8 +729,8 @@ __weak uint8_t TSK_HighFrequencyTask(void)
 			samples.dec_state = 0;
 			samples.m_curr0_samples[samples.index] = (uint16_t)FOCVars[M1].Iab.a >>4; //Make room for position
 			samples.m_curr1_samples[samples.index] = (uint16_t)FOCVars[M1].Iab.b >>4; //Make room for position
-			samples.m_curr0_samples[samples.index] |= (((uint16_t)HALL_M1._Super.hElAngle<<4) & 0xF000);
-			samples.m_curr1_samples[samples.index] |= (uint16_t)HALL_M1._Super.hElAngle & 0xF000;
+			samples.m_curr0_samples[samples.index] |= (((uint16_t)pSTC[M1]->SPD->hElAngle<<4) & 0xF000);
+			samples.m_curr1_samples[samples.index] |= (uint16_t)pSTC[M1]->SPD->hElAngle & 0xF000;
 #if SCOPE_UVW == 1
 			samples.m_v0_samples[samples.index] = (uint16_t)PWM_Handle_M1._Super.CntPhA >>3;
 			samples.m_v1_samples[samples.index] = (uint16_t)PWM_Handle_M1._Super.CntPhB >>3;
@@ -732,6 +753,19 @@ __weak uint8_t TSK_HighFrequencyTask(void)
 	else
 	{
 	/* USER CODE BEGIN HighFrequencyTask SINGLEDRIVE_3 */
+	STO_aux_Inputs.Ialfa_beta = FOCVars[M1].Ialphabeta; /*  only if sensorless*/
+	STO_aux_Inputs.Vbus = VBS_GetAvBusVoltage_d(&(RealBusVoltageSensorParamsM1._Super)); /*  only for sensorless*/
+	STO_CR_CalcElAngle (&STO_CR_M1, &STO_aux_Inputs);
+	STO_CR_CalcAvrgElSpeedDpp (&STO_CR_M1);
+
+	//if(abs(pSTC[M1]->SPD->hAvrMecSpeedUnit) > 200 && STO_CR_M1.IsAlgorithmConverged){
+	if(abs(HALL_M1._Super.hAvrMecSpeedUnit) > 500){
+		if(STO_CR_IsObserverConverged(&STO_CR_M1,HALL_M1._Super.hAvrMecSpeedUnit)){
+			pSTC[M1]->SPD = (SpeednPosFdbk_Handle_t *) &STO_CR_M1;
+		}
+	}else{
+		pSTC[M1]->SPD = (SpeednPosFdbk_Handle_t *) &HALL_M1;
+	}
 
 	/* USER CODE END HighFrequencyTask SINGLEDRIVE_3 */
 	}
@@ -761,25 +795,25 @@ __attribute__((section (".ccmram")))
   * @retval int16_t It returns MC_NO_FAULTS if the FOC has been ended before
   *         next PWM Update event, MC_FOC_DURATION otherwise
   */
-#define AVG_SAMPLES 512
-
 inline uint16_t FOC_CurrControllerM1(void)
 {
   qd_t Iqd, Vqd;
   ab_t Iab;
   alphabeta_t Ialphabeta, Valphabeta;
-
-
   int16_t hElAngle;
   uint16_t hCodeError;
   SpeednPosFdbk_Handle_t *speedHandle;
-
 #if MUSIC_ENABLE
   music_update(&bldc_music);
 #endif
 
   speedHandle = STC_GetSpeedSensor(pSTC[M1]);
   hElAngle = SPD_GetElAngle(speedHandle);
+//  if(HFI_is_ready(hfiHandle[M1])){
+//	  hElAngle = HFI_get_angle(hfiHandle[M1]);
+//  }else{
+//	  hElAngle = 0;
+//  }
   PWMC_GetPhaseCurrents(pwmcHandle[M1], &Iab);
   Ialphabeta = MCM_Clarke(Iab);
   Iqd = MCM_Park(Ialphabeta, hElAngle);
@@ -796,6 +830,10 @@ inline uint16_t FOC_CurrControllerM1(void)
   Vqd = Circle_Limitation(pCLM[M1], Vqd);
   hElAngle += SPD_GetInstElSpeedDpp(speedHandle)*REV_PARK_ANGLE_COMPENSATION_FACTOR;
   Valphabeta = MCM_Rev_Park(Vqd, hElAngle);
+
+
+  //Valphabeta = HFI_Inject(hfiHandle[M1], Valphabeta, Ialphabeta, FOCVars[M1].Iqdref);
+  //HALL_M1._Super.diff_sig = hfiHandle[M1]->_Super.hAvrMecSpeedUnit;
   hCodeError = PWMC_SetPhaseVoltage(pwmcHandle[M1], Valphabeta);
   FOCVars[M1].Vqd = Vqd;
   FOCVars[M1].Iab = Iab;
@@ -853,6 +891,7 @@ __weak void TSK_SafetyTask_PWMOFF(uint8_t bMotor)
   if(bMotor == M1)
   {
 	  uint16_t voltage_fault = RVBS_CalcAvVbus(pBusSensorM1);
+	  HFI_update_busvoltage(hfiHandle[M1], pBusSensorM1->_Super.AvBusVoltage_d);
 	  if(voltage_fault==MC_UNDER_VOLT){
 		  CodeReturn |=  errMask[bMotor] & voltage_fault;
 

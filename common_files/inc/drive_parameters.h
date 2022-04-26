@@ -31,7 +31,7 @@
 /******** MAIN AND AUXILIARY SPEED/POSITION SENSOR(S) SETTINGS SECTION ********/
 
 /*** Speed measurement settings ***/
-#define MAX_APPLICATION_SPEED_RPM       2500 /*!< rpm, mechanical */
+#define MAX_APPLICATION_SPEED_RPM       16000 /*!< rpm, mechanical */
 #define MIN_APPLICATION_SPEED_RPM       0 /*!< rpm, mechanical,
                                                            absolute value */
 #define MEAS_ERRORS_BEFORE_FAULTS       20 /*!< Number of speed
@@ -173,6 +173,59 @@
 #define SEGDIV                         595
 #define ANGC                           {0,0,0,0,-55,0,-54,-54}
 #define OFST                           {0,0,0,0,4,-1,4,4}
+
+
+/****** State Observer + CORDIC ***/
+#define CORD_VARIANCE_THRESHOLD           8  /*!<Maxiumum accepted
+                                                            variance on speed
+                                                            estimates (percentage) */
+#define CORD_F1                          16384
+#define CORD_F2                          16384
+#define CORD_F1_LOG                      LOG2(16384)
+#define CORD_F2_LOG                      LOG2(16384)
+
+/* State observer constants */
+#define CORD_GAIN1                       -22073
+#define CORD_GAIN2                       5845
+
+#define CORD_MEAS_ERRORS_BEFORE_FAULTS   3  /*!< Number of consecutive errors
+                                                           on variance test before a speed
+                                                           feedback error is reported */
+#define CORD_FIFO_DEPTH_DPP              64  /*!< Depth of the FIFO used
+                                                            to average mechanical speed
+                                                            in dpp format */
+#define CORD_FIFO_DEPTH_DPP_LOG          LOG2(64)
+
+#define CORD_FIFO_DEPTH_UNIT            64  /*!< Depth of the FIFO used
+                                                           to average mechanical speed
+                                                           in dpp format */
+#define CORD_MAX_ACCEL_DPPP              64  /*!< Maximum instantaneous
+                                                              electrical acceleration (dpp
+                                                              per control period) */
+#define CORD_BEMF_CONSISTENCY_TOL        64  /* Parameter for B-emf
+                                                           amplitude-speed consistency */
+#define CORD_BEMF_CONSISTENCY_GAIN       64  /* Parameter for B-emf
+                                                          amplitude-speed consistency */
+
+/******************************   START-UP PARAMETERS   **********************/
+
+/* Observer start-up output conditions  */
+#define OBS_MINIMUM_SPEED_RPM          500
+
+#define NB_CONSECUTIVE_TESTS           2 /* corresponding to
+                                                         former NB_CONSECUTIVE_TESTS/
+                                                         (TF_REGULATION_RATE/
+                                                         MEDIUM_FREQUENCY_TASK_RATE) */
+#define SPEED_BAND_UPPER_LIMIT         17 /*!< It expresses how much
+                                                            estimated speed can exceed
+                                                            forced stator electrical
+                                                            without being considered wrong.
+                                                            In 1/16 of forced speed */
+#define SPEED_BAND_LOWER_LIMIT         15  /*!< It expresses how much
+                                                             estimated speed can be below
+                                                             forced stator electrical
+                                                             without being considered wrong.
+                                                             In 1/16 of forced speed */
 
 /*** On the fly start-up ***/
 
