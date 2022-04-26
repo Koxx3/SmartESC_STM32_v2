@@ -223,8 +223,15 @@ void send_position(PACKET_STATE_t * phandle){
 		//commands_send_rotor_pos(phandle, STO_CR_M1._Super.hElAngle);
 
 		break;
-//	case DISP_POS_MODE_OBSERVER:
-//
+	case DISP_POS_MODE_ENCODER_OBSERVER_ERROR:{
+			if(phandle->port->half_duplex==true && (xTaskGetTickCount() % 100)) break;
+			//int32_t temp = HFI_M1._Super.hElAngle - SpeednTorqCtrlM1.SPD->hElAngle;
+			int32_t temp = HALL_M1._Super.hElAngle - STO_CR_M1._Super.hElAngle;
+			commands_send_rotor_pos(phandle, temp);
+		}
+		break;
+//	case DISP_POS_MODE_PID_POS:
+//		//commands_send_rotor_pos(SpeednTorqCtrlM1.SPD->hElAngle);
 //		break;
 //
 //	case DISP_POS_MODE_PID_POS_ERROR:
@@ -1143,26 +1150,6 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 					buffer[ind++] = COMM_DETECT_APPLY_ALL_FOC;
 					buffer_append_int16(buffer, res, &ind);
 					reply_func(send_buffer, ind, phandle);
-				} break;
-				case CAMILO_FROM_DASH: {
-					int32_t ind = 0;
-					uint8_t ad1 = data[ind++];
-					uint8_t ad2 = data[ind++];
-					app_adc_set_adc(ad1, ad2);
-				} break;
-				case CAMILO_TO_DASH: {
-					int32_t ind = 0;
-					uint8_t send_buffer[PACKET_SIZE(20)];
-					uint8_t * buffer = send_buffer + PACKET_HEADER;
-					buffer[ind++] = packet_id;
-					buffer[ind++] = m365_to_display.mode;
-					buffer[ind++] = m365_to_display.battery;
-					buffer[ind++] = m365_to_display.light;
-					buffer[ind++] = m365_to_display.beep;
-					buffer[ind++] = m365_to_display.speed;
-					buffer[ind++] = m365_to_display.faultcode;
-					reply_func(send_buffer, ind, phandle);
-
 				} break;
 				case COMM_BM_CONNECT:
 				case COMM_BM_ERASE_FLASH_ALL:
