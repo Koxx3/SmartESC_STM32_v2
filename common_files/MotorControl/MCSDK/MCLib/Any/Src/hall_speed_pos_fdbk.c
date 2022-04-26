@@ -245,10 +245,16 @@ if ( pHandle->_Super.hElSpeedDpp != HALL_MAX_PSEUDO_SPEED )
 	} else if (diff < -32000) {
 		diff += 65536;
 	}
-	if(abs(diff)<(5461*2)){
-		pHandle->_Super.hElAngle += pHandle->_Super.hElSpeedDpp + pHandle->CompSpeed;
-	}
 
+	if(abs(pHandle->_Super.hAvrMecSpeedUnit) > pHandle->SwitchSpeed){
+		if(abs(diff)<(6000*2)){ //5461*2
+			pHandle->CompAngle += pHandle->_Super.hElSpeedDpp;
+			pHandle->_Super.hElAngle += pHandle->_Super.hElSpeedDpp + pHandle->CompSpeed;
+		}
+	}else{
+		pHandle->CompAngle = pHandle->MeasuredElAngle;
+		pHandle->_Super.hElAngle = pHandle->MeasuredElAngle;
+	}
 	pHandle->PrevRotorFreq = pHandle->_Super.hElSpeedDpp;
   }
   else
@@ -330,10 +336,15 @@ __weak bool HALL_CalcAvrgMecSpeedUnit( HALL_Handle_t * pHandle, int16_t * hMecSp
           }
           else  
           {
-            pHandle->DeltaAngle = pHandle->MeasuredElAngle - pHandle->_Super.hElAngle;
+            pHandle->DeltaAngle = pHandle->CompAngle - pHandle->_Super.hElAngle;
             pHandle->CompSpeed = ( int16_t )
             ( ( int32_t )( pHandle->DeltaAngle ) /
               ( int32_t )( pHandle->PWMNbrPSamplingFreq ) );
+            if(pHandle->CompSpeed > 1000){
+            	pHandle->CompSpeed = 1000;
+            }else if(pHandle->CompSpeed < -1000){
+            	pHandle->CompSpeed = -1000;
+            }
           }
           /* Convert el_dpp to MecUnit */
           *hMecSpeedUnit = ( int16_t )( (  pHandle->AvrElSpeedDpp * 
@@ -413,9 +424,10 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
 		}
 
 		if(diff){
-			if(diff > 0){
+			if(diff >= 0){
 				pHandle->Direction = POSITIVE;
 				pHandle->tachometer++;
+				if(diff==0) diff = 64;
 			}else if (diff < 0){
 				pHandle->Direction = NEGATIVE;
 				pHandle->tachometer--;
@@ -424,12 +436,13 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
 		}
 
 		pHandle->MeasuredElAngle = (((uint16_t)pHandle->lut[pHandle->HallState]-(diff/2))<<8);
+		pHandle->CompAngle = pHandle->MeasuredElAngle;
 		//pHandle->_Super.hElAngle = pHandle->MeasuredElAngle;
     }
 
     /* We need to check that the direction has not changed.
        If it is the case, the sign of the current speed can be the opposite of the
-       average speed, and the average time can be close to 0 which lead to a 
+       average speed, and the average time can be close to 0 which lead to a
        computed speed close to the infinite, and bring instability. */
     if (pHandle->Direction != PrevDirection)
     {
@@ -557,7 +570,7 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
           pHandle->ElPeriodSum -= pHandle->SensorPeriod[pHandle->SpeedFIFOIdx]; /* value we gonna removed from the accumulator */
           if ( wCaptBuf >= pHandle->MaxPeriod )
           {
-            pHandle->SensorPeriod[pHandle->SpeedFIFOIdx] = pHandle->MaxPeriod*pHandle->Direction; 
+            pHandle->SensorPeriod[pHandle->SpeedFIFOIdx] = pHandle->MaxPeriod*pHandle->Direction;
           }
           else
           {
@@ -571,21 +584,21 @@ __weak void * HALL_TIMx_CC_IRQHandler( void * pHandleVoid )
           {
             pHandle->SpeedFIFOIdx = 0u;
           }
-          if ( pHandle->SensorIsReliable) 
+          if ( pHandle->SensorIsReliable)
           {
             if ( pHandle->BufferFilled < pHandle->SpeedBufferSize )
             {
               pHandle->AvrElSpeedDpp = ( int16_t ) (( pHandle->PseudoFreqConv / wCaptBuf )*pHandle->Direction);
             }
-            else 
+            else
             { /* Average speed allow to smooth the mechanical sensors misalignement */
               pHandle->AvrElSpeedDpp = ( int16_t )((int32_t) pHandle->PseudoFreqConv / ( pHandle->ElPeriodSum / pHandle->SpeedBufferSize )); /* Average value */
 
             }
 
-            if((abs(pHandle->AvrElSpeedDpp) < pHandle->SwitchSpeed) ){
+            /*if((abs(pHandle->AvrElSpeedDpp) < pHandle->SwitchSpeed) ){
             	pHandle->HallMtpa = true;
-            }
+            }*/
 
           }
           else /* Sensor is not reliable */
@@ -688,9 +701,10 @@ static void HALL_Init_Electrical_Angle( HALL_Handle_t * pHandle )
 		}
 
 		if(diff){
-			if(diff > 0){
+			if(diff >= 0){
 				pHandle->Direction = POSITIVE;
 				pHandle->tachometer++;
+				if(diff==0) diff = 64;
 			}else if (diff < 0){
 				pHandle->Direction = NEGATIVE;
 				pHandle->tachometer--;
@@ -701,6 +715,7 @@ static void HALL_Init_Electrical_Angle( HALL_Handle_t * pHandle )
 		pHandle->MeasuredElAngle = (((uint16_t)pHandle->lut[pHandle->HallState]-(diff/2))<<8);
     	//pHandle->_Super.hElAngle = pHandle->PhaseShift + (((uint16_t)pHandle->lut[pHandle->HallState])<<8);
     	/* Initialize the measured angle */
+		pHandle->CompAngle = pHandle->MeasuredElAngle;
     	//pHandle->MeasuredElAngle = pHandle->_Super.hElAngle;
     }
 

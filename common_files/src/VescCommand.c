@@ -223,15 +223,8 @@ void send_position(PACKET_STATE_t * phandle){
 		//commands_send_rotor_pos(phandle, STO_CR_M1._Super.hElAngle);
 
 		break;
-	case DISP_POS_MODE_ENCODER_OBSERVER_ERROR:{
-			if(phandle->port->half_duplex==true && (xTaskGetTickCount() % 100)) break;
-			//int32_t temp = HFI_M1._Super.hElAngle - SpeednTorqCtrlM1.SPD->hElAngle;
-			int32_t temp = HALL_M1._Super.hElAngle - STO_CR_M1._Super.hElAngle;
-			commands_send_rotor_pos(phandle, temp);
-		}
-		break;
-//	case DISP_POS_MODE_PID_POS:
-//		//commands_send_rotor_pos(SpeednTorqCtrlM1.SPD->hElAngle);
+//	case DISP_POS_MODE_OBSERVER:
+//
 //		break;
 //
 //	case DISP_POS_MODE_PID_POS_ERROR:

@@ -413,7 +413,7 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 		float v_mag = qfp_fsqrt(SQ(vq_avg) + SQ(vd_avg));
 		float i_mag = qfp_fsqrt(SQ(iq_avg) + SQ(id_avg));
 		*linkage = (v_mag - (2.0 / 3.0) * res * i_mag) / rad_s - (2.0 / 3.0) * i_mag * ind;
-
+		*linkage /= 2.0;
 		while (erpm_now>0) {
 			erpm_now -= erpm_per_sec / 1000.0;
 			VescToSTM_set_open_loop_erpm(erpm_now);
@@ -423,7 +423,7 @@ bool tune_foc_measure_flux_linkage_openloop(float current, float duty,
 		VescToSTM_set_current(0, 0);
 		VescToSTM_set_open_loop(false, 0, 0);
 
-		*linkage_undriven = *linkage;
+		*linkage_undriven = *linkage/2.0;
 
 		result = true;
 	}
