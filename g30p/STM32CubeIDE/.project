@@ -217,11 +217,6 @@
 			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/defines.h</locationURI>
 		</link>
 		<link>
-			<name>Application/User/functions.c</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/common_files/src/functions.c</locationURI>
-		</link>
-		<link>
 			<name>Application/User/main.c</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Src/main.c</locationURI>

@@ -58,9 +58,10 @@
 /* External variables --------------------------------------------------------*/
 extern DMA_HandleTypeDef hdma_usart1_rx;
 extern DMA_HandleTypeDef hdma_usart1_tx;
+extern DMA_HandleTypeDef hdma_usart2_tx;
+extern DMA_HandleTypeDef hdma_usart2_rx;
 extern DMA_HandleTypeDef hdma_usart3_tx;
 extern DMA_HandleTypeDef hdma_usart3_rx;
-extern UART_HandleTypeDef huart2;
 extern TIM_HandleTypeDef htim4;
 
 /* USER CODE BEGIN EV */
@@ -139,6 +140,34 @@ void DMA1_Channel5_IRQHandler(void)
 }
 
 /**
+  * @brief This function handles DMA1 channel6 global interrupt.
+  */
+void DMA1_Channel6_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel6_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel6_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_usart2_rx);
+  /* USER CODE BEGIN DMA1_Channel6_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel6_IRQn 1 */
+}
+
+/**
+  * @brief This function handles DMA1 channel7 global interrupt.
+  */
+void DMA1_Channel7_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel7_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel7_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_usart2_tx);
+  /* USER CODE BEGIN DMA1_Channel7_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel7_IRQn 1 */
+}
+
+/**
   * @brief This function handles TIM4 global interrupt.
   */
 void TIM4_IRQHandler(void)
@@ -150,47 +179,6 @@ void TIM4_IRQHandler(void)
   /* USER CODE BEGIN TIM4_IRQn 1 */
 
   /* USER CODE END TIM4_IRQn 1 */
-}
-
-/**
-  * @brief This function handles USART2 global interrupt.
-  */
-void USART2_IRQHandler(void)
-{
-  /* USER CODE BEGIN USART2_IRQn 0 */
-  if (__HAL_UART_GET_FLAG(&huart2, UART_FLAG_IDLE)) {
-	__HAL_UART_CLEAR_IDLEFLAG(&huart2); // taken from https://electronics.stackexchange.com/questions/471272/setting-up-stm32-timer-for-uart-idle-detection#comment1353999_480556
-	if( GlobalData.rotos_handle.EventGrouptHandle.Peripheral != NULL){
-		BaseType_t xHigherPriorityTaskWoken, xResult;
-
-		/* xHigherPriorityTaskWoken must be initialised to pdFALSE. */
-		xHigherPriorityTaskWoken = pdFALSE;
-
-		/* Set bit 0 and bit 4 in xEventGroup. */
-		xResult = xEventGroupSetBitsFromISR(GlobalData.rotos_handle.EventGrouptHandle.Peripheral, USART_TX_COMPLETION_EVENT,&xHigherPriorityTaskWoken);
-
-		/* Was the message posted successfully? */
-		if( xResult != pdFAIL )
-		{
-			  /* If xHigherPriorityTaskWoken is now set to pdTRUE then a context
-			  switch should be requested.  The macro used is port specific and will
-			  be either portYIELD_FROM_ISR() or portEND_SWITCHING_ISR() - refer to
-			  the documentation page for the port being used. */
-			  portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
-		}
-	}
-  } else {
-	char buff;
-	HAL_UART_Receive (&huart2, (uint8_t *)&buff, 1, 400);
-	ninebot_parse_usart1_frame(buff);
-	//uart2_handler();
-  }
-  return;
-  /* USER CODE END USART2_IRQn 0 */
-  HAL_UART_IRQHandler(&huart2);
-  /* USER CODE BEGIN USART2_IRQn 1 */
-
-  /* USER CODE END USART2_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

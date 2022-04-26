@@ -24,5 +24,3 @@ g30p/STM32CubeIDE/g30p.launch
 
 *.d
 *.o
-/g30p/STM32CubeIDE/.settings/com.st.stm32cube.ide.mcu.sfrview.prefs
-/g30p/STM32CubeIDE/g30p RELEASE.launch

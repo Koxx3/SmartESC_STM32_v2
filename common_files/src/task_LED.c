@@ -70,11 +70,13 @@ void prv_LED_blink(uint32_t speed){
 
 }
 
+
+
 void task_LED_set_brake_light(en_brake mode){
-	if(brake_mode != mode){
-		brake_mode = mode;
-	}
+	brake_mode = mode;
 }
+
+
 
 //#define  MC_NO_ERROR  (uint16_t)(0x0000u)      /**< @brief No error.*/
 //#define  MC_NO_FAULTS  (uint16_t)(0x0000u)     /**< @brief No error.*/
