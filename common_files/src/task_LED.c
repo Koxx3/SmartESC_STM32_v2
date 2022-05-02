@@ -51,7 +51,7 @@ void prv_LED_blink(uint32_t speed){
 
 
 	if(VescToSTM_mode == STM_STATE_BRAKE && (FW_M1.AvAmpere_qd.q < (-1*CURRENT_FACTOR_A) || FW_M1.AvAmpere_qd.q > (1*CURRENT_FACTOR_A))){
-		if(brake_cnt>20){
+		if(brake_cnt>10){
 			brake_cnt=0;
 			HAL_GPIO_TogglePin(BRAKE_LIGHT_GPIO_Port, BRAKE_LIGHT_Pin);
 		}else{
@@ -60,7 +60,7 @@ void prv_LED_blink(uint32_t speed){
 	}else{
 		if(brake_mode == BRAKE_LIGHT_ON){
 			HAL_GPIO_WritePin(BRAKE_LIGHT_GPIO_Port, BRAKE_LIGHT_Pin, GPIO_PIN_RESET);
-			brake_cnt=20;
+			brake_cnt=10;
 		}else{
 			HAL_GPIO_WritePin(BRAKE_LIGHT_GPIO_Port, BRAKE_LIGHT_Pin, GPIO_PIN_SET);
 			brake_cnt=0;
