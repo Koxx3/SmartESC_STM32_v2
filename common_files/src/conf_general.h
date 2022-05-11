@@ -22,13 +22,11 @@
 
 #include "VescDatatypes.h"
 #include "packet.h"
+#include "product.h"
 
 
-#define APP_PAGE				126
-#define CONF_PAGE				127
-
-#define ADDR_FLASH_PAGE_126    ((uint32_t)0x08000000+(APP_PAGE*0x400)) /* Base @ of Page 126, 1 Kbytes */
-#define ADDR_FLASH_PAGE_127    ((uint32_t)0x08000000+(CONF_PAGE*0x400)) /* Base @ of Page 127, 1 Kbytes */
+#define ADDR_FLASH_PAGE_126    ((uint32_t)0x08000000+(APP_PAGE*PAGE_SIZE))
+#define ADDR_FLASH_PAGE_127    ((uint32_t)0x08000000+(CONF_PAGE*PAGE_SIZE))
 
 extern mc_configuration mc_conf;
 extern app_configuration appconf;

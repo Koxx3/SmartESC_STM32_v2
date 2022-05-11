@@ -158,8 +158,6 @@ void conf_general_read_mc_configuration(mc_configuration *conf, bool is_motor_2)
 }
 
 bool conf_general_write_flash(uint8_t page, uint8_t * data, uint16_t size){
-	if(page > 127) return false;
-
 	uint32_t word;
 	uint8_t byte=0;
 	uint8_t * word_ptr = (uint8_t*)&word;
@@ -170,7 +168,7 @@ bool conf_general_write_flash(uint8_t page, uint8_t * data, uint16_t size){
 	uint32_t page_error = 0;
 	FLASH_EraseInitTypeDef s_eraseinit;
 	s_eraseinit.TypeErase   = FLASH_TYPEERASE_PAGES;
-	s_eraseinit.PageAddress = 0x08000000 + ((uint32_t)page*0x400);
+	s_eraseinit.PageAddress = 0x08000000 + ((uint32_t)page*PAGE_SIZE);
 	s_eraseinit.NbPages     = 1;
 	HAL_FLASHEx_Erase(&s_eraseinit, &page_error);
 
@@ -296,7 +294,7 @@ void conf_general_setup_f_sw(uint32_t f_sw){
 
 	uint32_t regulation_exec_rate = (f_sw > 20000) ? 2 : 1;
 
-	uint16_t pwm_p_cycles = (uint16_t)((ADV_TIM_CLK_MHz*(uint32_t)1000000u/((uint32_t)(f_sw)))&0xFFFE);
+	uint16_t pwm_p_cycles = (uint16_t)((MOT_TMR_MHZ*(uint32_t)1000000u/((uint32_t)(f_sw)))&0xFFFE);
 
 	PWM_Handle_M1._Super.hT_Sqrt3 	 = (pwm_p_cycles*SQRT3FACTOR)/16384u;
 	PWM_Handle_M1._Super.PWMperiod   = pwm_p_cycles;

@@ -51,7 +51,6 @@ void my_uart_send_data(unsigned char *buf, unsigned int len, port_str * port){
 		port->uart->Instance->CR1 &= ~USART_CR1_RE;
 		vTaskDelay(1);
 	}
-	//HAL_UART_Transmit(port->uart, buf, len, 500);
 	HAL_UART_Transmit_DMA(port->uart, buf, len);
 	while(port->uart->hdmatx->State != HAL_DMA_STATE_READY){
 		port->uart->gState = HAL_UART_STATE_READY;
@@ -86,6 +85,7 @@ static float decoded_level2 = 0.0;
 
 
 void vTimerCallback( TimerHandle_t xTimer ){
+	//uint32_t cycles = *DWT_CYCCNT;
 	if(SpeednTorqCtrlM1.SPD->open_loop==true) return;
 	uint32_t temp1 = adc1;
 	uint32_t temp2 = adc2;
@@ -230,6 +230,10 @@ void vTimerCallback( TimerHandle_t xTimer ){
 	default:
 		break;
 	}
+//	FOCVars[M1].cycles_last = *DWT_CYCCNT - cycles;
+//		if(FOCVars[M1].cycles_last > FOCVars[M1].cycles_max){
+//			FOCVars[M1].cycles_max = FOCVars[M1].cycles_last;
+//		}
 }
 
 float app_adc_get_decoded_level(void) {

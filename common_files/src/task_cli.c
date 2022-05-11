@@ -136,7 +136,7 @@ void task_cli(void * argument)
 void task_cli_init(port_str * port){
 #if VESC_TOOL_ENABLE
 	if(port->task_handle == NULL){
-		xTaskCreate(task_cli, "tskCLI", 256, (void*)port, PRIO_NORMAL, &port->task_handle);
+		xTaskCreate(task_cli, "tskCLI", 320, (void*)port, PRIO_NORMAL, &port->task_handle);
 	}
 #endif
 }
