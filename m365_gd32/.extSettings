@@ -1,0 +1,4 @@
+[Others]
+Define=ARM_MATH_CM3
+[ProjectFiles]
+HeaderPath=..\Drivers\CMSIS\DSP\Include\
