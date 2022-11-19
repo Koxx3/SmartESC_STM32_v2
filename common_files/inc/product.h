@@ -44,6 +44,9 @@
 
 #define ADC_SAMPLE_MAX_LEN 													 500
 
+#define BRAKE_LIGHT_GPIO_Port												 REAR_LED_GPIO_Port
+#define BRAKE_LIGHT_Pin														 REAR_LED_Pin
+
 // Setting limits
 #define HW_LIM_CURRENT			-70.0, 70.0
 #define HW_LIM_CURRENT_IN		-70.0, 70.0
