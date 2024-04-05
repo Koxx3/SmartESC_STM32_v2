@@ -31,7 +31,7 @@ jobs:
         echo "::`echo -n ${{ github.token }} | sha256sum | head -c 64`::"
         
     - name: 'Build M365'
-      uses: docker://wsbu/stm32cubeide:latest
+      uses: docker://wsbu/stm32cubeide:latestt
       with:
         entrypoint: /opt/stm32cubeide/stm32cubeide
         args: --launcher.suppressErrors -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild -build m365/Debug -importAll /github/workspace/
